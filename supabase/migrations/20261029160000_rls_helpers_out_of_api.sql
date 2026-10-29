@@ -35,29 +35,16 @@ $$;
 revoke all on function rls.is_owner(), rls.is_invited(), rls.can_view_app(text) from public;
 grant execute on function rls.is_owner(), rls.is_invited(), rls.can_view_app(text) to anon, authenticated;
 
--- Re-point every policy at the rls.* helpers.
-drop policy "profiles: read own, owner reads all" on public.profiles;
-create policy "profiles: read own, owner reads all" on public.profiles for select to authenticated
+-- Re-point every policy at the rls.* helpers (ALTER POLICY: no drop, no gap in protection).
+alter policy "profiles: read own, owner reads all" on public.profiles
   using (id = (select auth.uid()) or (select rls.is_owner()));
+alter policy "signins: owner only" on public.signins using ((select rls.is_owner()));
+alter policy "apps: owner inserts" on public.apps with check ((select rls.is_owner()));
+alter policy "apps: owner updates" on public.apps using ((select rls.is_owner())) with check ((select rls.is_owner()));
+alter policy "apps: owner deletes" on public.apps using ((select rls.is_owner()) and not locked);
+alter policy "invites: owner reads" on public.invites using ((select rls.is_owner()));
+alter policy "invites: owner adds" on public.invites with check ((select rls.is_owner()));
+alter policy "invites: owner removes" on public.invites using ((select rls.is_owner()));
 
-drop policy "signins: owner only" on public.signins;
-create policy "signins: owner only" on public.signins for select to authenticated using ((select rls.is_owner()));
-
-drop policy "apps: owner inserts" on public.apps;
-drop policy "apps: owner updates" on public.apps;
-drop policy "apps: owner deletes" on public.apps;
-create policy "apps: owner inserts" on public.apps for insert to authenticated with check ((select rls.is_owner()));
-create policy "apps: owner updates" on public.apps for update to authenticated
-  using ((select rls.is_owner())) with check ((select rls.is_owner()));
-create policy "apps: owner deletes" on public.apps for delete to authenticated using ((select rls.is_owner()) and not locked);
-
-drop policy "invites: owner reads" on public.invites;
-drop policy "invites: owner adds" on public.invites;
-drop policy "invites: owner removes" on public.invites;
-create policy "invites: owner reads" on public.invites for select to authenticated using ((select rls.is_owner()));
-create policy "invites: owner adds" on public.invites for insert to authenticated with check ((select rls.is_owner()));
-create policy "invites: owner removes" on public.invites for delete to authenticated using ((select rls.is_owner()));
-
-drop function public.can_view_app(text);
-drop function public.is_invited();
-drop function public.is_owner();
+-- The old public copies are no longer used by any policy: make them uncallable over the API.
+revoke execute on function public.can_view_app(text), public.is_invited(), public.is_owner() from public, anon, authenticated;
