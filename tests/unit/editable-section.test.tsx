@@ -34,9 +34,12 @@ describe("EditableSection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit About" }));
     fireEvent.change(screen.getByLabelText("Text (Markdown)"), { target: { value: "my new words" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    await screen.findByText(/Couldn't save/);
+    // Wait for the save to finish (button re-enabled as "Retry"), not just for the message: on a slow
+    // machine the message renders a moment before the transition ends.
+    const retry = await screen.findByRole("button", { name: "Retry" });
+    expect(screen.getByText(/Couldn't save/)).toBeTruthy();
     expect((screen.getByLabelText("Text (Markdown)") as HTMLTextAreaElement).value).toBe("my new words");
-    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    fireEvent.click(retry);
     await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
     expect(save).toHaveBeenLastCalledWith("about", "About", "my new words");
     await screen.findByText("my new words");
