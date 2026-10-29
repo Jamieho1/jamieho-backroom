@@ -5,7 +5,9 @@ Jamie Ho's personal website. It has three parts:
 - a Google-sign-in desktop of apps (Notes, practice arena, Behavioral);
 - a hub for later projects on subdomains.
 
-The plan is in `../PRD.md`, and the tickets are in Notion (TKT-51 to TKT-71).
+The plan is in `PRD.md`, working rules in `CLAUDE.md`, status in `MEMORY.md`, and the ticket order in `Resources/Tickets - Dependency Map.md`. Tickets live in Notion (TKT-51 to TKT-71).
+
+**This folder is the repo root.** Run every git command here, never in the parent `Personal Website` folder.
 
 **Stack:** Next.js (App Router) on Vercel, with Supabase (Postgres, Auth, row-level security).
 
