@@ -102,3 +102,8 @@ test("settings (and so the inbox) is hidden from visitors", async ({ page }) => 
   const res = await page.goto("/settings");
   expect(res?.status()).toBe(404);
 });
+
+test("reading the public pages sets no cookies (so no cookie banner is needed)", async ({ page, context }) => {
+  for (const path of ["/", "/projects", "/privacy"]) await page.goto(path);
+  expect(await context.cookies()).toEqual([]);
+});

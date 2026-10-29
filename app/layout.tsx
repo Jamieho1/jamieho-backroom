@@ -3,6 +3,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { ViewerProvider } from "@/components/viewer-provider";
 import { THEME_BOOT } from "@/components/theme-toggle";
+import { SiteAnalytics } from "@/components/site-analytics";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/privacy">Privacy</a>
           </footer>
         </ViewerProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );

@@ -196,3 +196,4 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .msg-body { white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0; }
 .msg-actions { display: flex; gap: 8px; }
 .contact-form textarea { font-family: var(--f-body); }
+.tbl-wrap { overflow-x: auto; }

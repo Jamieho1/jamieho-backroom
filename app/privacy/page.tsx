@@ -26,15 +26,17 @@ export default function Privacy() {
       <h2>What is collected</h2>
       <ul>
         <li>
-          <strong>Reading the public pages</strong> collects nothing that identifies you. The site sets no tracking or advertising cookies.
+          <strong>Reading the public pages</strong> collects nothing that identifies you. Vercel Web Analytics counts page views
+          (the page, the referring site, and your rough country, browser and device type) without cookies and without storing
+          your IP address. The site sets no tracking or advertising cookies.
         </li>
         <li>
           <strong>Signing in with Google</strong> (optional) shares your name, email address and profile picture from your Google
           account. Nothing else from your Google account is requested.
         </li>
         <li>
-          <strong>Sign-in records</strong>: the date and time of each sign-in, so the site owner can see who has visited the signed-in
-          area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
+          <strong>Sign-in records</strong>: the date and time of each sign-in, and which apps you open on each day, so the site owner
+          can see who has visited the signed-in area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
         </li>
         <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
@@ -57,7 +59,7 @@ export default function Privacy() {
       <h2>Who processes it</h2>
       <ul>
         <li>Supabase (database and sign-in), hosted in London, UK.</li>
-        <li>Vercel (website hosting).</li>
+        <li>Vercel (website hosting and cookieless page-view counts).</li>
         <li>Google (only when you choose &quot;Sign in with Google&quot;).</li>
         <li>Resend (sends Jamie an email when a contact message arrives).</li>
       </ul>

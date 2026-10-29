@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
 import { VISIBILITY_HINT, type AppRow } from "@/lib/apps";
+import { buildVisitors, type OpenRow, type ProfileRow, type SigninRow } from "@/lib/visitors";
 import { AddInviteForm, DeleteMessageForm, MessageReadForm, RemoveInviteForm, VisibilityForm } from "./forms";
 
 interface Message {
@@ -25,11 +26,24 @@ export default async function SettingsPage() {
   const sb = await supabaseServer();
   if (viewer.role !== "owner" || !sb) notFound();
 
-  const [{ data: apps, error: appsError }, { data: invites, error: invitesError }, { data: messages, error: messagesError }] = await Promise.all([
+  const [
+    { data: apps, error: appsError },
+    { data: invites, error: invitesError },
+    { data: messages, error: messagesError },
+    { data: profiles, error: profilesError },
+    { data: signins, error: signinsError },
+    { data: opens, error: opensError },
+  ] = await Promise.all([
     sb.from("apps").select("*").order("sort"),
     sb.from("invites").select("email, note, created_at").order("created_at", { ascending: false }),
     sb.from("messages").select("id, name, email, need, budget, read, created_at").order("created_at", { ascending: false }).limit(200),
+    sb.from("profiles").select("id, email, full_name, role, created_at"),
+    sb.from("signins").select("user_id, at").order("at", { ascending: false }).limit(5000),
+    sb.from("app_opens").select("user_id, app_id").limit(5000),
   ]);
+  const appNames = Object.fromEntries(((apps ?? []) as AppRow[]).map((a) => [a.id, a.name]));
+  const visitors = buildVisitors((profiles ?? []) as ProfileRow[], (signins ?? []) as SigninRow[], (opens ?? []) as OpenRow[], appNames);
+  const visitorsError = profilesError || signinsError || opensError;
   const inbox = (messages ?? []) as Message[];
   const unread = inbox.filter((m) => !m.read).length;
 
@@ -65,6 +79,47 @@ export default async function SettingsPage() {
           </ul>
         ) : messagesError ? null : (
           <p className="muted">No messages yet.</p>
+        )}
+      </section>
+
+      <section aria-labelledby="visitors-h" id="visitors">
+        <h2 id="visitors-h">Visitors</h2>
+        <p className="muted">
+          People who signed in with Google (you&apos;re left out). Page views are in Vercel → Analytics.
+        </p>
+        {visitorsError ? <p role="alert" className="alert">Can&apos;t reach the data right now.</p> : null}
+        {visitors.length ? (
+          <div className="tbl-wrap">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Who</th>
+                  <th scope="col">First visit</th>
+                  <th scope="col">Last visit</th>
+                  <th scope="col">Sign-ins</th>
+                  <th scope="col">Apps opened</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visitors.map((v) => (
+                  <tr key={v.id}>
+                    <td>
+                      <strong>{v.name}</strong>
+                      <div className="muted small">
+                        <a href={`mailto:${v.email}`}>{v.email}</a>
+                      </div>
+                    </td>
+                    <td>{WHEN.format(new Date(v.firstVisit))}</td>
+                    <td>{WHEN.format(new Date(v.lastVisit))}</td>
+                    <td>{v.signins}</td>
+                    <td>{v.apps.length ? v.apps.join(", ") : <span className="muted">None yet</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : visitorsError ? null : (
+          <p className="muted">No one else has signed in yet.</p>
         )}
       </section>
 
