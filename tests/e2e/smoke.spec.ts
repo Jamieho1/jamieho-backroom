@@ -70,3 +70,15 @@ test("dark/light toggle switches the theme and remembers it", async ({ page }) =
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   expect(bg).toBe(theme === "dark" ? "rgb(30, 31, 35)" : "rgb(255, 253, 247)");
 });
+
+test("projects show as windows on the landing page and /projects", async ({ page }) => {
+  await page.goto("/");
+  const section = page.getByRole("region", { name: "Projects" });
+  await expect(section.getByRole("article").first()).toBeVisible();
+  await page.getByRole("banner").getByRole("link", { name: "Projects" }).click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Projects" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Behavioral" })).toContainText("Invite-only");
+  const noSideScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  expect(noSideScroll).toBe(true);
+});

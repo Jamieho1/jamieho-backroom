@@ -8,6 +8,9 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <a href="/" className="brand">Jamie Ho</a>
+      <nav aria-label="Site" className="site-nav">
+        <a href="/projects">Projects</a>
+      </nav>
       <span className="spacer" />
       {viewer.status === "owner" ? (
         <button type="button" className={`btn ghost${editing ? " on" : ""}`} aria-pressed={editing} onClick={() => setEditing(!editing)}>

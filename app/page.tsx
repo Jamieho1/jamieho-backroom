@@ -1,6 +1,8 @@
 import { getSections } from "@/lib/sections";
 import { getPublicExperience } from "@/lib/experience";
 import { ExperienceSection } from "@/components/experience-section";
+import { getProjectApps } from "@/lib/projects";
+import { ProjectGrid } from "@/components/project-grid";
 import { Markdown } from "@/components/markdown";
 import { EditableSection } from "@/components/editable-section";
 import { AuthErrorNotice } from "@/components/auth-error-notice";
@@ -9,7 +11,7 @@ import { AuthErrorNotice } from "@/components/auth-error-notice";
 export const revalidate = 86400;
 
 export default async function Home() {
-  const [s, experience] = await Promise.all([getSections(), getPublicExperience()]);
+  const [s, experience, apps] = await Promise.all([getSections(), getPublicExperience(), getProjectApps()]);
   return (
     <main className="page landing">
       <AuthErrorNotice />
@@ -20,6 +22,13 @@ export default async function Home() {
         <Markdown text={s.about.body} />
       </EditableSection>
       <ExperienceSection items={experience} />
+      <section className="block wide" aria-labelledby="projects-h">
+        <h2 id="projects-h">Projects</h2>
+        <ProjectGrid apps={apps} />
+        <p>
+          <a href="/projects">All projects →</a>
+        </p>
+      </section>
       <EditableSection sectionKey="writing" title={s.writing.title} body={s.writing.body} className="block">
         <Markdown text={s.writing.body} />
       </EditableSection>
