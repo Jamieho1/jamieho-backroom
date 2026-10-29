@@ -21,6 +21,7 @@ describe("contact checks", () => {
     expect(validateContact({ ...ok, need: "x".repeat(4001) })).toMatch(/4000/);
     expect(validateContact({ ...ok, budget: "" })).toMatch(/budget/);
     expect(validateContact({ ...ok, budget: "a million" })).toMatch(/budget/);
+    expect(validateContact({ ...ok, budget: "Free consultation" })).toBeNull();
   });
   it("takes the first forwarded address and hashes it one way", () => {
     expect(clientIp("203.0.113.7, 10.0.0.1")).toBe("203.0.113.7");

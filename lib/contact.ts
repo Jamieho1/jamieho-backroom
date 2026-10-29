@@ -2,7 +2,7 @@
 import { createHmac } from "node:crypto";
 
 export const CONTACT_LIMITS = { name: 100, email: 200, need: 4000, budget: 60 } as const;
-export const BUDGETS = ["Under £1k", "£1k–£5k", "£5k–£15k", "£15k+", "Not sure yet"] as const;
+export const BUDGETS = ["Free consultation", "Under £1k", "£1k–£5k", "£5k–£15k", "£15k+", "Not sure yet"] as const;
 
 export interface ContactInput {
   name: string;
