@@ -3,6 +3,8 @@ import { getPublicExperience } from "@/lib/experience";
 import { ExperienceSection } from "@/components/experience-section";
 import { getProjectApps } from "@/lib/projects";
 import { ProjectGrid } from "@/components/project-grid";
+import { ContactForm } from "@/components/contact-form";
+import { sendMessage } from "@/app/actions/contact";
 import { Markdown } from "@/components/markdown";
 import { EditableSection } from "@/components/editable-section";
 import { AuthErrorNotice } from "@/components/auth-error-notice";
@@ -35,6 +37,9 @@ export default async function Home() {
       <EditableSection sectionKey="contact" title={s.contact.title} body={s.contact.body} className="block">
         <Markdown text={s.contact.body} />
       </EditableSection>
+      <section className="block" aria-label="Send a message">
+        <ContactForm action={sendMessage} />
+      </section>
     </main>
   );
 }

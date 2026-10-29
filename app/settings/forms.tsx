@@ -1,6 +1,6 @@
 "use client";
-import { useActionState } from "react";
-import { addInvite, removeInvite, setVisibility, type ActionResult } from "./actions";
+import { useActionState, useState } from "react";
+import { addInvite, deleteMessage, removeInvite, setMessageRead, setVisibility, type ActionResult } from "./actions";
 import { VISIBILITIES, VISIBILITY_HINT, VISIBILITY_LABEL, type AppRow } from "@/lib/apps";
 
 function Status({ state }: { state: ActionResult | null }) {
@@ -61,6 +61,35 @@ export function RemoveInviteForm({ email }: { email: string }) {
         Remove
       </button>
       <Status state={state} />
+    </form>
+  );
+}
+
+export function MessageReadForm({ id, read }: { id: string; read: boolean }) {
+  const [state, action, pending] = useActionState(setMessageRead, null);
+  return (
+    <form action={action} className="row-form">
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="read" value={String(!read)} />
+      <button type="submit" className="btn ghost small" disabled={pending}>
+        {read ? "Mark unread" : "Mark read"}
+      </button>
+      {state && !state.ok ? <Status state={state} /> : null}
+    </form>
+  );
+}
+
+/** Delete asks twice: the first click arms it. */
+export function DeleteMessageForm({ id, from }: { id: string; from: string }) {
+  const [state, action, pending] = useActionState(deleteMessage, null);
+  const [armed, setArmed] = useState(false);
+  return (
+    <form action={action} className="row-form" onSubmit={(e) => (armed ? undefined : (e.preventDefault(), setArmed(true)))}>
+      <input type="hidden" name="id" value={id} />
+      <button type="submit" className="btn ghost small" disabled={pending} aria-label={armed ? `Confirm delete message from ${from}` : `Delete message from ${from}`}>
+        {armed ? "Click again to delete" : "Delete"}
+      </button>
+      {state && !state.ok ? <Status state={state} /> : null}
     </form>
   );
 }

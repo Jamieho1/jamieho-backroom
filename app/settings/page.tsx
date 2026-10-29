@@ -3,7 +3,18 @@ import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
 import { VISIBILITY_HINT, type AppRow } from "@/lib/apps";
-import { AddInviteForm, RemoveInviteForm, VisibilityForm } from "./forms";
+import { AddInviteForm, DeleteMessageForm, MessageReadForm, RemoveInviteForm, VisibilityForm } from "./forms";
+
+interface Message {
+  id: string;
+  name: string;
+  email: string;
+  need: string;
+  budget: string;
+  read: boolean;
+  created_at: string;
+}
+const WHEN = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/London" });
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Settings · Jamie Ho", robots: { index: false } };
@@ -14,14 +25,48 @@ export default async function SettingsPage() {
   const sb = await supabaseServer();
   if (viewer.role !== "owner" || !sb) notFound();
 
-  const [{ data: apps, error: appsError }, { data: invites, error: invitesError }] = await Promise.all([
+  const [{ data: apps, error: appsError }, { data: invites, error: invitesError }, { data: messages, error: messagesError }] = await Promise.all([
     sb.from("apps").select("*").order("sort"),
     sb.from("invites").select("email, note, created_at").order("created_at", { ascending: false }),
+    sb.from("messages").select("id, name, email, need, budget, read, created_at").order("created_at", { ascending: false }).limit(200),
   ]);
+  const inbox = (messages ?? []) as Message[];
+  const unread = inbox.filter((m) => !m.read).length;
 
   return (
     <main className="page settings">
       <h1>Settings</h1>
+
+      <section aria-labelledby="inbox-h" id="inbox">
+        <h2 id="inbox-h">
+          Inbox {unread ? <span className="badge">{unread} new</span> : null}
+        </h2>
+        <p className="muted">Messages from the contact form. Reply from your own email.</p>
+        {messagesError ? <p role="alert" className="alert">Can&apos;t reach the data right now.</p> : null}
+        {inbox.length ? (
+          <ul className="inbox">
+            {inbox.map((m) => (
+              <li key={m.id} className={m.read ? "msg" : "msg unread"}>
+                <div className="msg-head">
+                  <strong>{m.name}</strong>
+                  <a href={`mailto:${m.email}?subject=${encodeURIComponent("Re: your message")}`}>{m.email}</a>
+                  {m.budget ? <span className="badge">{m.budget}</span> : null}
+                  <time className="muted small" dateTime={m.created_at}>
+                    {WHEN.format(new Date(m.created_at))}
+                  </time>
+                </div>
+                <p className="msg-body">{m.need}</p>
+                <div className="msg-actions">
+                  <MessageReadForm id={m.id} read={m.read} />
+                  <DeleteMessageForm id={m.id} from={m.name} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : messagesError ? null : (
+          <p className="muted">No messages yet.</p>
+        )}
+      </section>
 
       <section aria-labelledby="apps-h">
         <h2 id="apps-h">Apps</h2>

@@ -49,3 +49,22 @@ export async function removeInvite(_: ActionResult | null, form: FormData): Prom
   revalidatePath("/settings");
   return { ok: true, message: `Removed ${email}.` };
 }
+
+export async function setMessageRead(_: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const sb = await ownerClient();
+  if (!sb) return { ok: false, message: "Only the owner can change this." };
+  const read = form.get("read") === "true";
+  const { data, error } = await sb.from("messages").update({ read }).eq("id", String(form.get("id") ?? "")).select("id");
+  if (error || !data?.length) return { ok: false, message: "Couldn't update. Try again." };
+  revalidatePath("/settings");
+  return { ok: true, message: read ? "Marked read." : "Marked unread." };
+}
+
+export async function deleteMessage(_: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const sb = await ownerClient();
+  if (!sb) return { ok: false, message: "Only the owner can change this." };
+  const { data, error } = await sb.from("messages").delete().eq("id", String(form.get("id") ?? "")).select("id");
+  if (error || !data?.length) return { ok: false, message: "Couldn't delete. Try again." };
+  revalidatePath("/settings");
+  return { ok: true, message: "Deleted." };
+}

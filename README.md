@@ -44,6 +44,19 @@ npm run test:e2e               # Playwright, desktop + 390 px phone
 
 The owner is whoever signs in with the email stored in `private.settings` (seeded with SQL, not in git).
 
+## Contact form email alert (Jamie, TKT-57)
+
+Messages are always saved to the Inbox (Settings). The email alert is optional:
+
+1. Sign up at resend.com with the email you want alerts sent to. Until you verify a domain (TKT-71), Resend only
+   delivers from `onboarding@resend.dev` to your own account email, which is all the alert needs.
+2. Resend → API Keys → Create, permission **Sending access**. Copy it.
+3. Vercel → Settings → Environment Variables, Production + Preview:
+   - `RESEND_API_KEY` = the key, **Sensitive**
+   - `CONTACT_ALERT_TO` = your Resend account email
+   - `IP_HASH_SALT` = a long random string you make yourself (e.g. `openssl rand -hex 32`), **Sensitive**
+4. Redeploy. Send yourself a test message from the home page.
+
 ## Database
 - Migrations live in `supabase/migrations`.
 - `npm test` runs the row-level security (RLS) tests on an in-process Postgres (PGlite) with Supabase's roles, so they need no secrets.

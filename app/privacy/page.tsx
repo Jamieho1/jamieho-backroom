@@ -37,6 +37,11 @@ export default function Privacy() {
           area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
         </li>
         <li>
+          <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
+          read and answer it. To stop spam, a one-way coded version of your IP address (not the address itself) is stored with the
+          message and wiped after one hour. Each message is also forwarded to Jamie by email.
+        </li>
+        <li>
           <strong>Hosting logs</strong>: the hosting providers keep standard technical logs (such as IP address and browser type) for
           security and reliability.
         </li>
@@ -44,7 +49,8 @@ export default function Privacy() {
 
       <h2>Why it is used</h2>
       <p>
-        Only to let you sign in, to decide which parts of the site you can open, and to let the site owner see who has signed in.
+        Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
+        read and reply to messages you send.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -53,10 +59,14 @@ export default function Privacy() {
         <li>Supabase (database and sign-in), hosted in London, UK.</li>
         <li>Vercel (website hosting).</li>
         <li>Google (only when you choose &quot;Sign in with Google&quot;).</li>
+        <li>Resend (sends Jamie an email when a contact message arrives).</li>
       </ul>
 
       <h2>How long it is kept</h2>
-      <p>Your profile and sign-in records are kept until you ask for them to be deleted, or until the site no longer needs them.</p>
+      <p>
+        Your profile, sign-in records and messages are kept until you ask for them to be deleted, or until the site no longer
+        needs them. The coded IP address on a message is wiped after one hour.
+      </p>
 
       <h2>Your rights</h2>
       <p>

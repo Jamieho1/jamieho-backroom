@@ -82,3 +82,21 @@ test("projects show as windows on the landing page and /projects", async ({ page
   const noSideScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(noSideScroll).toBe(true);
 });
+
+test("the contact form checks fields and quietly drops bot submissions", async ({ page }) => {
+  await page.goto("/");
+  const form = page.getByRole("region", { name: "Send a message" });
+  await form.getByRole("button", { name: "Send" }).click();
+  await expect(form.getByRole("alert")).toHaveText("Please add your name.");
+  await form.getByLabel("Name").fill("Bot");
+  await form.getByLabel("Email").fill("bot@example.com");
+  await form.getByLabel("What do you need?").fill("Spam");
+  await page.locator('input[name="website"]').fill("http://spam.example", { force: true });
+  await form.getByRole("button", { name: "Try again" }).click();
+  await expect(form.getByRole("status")).toContainText("Thanks");
+});
+
+test("settings (and so the inbox) is hidden from visitors", async ({ page }) => {
+  const res = await page.goto("/settings");
+  expect(res?.status()).toBe(404);
+});
