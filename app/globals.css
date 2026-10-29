@@ -1,0 +1,86 @@
+/* Design tokens carried over from the Interview Prep artifact (DESIGN_SYSTEM v0.6, PostHog-style). */
+:root {
+  --bg: rgb(255 253 247);
+  --bg-accent: rgb(241 235 221);
+  --desktop: rgb(247 242 231);
+  --input: rgb(246 241 230);
+  --border: rgb(214 203 180);
+  --border-light: rgb(231 222 203);
+  --ink: rgb(24 22 18);
+  --heading: rgb(28 24 18);
+  --secondary: rgb(104 96 82);
+  --muted: rgb(163 153 134);
+  --cta-face: rgb(235 157 42);
+  --cta-base: rgb(205 132 7);
+  --cta-edge: rgb(177 120 22);
+  --cta-ink: rgb(17 17 17);
+  --red: rgb(245 78 0);
+  --danger-face: rgb(180 35 24);
+  --danger-base: rgb(122 23 16);
+  --yellow-text: rgb(154 103 0);
+  --blue: rgb(29 74 255);
+  --green: rgb(48 119 66);
+  --shadow: rgb(77 79 70 / 0.18);
+  --f-head: "Nunito", ui-rounded, system-ui, sans-serif;
+  --f-body: "Nunito Sans", ui-rounded, system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: rgb(30 31 35);
+    --bg-accent: rgb(45 46 55);
+    --desktop: rgb(22 23 26);
+    --input: rgb(37 38 43);
+    --border: rgb(62 66 79);
+    --border-light: rgb(50 52 63);
+    --ink: rgb(250 250 250);
+    --heading: rgb(250 250 250);
+    --secondary: rgb(174 179 194);
+    --muted: rgb(98 102 116);
+    --cta-base: rgb(178 112 6);
+    --cta-edge: rgb(140 92 12);
+    --red: rgb(255 112 51);
+    --yellow-text: rgb(250 190 60);
+    --blue: rgb(110 140 255);
+    --green: rgb(110 200 130);
+    --shadow: rgb(0 0 0 / 0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: rgb(30 31 35);
+  --bg-accent: rgb(45 46 55);
+  --desktop: rgb(22 23 26);
+  --input: rgb(37 38 43);
+  --border: rgb(62 66 79);
+  --border-light: rgb(50 52 63);
+  --ink: rgb(250 250 250);
+  --heading: rgb(250 250 250);
+  --secondary: rgb(174 179 194);
+  --muted: rgb(98 102 116);
+  --cta-base: rgb(178 112 6);
+  --cta-edge: rgb(140 92 12);
+  --red: rgb(255 112 51);
+  --yellow-text: rgb(250 190 60);
+  --blue: rgb(110 140 255);
+  --green: rgb(110 200 130);
+  --shadow: rgb(0 0 0 / 0.4);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--f-head); color: var(--heading); line-height: 1.15; margin: 0 0 0.5em; }
+a { color: var(--blue); }
+code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); border: 1px solid var(--border-light); border-radius: 4px; padding: 0 4px; }
+
+.page { max-width: 72rem; margin: 0 auto; padding: 72px 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); letter-spacing: -0.02em; }
+.hero p { color: var(--secondary); font-size: 1.15rem; max-width: 40rem; }
+.tag { display: inline-block; font: 700 12px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--yellow-text); background: var(--bg-accent); border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px; margin-bottom: 18px; }
+.window { margin-top: 40px; max-width: 34rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 30px -12px var(--shadow); overflow: hidden; }
+.window-bar { display: flex; gap: 6px; align-items: center; padding: 10px 12px; background: var(--bg-accent); border-bottom: 1px solid var(--border-light); }
+.window-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.window-bar span { margin-left: 8px; font: 600 13px/1 var(--f-body); color: var(--secondary); }
+.window-body { padding: 16px; color: var(--secondary); }
