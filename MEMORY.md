@@ -38,3 +38,9 @@
   - Fix: migration owner_role_on_confirm, which recomputes the role on email/confirmation updates and fixed existing rows. Applied to Supabase.
   - The PGlite tests now copy the insert-then-confirm order.
 - Vercel env naming: `NEXT_PUBLIC_*` variables are type Config, not Sensitive (Vercel forbids it). Real secrets (Resend key etc.) are unprefixed and Sensitive.
+- 2026-10-29: blocked API access to Supabase's `public.rls_auto_enable()` (migration lock_rls_auto_enable, applied).
+- 2026-10-29: TKT-53 built:
+  - `apps` + `invites` tables with RLS, 4 seeded apps (Settings locked to owner-only).
+  - `/settings` (owner-only, 404 for others): change app visibility, manage invites.
+  - New data tables guard reads with `rls.can_view_app('<app>')`.
+  - Migration `rls_helpers_out_of_api` (moves the helpers out of `public`) is written and tested. It is NOT yet applied: Jamie's approval timed out.

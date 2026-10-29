@@ -44,3 +44,9 @@ test("the Google site-verification tag appears only when configured", async ({ p
   const tag = page.locator('meta[name="google-site-verification"]');
   await expect(tag).toHaveCount(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? 1 : 0);
 });
+
+test("Settings is a plain 404 for anyone who isn't the owner", async ({ page }) => {
+  const res = await page.goto("/settings");
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "Settings" })).toHaveCount(0);
+});

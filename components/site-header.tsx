@@ -14,7 +14,12 @@ export async function SiteHeader() {
       ) : (
         <div className="who" aria-label="Signed in">
           <span>{viewer.name}</span>
-          {viewer.role === "owner" ? <span className="badge">Owner</span> : null}
+          {viewer.role === "owner" ? (
+            <>
+              <span className="badge">Owner</span>
+              <a href="/settings">Settings</a>
+            </>
+          ) : null}
           <form action="/auth/signout" method="post">
             <button type="submit" className="btn ghost">Sign out</button>
           </form>
