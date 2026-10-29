@@ -1,4 +1,6 @@
 import { getSections } from "@/lib/sections";
+import { getPublicExperience } from "@/lib/experience";
+import { ExperienceSection } from "@/components/experience-section";
 import { Markdown } from "@/components/markdown";
 import { EditableSection } from "@/components/editable-section";
 import { AuthErrorNotice } from "@/components/auth-error-notice";
@@ -7,7 +9,7 @@ import { AuthErrorNotice } from "@/components/auth-error-notice";
 export const revalidate = 86400;
 
 export default async function Home() {
-  const s = await getSections();
+  const [s, experience] = await Promise.all([getSections(), getPublicExperience()]);
   return (
     <main className="page landing">
       <AuthErrorNotice />
@@ -17,6 +19,7 @@ export default async function Home() {
       <EditableSection sectionKey="about" title={s.about.title} body={s.about.body} className="block">
         <Markdown text={s.about.body} />
       </EditableSection>
+      <ExperienceSection items={experience} />
       <EditableSection sectionKey="writing" title={s.writing.title} body={s.writing.body} className="block">
         <Markdown text={s.writing.body} />
       </EditableSection>

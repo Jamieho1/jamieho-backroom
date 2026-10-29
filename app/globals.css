@@ -136,3 +136,26 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .edit-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .preview { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); }
 @media (max-width: 520px) { .who > span:first-child { display: none; } .site-header { gap: 8px; } }
+
+/* TKT-55 experience */
+.xp { list-style: none; padding: 0; margin: 0; display: grid; gap: 28px; }
+.xp-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; }
+.xp-head h3 { margin: 0; font-size: 1.1rem; }
+.xp-org { color: var(--secondary); font-weight: 600; }
+.xp-summary { color: var(--secondary); margin: 6px 0; }
+.xp-item ul { margin: 8px 0 0; padding-left: 1.2em; }
+.xp-item li { margin: 4px 0; }
+.xp-edit { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin: 12px 0; }
+.xp-edit-top { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.xp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0 12px; }
+.field select { font: inherit; color: var(--ink); background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--secondary); }
+.xp-bullets { border: 1px solid var(--border-light); border-radius: 8px; padding: 10px; margin: 10px 0; display: grid; gap: 8px; }
+.xp-bullets legend { font-size: 13px; color: var(--secondary); padding: 0 4px; }
+.xp-bullet { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 6px; align-items: center; }
+.xp-bullet textarea { font: 14px/1.5 var(--f-body); color: var(--ink); background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; width: 100%; }
+@media (max-width: 520px) { .xp-bullet { grid-template-columns: 1fr 1fr 1fr 1fr; } .xp-bullet textarea { grid-column: 1 / -1; } .xp-bullet .check { grid-column: 1 / 2; } }
+.pill { font: 700 11px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); margin-right: auto; }
+.pill.on { color: var(--green); border-color: var(--green); }
+.btn.danger { color: var(--danger-face); }
+.field input, .field select, .xp-edit .field textarea { font-family: var(--f-body); }

@@ -52,3 +52,9 @@
   - When Supabase is down, `getSections()` throws, so Next keeps the last good page.
   - The proxy skips the Supabase call when there is no session cookie.
   - Light/dark toggle persists in localStorage, with a boot script to avoid a flash of the wrong theme.
+- 2026-10-29: TKT-54 done. Fixed a flaky CI test (wait for the Retry button, not just the message).
+- 2026-10-29: TKT-55 built:
+  - `experience_items` + `experience_bullets` with a public flag on each; new rows default to hidden. Applied.
+  - Reads: public rows for everyone; the whole CV for whoever can open Behavioral (`rls.can_view_app('behavioral')`). Writes: owner only.
+  - Landing shows the public Experience list; in Edit site mode the owner gets an editor (add, edit, reorder, delete, tick public).
+  - Perf advisor: the owner `for all` policy overlaps the select policy. Harmless at this size; split it into insert/update/delete policies next time these tables change.
