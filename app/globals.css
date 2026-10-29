@@ -197,3 +197,7 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .msg-actions { display: flex; gap: 8px; }
 .contact-form textarea { font-family: var(--f-body); }
 .tbl-wrap { overflow-x: auto; }
+
+/* TKT-59 ops banner */
+.ops-banner { border: 1px solid var(--border); border-left: 4px solid #c2410c; background: var(--bg-accent); border-radius: 8px; padding: 12px 14px; margin: 8px 0 20px; }
+.ops-banner ul { margin: 6px 0 0; padding-left: 18px; }

@@ -57,6 +57,24 @@ Messages are always saved to the Inbox (Settings). The email alert is optional:
    - `IP_HASH_SALT` = a long random string you make yourself (e.g. `openssl rand -hex 32`), **Sensitive**
 4. Redeploy. Send yourself a test message from the home page.
 
+## Ops: daily ping, weekly encrypted export (Jamie, TKT-59)
+
+The **Ops** GitHub workflow pings the database every day (a free Supabase project pauses after 7 quiet days) and
+exports every table each Sunday. Results show in Settings → Ops; problems show as a banner at the top of Settings.
+
+1. Supabase → Project Settings → API Keys: copy the **service_role** (or a new **secret**) key. Keep it out of Vercel.
+2. GitHub → repo → Settings → Secrets and variables → Actions → **New repository secret**, three times:
+   - `SUPABASE_URL` = your project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` = that key
+   - `EXPORT_PASSPHRASE` = a long passphrase you make up (16+ characters). Save it in your password manager:
+     without it the exports can't be opened.
+3. GitHub → Actions → **Ops** → Run workflow → `ping`, then again with `export`. Settings → Ops should show both.
+4. To open an export: download it from the run's page (Artifacts), unzip, then
+   `npm run decrypt-export -- ~/Downloads/backroom-export-YYYY-MM-DD.json.enc` and type the passphrase.
+
+GitHub pauses scheduled workflows after 60 days with no commits; Settings warns when the ping goes stale.
+To see the banner on purpose, set `FREE_TIER_WARN_AT=0.0001` in Vercel, redeploy, then remove it.
+
 ## Database
 - Migrations live in `supabase/migrations`.
 - `npm test` runs the row-level security (RLS) tests on an in-process Postgres (PGlite) with Supabase's roles, so they need no secrets.

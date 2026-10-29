@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
 import { VISIBILITY_HINT, type AppRow } from "@/lib/apps";
+import { FREE_LIMITS, formatMB, opsWarnings, usageOf, type OpsRow } from "@/lib/ops";
 import { buildVisitors, type OpenRow, type ProfileRow, type SigninRow } from "@/lib/visitors";
 import { AddInviteForm, DeleteMessageForm, MessageReadForm, RemoveInviteForm, VisibilityForm } from "./forms";
 
@@ -33,6 +34,7 @@ export default async function SettingsPage() {
     { data: profiles, error: profilesError },
     { data: signins, error: signinsError },
     { data: opens, error: opensError },
+    { data: ops },
   ] = await Promise.all([
     sb.from("apps").select("*").order("sort"),
     sb.from("invites").select("email, note, created_at").order("created_at", { ascending: false }),
@@ -40,7 +42,11 @@ export default async function SettingsPage() {
     sb.from("profiles").select("id, email, full_name, role, created_at"),
     sb.from("signins").select("user_id, at").order("at", { ascending: false }).limit(5000),
     sb.from("app_opens").select("user_id, app_id").limit(5000),
+    sb.from("ops_status").select("job, ran_at, ok, detail"),
   ]);
+  const opsRows = (ops ?? []) as OpsRow[];
+  const warnings = opsWarnings(opsRows);
+  const usage = usageOf(opsRows.find((r) => r.job === "ping"));
   const appNames = Object.fromEntries(((apps ?? []) as AppRow[]).map((a) => [a.id, a.name]));
   const visitors = buildVisitors((profiles ?? []) as ProfileRow[], (signins ?? []) as SigninRow[], (opens ?? []) as OpenRow[], appNames);
   const visitorsError = profilesError || signinsError || opensError;
@@ -50,6 +56,16 @@ export default async function SettingsPage() {
   return (
     <main className="page settings">
       <h1>Settings</h1>
+      {warnings.length ? (
+        <div role="alert" className="ops-banner">
+          <strong>Needs a look</strong>
+          <ul>
+            {warnings.map((w) => (
+              <li key={w}>{w}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <section aria-labelledby="inbox-h" id="inbox">
         <h2 id="inbox-h">
@@ -121,6 +137,33 @@ export default async function SettingsPage() {
         ) : visitorsError ? null : (
           <p className="muted">No one else has signed in yet.</p>
         )}
+      </section>
+
+      <section aria-labelledby="ops-h" id="ops">
+        <h2 id="ops-h">Ops</h2>
+        <p className="muted">Run by the Ops workflow in GitHub → Actions. Exports download from that run&apos;s page (encrypted).</p>
+        <table className="tbl">
+          <tbody>
+            {(["ping", "export"] as const).map((job) => {
+              const r = opsRows.find((x) => x.job === job);
+              return (
+                <tr key={job}>
+                  <th scope="row">{job === "ping" ? "Daily keep-alive ping" : "Weekly export"}</th>
+                  <td>{r ? `${r.ok ? "OK" : "Failed"} · ${WHEN.format(new Date(r.ran_at))}` : <span className="muted">Not run yet</span>}</td>
+                </tr>
+              );
+            })}
+            {usage ? (
+              <tr>
+                <th scope="row">Database size</th>
+                <td>
+                  {formatMB(usage.db_bytes)} of {formatMB(FREE_LIMITS.db_bytes)} · emails today {usage.messages_today}/{FREE_LIMITS.emails_day}, this month{" "}
+                  {usage.messages_month}/{FREE_LIMITS.emails_month}
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
       </section>
 
       <section aria-labelledby="apps-h">

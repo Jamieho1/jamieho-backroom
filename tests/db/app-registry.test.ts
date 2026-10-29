@@ -111,3 +111,28 @@ describe("nothing but record_signin is callable through the API", () => {
     expect(r.rows.map((x) => x.proname)).toEqual(["record_signin"]);
   });
 });
+
+describe("ops (TKT-59)", () => {
+  it("ops_usage is callable by the service role only", async () => {
+    const r = await db.query<{ a: boolean; u: boolean; s: boolean }>(`select has_function_privilege('anon', 'public.ops_usage()', 'execute') a,
+      has_function_privilege('authenticated', 'public.ops_usage()', 'execute') u, has_function_privilege('service_role', 'public.ops_usage()', 'execute') s`);
+    expect(r.rows[0]).toEqual({ a: false, u: false, s: true });
+  });
+  it("ops_usage reports size and message counts", async () => {
+    await db.exec("begin; set local role service_role;");
+    try {
+      const r = await db.query<{ u: Record<string, number> }>("select public.ops_usage() u");
+      expect(Object.keys(r.rows[0].u).sort()).toEqual(["db_bytes", "messages", "messages_month", "messages_today", "users"]);
+    } finally {
+      await db.exec("rollback");
+    }
+  });
+  it("ops_status: only the owner reads it; nobody but the service role writes it", async () => {
+    await db.query("insert into public.ops_status (job, ok) values ('ping', true)");
+    expect(await as(db, anon, (q) => q("select 1 from public.ops_status").catch(() => "denied"))).toBe("denied");
+    expect(await as(db, member, (q) => q("select job from public.ops_status"))).toEqual([]);
+    expect(await as(db, owner, (q) => q("select job from public.ops_status"))).toEqual([{ job: "ping" }]);
+    await expect(as(db, owner, (q) => q("insert into public.ops_status (job, ok) values ('export', true)"))).rejects.toThrow(/permission denied/);
+    await db.query("delete from public.ops_status");
+  });
+});

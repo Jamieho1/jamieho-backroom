@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs"
+    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs",
+    "decrypt-export": "node scripts/decrypt-export.mjs"
   },
   "engines": {
     "node": ">=20.9"

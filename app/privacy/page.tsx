@@ -62,12 +62,14 @@ export default function Privacy() {
         <li>Vercel (website hosting and cookieless page-view counts).</li>
         <li>Google (only when you choose &quot;Sign in with Google&quot;).</li>
         <li>Resend (sends Jamie an email when a contact message arrives).</li>
+        <li>GitHub (runs the daily health check and stores the encrypted weekly backup).</li>
       </ul>
 
       <h2>How long it is kept</h2>
       <p>
         Your profile, sign-in records and messages are kept until you ask for them to be deleted, or until the site no longer
-        needs them. The coded IP address on a message is wiped after one hour.
+        needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
+        kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>
 
       <h2>Your rights</h2>
