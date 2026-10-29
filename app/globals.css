@@ -115,3 +115,24 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .row-form input[name="note"] { flex: 2 1 14rem; }
 .ok { color: var(--green); font-size: 14px; }
 .err { color: var(--danger-face); font-size: 14px; }
+
+/* TKT-54 landing */
+.landing .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); letter-spacing: -0.02em; }
+.landing .hero .md p { color: var(--secondary); font-size: 1.15rem; max-width: 40rem; }
+.landing .block { margin-top: 56px; max-width: 46rem; }
+.landing section { position: relative; }
+.md p { margin: 0 0 0.8em; }
+.md ul, .md ol { padding-left: 1.3em; }
+.md em { color: var(--secondary); }
+.edit-btn { margin-top: 8px; }
+.btn.small { font-size: 13px; padding: 6px 10px; }
+.btn.icon { width: 36px; padding: 8px 0; text-align: center; }
+.btn.on { border-color: var(--cta-edge); color: var(--yellow-text); }
+.theme-slot { display: inline-block; width: 36px; }
+.who-slot { display: inline-block; width: 160px; }
+.editing { background: var(--bg-accent); border: 1px dashed var(--border); border-radius: 10px; padding: 14px; }
+.field { display: grid; gap: 4px; margin-bottom: 10px; font-size: 13px; color: var(--secondary); }
+.field input, .field textarea { font: 15px/1.5 var(--f-mono); color: var(--ink); background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; width: 100%; }
+.edit-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.preview { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); }
+@media (max-width: 520px) { .who > span:first-child { display: none; } .site-header { gap: 8px; } }

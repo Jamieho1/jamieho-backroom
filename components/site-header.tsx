@@ -1,20 +1,26 @@
-import { getViewer } from "@/lib/viewer";
-import { readSupabaseEnv } from "@/lib/env";
+"use client";
+import { useViewer } from "./viewer-provider";
 import { SignInButton } from "./sign-in-button";
+import { ThemeToggle } from "./theme-toggle";
 
-export async function SiteHeader() {
-  const env = readSupabaseEnv();
-  const viewer = await getViewer();
+export function SiteHeader() {
+  const { viewer, configured, editing, setEditing } = useViewer();
   return (
     <header className="site-header">
       <a href="/" className="brand">Jamie Ho</a>
       <span className="spacer" />
-      {viewer.role === "anonymous" ? (
-        env ? <SignInButton url={env.url} anonKey={env.anonKey} /> : null
-      ) : (
+      {viewer.status === "owner" ? (
+        <button type="button" className={`btn ghost${editing ? " on" : ""}`} aria-pressed={editing} onClick={() => setEditing(!editing)}>
+          {editing ? "Done editing" : "Edit site"}
+        </button>
+      ) : null}
+      <ThemeToggle />
+      {viewer.status === "loading" ? <span className="who-slot" aria-hidden="true" /> : null}
+      {viewer.status === "anonymous" && configured ? <SignInButton /> : null}
+      {viewer.status === "member" || viewer.status === "owner" ? (
         <div className="who" aria-label="Signed in">
           <span>{viewer.name}</span>
-          {viewer.role === "owner" ? (
+          {viewer.status === "owner" ? (
             <>
               <span className="badge">Owner</span>
               <a href="/settings">Settings</a>
@@ -24,7 +30,7 @@ export async function SiteHeader() {
             <button type="submit" className="btn ghost">Sign out</button>
           </form>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }

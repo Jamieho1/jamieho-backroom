@@ -1,23 +1,28 @@
-/** Placeholder landing (TKT-51). The real sections come from the database in TKT-54; no CV text lives in code. */
-export default async function Home({ searchParams }: { searchParams: Promise<{ auth?: string }> }) {
-  const { auth } = await searchParams;
+import { getSections } from "@/lib/sections";
+import { Markdown } from "@/components/markdown";
+import { EditableSection } from "@/components/editable-section";
+import { AuthErrorNotice } from "@/components/auth-error-notice";
+
+/** Pre-rendered; re-rendered when the owner saves a section (revalidatePath), or at least daily. */
+export const revalidate = 86400;
+
+export default async function Home() {
+  const s = await getSections();
   return (
-    <main className="page hero">
-      {auth === "error" ? <p role="alert" className="alert">Sign-in didn&apos;t complete. Please try again.</p> : null}
-      <span className="tag">Under construction</span>
-      <h1>Jamie Ho</h1>
-      <p>Software engineer in London. This site is being built in public: a portfolio, a desktop of apps, and a home for side projects.</p>
-      <div className="window" aria-label="Status">
-        <div className="window-bar">
-          <i />
-          <i />
-          <i />
-          <span>status</span>
-        </div>
-        <div className="window-body">
-          Skeleton is live. Health check: <a href="/api/health"><code>/api/health</code></a>
-        </div>
-      </div>
+    <main className="page landing">
+      <AuthErrorNotice />
+      <EditableSection sectionKey="hero" title={s.hero.title} body={s.hero.body} heading="h1" className="hero">
+        <Markdown text={s.hero.body} />
+      </EditableSection>
+      <EditableSection sectionKey="about" title={s.about.title} body={s.about.body} className="block">
+        <Markdown text={s.about.body} />
+      </EditableSection>
+      <EditableSection sectionKey="writing" title={s.writing.title} body={s.writing.body} className="block">
+        <Markdown text={s.writing.body} />
+      </EditableSection>
+      <EditableSection sectionKey="contact" title={s.contact.title} body={s.contact.body} className="block">
+        <Markdown text={s.contact.body} />
+      </EditableSection>
     </main>
   );
 }

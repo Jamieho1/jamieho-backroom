@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { ViewerProvider } from "@/components/viewer-provider";
+import { THEME_BOOT } from "@/components/theme-toggle";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
@@ -13,13 +15,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>
-        <SiteHeader />
-        {children}
-        <footer className="site-footer">
-          <a href="/privacy">Privacy</a>
-        </footer>
+        <ViewerProvider>
+          <SiteHeader />
+          {children}
+          <footer className="site-footer">
+            <a href="/privacy">Privacy</a>
+          </footer>
+        </ViewerProvider>
       </body>
     </html>
   );

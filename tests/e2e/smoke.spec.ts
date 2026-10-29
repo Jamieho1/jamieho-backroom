@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("the placeholder landing page loads with no login", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Jamie Ho" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Jamie Ho" })).toBeVisible();
   const noSideScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(noSideScroll).toBe(true);
 });
@@ -49,4 +49,24 @@ test("Settings is a plain 404 for anyone who isn't the owner", async ({ page }) 
   const res = await page.goto("/settings");
   expect(res?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Settings" })).toHaveCount(0);
+});
+
+test("the landing page shows its sections", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: "Jamie Ho" })).toBeVisible();
+  for (const h of ["About", "Writing & videos", "Contact"]) await expect(page.getByRole("heading", { level: 2, name: h })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Edit site" })).toHaveCount(0); // only the owner gets this
+});
+
+test("dark/light toggle switches the theme and remembers it", async ({ page }) => {
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: /Switch to (dark|light) mode/ });
+  const before = await toggle.getAttribute("aria-label");
+  await toggle.click();
+  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+  expect(before).toContain(theme!);
+  await page.reload();
+  expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(theme);
+  const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(bg).toBe(theme === "dark" ? "rgb(30, 31, 35)" : "rgb(255, 253, 247)");
 });

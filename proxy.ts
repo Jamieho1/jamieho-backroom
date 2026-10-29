@@ -6,7 +6,8 @@ import { readSupabaseEnv } from "@/lib/env";
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   const env = readSupabaseEnv();
-  if (!env) return response;
+  // No Supabase session cookie → nothing to refresh; skip the network call (keeps public pages fast).
+  if (!env || !request.cookies.getAll().some((c) => c.name.startsWith("sb-"))) return response;
   const sb = createServerClient(env.url, env.anonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 
-export function SignInButton({ url, anonKey }: { url: string; anonKey: string }) {
+export function SignInButton() {
   const [busy, setBusy] = useState(false);
   return (
     <button
@@ -12,7 +12,7 @@ export function SignInButton({ url, anonKey }: { url: string; anonKey: string })
       onClick={async () => {
         setBusy(true);
         const next = window.location.pathname + window.location.search;
-        await supabaseBrowser(url, anonKey).auth.signInWithOAuth({
+        await supabaseBrowser(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!).auth.signInWithOAuth({
           provider: "google",
           options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
         });
