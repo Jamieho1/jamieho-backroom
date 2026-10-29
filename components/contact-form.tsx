@@ -15,7 +15,7 @@ export function ContactForm({ action: send }: { action: Action }) {
   }
   const v = state?.values;
   return (
-    <form action={action} className="contact-form" noValidate>
+    <form action={action} className="contact-form">
       <div className="contact-row">
         <label className="field">
           <span>Name</span>
@@ -31,11 +31,14 @@ export function ContactForm({ action: send }: { action: Action }) {
         <textarea name="need" rows={5} required maxLength={CONTACT_LIMITS.need} defaultValue={v?.need} />
       </label>
       <label className="field">
-        <span>Budget (optional)</span>
-        <select name="budget" defaultValue={v?.budget ?? ""}>
+        <span>Budget</span>
+        <select name="budget" required defaultValue={v?.budget ?? ""}>
+          <option value="" disabled>
+            Choose one
+          </option>
           {BUDGETS.map((b) => (
             <option key={b} value={b}>
-              {b || "Prefer not to say"}
+              {b}
             </option>
           ))}
         </select>
@@ -57,7 +60,7 @@ export function ContactForm({ action: send }: { action: Action }) {
         ) : null}
       </div>
       <p className="muted small">
-        Your name, email and message are stored so I can reply. See the <a href="/privacy">privacy policy</a>.
+        All fields are required. Your name, email and message are stored so I can reply. See the <a href="/privacy">privacy policy</a>.
       </p>
     </form>
   );

@@ -2,7 +2,7 @@
 import { createHmac } from "node:crypto";
 
 export const CONTACT_LIMITS = { name: 100, email: 200, need: 4000, budget: 60 } as const;
-export const BUDGETS = ["", "Under £1k", "£1k–£5k", "£5k–£15k", "£15k+", "Not sure yet"] as const;
+export const BUDGETS = ["Under £1k", "£1k–£5k", "£5k–£15k", "£15k+", "Not sure yet"] as const;
 
 export interface ContactInput {
   name: string;
@@ -31,7 +31,7 @@ export function validateContact(c: ContactInput): string | null {
   if (!EMAIL.test(c.email) || c.email.length > CONTACT_LIMITS.email) return "That doesn't look like an email address.";
   if (!c.need) return "Tell me a little about what you need.";
   if (c.need.length > CONTACT_LIMITS.need) return `Please keep it under ${CONTACT_LIMITS.need} characters.`;
-  if (c.budget.length > CONTACT_LIMITS.budget) return "Budget is too long.";
+  if (!(BUDGETS as readonly string[]).includes(c.budget)) return "Please pick a budget (\"Not sure yet\" is fine).";
   return null;
 }
 
@@ -48,7 +48,6 @@ export function hashIp(ip: string, salt: string): string {
 
 /** Plain-text alert email for Jamie. */
 export function alertText(c: ContactInput): string {
-  return [`From: ${c.name} <${c.email}>`, c.budget ? `Budget: ${c.budget}` : null, "", c.need, "", "Reply to this email to answer them. All messages: /settings#inbox"]
-    .filter((l) => l !== null)
+  return [`From: ${c.name} <${c.email}>`, `Budget: ${c.budget}`, "", c.need, "", "Reply to this email to answer them. All messages: /settings#inbox"]
     .join("\n");
 }

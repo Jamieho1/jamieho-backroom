@@ -2,7 +2,7 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import { alertText, clientIp, hashIp, readContact, validateContact } from "@/lib/contact";
 import { sendAlert } from "@/lib/resend";
 
-const ok = { name: "Ann", email: "ann@example.com", need: "A website", budget: "" };
+const ok = { name: "Ann", email: "ann@example.com", need: "A website", budget: "Not sure yet" };
 
 describe("contact checks", () => {
   it("reads and tidies the form", () => {
@@ -10,7 +10,8 @@ describe("contact checks", () => {
     f.set("name", " Ann ");
     f.set("email", " Ann@Example.com ");
     f.set("need", " Hi ");
-    expect(readContact(f)).toEqual({ name: "Ann", email: "ann@example.com", need: "Hi", budget: "" });
+    f.set("budget", "£15k+");
+    expect(readContact(f)).toEqual({ name: "Ann", email: "ann@example.com", need: "Hi", budget: "£15k+" });
   });
   it("accepts a good message and names the first problem otherwise", () => {
     expect(validateContact(ok)).toBeNull();
@@ -18,6 +19,8 @@ describe("contact checks", () => {
     expect(validateContact({ ...ok, email: "nope" })).toMatch(/email/);
     expect(validateContact({ ...ok, need: "" })).toMatch(/what you need/);
     expect(validateContact({ ...ok, need: "x".repeat(4001) })).toMatch(/4000/);
+    expect(validateContact({ ...ok, budget: "" })).toMatch(/budget/);
+    expect(validateContact({ ...ok, budget: "a million" })).toMatch(/budget/);
   });
   it("takes the first forwarded address and hashes it one way", () => {
     expect(clientIp("203.0.113.7, 10.0.0.1")).toBe("203.0.113.7");
@@ -27,8 +30,7 @@ describe("contact checks", () => {
     expect(h).not.toContain("203");
     expect(hashIp("203.0.113.7", "other")).not.toBe(h);
   });
-  it("writes a plain alert with the budget only when given", () => {
-    expect(alertText(ok)).not.toMatch(/Budget/);
+  it("writes a plain alert with the budget", () => {
     expect(alertText({ ...ok, budget: "£1k–£5k" })).toMatch(/Budget: £1k–£5k/);
   });
 });

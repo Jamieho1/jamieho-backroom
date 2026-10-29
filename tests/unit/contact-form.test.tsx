@@ -15,15 +15,19 @@ describe("ContactForm", () => {
     });
     render(<ContactForm action={action} />);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Ann" } });
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    fireEvent.submit(screen.getByRole("button", { name: "Send" }).closest("form")!); // skip browser checks: test the server's answer
     expect((await screen.findByRole("alert")).textContent).toMatch(/Couldn't send/);
     expect((screen.getByLabelText("What do you need?") as HTMLTextAreaElement).value).toBe("Hello");
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
   });
   it("shows a thank-you once saved", async () => {
     render(<ContactForm action={async () => ({ ok: true, message: "Thanks, your message is in." })} />);
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    fireEvent.submit(screen.getByRole("button", { name: "Send" }).closest("form")!);
     expect((await screen.findByRole("status")).textContent).toMatch(/Thanks/);
+  });
+  it("marks every visible field required", () => {
+    render(<ContactForm action={async () => ({ ok: true, message: "" })} />);
+    for (const l of ["Name", "Email", "What do you need?", "Budget"]) expect(screen.getByLabelText(l).hasAttribute("required")).toBe(true);
   });
   it("hides the honeypot from people and screen readers", () => {
     render(<ContactForm action={async () => ({ ok: true, message: "" })} />);

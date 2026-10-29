@@ -86,13 +86,15 @@ test("projects show as windows on the landing page and /projects", async ({ page
 test("the contact form checks fields and quietly drops bot submissions", async ({ page }) => {
   await page.goto("/");
   const form = page.getByRole("region", { name: "Send a message" });
-  await form.getByRole("button", { name: "Send" }).click();
-  await expect(form.getByRole("alert")).toHaveText("Please add your name.");
+  await form.getByRole("button", { name: "Send" }).click(); // the browser blocks it: every field is required
+  await expect(form.locator(":invalid")).toHaveCount(5); // form + name, email, need, budget
+  await expect(form.getByRole("alert")).toHaveCount(0);
   await form.getByLabel("Name").fill("Bot");
   await form.getByLabel("Email").fill("bot@example.com");
   await form.getByLabel("What do you need?").fill("Spam");
+  await form.getByLabel("Budget").selectOption("Not sure yet");
   await page.locator('input[name="website"]').fill("http://spam.example", { force: true });
-  await form.getByRole("button", { name: "Try again" }).click();
+  await form.getByRole("button", { name: "Send" }).click();
   await expect(form.getByRole("status")).toContainText("Thanks");
 });
 
