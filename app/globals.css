@@ -95,3 +95,10 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .btn:disabled { opacity: 0.7; cursor: progress; }
 .btn.ghost { color: var(--ink); background: transparent; border-color: var(--border); }
 .alert { color: var(--danger-face); background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+
+.prose { max-width: 46rem; }
+.prose h2 { margin-top: 1.6em; font-size: 1.3rem; }
+.prose li { margin: 0.4em 0; }
+.muted { color: var(--muted); }
+.site-footer { max-width: 72rem; margin: 0 auto; padding: 24px 16px 40px; font-size: 14px; color: var(--muted); }
+.site-footer a { color: var(--secondary); }

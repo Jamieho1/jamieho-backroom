@@ -31,3 +31,6 @@
   - Security advisor flags is_owner()/record_signin() as callable by authenticated users. This is intended.
   - `public.rls_auto_enable()` is Supabase-created, not ours; anon can call it. Tell Jamie and offer to revoke.
 - Later: `/` became dynamic because the header reads the session. TKT-54 must make the landing pre-rendered again (move the sign-in state to a client component).
+- 2026-10-29: Google won't publish the OAuth app without a privacy policy link, and checks site ownership. Added a public `/privacy` page and a footer link.
+  - Optional env: `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` (adds the Search Console meta tag) and `NEXT_PUBLIC_CONTACT_EMAIL` (shown on /privacy).
+  - Keep /privacy true to what the code collects; update it whenever a ticket adds data collection (contact form, analytics).

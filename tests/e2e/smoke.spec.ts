@@ -28,3 +28,19 @@ test("a callback without a code comes back with a clear message", async ({ page 
   await expect(page).toHaveURL(/\/\?auth=error$/);
   await expect(page.locator("main [role=alert]")).toHaveText(/Sign-in didn.t complete/);
 });
+
+test("the privacy policy is public and linked from every page", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Privacy" }).click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(page.getByRole("heading", { name: "Privacy policy" })).toBeVisible();
+  for (const h of ["What is collected", "Why it is used", "Who processes it", "How long it is kept", "Your rights"]) {
+    await expect(page.getByRole("heading", { name: h })).toBeVisible();
+  }
+});
+
+test("the Google site-verification tag appears only when configured", async ({ page }) => {
+  await page.goto("/");
+  const tag = page.locator('meta[name="google-site-verification"]');
+  await expect(tag).toHaveCount(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? 1 : 0);
+});
