@@ -34,3 +34,7 @@
 - 2026-10-29: Google won't publish the OAuth app without a privacy policy link, and checks site ownership. Added a public `/privacy` page and a footer link.
   - Optional env: `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` (adds the Search Console meta tag) and `NEXT_PUBLIC_CONTACT_EMAIL` (shown on /privacy).
   - Keep /privacy true to what the code collects; update it whenever a ticket adds data collection (contact form, analytics).
+- 2026-10-29: bug found in testing. Supabase inserts an OAuth user and only then sets email_confirmed_at, so the owner landed as a member.
+  - Fix: migration owner_role_on_confirm, which recomputes the role on email/confirmation updates and fixed existing rows. Applied to Supabase.
+  - The PGlite tests now copy the insert-then-confirm order.
+- Vercel env naming: `NEXT_PUBLIC_*` variables are type Config, not Sensitive (Vercel forbids it). Real secrets (Resend key etc.) are unprefixed and Sensitive.

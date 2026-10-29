@@ -47,6 +47,26 @@ describe("roles are decided by the database", () => {
   });
 });
 
+describe("Supabase's real OAuth order: insert first, confirm the email afterwards", () => {
+  it("the owner becomes owner once Google's confirmation lands", async () => {
+    const id = "00000000-0000-4000-8000-000000000009";
+    await db.query("update private.settings set value = 'late@example.com' where key = 'owner_email'");
+    await addUser(db, { id, email: "late@example.com", confirmed: false });
+    expect((await db.query<{ role: string }>("select role from public.profiles where id = $1", [id])).rows[0].role).toBe("member");
+    await db.query("update auth.users set email_confirmed_at = now() where id = $1", [id]);
+    expect((await db.query<{ role: string }>("select role from public.profiles where id = $1", [id])).rows[0].role).toBe("owner");
+    // changing the email away from the owner address takes the role away again
+    await db.query("update auth.users set email = 'other@example.com' where id = $1", [id]);
+    expect((await db.query<{ role: string }>("select role from public.profiles where id = $1", [id])).rows[0].role).toBe("member");
+    await db.query("delete from auth.users where id = $1", [id]);
+    await db.query("update private.settings set value = $1 where key = 'owner_email'", [OWNER.email]);
+  });
+  it("a confirmed non-owner stays a member", async () => {
+    await db.query("update auth.users set email_confirmed_at = now() where id = $1", [MEMBER.id]);
+    expect((await db.query<{ role: string }>("select role from public.profiles where id = $1", [MEMBER.id])).rows[0].role).toBe("member");
+  });
+});
+
 describe("profiles visibility", () => {
   it("anonymous visitors see no profiles", async () => {
     expect(await as(db, anon, (q) => q("select id from public.profiles"))).toEqual([]);
