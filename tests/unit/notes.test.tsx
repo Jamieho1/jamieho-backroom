@@ -7,7 +7,7 @@ import { splitConcepts } from "@/lib/notes/concepts";
 import { highlightPython } from "@/components/notes/code-highlight";
 import { Markdown } from "@/components/notes/markdown";
 const visual = { kind: "array", title: "Walk a list", concept: "Walk", values: [2,4], frames: [{ caption: "Start", pointers:[{name:"i",index:0}] }, {caption:"Move", pointers:[{name:"i",index:1}]}] };
-const note: NoteRow = { id: "arrays-hashing", title: "Arrays", body: 'Intro\n\n### 1. Walk\n- *When*: read each value\n\n**Time** O(n) **Space** O(1)\n\n```python\ndef visit(items):\n    return len(items)\n```\n\nContains Duplicate', visual: [visual], sort:10, updated_at:"2026-10-31T00:00:00Z" };
+const note: NoteRow = { id: "arrays-hashing", title: "Arrays", free: "", body: 'Intro\n\n### 1. Walk\n- *When*: read each value\n\n**Time** O(n) **Space** O(1)\n\n```python\ndef visit(items):\n    return len(items)\n```\n\nContains Duplicate', visual: [visual], sort:10, updated_at:"2026-10-31T00:00:00Z" };
 afterEach(cleanup);
 it("starts concept cards closed and opens/closes all without edit or AI controls", () => {
   render(<NotesReader notes={[note]} />);

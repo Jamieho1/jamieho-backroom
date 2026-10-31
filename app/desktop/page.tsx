@@ -25,5 +25,5 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   const apps = (result.data ?? []) as AppRow[];
   const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
   const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
-  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent /> : undefined} />;
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : undefined} />;
 }

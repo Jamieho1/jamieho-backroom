@@ -4,9 +4,21 @@ export interface NoteRow {
   id: string;
   title: string;
   body: string;
+  free: string;
   visual: unknown;
   sort: number;
   updated_at: string;
+}
+
+export interface NoteEdit { body: string; free: string }
+export const NOTE_TEXT_LIMIT = 200000;
+export function validateNoteEdit(id: unknown, value: unknown): string | null {
+  if (typeof id !== "string" || !/^[a-z0-9][a-z0-9-]{0,79}$/.test(id)) return "Choose a valid note.";
+  if (!value || typeof value !== "object") return "Enter the note text.";
+  const edit = value as Record<string, unknown>;
+  if (typeof edit.body !== "string" || typeof edit.free !== "string") return "Enter the note text.";
+  if (edit.body.length > NOTE_TEXT_LIMIT || edit.free.length > NOTE_TEXT_LIMIT) return "Keep each text field under 200,000 characters.";
+  return null;
 }
 
 /** Accepts the artifact's JSON string or already-decoded JSON; rejects invalid pictures safely. */

@@ -110,3 +110,7 @@
   .notes-main { padding: 16px; }
   .notes-reader .cc-head { flex-wrap: wrap; }
 }
+
+.notes-main textarea { width: 100%; max-width: 100%; font-family: var(--f-mono); }
+.notes-free { margin-top: 24px; }
+.notes-topic:disabled { cursor: default; opacity: .6; }

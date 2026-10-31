@@ -11,6 +11,7 @@ Claude owns the one-time TKT-63 import. A `public.notes` row has:
 | `id` | Coding topic ID, e.g. `arrays-hashing`; strip the artifact's `n_` prefix. |
 | `title` | Topic label shown in the sidebar. |
 | `body` | The current Markdown body, not the old AI draft. `###` headings become concept cards. |
+| `free` | Owner free notes from the artifact, or an empty string. Requires the TKT-62 migration `20261031151127_notes_free.sql` (applied live on 31 October 2026). |
 | `visual` | Decoded JSON: one artifact Visual object or an array of them; default `[]`. Parse the artifact's serialized `visual` string before inserting it. |
 | `sort` | Integer sidebar order. |
 | `updated_at` | ISO timestamp; defaults to the insertion time. |
@@ -24,8 +25,8 @@ imported `visual` array, with the appropriate `concept`. The website does not bu
 or call an AI service to reconstruct it. NeetCode problem names/links are metadata only; no problem statements are in git.
 
 No sample note is seeded in production. Unit/database tests use synthetic notes; the live Notes window remains
-empty until data is loaded. Editing is TKT-62; copying data is TKT-63. Spaced repetition, mock history, quizzes,
+empty until data is loaded. Owner editing is implemented in TKT-62 (awaiting its migration and deployment); copying data is TKT-63. Spaced repetition, mock history, quizzes,
 AI controls and the On-this-page bar are outside this read-view ticket.
 
 Reads follow `rls.can_view_app('notes')`. Only the owner may insert, update or delete rows. The table is included
-in the existing encrypted weekly export. The renderer exposes no edit controls to any visitor, including the owner.
+in the existing encrypted weekly export. Visitors have no edit controls. The owner can edit the body and free notes through a server action that checks the owner role again; RLS independently enforces writes. A failed save keeps the draft and offers Retry.

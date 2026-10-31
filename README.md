@@ -100,3 +100,11 @@ Apply `supabase/migrations/20261031150000_notes.sql` before deploying this versi
 RLS-protected `notes` table; applied to production through Supabase MCP with Jamie's approval on 31 October 2026. Open Notes from `/desktop` to read it.
 The import format for Claude's TKT-63 copy is in `Resources/Notes - Import Contract.md`.
 No personal note content is included in the repository or seeded by this migration.
+
+## Notes owner editor (TKT-62)
+
+Apply `supabase/migrations/20261031151127_notes_free.sql` before deploying this version. It adds the empty
+`free` text column to notes and keeps the existing RLS policies. Applied to production through Supabase MCP with Jamie's approval on 31 October 2026.
+The owner sees **Edit note** on an existing note and can save its body and free notes. Failed saves keep both
+draft fields with **Retry**. Cancel discards the draft; readers have no editing controls. Notes must be imported
+before the editor is visible; this ticket creates no sample content.
