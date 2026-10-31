@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { FREE_LIMITS, opsWarnings, usageOf, warnRatio, type OpsRow } from "@/lib/ops";
 // @ts-expect-error plain JS module used by the GitHub Action
 import { encrypt, decrypt } from "../../scripts/export-crypto.mjs";
@@ -47,8 +47,8 @@ describe("export encryption", () => {
 
 describe("export table list", () => {
   it("names every table the migrations create in public", () => {
-    const sql = ["20261029100000_auth_roles", "20261029150000_app_registry", "20261029170000_site_sections", "20261029180000_experience", "20261029190000_messages", "20261029200000_app_opens", "20261029210000_ops"]
-      .map((f) => readFileSync(`supabase/migrations/${f}.sql`, "utf8"))
+    const sql = readdirSync("supabase/migrations").filter((f) => f.endsWith(".sql"))
+      .map((f) => readFileSync(`supabase/migrations/${f}`, "utf8"))
       .join("\n");
     const created = [...sql.matchAll(/create table public\.(\w+)/g)].map((m) => m[1]).sort();
     expect(JSON.parse(readFileSync("scripts/export-tables.json", "utf8")).sort()).toEqual(created);

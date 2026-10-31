@@ -5,8 +5,9 @@ _Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho �
 ## Current position (2026-10-31)
 
 - **R1 (TKT-51–59): Done**, live and verified by Jamie.
-- **TKT-60: In Progress** — deployed; the desktop migration is applied live. A Settings-window fix is ready locally, awaiting Jamie's push and live review.
-- Next in R2: **TKT-61**, after TKT-60 is verified live and marked Done. Ask Jamie before starting it.
+- **TKT-60: Done** — desktop and Settings fix deployed; desktop migration applied live. Jamie authorized continuing.
+- **TKT-61: In Progress** — Notes read view implemented/tested locally. The Notes migration is applied live; awaiting Jamie's push and live review.
+- **TKT-63 data copy stays with Claude.**
 
 ## Order
 

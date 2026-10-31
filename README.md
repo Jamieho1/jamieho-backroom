@@ -93,3 +93,10 @@ Applied to production with Jamie's approval on 31 October 2026.
 open in a new tab. Notes, Practice and Behavioral are placeholders pending their content tickets.
 Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
 After deployment, check a member, an invited member and the owner; the owner alone should see Settings.
+
+## Notes read view (TKT-61)
+
+Apply `supabase/migrations/20261031150000_notes.sql` before deploying this version. It creates an empty,
+RLS-protected `notes` table; applied to production through Supabase MCP with Jamie's approval on 31 October 2026. Open Notes from `/desktop` to read it.
+The import format for Claude's TKT-63 copy is in `Resources/Notes - Import Contract.md`.
+No personal note content is included in the repository or seeded by this migration.

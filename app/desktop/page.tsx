@@ -4,6 +4,8 @@ import { SignInButton } from "@/components/sign-in-button";
 import { Desktop } from "@/components/desktop";
 import type { AppRow } from "@/lib/apps";
 import { SettingsContent } from "@/app/settings/content";
+import { NotesContent } from "./notes-content";
+import "../notes.css";
 
 export const dynamic = "force-dynamic";
 
@@ -22,5 +24,6 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   if (!result || result.error) return <main className="page"><h1>Your desktop</h1><p role="alert">Can&apos;t reach the data right now.</p><a href="/desktop">Try again</a></main>;
   const apps = (result.data ?? []) as AppRow[];
   const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
-  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : undefined} />;
+  const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent /> : undefined} />;
 }
