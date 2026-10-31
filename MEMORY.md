@@ -91,3 +91,7 @@
   - Patch verified: typecheck; 121 unit/DB tests; production build; static assertions; 30 desktop/390 px E2E tests. Temporary build copy excludes .env files. The signed-in patched Settings window still needs a live recheck after Jamie pushes it.
   - Uncommitted patch: app/settings/content.tsx (new), app/settings/page.tsx, app/desktop/page.tsx, components/desktop.tsx, app/globals.css, tests/unit/desktop.test.tsx; README.md, Resources/Tickets - Dependency Map.md and MEMORY.md handoff updates. AGENTS.md also has Jamie/Claude's concurrent data-copy-ticket clarification; left intact. No commit or push performed.
   - TKT-60 remains In Progress pending the Settings patch deployment and Jamie's live confirmation. TKT-61 not started.
+- 2026-10-31: Jamie pushed fd3cf4e027198d8780b967aebe5ebe9ddd5efa0f (Settings-window fix). GitHub CI run 41211501824 passed and Vercel deployment succeeded.
+  - Verified live owner /desktop?app=settings renders Inbox, Visitors, Ops, Apps and Invites inside the desktop window; blank iframe issue resolved. Migration 20261031090000_desktop_apps.sql remains APPLIED live. No additional database change.
+  - Updated Notion TKT-60 with production verification; kept In Progress pending Jamie's live sign-off. Member/invited accounts were not exercised live. TKT-61 not started; ask Jamie before starting per AGENTS.md.
+  - Only this new MEMORY.md verification entry remains uncommitted; no commit or push performed.
