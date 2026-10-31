@@ -87,6 +87,7 @@ Never put a secret in this repo. Only `.env.example` (empty values) is committed
 Before deploying this version, apply `supabase/migrations/20261031090000_desktop_apps.sql`
 in the Supabase SQL editor after the earlier migrations. This adds the read-only `desktop_apps`
 view, which uses the current caller's RLS access checks without exposing invite emails or policy helpers.
+Applied to production with Jamie's approval on 31 October 2026.
 
 `/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
 open in a new tab. Notes, Practice and Behavioral are placeholders pending their content tickets.

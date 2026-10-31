@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { SignInButton } from "@/components/sign-in-button";
 import { Desktop } from "@/components/desktop";
 import type { AppRow } from "@/lib/apps";
+import { SettingsContent } from "@/app/settings/content";
 
 export const dynamic = "force-dynamic";
 
@@ -19,5 +20,7 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   );
   const result = sb ? await sb.from("desktop_apps").select("*").order("sort").order("id") : null;
   if (!result || result.error) return <main className="page"><h1>Your desktop</h1><p role="alert">Can&apos;t reach the data right now.</p><a href="/desktop">Try again</a></main>;
-  return <Desktop apps={(result.data ?? []) as AppRow[]} initialApp={app} />;
+  const apps = (result.data ?? []) as AppRow[];
+  const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : undefined} />;
 }

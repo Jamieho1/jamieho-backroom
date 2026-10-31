@@ -247,3 +247,6 @@ body:has(.desktop-os) .site-header { display: none; }
   .desktop-placeholder { padding: 20px; min-height: 180px; }
   .desktop-window, .desktop-os.is-maximised .desktop-window { min-height: 0; border-radius: 12px; }
 }
+
+.desktop-app-content { max-height: 70dvh; overflow: auto; }
+.desktop-app-content > .page { padding: 24px; }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState, type ReactNode, type CSSProperties } from "react";
 import type { AppRow } from "@/lib/apps";
 import { WALL_IMAGES } from "@/lib/desktop-wallpaper";
 import { ICONS, AppMark } from "./desktop-icons";
@@ -15,7 +15,7 @@ const PLACEHOLDERS: Record<string, string> = {
   behavioral: "Your experience, stories and interview questions will be here once Behavioral is ported.",
 };
 
-export function Desktop({ apps, initialApp }: { apps: AppRow[]; initialApp?: string }) {
+export function Desktop({ apps, initialApp, content }: { apps: AppRow[]; initialApp?: string; content?: ReactNode }) {
   const active = apps.find((a) => a.id === initialApp && a.kind === "internal");
   const [maximised, setMaximised] = useState(false);
   const [clock, setClock] = useState("");
@@ -64,7 +64,7 @@ export function Desktop({ apps, initialApp }: { apps: AppRow[]; initialApp?: str
                 <Link href="/desktop" aria-label="Close window">×</Link>
               </div>
             </div>
-            {PLACEHOLDERS[active.id] ? <div className="desktop-placeholder"><h2>{active.name}</h2><p>{PLACEHOLDERS[active.id]}</p></div> : (
+            {content ? <div className="desktop-app-content">{content}</div> : PLACEHOLDERS[active.id] ? <div className="desktop-placeholder"><h2>{active.name}</h2><p>{PLACEHOLDERS[active.id]}</p></div> : (
               active.url.startsWith("/") && !active.url.startsWith("//") && !/^\/desktop(?:[/?#]|$)/.test(active.url)
                 ? <iframe className="desktop-frame" src={active.url} title={active.name} />
                 : <div className="desktop-placeholder"><p>This app&apos;s content is not available yet.</p></div>

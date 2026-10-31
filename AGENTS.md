@@ -18,7 +18,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 - **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
   desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.
 - **Data:** Jamie's notes, progress and Behavioral stories live inside the published Claude artifact, not in this code.
-  Other agents can't open it. **Leave the one-time data copy to Claude.**
+  Other agents can't open it. **Skip the data-copy tickets TKT-63, TKT-66, TKT-69 and the cut-over TKT-70: leave them to Claude.**
 
 ## Working agreement with Jamie
 - **Ask before starting each ticket**: say which ticket and what it will change, then wait for his go-ahead.

@@ -31,3 +31,11 @@ it("external apps open a new tab and record the click", () => {
   fireEvent.click(link);
   expect(log).toHaveBeenCalledWith("external");
 });
+
+it("renders built-in server content in its window without an iframe", () => {
+  const settings = { ...FALLBACK_APPS[0], id: "settings", name: "Settings", url: "/settings", visibility: "owner_only" as const };
+  const { container } = render(<Desktop apps={[settings]} initialApp="settings" content={<h2>Visitors</h2>} />);
+  expect(screen.getByRole("region", { name: "Settings" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Visitors" })).toBeTruthy();
+  expect(container.querySelector("iframe")).toBeNull();
+});
