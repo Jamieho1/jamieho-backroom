@@ -2,7 +2,7 @@
 
 ## Status
 - 2026-10-29: plan grilled and every branch resolved. PRD signed off by Jamie.
-- Nothing is built yet.
+- 2026-10-31: R1 (TKT-51…59) done and live. R2 started: TKT-60 in progress (see Working Notes).
 
 ## Key Context
 - **Stack:** Next.js on Vercel Hobby + Supabase (Postgres, Auth with Google, RLS) + Resend + Vercel Web Analytics.
@@ -42,7 +42,7 @@
   - `apps` + `invites` tables with RLS, 4 seeded apps (Settings locked to owner-only).
   - `/settings` (owner-only, 404 for others): change app visibility, manage invites.
   - New data tables guard reads with `rls.can_view_app('<app>')`.
-  - Migration `rls_helpers_out_of_api` (moves the helpers out of `public`) is written and tested. It is NOT yet applied: Jamie's approval timed out.
+  - Migration `rls_helpers_out_of_api` (moves the helpers out of `public`): applied later on 2026-10-29.
 - 2026-10-29: TKT-53 done.
 - 2026-10-29: TKT-54 built:
   - `site_sections` table (hero / about / writing / contact) with RLS: anyone reads, the owner edits. Applied.
@@ -58,3 +58,24 @@
   - Reads: public rows for everyone; the whole CV for whoever can open Behavioral (`rls.can_view_app('behavioral')`). Writes: owner only.
   - Landing shows the public Experience list; in Edit site mode the owner gets an editor (add, edit, reorder, delete, tick public).
   - Perf advisor: the owner `for all` policy overlaps the select policy. Harmless at this size; split it into insert/update/delete policies next time these tables change.
+- 2026-10-29: TKT-56 done. Projects cards from the `apps` registry on the landing page and the static `/projects`; non-public apps still show; owner edits card text, tags and https screenshots in Edit site mode.
+- 2026-10-29: TKT-57 done. `messages` table (anyone inserts named columns; owner reads, marks read, deletes); DB trigger limits 5/hour per sender (HMAC of IP, wiped after 1 h) and 30/hour overall; honeypot; every field required, budget includes "Free consultation"; Settings → Inbox; Resend alert (the message is saved even if Resend fails; failures logged as "contact alert" in Vercel logs). Applied.
+- 2026-10-29: TKT-58 done. Cookieless Vercel Web Analytics (skips /settings and /auth, drops query strings); Settings → Visitors; `app_opens` table (one row per person/app/day, insert only your own for apps you can open; owner reads). Applied.
+- 2026-10-29: TKT-59 done. GitHub "Ops" workflow: daily ping, Sunday export encrypted with EXPORT_PASSPHRASE (90-day artifact; `npm run decrypt-export`); `ops_status` table + service-role-only `ops_usage()`; Settings → Ops and a banner for failed/stale jobs or 80% of a free limit (`FREE_TIER_WARN_AT` to test). Applied; Jamie ran both jobs successfully. **R1 complete.**
+- 2026-10-31: handoff notes for other agents added in `AGENTS.md`.
+- 2026-10-31: TKT-60 implemented locally; Notion is In Progress pending migration, deployment and review.
+  - `/desktop`: sign-in gate, registry-driven allowed apps via read-only security-invoker `desktop_apps` view.
+  - Ported original Hills/day-night wallpaper and SVG icons from `Interview Prep/artifact/src/ui`; app menu, maximise/restore/close, phone launcher.
+  - Internal apps open as windows (Notes/Practice/Behavioral placeholders; other internal routes embedded); external links open new tabs.
+  - Landing “Open my desktop”, Projects desktop links enabled, launches recorded through TKT-58's app_opens log.
+  - New migration `20261031090000_desktop_apps.sql` is NOT applied to live Supabase. Apply before deployment.
+  - Verified: typecheck, 118 unit/database tests, production build, public-page static assertions, 30 committed E2E cases plus 8 temporary shell-fixture browser cases at 1280/390 px. Visually inspected screenshots.
+  - Live Google OAuth and signed-in Supabase path still need checking after migration/deployment. No push/deploy performed.
+- 2026-10-31: reviewed TKT-60 against the new AGENTS.md and Claude's R1 handoff; no implementation conflict found.
+  - Kept Claude's AGENTS.md and R1 history. Updated the dependency map's stale starting position to R1 complete / TKT-60 in progress.
+  - Added security regression tests proving the desktop view rejects insert/update/delete (including from the owner) and reflects visibility changes without deployment.
+  - Fresh `npm run check` passed: 120 unit/database tests, production build and static-page assertions. All 30 repository E2E cases passed at desktop/390 px. Checks ran in a temporary source copy excluding .env files; browser checks used the installed Chromium with a temporary config only.
+  - Privacy already describes daily app-open records; no new disclosure is needed for this change. No personal content or credentials were read or changed.
+  - Migration `20261031090000_desktop_apps.sql` remains NOT applied live. Jamie must approve/apply it before pushing this auto-deployed version; then check live sign-in, member/invited/owner access and Visitors. TKT-60 remains In Progress until Jamie confirms live.
+  - All work remains uncommitted: AGENTS.md, MEMORY.md, README.md, Resources/Tickets - Dependency Map.md; app/globals.css, app/page.tsx, app/actions/desktop.ts, app/desktop/page.tsx; components/desktop.tsx, components/desktop-icons.tsx, components/project-card.tsx; lib/desktop-wallpaper.ts, lib/projects.ts; the new migration; tests/db/desktop.test.ts, tests/unit/desktop.test.tsx, tests/e2e/desktop.spec.ts. No commits, pushes or remote DB changes performed.
+  - Git's current author name is jamieho1 (email matches). Use Jamie Ho <shinghimho@gmail.com> when committing, per AGENTS.md.

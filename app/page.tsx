@@ -19,6 +19,7 @@ export default async function Home() {
       <AuthErrorNotice />
       <EditableSection sectionKey="hero" title={s.hero.title} body={s.hero.body} heading="h1" className="hero">
         <Markdown text={s.hero.body} />
+        <p><a className="btn" href="/desktop">Open my desktop</a></p>
       </EditableSection>
       <EditableSection sectionKey="about" title={s.about.title} body={s.about.body} className="block">
         <Markdown text={s.about.body} />

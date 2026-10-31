@@ -81,3 +81,14 @@ To see the banner on purpose, set `FREE_TIER_WARN_AT=0.0001` in Vercel, redeploy
 - Every table in `public` must have RLS enabled; a test fails otherwise.
 
 Never put a secret in this repo. Only `.env.example` (empty values) is committed. The service-role key is never used by the app.
+
+## Signed-in desktop (TKT-60)
+
+Before deploying this version, apply `supabase/migrations/20261031090000_desktop_apps.sql`
+in the Supabase SQL editor after the earlier migrations. This adds the read-only `desktop_apps`
+view, which uses the current caller's RLS access checks without exposing invite emails or policy helpers.
+
+`/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
+open in a new tab. Notes, Practice and Behavioral are placeholders pending their content tickets.
+Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
+After deployment, check a member, an invited member and the owner; the owner alone should see Settings.

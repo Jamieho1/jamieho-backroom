@@ -2,9 +2,11 @@
 
 _Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho — Cowork OS → Tickets (project row "Personal Website (jamieho-backroom)"). IDs match Notion. Check this before starting work; only pick tickets whose blockers are Done, and tell Jamie before starting any coding ticket._
 
-## Startable now
+## Current position (2026-10-31)
 
-- **TKT-51** [R1] Skeleton: Next.js on Vercel + Supabase, deployed hello page — needs Jamie to create the GitHub repo, the Vercel and Supabase projects, and paste the secrets.
+- **R1 (TKT-51–59): Done**, live and verified by Jamie.
+- **TKT-60: In Progress** — implemented locally; its new migration is not applied live. Awaiting migration approval, deployment and Jamie's live review.
+- Next in R2: **TKT-61**, after TKT-60 is verified live and marked Done. Ask Jamie before starting it.
 
 ## Order
 

@@ -10,6 +10,7 @@ import { VISIBILITY_LABEL, type AppRow } from "@/lib/apps";
 import { SignInButton } from "./sign-in-button";
 import { CARD_LIMITS, DESKTOP_READY, parseLines, parseTags, validateCard, type CardEdit } from "@/lib/projects";
 import type { CardResult } from "@/app/actions/projects";
+import { logDesktopOpen } from "@/app/actions/desktop";
 
 const GLYPH: Record<string, string> = { notes: "▤", code: "{ }", chat: "❝", gear: "⚙" };
 
@@ -66,7 +67,7 @@ export function ProjectCard({ app, save }: { app: AppRow; save?: (id: string, ca
           {(state === "sign-in" || state === "invite-only") && viewer.status === "anonymous" && configured ? (
             <SignInButton next={app.url} label={OPEN_LABEL[state]} className="btn ghost" />
           ) : state === "open" || state === "visit" ? (
-            <a className="btn ghost" href={app.url} {...(state === "visit" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+            <a className="btn ghost" href={app.url} onClick={() => { if (state === "visit" && (viewer.status === "member" || viewer.status === "owner")) void logDesktopOpen(app.id); }} {...(state === "visit" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
               {OPEN_LABEL[state]}
             </a>
           ) : (

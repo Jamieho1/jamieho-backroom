@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 import { readSupabaseEnv } from "@/lib/env";
 import type { AppRow } from "@/lib/apps";
 
-/** The signed-in desktop arrives in TKT-60. Until then its apps show "Coming soon" instead of a dead link. */
-export const DESKTOP_READY = false;
+/** The desktop shell is available (TKT-60). */
+export const DESKTOP_READY = true;
 
 export const CARD_LIMITS = { name: 60, description: 400, tags: 8, tag: 24, screenshots: 6 } as const;
 

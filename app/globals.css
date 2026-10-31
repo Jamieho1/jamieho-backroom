@@ -201,3 +201,49 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 /* TKT-59 ops banner */
 .ops-banner { border: 1px solid var(--border); border-left: 4px solid #c2410c; background: var(--bg-accent); border-radius: 8px; padding: 12px 14px; margin: 8px 0 20px; }
 .ops-banner ul { margin: 6px 0 0; padding-left: 18px; }
+
+/* TKT-60: shell and original Hills artwork ported from Interview Prep. */
+.desktop-os { min-height: 100dvh; background: var(--wall-hills) center / cover; --purple: var(--blue); }
+body:has(.desktop-os) .site-header { display: none; }
+:root[data-theme="dark"] .desktop-os { background-image: var(--wall-night); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .desktop-os { background-image: var(--wall-night); } }
+.desktop-menubar { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 4px 16px; background: color-mix(in srgb, var(--bg) 72%, transparent); border-bottom: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.2); }
+.desktop-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; white-space: nowrap; }
+.desktop-menubar a { color: var(--ink); text-decoration: none; }
+.desktop-menubar nav { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.desktop-menu-link { padding: 4px 8px; border-radius: 6px; font-size: 14px; font-weight: 800; }
+.desktop-menubar button.desktop-menu-link { border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.desktop-menu-link:hover, .desktop-menu-link[aria-current] { background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.desktop-home-link { margin-left: auto; }
+.desktop-clock { font: 700 13px/20px var(--f-body); white-space: nowrap; }
+.desktop-workspace { position: relative; padding: 32px 124px; min-height: 74dvh; }
+.desktop-launcher { position: absolute; top: 16px; left: 12px; display: grid; gap: 6px; width: 88px; }
+.desktop-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 88px; padding: 8px 4px; border-radius: 8px; text-decoration: none; color: var(--ink); font: 700 13px/16px var(--f-body); text-align: center; overflow-wrap: anywhere; }
+.desktop-icon svg { flex-shrink: 0; filter: drop-shadow(0 2px 3px rgb(60 45 20 / .18)); }
+.desktop-icon:hover, .desktop-icon[aria-current] { background: color-mix(in srgb, var(--bg) 85%, transparent); }
+.desktop-window, .desktop-welcome, .desktop-notice { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 40px -8px var(--shadow); }
+.desktop-window { overflow: hidden; width: 100%; min-width: 0; }
+.desktop-titlebar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; min-height: 36px; padding: 0 6px 0 14px; background: var(--bg-accent); border-bottom: 1px solid var(--border); }
+.desktop-titlebar h1 { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.desktop-controls { justify-self: end; display: flex; align-items: center; gap: 6px; }
+.desktop-controls button, .desktop-controls a { background: transparent; border: 0; color: var(--ink); text-decoration: none; font: 20px/1 var(--f-body); padding: 6px; cursor: pointer; }
+.desktop-placeholder { padding: 32px; min-height: 320px; }
+.desktop-frame { display: block; width: 100%; height: 65dvh; border: 0; background: var(--bg); }
+.desktop-welcome { max-width: 40rem; margin: 64px auto; padding: 32px; }
+.desktop-notice { padding: 16px; }
+.desktop-os.is-maximised .desktop-workspace { padding: 0; }
+.desktop-os.is-maximised .desktop-launcher { display: none; }
+.desktop-os.is-maximised .desktop-window { min-height: 75dvh; border-radius: 0; }
+.desktop-os a:focus-visible, .desktop-os button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+@media (max-width: 1023px) {
+  .desktop-menubar { flex-wrap: wrap; }
+  .desktop-menubar nav, .desktop-clock { display: none; }
+  .desktop-workspace, .desktop-os.is-maximised .desktop-workspace { padding: 20px 16px; }
+  .desktop-launcher, .desktop-os.is-maximised .desktop-launcher { display: grid; position: static; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 12px; width: 100%; margin-bottom: 24px; }
+  .desktop-icon { justify-self: center; }
+  .desktop-welcome { margin: 24px auto; padding: 20px; }
+  .desktop-titlebar { display: flex; justify-content: space-between; }
+  .desktop-titlebar > span, .desktop-controls button { display: none; }
+  .desktop-placeholder { padding: 20px; min-height: 180px; }
+  .desktop-window, .desktop-os.is-maximised .desktop-window { min-height: 0; border-radius: 12px; }
+}
