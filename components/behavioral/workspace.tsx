@@ -3,9 +3,13 @@ import { useState } from 'react';
 import type { Item } from '@/lib/experience';
 import { emptyStory,type Story,type StoryEdit } from '@/lib/behavioral';
 import { saveStory } from '@/app/actions/behavioral';
+import { QuestionBank } from './questions';
+import type { Answer } from '@/lib/behavioral/answers';
 const fields=['situation','task','action','result','skills','numbers'] as const;
 const labels={situation:'Situation',task:'Task',action:'Action',result:'Result',skills:'Skills',numbers:'Numbers'};
-export function Behavioral({items,initialStories,canEdit=false}:{items:Item[];initialStories:Story[];canEdit?:boolean}){
+export function Behavioral({items,initialStories,initialAnswers=[],canEdit=false}:{items:Item[];initialStories:Story[];initialAnswers?:Answer[];canEdit?:boolean}){
+ const [view,setView]=useState<'cv'|'questions'>('cv');
+ const [questionEditing,setQuestionEditing]=useState(false);
  const [stories,setStories]=useState(initialStories);
  const [bullet,setBullet]=useState<string|null>(null);
  const [selected,setSelected]=useState<string|null>(null);
@@ -21,8 +25,11 @@ export function Behavioral({items,initialStories,canEdit=false}:{items:Item[];in
   catch{setError("Couldn't save. Your draft is still here — retry.");}finally{setSaving(false);}
  }
  return <div className="behavioral">
-  <header className="behavioral-head"><div><p className="eyebrow">Behavioral</p><h2>Your CV &amp; STAR stories</h2></div>{canEdit?<button className="btn" disabled={!!draft} onClick={()=>edit(emptyStory(bullet))}>Add story</button>:null}</header>
+  <header className="behavioral-head"><div><p className="eyebrow">Behavioral</p><h2>Your CV &amp; STAR stories</h2></div>{canEdit?<button className="btn" disabled={!!draft||questionEditing} onClick={()=>{setView('cv');edit(emptyStory(bullet));}}>Add story</button>:null}</header>
   <p className="muted">Each CV bullet links to its stories. Access follows the Behavioral app setting.</p>
+  <div className="notes-tabs" role="tablist" aria-label="Behavioral view"><button type="button" role="tab" id="behavioral-tab-cv" aria-controls="behavioral-cv" aria-selected={view==='cv'} disabled={questionEditing} onClick={()=>setView('cv')}>CV &amp; stories</button><button type="button" role="tab" id="behavioral-tab-questions" aria-controls="behavioral-questions" aria-selected={view==='questions'} disabled={!!draft} onClick={()=>setView('questions')}>Questions</button></div>
+  <div id="behavioral-questions" role="tabpanel" aria-labelledby="behavioral-tab-questions" hidden={view!=='questions'}><QuestionBank stories={stories} initialAnswers={initialAnswers} canEdit={canEdit} onEditing={setQuestionEditing} onOpenStory={id=>{setSelected(id);setBullet(null);setView('cv');}} /></div>
+  <div id="behavioral-cv" role="tabpanel" aria-labelledby="behavioral-tab-cv" hidden={view!=='cv'}>
   <div className="behavioral-columns">
    <section aria-label="CV" className="behavioral-cv">
     {!items.length?<p>No experience has been added yet.</p>:items.map(item=><section className="behavioral-role" key={item.id}>
@@ -47,6 +54,7 @@ export function Behavioral({items,initialStories,canEdit=false}:{items:Item[];in
      </article>:shown.length?<p>Select a story to read it.</p>:null}
     </>}
    </section>
+  </div>
   </div>
  </div>;
 }

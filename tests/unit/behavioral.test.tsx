@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach,afterEach,it,expect,vi } from 'vitest';
 import { render,screen,fireEvent,cleanup,waitFor } from '@testing-library/react';
-const save=vi.hoisted(()=>vi.fn());vi.mock('@/app/actions/behavioral',()=>({saveStory:save}));
+const save=vi.hoisted(()=>vi.fn());vi.mock('@/app/actions/behavioral',()=>({saveStory:save,saveAnswer:vi.fn()}));
 import { Behavioral } from '@/components/behavioral/workspace';
 import type { Item } from '@/lib/experience';
 import type { Story } from '@/lib/behavioral';

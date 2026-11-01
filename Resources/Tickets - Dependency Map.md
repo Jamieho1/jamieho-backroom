@@ -12,7 +12,9 @@ _Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho �
 - **TKT-65: In Progress** — owner code saving, private attempts and shared question notes implemented locally; migration applied live; committed/pushed as f542c96, awaiting Jamie's live review. Claude owns TKT-66 import.
 - **TKT-64: In Progress** — Practice arena pushed; awaiting Jamie's explicit live confirmation before Done. No database migration.
 
-- **TKT-67: In Progress** — Behavioral CV and linked STAR story owner editor implemented locally; migration applied live; awaiting Jamie's push/live review. TKT-68 follows; Claude owns TKT-69 import.
+- **TKT-67: Done** — Behavioral CV and linked STAR stories committed as 7728dfe; migration applied live; Jamie confirmed live verification. TKT-68 follows; Claude owns TKT-69 import.
+
+- **TKT-68: In Progress** — question bank, story mappings, answer preparation and coverage implemented locally; migration applied live, awaiting Jamie's push/live review. Claude owns TKT-69 import.
 
 ## Order
 

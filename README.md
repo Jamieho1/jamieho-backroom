@@ -158,4 +158,22 @@ stories with no linked bullet, accessible under All stories. Story text is store
 2026-11-01 (remote version `20261101105507`). It adds RLS-protected `behavioral_stories` and splits the existing Experience
 owner write policies into INSERT/UPDATE/DELETE without changing public read rules. No data is imported.
 Claude handles TKT-69 using `Resources/Behavioral - Import Contract.md`; personal CV and story text
-must never be committed. The question bank/coverage strip follows in TKT-68.
+must never be committed. The question bank/coverage strip is implemented in TKT-68 below.
+
+## Behavioral question bank (TKT-68)
+
+Behavioral → Questions has 37 generic prompts grouped under Conflict, Failure, Leadership, Ambiguity,
+Ownership, Impact and Customer, with General/Palantir/Balyasny/JPMorgan set filters and search.
+Company sets are practice prompts, not an official list of interview questions.
+
+The owner maps up to two different stories to each question and edits its answer outline/follow-ups.
+Save updates coverage immediately; failed Save/Retry keeps the draft and locks filters/view switching.
+Invitees read the saved preparation and can open its linked STAR stories. Coverage counts mapped
+questions with an existing linked story, once per question; outlines alone do not count. Theme totals
+always cover the complete bank, independently of filters. Clearing links removes coverage; deleting a
+story clears its database links without deleting answer text.
+
+Migration `supabase/migrations/20261101110015_behavioral_answers.sql` was approved and **applied live**
+on 2026-11-01 (remote version `20261101110756`). It creates RLS-protected `behavioral_answers`;
+Behavioral app access controls reads and only the owner writes. Generic prompts stay in code;
+personal preparation stays in Supabase and encrypted exports. Claude handles the TKT-69 import.
