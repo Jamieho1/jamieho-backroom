@@ -20,6 +20,8 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 - Practice UI follow-up: difficulty/NeetCode tags, search styling and private owner starred review list implemented locally. Migration `20261101142129_practice_stars.sql` was applied live on 2026-11-01; awaiting Jamie's push/live UI review.
 
+- New authorized follow-up: Practice collapse/resize and CI Retry fix implemented locally. Public Articles app with owner drafts/publishing implemented; migration `20261101145851_articles.sql` was approved/applied live on 2026-11-01; deployment/live review pending. `/articles` is pre-rendered; `/articles/manage` is owner-only.
+
 ## The predecessor app (Interview Prep artifact)
 - **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
   desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.

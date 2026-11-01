@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach,afterEach,expect,it,vi } from 'vitest';
-import { cleanup,render,screen,fireEvent,waitFor,within } from '@testing-library/react';
+import { cleanup,render,screen,fireEvent,waitFor,within,act } from '@testing-library/react';
 const mocks=vi.hoisted(()=>({load:vi.fn(),saveCode:vi.fn(),saveAttempt:vi.fn(),saveNotes:vi.fn(),run:vi.fn(),warm:vi.fn()}));
 vi.mock('@/app/actions/practice-stars',()=>({loadPracticeStars:vi.fn(async()=>({ok:true,problems:[]})),savePracticeStar:vi.fn(async()=>({ok:true}))}));
 vi.mock('@/app/actions/practice',()=>({loadPracticeData:mocks.load,savePracticeCode:mocks.saveCode,savePracticeAttempt:mocks.saveAttempt,saveQuestionNotes:mocks.saveNotes}));
@@ -53,10 +53,11 @@ it('question-note edits survive save failure and block switching until Save or C
  fireEvent.click(await screen.findByRole('button',{name:'Edit question notes'}));
  fireEvent.change(screen.getByLabelText('Question notes (Markdown)'),{target:{value:'Draft explanation'}});
  expect((screen.getByRole('tab',{name:'Solution'}) as HTMLButtonElement).disabled).toBe(true);
- fireEvent.click(screen.getByRole('button',{name:'Save notes'}));
- await screen.findByRole('button',{name:'Retry'});
+ const form=within(screen.getByRole('form',{name:'Edit question notes'}));
+ await act(async()=>{fireEvent.click(form.getByRole('button',{name:'Save notes'}));});
+ expect(form.getByRole('button',{name:'Retry'})).toBeTruthy();
  expect((screen.getByLabelText('Question notes (Markdown)') as HTMLTextAreaElement).value).toBe('Draft explanation');
- fireEvent.click(screen.getByRole('button',{name:'Retry'}));
+ await act(async()=>{fireEvent.click(form.getByRole('button',{name:'Retry'}));});
  await screen.findByText('Draft explanation');expect(mocks.saveNotes).toHaveBeenLastCalledWith(217,'Draft explanation');
 });
 it('visitors read question notes but never get edit/save controls or upload attempts',async()=>{

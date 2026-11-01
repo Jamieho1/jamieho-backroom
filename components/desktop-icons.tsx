@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 const S = { fill: "none", stroke: "var(--secondary)", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 const tint = (c: string) => ({ fill: c, opacity: 0.35 });
 export const ICONS: Record<string, ReactNode> = {
+  articles: <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 5h22l8 8v30H10Z" fill="#f7e9c9" stroke="#866143" strokeWidth="2"/><path d="M32 5v9h8M16 21h18M16 27h18M16 33h12" fill="none" stroke="#866143" strokeWidth="2"/></svg>,
   home: <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><path d="M5 23 24 6l19 17" fill="#f2c76d" stroke="#866143" strokeWidth="3" strokeLinejoin="round"/><path d="M10 21v21h28V21L24 9Z" fill="#f7e9c9" stroke="#866143" strokeWidth="2"/><path d="M20 29h9v13h-9Z" fill="#8ca874" stroke="#58705c" strokeWidth="2"/></svg>,
   projects: <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 13h17l4 5h19v23H4Z" fill="#e6b658" stroke="#866143" strokeWidth="2"/><path d="M4 22h40l-4 20H8Z" fill="#f2d48e" stroke="#866143" strokeWidth="2"/><path d="m21 27-5 5 5 5m7-10 5 5-5 5" fill="none" stroke="#866143" strokeWidth="2"/></svg>,
   practice: (

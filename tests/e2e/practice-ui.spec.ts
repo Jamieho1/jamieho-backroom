@@ -127,3 +127,20 @@ test('Practice tags, search, title alignment and private review filter work at d
  await page.getByRole('button',{name:'Star Contains Duplicate for later',exact:true}).click();await expect(page.getByRole('button',{name:'★ Starred (1)',exact:true})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('Practice question list collapses and panel dividers resize without resetting code',async({page},info)=>{
+ await page.route('**/runner/worker.mjs',r=>r.abort());await mount(page);
+ const editor=page.getByRole('textbox',{name:'Python code'});await editor.fill('Keep this draft');
+ const list=page.getByRole('navigation',{name:'Practice problems'});await expect(list).toBeVisible();
+ await page.getByRole('button',{name:'Collapse question list'}).click();await expect(list).toHaveCount(0);await expect(editor).toHaveText('Keep this draft');
+ await page.getByRole('button',{name:'Expand question list'}).click();await expect(list).toBeVisible();
+ if(info.project.name==='desktop'){
+  const sidebar=page.locator('.practice-sidebar');const before=(await sidebar.boundingBox())!.width;
+  const handle=page.getByRole('separator',{name:'Resize question list'});const bar=(await handle.boundingBox())!;
+  await page.mouse.move(bar.x+bar.width/2,bar.y+20);await page.mouse.down();await page.mouse.move(bar.x+bar.width/2+80,bar.y+20);await page.mouse.up();expect((await sidebar.boundingBox())!.width).toBeGreaterThan(before+50);
+  const split=page.getByRole('separator',{name:'Resize problem and code panels'});await expect(split).toBeVisible();const old=Number(await split.getAttribute('aria-valuenow'));const center=(await split.boundingBox())!;await page.mouse.move(center.x+4,center.y+20);await page.mouse.down();await page.mouse.move(center.x+70,center.y+20);await page.mouse.up();expect(Number(await split.getAttribute('aria-valuenow'))).toBeGreaterThan(old);
+  await expect(editor).toHaveText('Keep this draft');
+  await mount(page);await expect.poll(async()=>Number(await page.getByRole('separator',{name:'Resize question list'}).getAttribute('aria-valuenow'))).toBeGreaterThan(260);
+ }else{await expect(page.getByRole('separator',{name:'Resize question list'})).toHaveCount(0);}
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

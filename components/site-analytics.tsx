@@ -7,7 +7,7 @@ import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next";
 
 export function tidyEvent(event: BeforeSendEvent): BeforeSendEvent | null {
   const url = new URL(event.url);
-  if (url.pathname.startsWith("/settings") || url.pathname.startsWith("/auth")) return null;
+  if (url.pathname === "/articles/manage" || url.pathname.startsWith("/settings") || url.pathname.startsWith("/auth")) return null;
   url.search = "";
   return { ...event, url: url.toString() };
 }

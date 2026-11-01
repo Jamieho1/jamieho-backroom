@@ -45,7 +45,7 @@ describe("ProjectGrid", () => {
   it("renders one window per registry row, so a new row is a new card", () => {
     const rows = [...FALLBACK_APPS, app({ id: "new", name: "Brand New", kind: "external", url: "https://new.dev", visibility: "public", tags: ["Go"] })];
     render(<ProjectGrid apps={rows} />);
-    expect(screen.getAllByRole("article")).toHaveLength(4);
+    expect(screen.getAllByRole("article")).toHaveLength(rows.length);
     const card = screen.getByRole("article", { name: "Brand New" });
     expect(within(card).getByRole("link", { name: "Visit ↗" }).getAttribute("rel")).toBe("noopener noreferrer");
     expect(within(screen.getByRole("article", { name: "Behavioral" })).getByText("Invite-only")).toBeTruthy();

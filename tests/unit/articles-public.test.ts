@@ -1,0 +1,7 @@
+import {beforeEach,it,expect,vi} from 'vitest';
+const m=vi.hoisted(()=>({client:vi.fn(),select:vi.fn(),eq:vi.fn(),order:vi.fn(),single:vi.fn()}));
+vi.mock('@/lib/env',()=>({readSupabaseEnv:()=>({url:'https://example.supabase.co',anonKey:'public-test-placeholder'})}));vi.mock('@supabase/supabase-js',()=>({createClient:m.client}));
+import {getPublicArticles,getPublicArticle} from '@/lib/articles-public';
+beforeEach(()=>{vi.clearAllMocks();m.order.mockResolvedValue({data:[],error:null});m.single.mockResolvedValue({data:null,error:null});m.eq.mockReturnValue({eq:m.eq,order:m.order,maybeSingle:m.single});m.select.mockReturnValue({eq:m.eq});m.client.mockReturnValue({from:()=>({select:m.select})});});
+it('uses a cookie-free anon client and explicitly excludes drafts for list and direct links',async()=>{await getPublicArticles();expect(m.client).toHaveBeenCalledWith('https://example.supabase.co','public-test-placeholder',{auth:{persistSession:false}});expect(m.eq).toHaveBeenCalledWith('published',true);await getPublicArticle('draft-example');expect(m.eq).toHaveBeenCalledWith('slug','draft-example');expect(m.eq).toHaveBeenLastCalledWith('published',true);});
+it('surfaces read failures instead of treating them as empty data',async()=>{m.order.mockResolvedValue({data:null,error:{message:'down'}});await expect(getPublicArticles()).rejects.toThrow('unavailable');m.single.mockResolvedValue({data:null,error:{message:'down'}});await expect(getPublicArticle('example')).rejects.toThrow('unavailable');});

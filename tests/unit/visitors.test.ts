@@ -45,6 +45,7 @@ describe("analytics events", async () => {
   const { tidyEvent } = await import("@/components/site-analytics");
   it("drops owner and sign-in pages and strips query strings", () => {
     expect(tidyEvent({ type: "pageview", url: "https://x.app/settings#inbox" })).toBeNull();
+    expect(tidyEvent({ type: "pageview", url: "https://x.app/articles/manage" })).toBeNull();
     expect(tidyEvent({ type: "pageview", url: "https://x.app/auth/callback?code=1" })).toBeNull();
     expect(tidyEvent({ type: "pageview", url: "https://x.app/projects?next=%2Fdesktop" })?.url).toBe("https://x.app/projects");
   });

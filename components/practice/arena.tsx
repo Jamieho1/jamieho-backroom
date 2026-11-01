@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { PRACTICE_LIST, problemByNumber, starterCode } from "@/lib/practice/catalog";
 import { extraOf, solutionOf } from "@/lib/practice/solutions";
 import { PythonRunner, type RunOutcome, type RunMode } from "@/lib/practice/runner";
@@ -13,10 +13,12 @@ import { CodeBlock } from "@/components/notes/code-highlight";
 import { TraceVisual } from "@/components/notes/trace-visual";
 import { CodeEditor } from "./code-editor";
 import { QuestionNotes } from "./question-notes";
+import { usePracticePanels,ResizeHandle } from "./panels";
 import { usePracticeStars } from "./use-practice-stars";
 import { useSavedPractice } from "./use-saved-practice";
 
 export function PracticeArena({ viewerKey, initialProblem, canEdit = false }: { viewerKey:string; initialProblem?:number;canEdit?:boolean }) {
+ const panels=usePracticePanels();
  const [selected,setSelected]=useState(problemByNumber(initialProblem??0)?.lc ?? PRACTICE_LIST[0].lc);
  const [search,setSearch]=useState("");
  const [topic,setTopic]=useState("");
@@ -24,9 +26,10 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false }: { 
  const stars=usePracticeStars(canEdit);
  const [busy,setBusy]=useState(false);
  const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canEdit||!starredOnly||stars.stars.has(p.lc)));
- return <div className="practice-arena">
+ return <div className={`practice-arena${panels.state.collapsed?' sidebar-collapsed':''}`} style={{'--practice-sidebar':`${panels.state.collapsed?52:panels.state.sidebar}px`} as CSSProperties}>
   <aside className="practice-sidebar">
-   <h2>Practice</h2>
+   <div className="practice-sidebar-heading">{!panels.state.collapsed?<h2>Practice</h2>:null}<button type="button" className="btn ghost small" aria-label={panels.state.collapsed?'Expand question list':'Collapse question list'} aria-expanded={!panels.state.collapsed} onClick={()=>panels.setState(s=>({...s,collapsed:!s.collapsed}))}>{panels.state.collapsed?'»':'«'}</button></div>
+   {!panels.state.collapsed?<>
    <label className="field"><span>Search problems</span><input type="search" placeholder="Search questions…" value={search} onChange={e=>setSearch(e.target.value)} /></label>
    <label className="field"><span>Topic</span><select value={topic} onChange={e=>setTopic(e.target.value)}><option value="">All topics</option>{TOPICS.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}</select></label>
    {canEdit?<>
@@ -36,14 +39,19 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false }: { 
     {stars.saveError?<div role="alert"><p>{stars.saveError}</p><button type="button" className="btn ghost small" disabled={stars.saving} onClick={()=>void stars.retry()}>Retry saving star</button></div>:null}
    </>:null}
    <nav aria-label="Practice problems">{list.map(p=><button type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{canEdit&&stars.stars.has(p.lc)?<span aria-label="Starred">★ </span>:null}{p.title}<span className="practice-tags"><Difficulty value={p.difficulty} /><span className="practice-tag practice-collection">NeetCode 150</span></span></button>)}{!list.length?<p>{canEdit&&starredOnly?'No starred questions match. Star a question to revisit it here.':'No matching problems.'}</p>:null}</nav>
+   </>:null}
   </aside>
-  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} starred={stars.stars.has(selected)} starDisabled={!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
+  {!panels.state.collapsed?<ResizeHandle label="Resize question list" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>panels.setState(s=>({...s,sidebar}))} />:<div className="practice-resizer-spacer" />}
+  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
  </div>;
 }
 
 function Difficulty({value}:{value:string}){return <span className={`practice-tag practice-difficulty ${value.toLowerCase()}`} data-difficulty={value.toLowerCase()}>{value}</span>;}
 
-function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,starred,starDisabled,onStar}:{lc:number;viewerKey:string;canEdit:boolean;onBusy(b:boolean):void;starred:boolean;starDisabled:boolean;onStar():void}) {
+function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,starDisabled,onStar}:{lc:number;viewerKey:string;canEdit:boolean;onBusy(b:boolean):void;split:number;onSplit(n:number):void;starred:boolean;starDisabled:boolean;onStar():void}) {
+ const columns=useRef<HTMLDivElement>(null);
+ const [columnsWidth,setColumnsWidth]=useState(800);
+ useEffect(()=>{if(!columns.current||typeof ResizeObserver==='undefined')return;const observer=new ResizeObserver(([entry])=>setColumnsWidth(entry.contentRect.width));observer.observe(columns.current);return()=>observer.disconnect();},[]);
  const problem=problemByNumber(lc)!;
  const meta=PRACTICE_LIST.find(p=>p.lc===lc)!;
  const [code,setCode]=useState(()=>readCode(viewerKey,lc)??starterCode(lc));
@@ -79,7 +87,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,starred,starDisabled,onSt
  }
  return <section className="practice-workspace" aria-label={meta.title}>
   <header className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">NeetCode 150</span><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canEdit?<button type="button" className="btn ghost small practice-star" aria-label={`${starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
-  <div className="practice-columns">
+  <div className="practice-columns" ref={columns} style={{'--practice-columns':`${split}fr 8px ${100-split}fr`} as CSSProperties}>
    <div className="practice-description">
     <div className="notes-tabs" role="tablist" aria-label="Problem view">{["Problem","Solution","Notes"].map(t=><button type="button" role="tab" key={t} disabled={notesEditing&&t!=="Notes"} id={`practice-tab-${t}`} aria-selected={tab===t} aria-controls="practice-panel" onClick={()=>setTab(t)}>{t}</button>)}</div>
     <div role="tabpanel" id="practice-panel" aria-labelledby={`practice-tab-${tab}`}>
@@ -93,6 +101,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,starred,starDisabled,onSt
      </>}
     </div>
    </div>
+   <ResizeHandle label="Resize problem and code panels" value={split} min={25} max={75} reset={50} unit="percent" scale={100/Math.max(1,columnsWidth-8)} onChange={onSplit} />
    <div className="practice-coding">
     <h3>Python</h3><p className="muted small">{canEdit?"Save code to sync it across devices. Runs and submissions are recorded automatically.":"Code is saved in this browser only."} Run checks examples; Submit checks all local tests.</p>
     {!ownerReady?<p role="status">Loading saved code…</p>:<CodeEditor key={editorVersion} initial={code} label="Python code" onChange={value=>{setCode(value);setBrowserDraft(value);setStorageFailed(!storeCode(viewerKey,lc,value));}} />}

@@ -14,7 +14,7 @@ import { appHref } from "@/lib/desktop-pages";
 import Link from "next/link";
 import { logDesktopOpen } from "@/app/actions/desktop";
 
-const GLYPH: Record<string, string> = { notes: "▤", code: "{ }", chat: "❝", gear: "⚙" };
+const GLYPH: Record<string, string> = { notes: "▤", code: "{ }", chat: "❝", gear: "⚙", articles:"▤" };
 
 export type OpenState = "visit" | "open" | "sign-in" | "invite-only" | "soon";
 export const OPEN_LABEL: Record<OpenState, string> = { visit: "Visit ↗", open: "Open", "sign-in": "Sign in to open", "invite-only": "Invite only · sign in", soon: "Coming soon" };

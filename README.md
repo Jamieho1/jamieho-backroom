@@ -221,3 +221,33 @@ retrying after navigating elsewhere. Owner code/attempt/note saves are independe
 Migration `supabase/migrations/20261101142129_practice_stars.sql` was approved and **applied live**
 on 2026-11-01 (remote version `20261101144554`). It adds RLS-protected practice_stars, owner-only writes and
 owner-only app-access reads. No SQL functions are exposed. Privacy and encrypted exports include the list.
+
+## Practice panels and CI Retry fix
+
+The Practice question list can collapse/expand. On desktop, drag the divider beside the list to resize
+it, and the divider between the problem and code to adjust those panels. Dividers also support arrow
+keys, Home/End and double-click to reset. Sizes and collapse state stay in this browser. Phone layouts
+remain stacked and avoid narrow draggable columns. Resizing/collapsing does not reset the code editor.
+
+The CI note-Retry failure was a test synchronization/query issue under load: the integration test now
+awaits the React transition and scopes Save/Retry queries to the named notes editor. Deprecated ignored
+esbuild JSX config was removed; tsconfig's automatic JSX configuration is used. Ubuntu 24.04, Node 22
+and pinned dependencies are unchanged. GitHub will verify the fix when Jamie pushes.
+
+## Articles
+
+Articles is public at `/articles`, with shareable `/articles/your-slug` pages for extra references
+from YouTube videos and Instagram posts. Search and platform filters help readers find an entry.
+The signed-in owner opens **Manage articles** (`/articles/manage`) to create or edit Markdown,
+choose a platform and optionally link the original video/post. New articles start as private drafts.
+Tick Publish publicly and Save to publish; untick and Save to unpublish. Failed saves retain the draft
+and offer Retry. Stable slugs are suitable for links from video descriptions and social profiles.
+
+Migration `supabase/migrations/20261101145851_articles.sql` was approved and **applied live** on
+2026-11-01 (remote version `20261101223239`). It registers the
+public Articles desktop app and creates `articles` with RLS: published/app-access public reads and
+owner-only drafts/writes. The database is ready for Jamie to push/deploy this version.
+Articles' registry visibility stays public; individual entries are published or private drafts.
+No content is seeded, no external-platform API/secret is needed, and no video/post content is fetched.
+Privacy and encrypted exports include Articles; owner management is excluded from analytics.
+The Articles index is also checked for pre-rendering. See `Resources/Articles - Content Guide.md`.

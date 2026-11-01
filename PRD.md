@@ -74,6 +74,7 @@ In scope (v1):
   - **Question bank view:** grouped by theme (Conflict, Failure, Leadership, Ambiguity, Ownership, Impact, Customer, plus the Palantir/Balyasny/JPMorgan sets). Each question shows its best stories, an answer outline and follow-ups.
   - A coverage strip per theme.
   - Starts Invite-only.
+- **Articles (Jamie, 2026-11-01):** public reference articles for YouTube/Instagram with shareable slug URLs; owner-only Markdown editing, drafts and publish/unpublish; public platform/search filters. Personal article content stays in the database.
 - **Settings:**
   - App visibility, the invite list, the Inbox.
   - The sign-in list (name, email, first and last visit, apps opened).

@@ -16,6 +16,7 @@ export const FALLBACK_APPS: AppRow[] = [
   { id: "notes", name: "Notes", icon: "notes", kind: "internal", url: "/notes", visibility: "signed_in", screenshots: [], tags: ["Next.js", "Supabase", "Markdown"], description: "Coding-interview notes: concept cards, step-by-step visuals and the problems for each pattern.", sort: 10, locked: false },
   { id: "practice", name: "Practice", icon: "code", kind: "internal", url: "/practices", visibility: "signed_in", screenshots: [], tags: ["Pyodide", "CodeMirror", "TypeScript"], description: "A LeetCode-style practice arena that runs Python in your browser, with solutions and visuals.", sort: 20, locked: false },
   { id: "behavioral", name: "Behavioral", icon: "chat", kind: "internal", url: "/behavioral", visibility: "invite_only", screenshots: [], tags: ["STAR", "Interview prep"], description: "Experience mapped to STAR stories and a behavioural question bank.", sort: 30, locked: false },
+  { id:"articles",name:"Articles",icon:"articles",kind:"internal",url:"/articles",visibility:"public",screenshots:[],tags:["References","Writing"],description:"Extra references and reading for videos and posts.",sort:35,locked:true },
 ];
 
 /** Pre-rendered pages read with the public key. Throws if Supabase is down so the last good page is kept. */

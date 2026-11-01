@@ -27,7 +27,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
   const {apps:cachedApps,loadError,seed}=useDesktopApps();
   useEffect(()=>{if(viewerId)seed(viewerId,apps);},[viewerId,apps,seed]);
   const registry=discoverApps?cachedApps:apps;
-  const launchers=[...DESKTOP_PAGES,...registry.filter(a=>!DESKTOP_PAGES.some(p=>p.id===a.id))];
+  const launchers=[...DESKTOP_PAGES.map(page=>registry.find(a=>a.id===page.id)??page),...registry.filter(a=>!DESKTOP_PAGES.some(p=>p.id===a.id))];
   const active = [...launchers,PRIVACY_WINDOW,SIGNIN_WINDOW].find((a) => a.id === initialApp && a.kind === "internal");
   const authenticated=signedIn||viewer.status==='member'||viewer.status==='owner';
   const [maximised, setMaximised] = useState(false);
@@ -38,9 +38,10 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
     const timer = setInterval(tick, 15000);
     return () => clearInterval(timer);
   }, []);
+  const tracked=!!active&&registry.some(a=>a.id===active.id);
   useEffect(() => {
-    if (active&&registry.some(a=>a.id===active.id)) void logDesktopOpen(active.id);
-  }, [active?.id]); // A deep link counts as opening an app, too.
+    if (active&&tracked) void logDesktopOpen(active.id);
+  }, [active?.id,tracked]); // A deep link counts as opening an app, too.
 
   function appLink(app: AppRow, icon: boolean) {
     const content = <>{icon ? (ICONS[ICON_KEY[app.icon] ?? app.icon] ?? ICONS.notes) : null}<span>{app.name}{app.kind === "external" ? " ↗" : ""}</span></>;

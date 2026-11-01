@@ -1,0 +1,9 @@
+// @vitest-environment jsdom
+import {beforeEach,afterEach,it,expect} from 'vitest';
+import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react';
+import {ResizeHandle,usePracticePanels} from '@/components/practice/panels';
+function Probe(){const {state,setState}=usePracticePanels();return <><output>{state.sidebar}:{state.split}:{String(state.collapsed)}</output><ResizeHandle label="Test panels" value={state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>setState(s=>({...s,sidebar}))} /><button onClick={()=>setState(s=>({...s,collapsed:!s.collapsed}))}>Collapse</button></>;}
+beforeEach(()=>localStorage.clear());afterEach(cleanup);
+it('keyboard resizing clamps dimensions and double-click resets',()=>{render(<Probe />);const handle=screen.getByRole('separator',{name:'Test panels'});fireEvent.keyDown(handle,{key:'ArrowRight'});expect(handle.getAttribute('aria-valuenow')).toBe('230');fireEvent.keyDown(handle,{key:'End'});expect(handle.getAttribute('aria-valuenow')).toBe('420');fireEvent.keyDown(handle,{key:'ArrowRight'});expect(handle.getAttribute('aria-valuenow')).toBe('420');fireEvent.doubleClick(handle);expect(handle.getAttribute('aria-valuenow')).toBe('220');});
+it('widths and collapse choice survive remount without storing content',async()=>{const first=render(<Probe />);fireEvent.keyDown(screen.getByRole('separator'),{key:'ArrowRight'});fireEvent.click(screen.getByRole('button',{name:'Collapse'}));first.unmount();render(<Probe />);await screen.findByText('230:50:true');expect(Object.keys(JSON.parse(localStorage.getItem('jamieho.practice.panels.v1')!)).sort()).toEqual(['collapsed','sidebar','split']);});
+it('invalid preferences fall back safely; oversized values are clamped',async()=>{localStorage.setItem('jamieho.practice.panels.v1',JSON.stringify({sidebar:9999,split:-10,collapsed:false}));render(<Probe />);await waitFor(()=>expect(screen.getByText('420:25:false')).toBeTruthy());});

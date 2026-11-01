@@ -26,12 +26,13 @@ beforeAll(async () => {
 });
 
 describe("seed rows", () => {
-  it("registers Notes, Practice, Behavioral (Invite-only) and a locked owner-only Settings", async () => {
+  it("registers Notes, Practice, Behavioral (Invite-only) public Articles and a locked owner-only Settings", async () => {
     const r = await db.query<{ id: string; visibility: string; locked: boolean }>("select id, visibility, locked from public.apps order by sort");
     expect(r.rows).toEqual([
       { id: "notes", visibility: "signed_in", locked: false },
       { id: "practice", visibility: "signed_in", locked: false },
       { id: "behavioral", visibility: "invite_only", locked: false },
+      { id: "articles", visibility: "public", locked: true },
       { id: "settings", visibility: "owner_only", locked: true },
     ]);
   });
@@ -39,7 +40,7 @@ describe("seed rows", () => {
 
 describe("the registry", () => {
   it("anyone, even anonymous, can read it (the Projects page shows every card)", async () => {
-    expect(await as(db, anon, (q) => q("select id from public.apps"))).toHaveLength(4);
+    expect(await as(db, anon, (q) => q("select id from public.apps"))).toHaveLength(5);
   });
   it("only the owner changes it", async () => {
     await expect(as(db, anon, (q) => q("update public.apps set visibility = 'public' where id = 'behavioral'"))).rejects.toThrow(/permission denied/);

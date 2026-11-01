@@ -1,0 +1,10 @@
+import {z} from 'zod';
+export const PLATFORM_LABEL={youtube:'YouTube',instagram:'Instagram',other:'Other'} as const;
+export const articleSchema=z.object({id:z.uuid(),slug:z.string().max(80).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).refine(s=>!['manage','new','edit'].includes(s)),title:z.string().trim().min(1).max(160),summary:z.string().max(600),body:z.string().max(200000),platform:z.enum(['youtube','instagram','other']),source_url:z.string().max(2048).refine(s=>{if(!s)return true;try{return new URL(s).protocol==='https:';}catch{return false;}}),published:z.boolean()});
+export type ArticleEdit=z.infer<typeof articleSchema>;
+export type Article=ArticleEdit&{created_at:string;updated_at:string};
+export type ArticleCard=Pick<Article,'id'|'slug'|'title'|'summary'|'platform'|'created_at'>;
+export const ARTICLE_SELECT='id,slug,title,summary,body,platform,source_url,published,created_at,updated_at';
+export const articleHref=(slug:string)=>`/articles/${encodeURIComponent(slug)}`;
+export const emptyArticle=():ArticleEdit=>({id:crypto.randomUUID(),slug:'',title:'',summary:'',body:'',platform:'other',source_url:'',published:false});
+export type ArticleSave={ok:true;article:Article}|{ok:false;message:string};
