@@ -14,6 +14,8 @@ Read these first, in order. They are the source of truth and apply to every agen
 - Notion: Tickets data source `collection://1ff804d9-463a-49b6-8221-217e5552c790`. Set a ticket In Progress when you start
   and Done only after Jamie confirms it works live.
 
+- Public site UI follow-up: Home (`/`), Projects and Privacy now use the shared viewport-height desktop shell. They stay pre-rendered/public; signed-in registry icons load separately through RLS-filtered server reads. Global footer removed; Privacy links from Home. No new migration. Local implementation awaits Jamie's push/live review.
+
 ## The predecessor app (Interview Prep artifact)
 - **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
   desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.

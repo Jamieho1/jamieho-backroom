@@ -24,9 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ViewerProvider>
           <SiteHeader />
           {children}
-          <footer className="site-footer">
-            <a href="/privacy">Privacy</a>
-          </footer>
         </ViewerProvider>
         <SiteAnalytics />
       </body>

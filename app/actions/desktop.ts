@@ -12,3 +12,13 @@ export async function logDesktopOpen(appId: string): Promise<void> {
     console.warn("app open not recorded: unavailable");
   }
 }
+
+/** Client-side public-page navigation only; cookies never enter the prerendered pages. */
+export async function getDesktopApps():Promise<import('@/lib/apps').AppRow[]>{
+ const {getViewer}=await import('@/lib/viewer');
+ if((await getViewer()).role==='anonymous')return [];
+ const sb=await supabaseServer();if(!sb)throw new Error('unavailable');
+ const {data,error}=await sb.from('desktop_apps').select('*').order('sort').order('id');
+ if(error)throw new Error('unavailable');
+ return data??[];
+}

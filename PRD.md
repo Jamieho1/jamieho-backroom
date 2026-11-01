@@ -80,6 +80,7 @@ In scope (v1):
   - A free-tier banner.
 - **Analytics:** Vercel Web Analytics (cookieless, no banner).
 - **Design:**
+  - Public Home opens first as a desktop app; Projects and Privacy share the same shell. Privacy links from Home instead of a global footer. Public routes remain pre-rendered; private apps still require access. Windows fill the remaining viewport height and scroll their content internally (Jamie, 2026-11-01).
   - The current PostHog-style tokens, type, light/dark mode and IDE code colours across the whole site.
   - The landing page uses an editorial layout.
   - Dark mode follows the system setting, with a toggle.

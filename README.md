@@ -90,7 +90,7 @@ view, which uses the current caller's RLS access checks without exposing invite 
 Applied to production with Jamie's approval on 31 October 2026.
 
 `/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
-open in a new tab. Notes and Practice render inside the desktop; Behavioral remains a placeholder pending its content tickets.
+open in a new tab. Notes, Practice and Behavioral render inside the desktop.
 Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
 After deployment, check a member, an invited member and the owner; the owner alone should see Settings.
 
@@ -177,3 +177,20 @@ Migration `supabase/migrations/20261101110015_behavioral_answers.sql` was approv
 on 2026-11-01 (remote version `20261101110756`). It creates RLS-protected `behavioral_answers`;
 Behavioral app access controls reads and only the owner writes. Generic prompts stay in code;
 personal preparation stays in Supabase and encrypted exports. Claude handles the TKT-69 import.
+
+## Shared public desktop and window sizing
+
+Home (`/`) opens first as a desktop app, with Projects (`/projects`) in the same shell. Privacy
+(`/privacy`) also uses the shell and is linked from the bottom of Home; there is no global footer
+under the desktop. All three public routes remain pre-rendered and need no sign-in. Home and Projects
+icons appear in every desktop launcher. Owner Edit site and sign-in/theme controls remain in the menu bar.
+
+On public pages, signed-in registry icons load client-side from the server's RLS-filtered desktop view.
+Guests see only the public page icons. Protected app content remains behind `/desktop` authentication
+and database RLS. Public page navigation is not logged as a registry app launch; existing private/app
+launch logging stays intact. `/desktop?app=home`, `projects` and `privacy` redirect to canonical public routes.
+
+The shell fills the viewport; open windows stretch to its bottom regardless of content length. Long
+content scrolls inside the window rather than extending the document. Phone launchers stay a grid
+with their own scroll limit so the active page remains usable at 390 px. Settings' standalone owner
+route and sign-in/unavailable desktop states also use the shell. No database migration is needed.

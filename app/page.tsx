@@ -1,3 +1,4 @@
+import { Desktop } from "@/components/desktop";
 import { getSections } from "@/lib/sections";
 import { getPublicExperience } from "@/lib/experience";
 import { ExperienceSection } from "@/components/experience-section";
@@ -15,7 +16,7 @@ export const revalidate = 86400;
 export default async function Home() {
   const [s, experience, apps] = await Promise.all([getSections(), getPublicExperience(), getProjectApps()]);
   return (
-    <main className="page landing">
+    <Desktop apps={[]} initialApp="home" discoverApps content={<div className="page landing">
       <AuthErrorNotice />
       <EditableSection sectionKey="hero" title={s.hero.title} body={s.hero.body} heading="h1" className="hero">
         <Markdown text={s.hero.body} />
@@ -41,6 +42,7 @@ export default async function Home() {
       <section className="block" aria-label="Send a message">
         <ContactForm action={sendMessage} />
       </section>
-    </main>
+      <footer className="landing-footer"><a href="/privacy">Privacy</a></footer>
+    </div>} />
   );
 }

@@ -29,9 +29,9 @@ test("a callback without a code comes back with a clear message", async ({ page 
   await expect(page.locator("main [role=alert]")).toHaveText(/Sign-in didn.t complete/);
 });
 
-test("the privacy policy is public and linked from every page", async ({ page }) => {
+test("the privacy policy is public and linked from Home without a global footer", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("contentinfo").getByRole("link", { name: "Privacy" }).click();
+  await page.locator(".landing-footer").getByRole("link", { name: "Privacy" }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole("heading", { name: "Privacy policy" })).toBeVisible();
   for (const h of ["What is collected", "Why it is used", "Who processes it", "How long it is kept", "Your rights"]) {
@@ -75,7 +75,7 @@ test("projects show as windows on the landing page and /projects", async ({ page
   await page.goto("/");
   const section = page.getByRole("region", { name: "Projects" });
   await expect(section.getByRole("article").first()).toBeVisible();
-  await page.getByRole("banner").getByRole("link", { name: "Projects" }).click();
+  await page.getByRole("navigation", { name: "Desktop apps" }).getByRole("link", { name: "Projects", exact:true }).click();
   await expect(page).toHaveURL(/\/projects$/);
   await expect(page.getByRole("heading", { level: 1, name: "Projects" })).toBeVisible();
   await expect(page.getByRole("article", { name: "Behavioral" })).toContainText("Invite-only");

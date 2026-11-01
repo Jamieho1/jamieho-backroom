@@ -1,3 +1,4 @@
+import { Desktop } from "@/components/desktop";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ const UPDATED = "1 November 2026";
 export default function Privacy() {
   const contact = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
   return (
-    <main className="page prose">
+    <Desktop apps={[]} initialApp="privacy" discoverApps content={<div className="page prose">
       <h1>Privacy policy</h1>
       <p className="muted">Last updated {UPDATED}</p>
 
@@ -100,6 +101,6 @@ export default function Privacy() {
 
       <h2>Changes</h2>
       <p>If this site starts collecting anything new, this page is updated first, with a new date at the top.</p>
-    </main>
+    </div>} />
   );
 }
