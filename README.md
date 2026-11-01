@@ -183,7 +183,9 @@ personal preparation stays in Supabase and encrypted exports. Claude handles the
 Home (`/`) opens first as a desktop app, with Projects (`/projects`) in the same shell. Privacy
 (`/privacy`) also uses the shell and is linked from the bottom of Home; there is no global footer
 under the desktop. All three public routes remain pre-rendered and need no sign-in. Home and Projects
-icons appear in every desktop launcher. Owner Edit site and sign-in/theme controls remain in the menu bar.
+icons appear in every desktop launcher. Home content fills the available window width within its 24 px
+side padding; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
+Owner Edit site and sign-in/theme controls remain in the menu bar.
 
 On public pages, signed-in registry icons load client-side from the server's RLS-filtered desktop view.
 Guests see only the public page icons. Protected app content remains behind `/desktop` authentication

@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test("landing links to the desktop, which asks anonymous visitors to sign in", async ({ page }) => {
+test("Home has no redundant desktop link; protected desktop still asks visitors to sign in", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Open my desktop" }).click();
+  await expect(page.getByRole("link", { name: "Open my desktop" })).toHaveCount(0);
+  await page.goto("/desktop");
   await expect(page).toHaveURL(/\/desktop$/);
   await expect(page.getByRole("heading", { name: "Your desktop", level:1 })).toBeVisible();
   await expect(page.getByText("Sign in with Google to open your apps.")).toBeVisible();
@@ -15,11 +16,19 @@ test("desktop deep links stay behind sign-in", async ({ page }) => {
   await expect(page.getByRole("region", { name: "Behavioral" })).toHaveCount(0);
 });
 
-test('Home, Projects and Privacy share a full-height desktop with no page footer gap',async({page})=>{
+test('Home, Projects and Privacy share a full-height desktop with no page footer gap',async({page},info)=>{
+ if(info.project.name==='desktop')await page.setViewportSize({width:1920,height:900});
  for(const [path,title] of [['/','Home'],['/projects','Projects'],['/privacy','Privacy']] as const){
   await page.goto(path);
   const win=page.getByRole('region',{name:title,exact:true});
   await expect(win).toBeVisible();
+  if(path==='/'){
+   const widthFits=await page.locator('.landing').evaluate(el=>{
+    const pane=el.parentElement!;const style=getComputedStyle(el);
+    const inner=el.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+    return Math.abs(el.getBoundingClientRect().width-pane.clientWidth)<2&&Array.from(el.querySelectorAll('.block,.hero .md p')).every(b=>Math.abs(b.getBoundingClientRect().width-inner)<2);
+   });expect(widthFits).toBe(true);
+  }
   const box=await win.boundingBox();
   expect(box).not.toBeNull();
   expect(Math.abs(box!.y+box!.height-page.viewportSize()!.height)).toBeLessThanOrEqual(2);
