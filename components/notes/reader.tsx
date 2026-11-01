@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { type NoteRow, parseVisuals } from "@/lib/notes";
-import { NEETCODE_150, leetcodeUrl } from "@/lib/notes/neetcode150";
+import { NEETCODE_150 } from "@/lib/notes/neetcode150";
 import { galleryGroups } from "@/lib/notes/concepts";
 import { ConceptCards } from "./concept-cards";
 import { NoteEditor, type SaveNote } from "./editor";
@@ -43,7 +43,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage }: { note: NoteRow; canE
   const groups = useMemo(() => galleryGroups(note.body, parsed.visuals), [note.body, parsed]);
   const concepts = useMemo(() => new Set(groups.map((g) => g.concept)), [groups]);
   const problems = NEETCODE_150.filter((p) => p.topic === note.id);
-  const links: AutoLink[] = problems.map((p) => ({ alias: p.title, href: leetcodeUrl(p), exact: false }));
+  const links: AutoLink[] = problems.map((p) => ({ alias: p.title, href: `/desktop?app=practice&problem=${p.lc}`, exact: false }));
   return (
     <section className="notes-main" aria-labelledby="notes-topic-title">
       <header className="notes-heading"><h2 id="notes-topic-title">{note.title}</h2><div className="actions"><button className="btn ghost small" type="button" aria-pressed={recall} onClick={() => setRecall(!recall)}>Recall mode</button>{canEdit ? <button type="button" className="btn ghost small" onClick={onEdit}>Edit note</button> : null}</div></header>
@@ -55,7 +55,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage }: { note: NoteRow; canE
         {tab === "Notes" ? <>
           {note.body ? <ConceptCards key={String(recall)} body={note.body} recall={recall} links={links} visualConcepts={concepts} onVisual={(concept) => { setFocus({ concept, tick: Date.now() }); setTab("Visuals"); }} /> : <p>No content for this topic yet.</p>}
           {note.free ? <section className="notes-free" aria-label="Free notes"><h3>Free notes</h3><Markdown key={String(recall)} text={note.free} recall={recall} links={links} /></section> : null}
-          {problems.length ? <section className="notes-problems" aria-label="NeetCode problems"><h3>NeetCode problems</h3><ul>{problems.map((p) => <li key={p.lc}><a href={leetcodeUrl(p)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></li>)}</ul></section> : null}
+          {problems.length ? <section className="notes-problems" aria-label="NeetCode problems"><h3>NeetCode problems</h3><ul>{problems.map((p) => <li key={p.lc}><a href={`/desktop?app=practice&problem=${p.lc}`}>{p.title} →</a></li>)}</ul></section> : null}
         </> : <>
           {parsed.invalid ? <p role="status">Some visuals could not be loaded. The note is still available.</p> : null}
           <VisualsTab groups={groups} focus={focus} />

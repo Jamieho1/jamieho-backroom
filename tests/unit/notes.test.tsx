@@ -15,7 +15,7 @@ it("starts concept cards closed and opens/closes all without edit or AI controls
   fireEvent.click(screen.getByRole("button", {name:"Open all"}));
   expect(screen.getByRole("button", {name:/1\. Walk/}).getAttribute("aria-expanded")).toBe("true");
   expect(document.querySelector(".tk-kw")?.textContent).toBe("def");
-  expect(screen.getAllByRole("link", {name:/Contains Duplicate/})[0].getAttribute("href")).toBe("https://leetcode.com/problems/contains-duplicate/");
+  expect(screen.getAllByRole("link", {name:/Contains Duplicate/})[0].getAttribute("href")).toBe("/desktop?app=practice&problem=217");
   expect(screen.queryByRole("button", {name:/edit|save|draft|AI/i})).toBeNull();
   fireEvent.click(screen.getByRole("button", {name:"Close all"}));
   expect(screen.queryByText("def visit(items):")).toBeNull();

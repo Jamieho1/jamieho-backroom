@@ -28,5 +28,5 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
   const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
   const practice = app === "practice" && apps.some((row) => row.id === "practice" && row.kind === "internal");
-  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena viewerKey={viewer.id!} initialProblem={Number(problem)} /> : undefined} />;
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena canEdit={viewer.role === "owner"} viewerKey={viewer.id!} initialProblem={Number(problem)} /> : undefined} />;
 }

@@ -120,8 +120,19 @@ there is no code-execution API or server execution. Runs stop after five seconds
 Run/Submit stay disabled with Retry Python, while the statement and Solution remain readable.
 
 Code is stored in localStorage per signed-in viewer and problem. It survives reloads in the same browser;
-it is not sent to Supabase or copied between devices. Owner database saving and question notes are TKT-65.
-Clearing site data clears this browser's code. The privacy page describes this storage.
+visitor code is not sent to Supabase. Clearing site data clears this browser's code.
+
+TKT-65 adds owner-only **Save code** to sync the current problem between devices. The saved database
+version loads first; **Restore browser draft** can recover a different local draft. Owner Run/Submit
+automatically saves a private attempt snapshot and result; failed saves offer Retry. Retrying an old
+attempt never replaces the separately saved code. Visitors keep browser-only code and attempts.
+The per-question Notes tab is shared with people allowed to open Practice; only the owner edits it.
+Notes problem links open the corresponding Practice problem. The privacy page describes this storage.
+
+TKT-65 migration `supabase/migrations/20261101005242_practice_owner_data.sql` was approved and applied live on 2026-11-01.
+It adds owner-only `practice_code` / `practice_attempts` and shared `question_notes`, all protected by RLS.
+Remote migration version: `20261101080700`. Claude handles the TKT-66 import using
+`Resources/Practice - Import Contract.md`; no personal code, attempts or question notes belong in git.
 
 `predev` and `prebuild` copy the pinned Pyodide package into ignored `public/pyodide/`; commit the package
 lock and `scripts/copy-pyodide.mjs`, not generated runtime assets. The worker and Python harness in

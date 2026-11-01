@@ -9,7 +9,8 @@ _Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho �
 - **TKT-61: Done** — Jamie confirmed the live Notes empty state.
 - **TKT-62: In Progress** — owner editor implemented/tested locally; free-notes migration applied live; awaiting Jamie's push and live review.
 - **TKT-63 data copy stays with Claude.**
-- **TKT-64: In Progress** — Practice arena implemented locally; testing and Jamie's live review before Done. No database migration.
+- **TKT-65: In Progress** — owner code saving, private attempts and shared question notes implemented locally; migration applied live; awaiting Jamie's push/live review. Claude owns TKT-66 import.
+- **TKT-64: In Progress** — Practice arena pushed; awaiting Jamie's explicit live confirmation before Done. No database migration.
 
 ## Order
 

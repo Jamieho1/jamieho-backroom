@@ -28,3 +28,8 @@
 .practice-arena .md-table { max-width:100%; overflow:auto; }
 @media(max-width:1150px) { .practice-columns { grid-template-columns:minmax(0,1fr); } }
 @media(max-width:800px) { .practice-arena { grid-template-columns:minmax(0,1fr); } .practice-sidebar nav { max-height:180px; } .practice-sidebar { border-right:0; border-bottom:1px solid var(--border); } }
+
+.practice-question-notes textarea { width:100%; max-width:100%; font:13px/1.7 var(--f-mono); }
+.practice-owner-save { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:12px 0; }
+.practice-owner-save p { width:100%; }
+.practice-history { margin-top:16px; }

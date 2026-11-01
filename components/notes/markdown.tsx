@@ -154,7 +154,7 @@ function linkify(str: string, key: number): ReactNode[] {
   while ((m = LINKS.re.exec(str))) {
     if (m.index > last) out.push(str.slice(last, m.index));
     out.push(
-      <a key={`al${k++}`} href={LINKS.byAlias.get(m[0].toLowerCase())} className="plink" target="_blank" rel="noopener noreferrer">
+      <a key={`al${k++}`} href={LINKS.byAlias.get(m[0].toLowerCase())} className="plink">
         {m[0]}
       </a>,
     );
@@ -172,7 +172,7 @@ function inline(text: string, key = 0): ReactNode[] {
     const inner = inline(text, key);
     LINKS = saved;
     return [
-      <a key={`ax${key}`} href={whole} className="plink" target="_blank" rel="noopener noreferrer">
+      <a key={`ax${key}`} href={whole} className="plink">
         {inner}
       </a>,
     ];

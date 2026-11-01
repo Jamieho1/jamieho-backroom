@@ -39,8 +39,11 @@ export default function Privacy() {
           can see who has visited the signed-in area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
         </li>
         <li>
-          <strong>Practice code</strong> stays in this browser, stored separately for each signed-in account and problem.
-          It is not sent to the site or executed on a server. Clearing this site’s browser storage removes it.
+          <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
+          and problem. Only the owner's explicitly saved code and run/submission attempts are stored in Supabase to sync
+          across devices. Question notes are also stored there; the owner edits them and people allowed to open Practice
+          can read them. Python executes only in the browser. Clearing site storage removes local drafts. Database copies
+          are covered by the retention and encrypted-backup periods below.
         </li>
         <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
@@ -56,7 +59,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send.
+        read and reply to messages you send, and store the owner’s notes, saved Practice code and attempts for use across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -71,7 +74,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records and messages are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, messages and the owner’s saved notes, Practice code and attempts are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>
