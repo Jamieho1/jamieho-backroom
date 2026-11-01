@@ -13,26 +13,37 @@ import { CodeBlock } from "@/components/notes/code-highlight";
 import { TraceVisual } from "@/components/notes/trace-visual";
 import { CodeEditor } from "./code-editor";
 import { QuestionNotes } from "./question-notes";
+import { usePracticeStars } from "./use-practice-stars";
 import { useSavedPractice } from "./use-saved-practice";
 
 export function PracticeArena({ viewerKey, initialProblem, canEdit = false }: { viewerKey:string; initialProblem?:number;canEdit?:boolean }) {
  const [selected,setSelected]=useState(problemByNumber(initialProblem??0)?.lc ?? PRACTICE_LIST[0].lc);
  const [search,setSearch]=useState("");
  const [topic,setTopic]=useState("");
+ const [starredOnly,setStarredOnly]=useState(false);
+ const stars=usePracticeStars(canEdit);
  const [busy,setBusy]=useState(false);
- const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&p.title.toLowerCase().includes(search.toLowerCase().trim()));
+ const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canEdit||!starredOnly||stars.stars.has(p.lc)));
  return <div className="practice-arena">
   <aside className="practice-sidebar">
    <h2>Practice</h2>
-   <label className="field"><span>Search problems</span><input type="search" value={search} onChange={e=>setSearch(e.target.value)} /></label>
+   <label className="field"><span>Search problems</span><input type="search" placeholder="Search questions…" value={search} onChange={e=>setSearch(e.target.value)} /></label>
    <label className="field"><span>Topic</span><select value={topic} onChange={e=>setTopic(e.target.value)}><option value="">All topics</option>{TOPICS.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}</select></label>
-   <nav aria-label="Practice problems">{list.map(p=><button type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{p.title}<small>{p.difficulty}</small></button>)}{!list.length?<p>No matching problems.</p>:null}</nav>
+   {canEdit?<>
+    <div className="practice-review-filter" aria-label="Review list"><button type="button" className="btn ghost small" aria-pressed={!starredOnly} onClick={()=>setStarredOnly(false)}>All questions</button><button type="button" className="btn ghost small" aria-pressed={starredOnly} disabled={!stars.loaded} onClick={()=>setStarredOnly(true)}>★ Starred ({stars.stars.size})</button></div>
+    {stars.loading?<p role="status">Loading starred questions…</p>:null}
+    {stars.loadError?<div role="alert"><p>{stars.loadError}</p><button type="button" className="btn ghost small" onClick={()=>void stars.load()}>Retry loading stars</button></div>:null}
+    {stars.saveError?<div role="alert"><p>{stars.saveError}</p><button type="button" className="btn ghost small" disabled={stars.saving} onClick={()=>void stars.retry()}>Retry saving star</button></div>:null}
+   </>:null}
+   <nav aria-label="Practice problems">{list.map(p=><button type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{canEdit&&stars.stars.has(p.lc)?<span aria-label="Starred">★ </span>:null}{p.title}<span className="practice-tags"><Difficulty value={p.difficulty} /><span className="practice-tag practice-collection">NeetCode 150</span></span></button>)}{!list.length?<p>{canEdit&&starredOnly?'No starred questions match. Star a question to revisit it here.':'No matching problems.'}</p>:null}</nav>
   </aside>
-  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} />
+  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} starred={stars.stars.has(selected)} starDisabled={!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
  </div>;
 }
 
-function ProblemWorkspace({lc,viewerKey,canEdit,onBusy}:{lc:number;viewerKey:string;canEdit:boolean;onBusy(b:boolean):void}) {
+function Difficulty({value}:{value:string}){return <span className={`practice-tag practice-difficulty ${value.toLowerCase()}`} data-difficulty={value.toLowerCase()}>{value}</span>;}
+
+function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,starred,starDisabled,onStar}:{lc:number;viewerKey:string;canEdit:boolean;onBusy(b:boolean):void;starred:boolean;starDisabled:boolean;onStar():void}) {
  const problem=problemByNumber(lc)!;
  const meta=PRACTICE_LIST.find(p=>p.lc===lc)!;
  const [code,setCode]=useState(()=>readCode(viewerKey,lc)??starterCode(lc));
@@ -67,7 +78,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy}:{lc:number;viewerKey:str
   if(mounted.current){setResult(out);setPhase("loading");void prepare(current);if(canEdit)void saved.record(snapshot,nextMode,out);}
  }
  return <section className="practice-workspace" aria-label={meta.title}>
-  <header className="practice-heading"><h2>{meta.title}</h2><span>{meta.difficulty}</span><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a></header>
+  <header className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">NeetCode 150</span><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canEdit?<button type="button" className="btn ghost small practice-star" aria-label={`${starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
   <div className="practice-columns">
    <div className="practice-description">
     <div className="notes-tabs" role="tablist" aria-label="Problem view">{["Problem","Solution","Notes"].map(t=><button type="button" role="tab" key={t} disabled={notesEditing&&t!=="Notes"} id={`practice-tab-${t}`} aria-selected={tab===t} aria-controls="practice-panel" onClick={()=>setTab(t)}>{t}</button>)}</div>

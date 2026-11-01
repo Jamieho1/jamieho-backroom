@@ -23,7 +23,7 @@ export function QuestionBank({stories,initialAnswers,canEdit,onEditing,onOpenSto
   <div className="behavioral-filters">
    <label className="field"><span>Question set</span><select value={set} disabled={!!draft} onChange={e=>{setSet(e.target.value as QuestionSet|'');setSelected(null);}}><option value="">All sets</option>{SETS.map(s=><option key={s}>{s}</option>)}</select></label>
    <label className="field"><span>Theme</span><select value={theme} disabled={!!draft} onChange={e=>{setTheme(e.target.value as Theme|'');setSelected(null);}}><option value="">All themes</option>{THEMES.map(s=><option key={s}>{s}</option>)}</select></label>
-   <label className="field"><span>Search questions</span><input type="search" value={search} disabled={!!draft} onChange={e=>{setSearch(e.target.value);setSelected(null);}} /></label>
+   <label className="field"><span>Search questions</span><input type="search" placeholder="Search questions…" value={search} disabled={!!draft} onChange={e=>{setSearch(e.target.value);setSelected(null);}} /></label>
   </div>
   <div className="behavioral-columns">
    <nav aria-label="Choose question">{THEMES.map(t=>{const rows=visible.filter(q=>q.theme===t);return rows.length?<section key={t}><h4>{t}</h4>{rows.map(q=><button type="button" className="btn ghost behavioral-question" key={q.id} disabled={!!draft} aria-pressed={question?.id===q.id} onClick={()=>setSelected(q.id)}>{q.text}<span className="muted">{q.set}</span></button>)}</section>:null;})}{!visible.length?<p>No questions match these filters.</p>:null}</nav>

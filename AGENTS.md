@@ -18,6 +18,8 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 - Canonical app URLs: `/notes`, `/practices`, `/practices/<problem>` and `/behavioral`; old desktop query URLs redirect. Permitted launcher icons persist in shared client state and revalidate on navigation/account changes. This route/cache follow-up is local, awaiting Jamie's push/review; no migration.
 
+- Practice UI follow-up: difficulty/NeetCode tags, search styling and private owner starred review list implemented locally. Migration `20261101142129_practice_stars.sql` was applied live on 2026-11-01; awaiting Jamie's push/live UI review.
+
 ## The predecessor app (Interview Prep artifact)
 - **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
   desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.

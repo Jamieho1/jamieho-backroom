@@ -2,6 +2,7 @@
 import { beforeEach,afterEach,expect,it,vi } from 'vitest';
 import { cleanup,render,screen,fireEvent,waitFor,within } from '@testing-library/react';
 const mocks=vi.hoisted(()=>({load:vi.fn(),saveCode:vi.fn(),saveAttempt:vi.fn(),saveNotes:vi.fn(),run:vi.fn(),warm:vi.fn()}));
+vi.mock('@/app/actions/practice-stars',()=>({loadPracticeStars:vi.fn(async()=>({ok:true,problems:[]})),savePracticeStar:vi.fn(async()=>({ok:true}))}));
 vi.mock('@/app/actions/practice',()=>({loadPracticeData:mocks.load,savePracticeCode:mocks.saveCode,savePracticeAttempt:mocks.saveAttempt,saveQuestionNotes:mocks.saveNotes}));
 vi.mock('@/lib/practice/runner',()=>({PythonRunner:class{warmUp=mocks.warm;run=mocks.run;dispose(){}}}));
 vi.mock('@/components/practice/code-editor',()=>({CodeEditor:({initial,onChange,label}:{initial:string;onChange(s:string):void;label:string})=><textarea aria-label={label} defaultValue={initial} onChange={e=>onChange(e.target.value)} />}));

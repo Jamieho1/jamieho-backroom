@@ -24,7 +24,7 @@ export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]
   return (
     <div className="notes-reader">
       <aside className="notes-sidebar">
-        <label className="field"><span>Search notes</span><input type="search" value={query} disabled={editing && canEdit} onChange={(e) => setQuery(e.target.value)} /></label>
+        <label className="field"><span>Search notes</span><input type="search" placeholder="Search notes…" value={query} disabled={editing && canEdit} onChange={(e) => setQuery(e.target.value)} /></label>
         <nav aria-label="Coding topics">
           {filtered.map((n) => <button className="notes-topic" type="button" key={n.id} disabled={editing && canEdit} aria-current={n.id === selected ? "page" : undefined} onClick={() => { setSelected(n.id); setSavedMessage(""); }}>{n.title}</button>)}
           {!filtered.length ? <p className="muted">No matching notes.</p> : null}

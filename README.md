@@ -205,3 +205,19 @@ The shell fills the viewport; open windows stretch to its bottom regardless of c
 content scrolls inside the window rather than extending the document. Phone launchers stay a grid
 with their own scroll limit so the active page remains usable at 390 px. Settings' standalone owner
 route and sign-in/unavailable desktop states also use the shell. No database migration is needed.
+
+## Practice tags and private review list
+
+Practice shows green Easy, orange Medium and red Hard pills, plus a NeetCode 150 collection tag.
+The current 143 supported problems are members of that collection; the tag does not imply all 150
+problems are implemented. Search accepts titles or problem numbers and has a tinted field/placeholder.
+Notes and Behavioral search fields also have descriptive placeholders.
+
+The owner can Star a question from its heading and use the Starred filter to revisit saved questions.
+Stars are private and stored in Supabase for cross-device use; visitors cannot read or change them.
+Failed loads/saves offer Retry, preserve the existing list and keep the original target question when
+retrying after navigating elsewhere. Owner code/attempt/note saves are independent of stars.
+
+Migration `supabase/migrations/20261101142129_practice_stars.sql` was approved and **applied live**
+on 2026-11-01 (remote version `20261101144554`). It adds RLS-protected practice_stars, owner-only writes and
+owner-only app-access reads. No SQL functions are exposed. Privacy and encrypted exports include the list.

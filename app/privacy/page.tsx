@@ -41,7 +41,7 @@ export default function Privacy() {
         </li>
         <li>
           <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
-          and problem. Only the owner's explicitly saved code and run/submission attempts are stored in Supabase to sync
+          and problem. Only the owner's starred review list, explicitly saved code and run/submission attempts are stored in Supabase to sync
           across devices. Question notes are also stored there; the owner edits them and people allowed to open Practice
           can read them. Python executes only in the browser. Clearing site storage removes local drafts. Database copies
           are covered by the retention and encrypted-backup periods below.
@@ -63,7 +63,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send, and store the owner’s notes, saved Practice code, attempts, Behavioral stories and answer preparation for use across devices.
+        read and reply to messages you send, and store the owner’s notes, saved Practice code, attempts, starred review list, Behavioral stories and answer preparation for use across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -78,7 +78,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, messages and the owner’s saved notes, Practice code, attempts, Behavioral stories and answer preparation are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, messages and the owner’s saved notes, Practice code, attempts, starred review list, Behavioral stories and answer preparation are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>

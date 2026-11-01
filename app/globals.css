@@ -254,3 +254,6 @@ body:has(.desktop-os) .site-header { display: none; }
 .desktop-app-content > .page.landing { width:100%; max-width:none; margin:0; }
 
 .landing-footer { border-top:1px solid var(--border); padding-top:16px; margin-top:32px; font-size:14px; }
+
+.desktop-app-content input[type="search"] { background:color-mix(in srgb,var(--blue) 12%,var(--bg)); color:var(--ink); border:1px solid color-mix(in srgb,var(--blue) 50%,var(--border)); border-radius:6px; padding:9px 10px; font:inherit; }
+.desktop-app-content input[type="search"]::placeholder { color:var(--secondary); opacity:1; }

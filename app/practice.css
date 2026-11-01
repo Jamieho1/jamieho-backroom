@@ -33,3 +33,19 @@
 .practice-owner-save { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:12px 0; }
 .practice-owner-save p { width:100%; }
 .practice-history { margin-top:16px; }
+
+.practice-heading h2 { margin:0; line-height:1.3; flex:1 1 180px; min-width:0; }
+.practice-heading-meta,.practice-tags,.practice-review-filter { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+.practice-heading-meta { max-width:100%; }
+.practice-tags { margin-top:5px; }
+.practice-tag { display:inline-flex; align-items:center; border:1px solid color-mix(in srgb,currentColor 25%,transparent); border-radius:999px; padding:3px 7px; font:700 11px/1.3 var(--f-body); white-space:nowrap; }
+.practice-difficulty { background:color-mix(in srgb,currentColor 12%,var(--bg)); }
+.practice-difficulty.easy { color:var(--green); }
+.practice-difficulty.medium { color:var(--practice-medium,#b45309); }
+.practice-difficulty.hard { color:var(--practice-hard,#b42318); }
+.practice-collection { color:var(--secondary); background:var(--input); }
+.practice-star[aria-pressed="true"] { color:var(--practice-medium,#b45309); }
+.practice-review-filter { margin:12px 0; }
+.practice-review-filter [aria-pressed="true"] { outline:2px solid var(--blue); outline-offset:1px; }
+:root[data-theme="dark"] { --practice-medium:#fdba74; --practice-hard:#ff9990; }
+@media(prefers-color-scheme:dark) { :root:not([data-theme="light"]) { --practice-medium:#fdba74; --practice-hard:#ff9990; } }

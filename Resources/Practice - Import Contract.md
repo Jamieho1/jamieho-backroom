@@ -25,3 +25,10 @@ copying. No LeetCode statement text. No AI calls or execution during import. Pra
 
 After import Jamie checks saved code on another device, private attempts, read-only member notes and
 problem links. TKT-66 stays with Claude; ticket Done requires Jamie's live confirmation.
+
+## Optional starred review list
+
+Migration `20261101142129_practice_stars.sql` was approved and APPLIED live on 2026-11-01 (remote version `20261101144554`). The new practice_stars table
+stores owner-only starred problem numbers (problem primary key, created_at timestamp). No starred
+data was copied. If a source review list needs importing later, use known catalog numbers and
+idempotent upserts after Jamie approves the content change; do not infer stars from past attempts.
