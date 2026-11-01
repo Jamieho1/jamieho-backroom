@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "What this site collects, why, and how to have it deleted.",
 };
 
-const UPDATED = "29 October 2026";
+const UPDATED = "1 November 2026";
 
 /**
  * Privacy policy (needed for Google sign-in to be published). Keep it true to what the code does:
@@ -37,6 +37,10 @@ export default function Privacy() {
         <li>
           <strong>Sign-in records</strong>: the date and time of each sign-in, and which apps you open on each day, so the site owner
           can see who has visited the signed-in area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
+        </li>
+        <li>
+          <strong>Practice code</strong> stays in this browser, stored separately for each signed-in account and problem.
+          It is not sent to the site or executed on a server. Clearing this site’s browser storage removes it.
         </li>
         <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can

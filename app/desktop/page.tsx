@@ -6,18 +6,20 @@ import type { AppRow } from "@/lib/apps";
 import { SettingsContent } from "@/app/settings/content";
 import { NotesContent } from "./notes-content";
 import "../notes.css";
+import "../practice.css";
+import { PracticeArena } from "@/components/practice/arena";
 
 export const dynamic = "force-dynamic";
 
-export default async function DesktopPage({ searchParams }: { searchParams: Promise<{ app?: string }> }) {
-  const { app } = await searchParams;
+export default async function DesktopPage({ searchParams }: { searchParams: Promise<{ app?: string; problem?: string }> }) {
+  const { app, problem } = await searchParams;
   const viewer = await getViewer();
   const sb = await supabaseServer();
   if (viewer.role === "anonymous") return (
     <main className="page">
       <h1>Your desktop</h1>
       <p>Sign in with Google to open your apps.</p>
-      {sb ? <SignInButton next={app ? `/desktop?app=${encodeURIComponent(app)}` : "/desktop"} /> : <p className="muted">Sign-in is not configured in this environment.</p>}
+      {sb ? <SignInButton next={app ? `/desktop?app=${encodeURIComponent(app)}${problem ? `&problem=${encodeURIComponent(problem)}` : ""}` : "/desktop"} /> : <p className="muted">Sign-in is not configured in this environment.</p>}
     </main>
   );
   const result = sb ? await sb.from("desktop_apps").select("*").order("sort").order("id") : null;
@@ -25,5 +27,6 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   const apps = (result.data ?? []) as AppRow[];
   const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
   const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
-  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : undefined} />;
+  const practice = app === "practice" && apps.some((row) => row.id === "practice" && row.kind === "internal");
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena viewerKey={viewer.id!} initialProblem={Number(problem)} /> : undefined} />;
 }

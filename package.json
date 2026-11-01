@@ -11,18 +11,26 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs",
-    "decrypt-export": "node scripts/decrypt-export.mjs"
+    "decrypt-export": "node scripts/decrypt-export.mjs",
+    "predev": "node scripts/copy-pyodide.mjs",
+    "prebuild": "node scripts/copy-pyodide.mjs"
   },
   "engines": {
     "node": ">=20.9"
   },
   "dependencies": {
+    "@codemirror/commands": "6.9.0",
+    "@codemirror/lang-python": "6.2.1",
+    "@codemirror/language": "6.11.3",
+    "@codemirror/state": "6.5.2",
+    "@codemirror/view": "6.38.6",
     "@lezer/highlight": "1.2.5",
     "@lezer/python": "1.1.19",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "@vercel/analytics": "2.0.1",
     "next": "16.4.3",
+    "pyodide": "314.0.7",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-markdown": "10.1.0",
@@ -36,6 +44,7 @@
     "@types/node": "22.20.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
     "jsdom": "30.0.0",
     "typescript": "5.9.3",
     "vitest": "5.0.5"

@@ -1,0 +1,21 @@
+/** NeetCode-style extras (complexity with reasons, pitfalls) for every written solution, keyed by LeetCode number. */
+import type { Extras } from "./types";
+import { extras as e0 } from "./advanced-graphs";
+import { extras as e1 } from "./arrays-hashing";
+import { extras as e2 } from "./backtracking";
+import { extras as e3 } from "./binary-search";
+import { extras as e4 } from "./dp-1d";
+import { extras as e5 } from "./dp-2d";
+import { extras as e6 } from "./graphs";
+import { extras as e7 } from "./greedy";
+import { extras as e8 } from "./heap";
+import { extras as e9 } from "./intervals";
+import { extras as e10 } from "./linked-list";
+import { extras as e11 } from "./math-geometry";
+import { extras as e12 } from "./sliding-window";
+import { extras as e13 } from "./stack";
+import { extras as e14 } from "./trees";
+import { extras as e15 } from "./tries";
+import { extras as e16 } from "./two-pointers";
+export const EXTRAS: Extras = Object.assign({}, e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16);
+export type { Extra, Big } from "./types";

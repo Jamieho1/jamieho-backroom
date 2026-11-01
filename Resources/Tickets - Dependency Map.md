@@ -2,13 +2,14 @@
 
 _Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho — Cowork OS → Tickets (project row "Personal Website (jamieho-backroom)"). IDs match Notion. Check this before starting work; only pick tickets whose blockers are Done, and tell Jamie before starting any coding ticket._
 
-## Current position (2026-10-31)
+## Current position (2026-11-01)
 
 - **R1 (TKT-51–59): Done**, live and verified by Jamie.
 - **TKT-60: Done** — desktop and Settings fix deployed; desktop migration applied live. Jamie authorized continuing.
 - **TKT-61: Done** — Jamie confirmed the live Notes empty state.
 - **TKT-62: In Progress** — owner editor implemented/tested locally; free-notes migration applied live; awaiting Jamie's push and live review.
 - **TKT-63 data copy stays with Claude.**
+- **TKT-64: In Progress** — Practice arena implemented locally; testing and Jamie's live review before Done. No database migration.
 
 ## Order
 

@@ -1,0 +1,30 @@
+.practice-arena { display:grid; grid-template-columns:200px minmax(0,1fr); min-width:0; }
+.practice-sidebar { min-width:0; padding:16px; background:var(--bg-accent); border-right:1px solid var(--border); }
+.practice-sidebar input,.practice-sidebar select { width:100%; min-width:0; }
+.practice-sidebar nav { max-height:55dvh; overflow:auto; }
+.practice-sidebar nav button { display:block; width:100%; border:0; border-radius:6px; text-align:left; padding:9px; color:var(--ink); background:transparent; cursor:pointer; font:600 13px var(--f-body); overflow-wrap:anywhere; }
+.practice-sidebar nav button:hover,.practice-sidebar nav [aria-current] { background:var(--bg); }
+.practice-sidebar small { display:block; color:var(--secondary); font-weight:400; }
+.practice-workspace { min-width:0; padding:16px; }
+.practice-heading,.practice-run-controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.practice-heading h2 { flex:1; }
+.practice-heading a { font-size:13px; }
+.practice-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; margin-top:16px; }
+.practice-description,.practice-coding { min-width:0; overflow-wrap:anywhere; }
+.practice-arena pre { white-space:pre-wrap; overflow-wrap:anywhere; max-width:100%; background:var(--input); border:1px solid var(--border-light); border-radius:6px; padding:12px; font:12px/1.7 var(--f-mono); }
+.practice-arena pre.code { white-space:pre; overflow:auto; }
+.practice-example,.practice-results { border:1px solid var(--border-light); border-radius:8px; padding:12px; margin:12px 0; }
+.practice-arena .editor { height:360px; min-width:0; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.practice-arena .cm-editor { max-width:100%; }
+.practice-arena .cm-scroller { overflow:auto; }
+.practice-run-controls { margin:12px 0; }
+.practice-results ul { padding-left:18px; }
+.practice-arena .tv-stage { max-width:100%; }
+.practice-arena .tv-pic { max-width:100%; }
+.practice-arena .tv-graph { max-width:100%; height:auto; }
+.practice-arena .tv-vars { max-width:100%; }
+.practice-arena .actions,.practice-arena .dg-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.practice-arena .hint { font-size:13px; color:var(--secondary); }
+.practice-arena .md-table { max-width:100%; overflow:auto; }
+@media(max-width:1150px) { .practice-columns { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:800px) { .practice-arena { grid-template-columns:minmax(0,1fr); } .practice-sidebar nav { max-height:180px; } .practice-sidebar { border-right:0; border-bottom:1px solid var(--border); } }

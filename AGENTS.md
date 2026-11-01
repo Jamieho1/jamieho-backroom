@@ -7,10 +7,10 @@ Read these first, in order. They are the source of truth and apply to every agen
 4. `Resources/Tickets - Dependency Map.md` and the Notion "Tickets" database (TKT-51…TKT-71).
 5. `README.md`: setup steps Jamie does himself (Google, Resend, Ops secrets).
 
-## Where things stand (2026-10-31)
+## Where things stand (2026-11-01)
 - **R1 done:** TKT-51…59 (skeleton, Google sign-in, app registry + Settings, landing sections, experience, projects,
   contact form + Inbox + Resend, analytics + Visitors, ops ping/export/banner). All live and verified by Jamie.
-- **R2 in progress:** TKT-60 (/desktop shell) is done; TKT-61 (Notes read view) is done; TKT-62 (owner editor) is in progress. TKT-63 data copy stays with Claude; R3 = TKT-64…66; R4 = TKT-67…70; TKT-71 = domain + subdomain SSO.
+- **R2 in progress:** TKT-60 (/desktop shell) is done; TKT-61 (Notes read view) is done; TKT-62 (owner editor) is in progress. TKT-63 data copy stays with Claude; R3: TKT-64 Practice is in progress; TKT-65…66 follow; R4 = TKT-67…70; TKT-71 = domain + subdomain SSO.
 - Notion: Tickets data source `collection://1ff804d9-463a-49b6-8221-217e5552c790`. Set a ticket In Progress when you start
   and Done only after Jamie confirms it works live.
 

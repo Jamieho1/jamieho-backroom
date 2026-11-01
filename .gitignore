@@ -11,3 +11,7 @@ playwright-report/
 .vercel/
 .DS_Store
 supabase/.temp/
+
+/public/pyodide/
+
+__pycache__/

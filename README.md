@@ -90,7 +90,7 @@ view, which uses the current caller's RLS access checks without exposing invite 
 Applied to production with Jamie's approval on 31 October 2026.
 
 `/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
-open in a new tab. Notes, Practice and Behavioral are placeholders pending their content tickets.
+open in a new tab. Notes and Practice render inside the desktop; Behavioral remains a placeholder pending its content tickets.
 Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
 After deployment, check a member, an invited member and the owner; the owner alone should see Settings.
 
@@ -108,3 +108,26 @@ Apply `supabase/migrations/20261031151127_notes_free.sql` before deploying this 
 The owner sees **Edit note** on an existing note and can save its body and free notes. Failed saves keep both
 draft fields with **Retry**. Cancel discards the draft; readers have no editing controls. Notes must be imported
 before the editor is visible; this ticket creates no sample content.
+
+## Practice arena (TKT-64)
+
+Open Practice from `/desktop`, or link to a problem with `/desktop?app=practice&problem=217`.
+The 143 prewritten problems, tests, reference solutions, visuals and pitfalls are ported from the artifact's
+own-words source. No LeetCode statements, saved attempts or personal question notes were imported.
+
+Run checks visible cases; Submit checks all local tests. Python runs only in a fresh browser Web Worker;
+there is no code-execution API or server execution. Runs stop after five seconds. If Python cannot load,
+Run/Submit stay disabled with Retry Python, while the statement and Solution remain readable.
+
+Code is stored in localStorage per signed-in viewer and problem. It survives reloads in the same browser;
+it is not sent to Supabase or copied between devices. Owner database saving and question notes are TKT-65.
+Clearing site data clears this browser's code. The privacy page describes this storage.
+
+`predev` and `prebuild` copy the pinned Pyodide package into ignored `public/pyodide/`; commit the package
+lock and `scripts/copy-pyodide.mjs`, not generated runtime assets. The worker and Python harness in
+`public/runner/` are tracked. Runtime source/license notices are generated alongside Pyodide.
+No database migration is needed for TKT-64.
+
+Tests validate all 143 reference solutions with the local test harness. Headless browser tests exercise real
+Pyodide, network restrictions, worker failure, CodeMirror, local code persistence, five-second termination
+and the 390 px layout. Their UI bundle is test-only; it does not create a public fixture route.
