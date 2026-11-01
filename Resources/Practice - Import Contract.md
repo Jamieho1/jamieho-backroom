@@ -21,7 +21,7 @@ source entries lacking outcomes: import their latest code into practice_code ins
 
 Question notes are shared, unlike code and attempts: review imported text for personal details before
 copying. No LeetCode statement text. No AI calls or execution during import. Practice links use
-`/desktop?app=practice&problem=217`.
+`/practices/217`.
 
 After import Jamie checks saved code on another device, private attempts, read-only member notes and
 problem links. TKT-66 stays with Claude; ticket Done requires Jamie's live confirmation.

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
 /**
@@ -12,6 +13,7 @@ export function Markdown({ text }: { text: string }) {
         components={{
           a: ({ href = "", children }) => {
             const external = /^https?:\/\//.test(href);
+            if(href.startsWith("/")&&!href.startsWith("//"))return <Link href={href} prefetch={false}>{children}</Link>;
             return (
               <a href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
                 {children}

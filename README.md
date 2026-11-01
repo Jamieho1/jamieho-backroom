@@ -91,6 +91,8 @@ Applied to production with Jamie's approval on 31 October 2026.
 
 `/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
 open in a new tab. Notes, Practice and Behavioral render inside the desktop.
+Canonical app routes are `/notes`, `/practices` (problem links `/practices/217`) and `/behavioral`.
+Legacy `/desktop?app=...` URLs redirect to their clean equivalents with the same sign-in/access checks.
 Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
 After deployment, check a member, an invited member and the owner; the owner alone should see Settings.
 
@@ -111,7 +113,7 @@ before the editor is visible; this ticket creates no sample content.
 
 ## Practice arena (TKT-64)
 
-Open Practice from `/desktop`, or link to a problem with `/desktop?app=practice&problem=217`.
+Open Practice at `/practices`, or link to a problem with `/practices/217`.
 The 143 prewritten problems, tests, reference solutions, visuals and pitfalls are ported from the artifact's
 own-words source. No LeetCode statements, saved attempts or personal question notes were imported.
 
@@ -147,7 +149,7 @@ and the 390 px layout. Their UI bundle is test-only; it does not create a public
 
 ## Behavioral CV and stories (TKT-67)
 
-Open Behavioral from `/desktop?app=behavioral`. It reuses Experience roles/projects/education and all
+Open Behavioral at `/behavioral`. It reuses Experience roles/projects/education and all
 of their bullets, including hidden bullets, for people permitted to open Behavioral. The registry starts
 Invite-only; Settings remains the place to change access. Public landing-page reads stay unchanged.
 
@@ -189,10 +191,15 @@ icons appear in every desktop launcher. Home content fills the available window 
 side padding; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
 Owner Edit site and sign-in/theme controls remain in the menu bar.
 
-On public pages, signed-in registry icons load client-side from the server's RLS-filtered desktop view.
+A shared provider above the page boundary retains signed-in registry icons across client navigation.
+It revalidates the server's RLS-filtered desktop view in the background on route/account changes,
+keeps same-account icons visible during refresh, and clears them on sign-out/account changes.
+Server-rendered permitted icons can seed this state on direct app entry. Internal menu/card/Notes links
+use client navigation so moving between Home, Projects and apps does not reload the document.
 Guests see only the public page icons. Protected app content remains behind `/desktop` authentication
 and database RLS. Public page navigation is not logged as a registry app launch; existing private/app
-launch logging stays intact. `/desktop?app=home`, `projects` and `privacy` redirect to canonical public routes.
+launch logging stays intact. Legacy query URLs redirect to canonical routes; registry URL values
+remain compatible without a database migration.
 
 The shell fills the viewport; open windows stretch to its bottom regardless of content length. Long
 content scrolls inside the window rather than extending the document. Phone launchers stay a grid

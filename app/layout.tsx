@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { DesktopAppsProvider } from "@/components/desktop-apps-provider";
 import { ViewerProvider } from "@/components/viewer-provider";
 import { THEME_BOOT } from "@/components/theme-toggle";
 import { SiteAnalytics } from "@/components/site-analytics";
@@ -22,8 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ViewerProvider>
-          <SiteHeader />
-          {children}
+          <DesktopAppsProvider>
+            <SiteHeader />
+            {children}
+          </DesktopAppsProvider>
         </ViewerProvider>
         <SiteAnalytics />
       </body>

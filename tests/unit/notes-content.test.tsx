@@ -11,7 +11,7 @@ it("shows the data-unavailable message when the notes query fails", async () => 
   server.mockResolvedValue({from:()=>({select:()=>({order})})});
   render(await NotesContent());
   expect(screen.getByRole("alert").textContent).toMatch(/Can't reach the data right now/);
-  expect(screen.getByRole("link", {name:"Try again"}).getAttribute("href")).toBe("/desktop?app=notes");
+  expect(screen.getByRole("link", {name:"Try again"}).getAttribute("href")).toBe("/notes");
 });
 it("shows a true empty state after a successful read", async () => {
   const order = vi.fn();

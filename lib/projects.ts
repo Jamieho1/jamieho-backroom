@@ -13,9 +13,9 @@ export const CARD_LIMITS = { name: 60, description: 400, tags: 8, tag: 24, scree
 
 /** Mirrors the seed rows; used only when Supabase isn't configured (local dev, CI). */
 export const FALLBACK_APPS: AppRow[] = [
-  { id: "notes", name: "Notes", icon: "notes", kind: "internal", url: "/desktop?app=notes", visibility: "signed_in", screenshots: [], tags: ["Next.js", "Supabase", "Markdown"], description: "Coding-interview notes: concept cards, step-by-step visuals and the problems for each pattern.", sort: 10, locked: false },
-  { id: "practice", name: "Practice", icon: "code", kind: "internal", url: "/desktop?app=practice", visibility: "signed_in", screenshots: [], tags: ["Pyodide", "CodeMirror", "TypeScript"], description: "A LeetCode-style practice arena that runs Python in your browser, with solutions and visuals.", sort: 20, locked: false },
-  { id: "behavioral", name: "Behavioral", icon: "chat", kind: "internal", url: "/desktop?app=behavioral", visibility: "invite_only", screenshots: [], tags: ["STAR", "Interview prep"], description: "Experience mapped to STAR stories and a behavioural question bank.", sort: 30, locked: false },
+  { id: "notes", name: "Notes", icon: "notes", kind: "internal", url: "/notes", visibility: "signed_in", screenshots: [], tags: ["Next.js", "Supabase", "Markdown"], description: "Coding-interview notes: concept cards, step-by-step visuals and the problems for each pattern.", sort: 10, locked: false },
+  { id: "practice", name: "Practice", icon: "code", kind: "internal", url: "/practices", visibility: "signed_in", screenshots: [], tags: ["Pyodide", "CodeMirror", "TypeScript"], description: "A LeetCode-style practice arena that runs Python in your browser, with solutions and visuals.", sort: 20, locked: false },
+  { id: "behavioral", name: "Behavioral", icon: "chat", kind: "internal", url: "/behavioral", visibility: "invite_only", screenshots: [], tags: ["STAR", "Interview prep"], description: "Experience mapped to STAR stories and a behavioural question bank.", sort: 30, locked: false },
 ];
 
 /** Pre-rendered pages read with the public key. Throws if Supabase is down so the last good page is kept. */

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 /**
  * A small, safe Markdown renderer for notes (headings, paragraphs, lists, code fences, inline code, bold, italics,
  * links). It builds React elements, never HTML strings, so nothing in a note can inject markup.
@@ -154,9 +155,9 @@ function linkify(str: string, key: number): ReactNode[] {
   while ((m = LINKS.re.exec(str))) {
     if (m.index > last) out.push(str.slice(last, m.index));
     out.push(
-      <a key={`al${k++}`} href={LINKS.byAlias.get(m[0].toLowerCase())} className="plink">
+      <Link prefetch={false} key={`al${k++}`} href={LINKS.byAlias.get(m[0].toLowerCase())!} className="plink">
         {m[0]}
-      </a>,
+      </Link>,
     );
     last = m.index + m[0].length;
   }
@@ -172,9 +173,9 @@ function inline(text: string, key = 0): ReactNode[] {
     const inner = inline(text, key);
     LINKS = saved;
     return [
-      <a key={`ax${key}`} href={whole} className="plink">
+      <Link prefetch={false} key={`ax${key}`} href={whole} className="plink">
         {inner}
-      </a>,
+      </Link>,
     ];
   }
   const out: ReactNode[] = [];

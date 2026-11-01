@@ -18,7 +18,7 @@ test.beforeAll(async()=>{
        </div></section>
      </div></main>
    );
- `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'mock-practice-service',setup(b){b.onResolve({filter:/app\/actions\/practice$/},()=>({path:'practice',namespace:'fixture'}));b.onResolve({filter:/app\/actions\/notes$/},()=>({path:'notes',namespace:'notes-fixture'}));b.onLoad({filter:/.*/,namespace:'notes-fixture'},()=>({contents:'export async function saveNote(){return {ok:false,message:"Not part of this fixture"};}'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`
+ `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'mock-practice-service',setup(b){b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'link-fixture'}));b.onLoad({filter:/.*/,namespace:'link-fixture'},()=>({resolveDir:process.cwd(),contents:'import React from "react";export default function Link({prefetch,children,...props}){return React.createElement("a",props,children)}'}));b.onResolve({filter:/app\/actions\/practice$/},()=>({path:'practice',namespace:'fixture'}));b.onResolve({filter:/app\/actions\/notes$/},()=>({path:'notes',namespace:'notes-fixture'}));b.onLoad({filter:/.*/,namespace:'notes-fixture'},()=>({contents:'export async function saveNote(){return {ok:false,message:"Not part of this fixture"};}'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`
  let codeFailures=1; let noteFailures=1;let loadFailures=location.search.includes('loadFailure')?1:0;
  export async function loadPracticeData(){if(loadFailures-- > 0)throw new Error('offline');return {ok:true,data:{note:'Shared question notes',code:location.search.includes('ownerFixture')?'Server code':null,attempts:[]}};}
  export async function savePracticeCode(){return codeFailures-- > 0 ? {ok:false,message:'Could not save code'} : {ok:true};}
@@ -91,9 +91,9 @@ test('owner controls preserve code and question-note drafts on failure',async({p
 test('Notes problem links target the matching arena problem',async({page})=>{
  await mount(page,'notesFixture');
  const link=page.getByRole('region',{name:'NeetCode problems'}).getByRole('link',{name:'Contains Duplicate →'});
- await expect(link).toHaveAttribute('href','/desktop?app=practice&problem=217');
+ await expect(link).toHaveAttribute('href','/practices/217');
  await link.click();
- await expect(page).toHaveURL(/\/desktop\?app=practice&problem=217$/);
+ await expect(page).toHaveURL(/\/practices\/217$/);
 });
 
 test('owner can recover saved code after an initial load failure without losing the latest browser draft',async({page})=>{

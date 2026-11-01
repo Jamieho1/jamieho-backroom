@@ -10,6 +10,8 @@ import { VISIBILITY_LABEL, type AppRow } from "@/lib/apps";
 import { SignInButton } from "./sign-in-button";
 import { CARD_LIMITS, DESKTOP_READY, parseLines, parseTags, validateCard, type CardEdit } from "@/lib/projects";
 import type { CardResult } from "@/app/actions/projects";
+import { appHref } from "@/lib/desktop-pages";
+import Link from "next/link";
 import { logDesktopOpen } from "@/app/actions/desktop";
 
 const GLYPH: Record<string, string> = { notes: "▤", code: "{ }", chat: "❝", gear: "⚙" };
@@ -20,7 +22,7 @@ export const OPEN_LABEL: Record<OpenState, string> = { visit: "Visit ↗", open:
 /** What the card's button does for this viewer. The database still decides what an opened app can read. */
 export function openState(app: Pick<AppRow, "kind" | "visibility" | "url">, status: "loading" | "anonymous" | "member" | "owner", desktopReady = DESKTOP_READY): OpenState {
   if (app.kind === "external") return "visit";
-  if (!desktopReady && app.url.startsWith("/desktop")) return "soon";
+  if (!desktopReady && (/^\/(?:desktop|notes|practices|behavioral)(?:[/?#]|$)/.test(app.url))) return "soon";
   if (app.visibility === "public" || status === "owner") return "open";
   if (status === "anonymous" || status === "loading") return app.visibility === "invite_only" ? "invite-only" : "sign-in";
   return "open"; // signed in: the app itself checks the invite list (and RLS guards its data)
@@ -65,11 +67,11 @@ export function ProjectCard({ app, save }: { app: AppRow; save?: (id: string, ca
         ) : null}
         <div className="win-actions">
           {(state === "sign-in" || state === "invite-only") && viewer.status === "anonymous" && configured ? (
-            <SignInButton next={app.url} label={OPEN_LABEL[state]} className="btn ghost" />
+            <SignInButton next={appHref(app)} label={OPEN_LABEL[state]} className="btn ghost" />
           ) : state === "open" || state === "visit" ? (
-            <a className="btn ghost" href={app.url} onClick={() => { if (state === "visit" && (viewer.status === "member" || viewer.status === "owner")) void logDesktopOpen(app.id); }} {...(state === "visit" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+            <Link prefetch={false} className="btn ghost" href={appHref(app)} onClick={() => { if (state === "visit" && (viewer.status === "member" || viewer.status === "owner")) void logDesktopOpen(app.id); }} {...(state === "visit" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
               {OPEN_LABEL[state]}
-            </a>
+            </Link>
           ) : (
             <span className="btn ghost" aria-disabled="true">
               {OPEN_LABEL[state]}

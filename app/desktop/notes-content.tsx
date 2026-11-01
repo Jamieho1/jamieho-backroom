@@ -11,6 +11,6 @@ export async function NotesContent({ canEdit = false }: { canEdit?: boolean } = 
     if (error) throw new Error("unavailable");
     return <NotesReader notes={(data ?? []) as NoteRow[]} canEdit={canEdit} />;
   } catch {
-    return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/desktop?app=notes">Try again</a></div>;
+    return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/notes">Try again</a></div>;
   }
 }

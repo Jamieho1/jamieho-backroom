@@ -5,9 +5,11 @@ import { useEffect, useState, useId, type ReactNode, type CSSProperties } from "
 import type { AppRow } from "@/lib/apps";
 import { WALL_IMAGES } from "@/lib/desktop-wallpaper";
 import { ICONS, AppMark } from "./desktop-icons";
-import { logDesktopOpen, getDesktopApps } from "@/app/actions/desktop";
+import { logDesktopOpen } from "@/app/actions/desktop";
 import { ThemeToggle } from "./theme-toggle";
 
+import { useDesktopApps } from './desktop-apps-provider';
+import { appHref } from '@/lib/desktop-pages';
 import { useViewer } from './viewer-provider';
 import { SignInButton } from './sign-in-button';
 import { DESKTOP_PAGES,PRIVACY_WINDOW,SIGNIN_WINDOW } from '@/lib/desktop-pages';
@@ -19,17 +21,12 @@ const PLACEHOLDERS: Record<string, string> = {
   behavioral: "Your experience, stories and interview questions will be here once Behavioral is ported.",
 };
 
-export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=false }: { apps: AppRow[]; initialApp?: string; content?: ReactNode;discoverApps?:boolean;signedIn?:boolean }) {
+export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=false,viewerId }: { apps: AppRow[]; initialApp?: string; content?: ReactNode;discoverApps?:boolean;signedIn?:boolean;viewerId?:string }) {
   const windowTitle=useId();
   const {viewer,configured,editing,setEditing}=useViewer();
-  const [discovered,setDiscovered]=useState<AppRow[]>([]);
-  const [loadError,setLoadError]=useState(false);
-  useEffect(()=>{
-    let live=true;setDiscovered([]);setLoadError(false);
-    if(discoverApps&&(viewer.status==='member'||viewer.status==='owner'))void getDesktopApps().then(rows=>{if(live)setDiscovered(rows);}).catch(()=>{if(live)setLoadError(true);});
-    return()=>{live=false;};
-  },[discoverApps,viewer.status,viewer.id,viewer.name]);
-  const registry=discoverApps?discovered:apps;
+  const {apps:cachedApps,loadError,seed}=useDesktopApps();
+  useEffect(()=>{if(viewerId)seed(viewerId,apps);},[viewerId,apps,seed]);
+  const registry=discoverApps?cachedApps:apps;
   const launchers=[...DESKTOP_PAGES,...registry.filter(a=>!DESKTOP_PAGES.some(p=>p.id===a.id))];
   const active = [...launchers,PRIVACY_WINDOW,SIGNIN_WINDOW].find((a) => a.id === initialApp && a.kind === "internal");
   const authenticated=signedIn||viewer.status==='member'||viewer.status==='owner';
@@ -53,7 +50,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
       if (!/^https?:\/\//i.test(app.url)) return null;
       return <a key={app.id} {...props} href={app.url} target="_blank" rel="noopener noreferrer" onClick={() => void logDesktopOpen(app.id)}>{content}</a>;
     }
-    return <Link key={app.id} {...props} prefetch={false} href={DESKTOP_PAGES.find(p=>p.id===app.id)?.url??`/desktop?app=${encodeURIComponent(app.id)}`}>{content}</Link>;
+    return <Link key={app.id} {...props} prefetch={false} href={appHref(app)}>{content}</Link>;
   }
 
   return (

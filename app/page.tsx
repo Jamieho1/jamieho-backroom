@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Desktop } from "@/components/desktop";
 import { getSections } from "@/lib/sections";
 import { getPublicExperience } from "@/lib/experience";
@@ -29,7 +30,7 @@ export default async function Home() {
         <h2 id="projects-h">Projects</h2>
         <ProjectGrid apps={apps} />
         <p>
-          <a href="/projects">All projects →</a>
+          <Link href="/projects" prefetch={false}>All projects →</Link>
         </p>
       </section>
       <EditableSection sectionKey="writing" title={s.writing.title} body={s.writing.body} className="block">
@@ -41,7 +42,7 @@ export default async function Home() {
       <section className="block" aria-label="Send a message">
         <ContactForm action={sendMessage} />
       </section>
-      <footer className="landing-footer"><a href="/privacy">Privacy</a></footer>
+      <footer className="landing-footer"><Link href="/privacy" prefetch={false}>Privacy</Link></footer>
     </div>} />
   );
 }

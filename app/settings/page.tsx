@@ -1,3 +1,4 @@
+import { getViewer } from "@/lib/viewer";
 import { Desktop } from "@/components/desktop";
 import { getDesktopApps } from "@/app/actions/desktop";
 import type { Metadata } from "next";
@@ -9,5 +10,6 @@ export const metadata: Metadata = { title: "Settings · Jamie Ho", robots: { ind
 export default async function SettingsPage() {
   const content=await SettingsContent();
   const apps=await getDesktopApps();
-  return <Desktop signedIn apps={apps} initialApp="settings" content={content} />;
+  const viewer=await getViewer();
+  return <Desktop signedIn viewerId={viewer.id} apps={apps} initialApp="settings" content={content} />;
 }

@@ -4,3 +4,7 @@ const page=(id:string,name:string,url:string,icon:string):AppRow=>({id,name,url,
 export const DESKTOP_PAGES=[page('home','Home','/','home'),page('projects','Projects','/projects','projects')];
 export const PRIVACY_WINDOW=page('privacy','Privacy','/privacy','notes');
 export const SIGNIN_WINDOW=page('signin','Your desktop','/desktop','home');
+
+export const APP_PATHS:Record<string,string>={home:'/',projects:'/projects',privacy:'/privacy',notes:'/notes',practice:'/practices',behavioral:'/behavioral',settings:'/settings'};
+export const practiceHref=(problem?:number|string)=>problem?`/practices/${encodeURIComponent(String(problem))}`:'/practices';
+export function appHref(app:Pick<AppRow,'id'|'kind'|'url'>){return app.kind==='internal'?(APP_PATHS[app.id]??`/desktop?app=${encodeURIComponent(app.id)}`):app.url;}

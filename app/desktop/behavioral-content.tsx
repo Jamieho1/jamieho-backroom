@@ -16,5 +16,5 @@ export async function BehavioralContent({canEdit=false}:{canEdit?:boolean}={}){
   ]);
   if(cv.error||stories.error||answers.error)throw new Error('unavailable');
   return <Behavioral items={fromRows(cv.data??[])} initialStories={(stories.data??[]) as Story[]} initialAnswers={(answers.data??[]) as Answer[]} canEdit={canEdit} />;
- }catch{return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/desktop?app=behavioral">Try again</a></div>;}
+ }catch{return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/behavioral">Try again</a></div>;}
 }

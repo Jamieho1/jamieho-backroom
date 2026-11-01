@@ -43,7 +43,7 @@ export function ViewerProvider({ children }: { children: ReactNode }) {
         if(!live||generation!==request)return;
         const user = data.user;
         if (!user) return reset();
-        if(currentUserId!==user.id){if(currentUserId)refresh();currentUserId=user.id;setEditing(false);setViewer({status:'loading'});}
+        if(currentUserId!==user.id){if(currentUserId)refresh();currentUserId=user.id;setEditing(false);setViewer({status:'loading',id:user.id});}
         const { data: p } = await sb.from("profiles").select("role, full_name").eq("id", user.id).maybeSingle();
         if (live&&generation===request) setViewer({ status: p?.role === "owner" ? "owner" : "member", id:user.id, name: p?.full_name ?? user.email ?? undefined });
       }catch{if(live&&generation===request)reset();}
@@ -51,7 +51,7 @@ export function ViewerProvider({ children }: { children: ReactNode }) {
     void load();
     const { data: sub } = sb.auth.onAuthStateChange((event,session) => {
       if(event==='SIGNED_OUT'){++generation;if(live){const hadUser=!!currentUserId;reset();if(hadUser)refresh();}return;}
-      if(session?.user.id&&session.user.id!==currentUserId){setViewer({status:'loading'});setEditing(false);}
+      if(session?.user.id&&session.user.id!==currentUserId){setViewer({status:'loading',id:session.user.id});setEditing(false);}
       void load();
     });
     return () => {
