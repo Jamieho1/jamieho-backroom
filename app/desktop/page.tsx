@@ -7,6 +7,8 @@ import { SettingsContent } from "@/app/settings/content";
 import { NotesContent } from "./notes-content";
 import "../notes.css";
 import "../practice.css";
+import "../behavioral.css";
+import { BehavioralContent } from "./behavioral-content";
 import { PracticeArena } from "@/components/practice/arena";
 
 export const dynamic = "force-dynamic";
@@ -28,5 +30,6 @@ export default async function DesktopPage({ searchParams }: { searchParams: Prom
   const settings = app === "settings" && apps.some((row) => row.id === "settings" && row.kind === "internal");
   const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
   const practice = app === "practice" && apps.some((row) => row.id === "practice" && row.kind === "internal");
-  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena canEdit={viewer.role === "owner"} viewerKey={viewer.id!} initialProblem={Number(problem)} /> : undefined} />;
+  const behavioral = app === "behavioral" && apps.some((row) => row.id === "behavioral" && row.kind === "internal");
+  return <Desktop apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena canEdit={viewer.role === "owner"} viewerKey={viewer.id!} initialProblem={Number(problem)} /> : behavioral ? <BehavioralContent canEdit={viewer.role === "owner"} /> : undefined} />;
 }

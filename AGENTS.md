@@ -10,7 +10,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 ## Where things stand (2026-11-01)
 - **R1 done:** TKT-51…59 (skeleton, Google sign-in, app registry + Settings, landing sections, experience, projects,
   contact form + Inbox + Resend, analytics + Visitors, ops ping/export/banner). All live and verified by Jamie.
-- **R2 in progress:** TKT-60 (/desktop shell) is done; TKT-61 (Notes read view) is done; TKT-62 (owner editor) is in progress. TKT-63 data copy stays with Claude; R3: TKT-64 Practice awaits explicit live sign-off; TKT-65 owner saving/Notes is implemented locally (migration applied live; deployment/review pending); TKT-66 data copy stays with Claude; R4 = TKT-67…70; TKT-71 = domain + subdomain SSO.
+- **R2 in progress:** TKT-60 (/desktop shell) is done; TKT-61 (Notes read view) is done; TKT-62 (owner editor) is in progress. TKT-63 data copy stays with Claude; R3: TKT-64 Practice awaits explicit live sign-off; TKT-65 owner saving/Notes is implemented locally (migration applied live; deployment/review pending); TKT-66 data copy stays with Claude; R4: TKT-67 Behavioral CV/stories in progress (migration applied live; deployment/review pending); TKT-68 follows; imports/cut-over stay with Claude; TKT-71 = domain + subdomain SSO.
 - Notion: Tickets data source `collection://1ff804d9-463a-49b6-8221-217e5552c790`. Set a ticket In Progress when you start
   and Done only after Jamie confirms it works live.
 
@@ -66,7 +66,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 ## Open follow-ups
 - Remind Jamie to **buy the domain** before the first subdomain app or the public launch (TKT-71).
-- Experience tables: split the owner `for all` policy into insert/update/delete next time they change (perf advisor).
+- Experience owner write policies were split into INSERT/UPDATE/DELETE by the TKT-67 migration, applied live 2026-11-01.
 - Desktop wallpaper stays the artifact's for v1; redesign later with Jamie.
 
 ## Handing back

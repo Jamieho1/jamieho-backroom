@@ -142,3 +142,20 @@ No database migration is needed for TKT-64.
 Tests validate all 143 reference solutions with the local test harness. Headless browser tests exercise real
 Pyodide, network restrictions, worker failure, CodeMirror, local code persistence, five-second termination
 and the 390 px layout. Their UI bundle is test-only; it does not create a public fixture route.
+
+## Behavioral CV and stories (TKT-67)
+
+Open Behavioral from `/desktop?app=behavioral`. It reuses Experience roles/projects/education and all
+of their bullets, including hidden bullets, for people permitted to open Behavioral. The registry starts
+Invite-only; Settings remains the place to change access. Public landing-page reads stay unchanged.
+
+Each CV bullet shows a story count and opens its linked STAR stories. The owner can Add story, select
+its CV bullet, and edit Situation, Task, Action, Result, Skills and Numbers. Invitees read only.
+Save/Retry retains the draft on failure; Cancel discards it. Removing an Experience bullet keeps its
+stories with no linked bullet, accessible under All stories. Story text is stored in Supabase, not localStorage.
+
+`supabase/migrations/20261101104828_behavioral_stories.sql` was approved and **applied live** on
+2026-11-01 (remote version `20261101105507`). It adds RLS-protected `behavioral_stories` and splits the existing Experience
+owner write policies into INSERT/UPDATE/DELETE without changing public read rules. No data is imported.
+Claude handles TKT-69 using `Resources/Behavioral - Import Contract.md`; personal CV and story text
+must never be committed. The question bank/coverage strip follows in TKT-68.

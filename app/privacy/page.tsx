@@ -46,6 +46,9 @@ export default function Privacy() {
           are covered by the retention and encrypted-backup periods below.
         </li>
         <li>
+          <strong>Behavioral stories</strong> are stored in Supabase, linked to CV bullets. Only the owner edits them; people allowed to open Behavioral can read them. They are retained and backed up for the periods below.
+        </li>
+        <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
           read and answer it. To stop spam, a one-way coded version of your IP address (not the address itself) is stored with the
           message and wiped after one hour. Each message is also forwarded to Jamie by email.
@@ -59,7 +62,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send, and store the owner’s notes, saved Practice code and attempts for use across devices.
+        read and reply to messages you send, and store the owner’s notes, saved Practice code, attempts and Behavioral stories for use across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -74,7 +77,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, messages and the owner’s saved notes, Practice code and attempts are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, messages and the owner’s saved notes, Practice code, attempts and Behavioral stories are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>
