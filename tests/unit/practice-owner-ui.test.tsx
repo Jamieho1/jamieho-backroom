@@ -66,3 +66,20 @@ it('visitors read question notes but never get edit/save controls or upload atte
  fireEvent.click(screen.getByRole('button',{name:'Submit'}));await screen.findByRole('region',{name:'Test results'});
  expect(mocks.saveAttempt).not.toHaveBeenCalled();expect(mocks.saveCode).not.toHaveBeenCalled();
 });
+
+it('failed initial load blocks saving unseen remote code; Retry preserves typing and exposes explicit saved-code recovery',async()=>{
+ mocks.load.mockRejectedValueOnce(new Error('offline'));
+ localStorage.setItem(codeKey('owner',217),'Initial browser draft');
+ render(<PracticeArena viewerKey="owner" initialProblem={217} canEdit />);
+ const editor=await screen.findByRole('textbox',{name:'Python code'});
+ fireEvent.change(editor,{target:{value:'Draft typed offline'}});
+ expect((screen.getByRole('button',{name:'Save code'}) as HTMLButtonElement).disabled).toBe(true);
+ fireEvent.click(screen.getByRole('button',{name:'Retry loading saved data'}));
+ await screen.findByRole('button',{name:'Load saved code'});
+ expect((screen.getByRole('textbox',{name:'Python code'}) as HTMLTextAreaElement).value).toBe('Draft typed offline');
+ fireEvent.click(screen.getByRole('button',{name:'Load saved code'}));
+ expect((screen.getByRole('textbox',{name:'Python code'}) as HTMLTextAreaElement).value).toBe('Server code');
+ expect(localStorage.getItem(codeKey('owner',217))).toBe('Draft typed offline');
+ fireEvent.click(screen.getByRole('button',{name:'Restore browser draft'}));
+ expect((screen.getByRole('textbox',{name:'Python code'}) as HTMLTextAreaElement).value).toBe('Draft typed offline');expect(mocks.saveCode).not.toHaveBeenCalled();
+});

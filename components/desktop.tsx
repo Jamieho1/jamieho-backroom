@@ -28,7 +28,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
     let live=true;setDiscovered([]);setLoadError(false);
     if(discoverApps&&(viewer.status==='member'||viewer.status==='owner'))void getDesktopApps().then(rows=>{if(live)setDiscovered(rows);}).catch(()=>{if(live)setLoadError(true);});
     return()=>{live=false;};
-  },[discoverApps,viewer.status,viewer.name]);
+  },[discoverApps,viewer.status,viewer.id,viewer.name]);
   const registry=discoverApps?discovered:apps;
   const launchers=[...DESKTOP_PAGES,...registry.filter(a=>!DESKTOP_PAGES.some(p=>p.id===a.id))];
   const active = [...launchers,PRIVACY_WINDOW,SIGNIN_WINDOW].find((a) => a.id === initialApp && a.kind === "internal");

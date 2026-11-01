@@ -19,8 +19,8 @@ test.beforeAll(async()=>{
      </div></main>
    );
  `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'mock-practice-service',setup(b){b.onResolve({filter:/app\/actions\/practice$/},()=>({path:'practice',namespace:'fixture'}));b.onResolve({filter:/app\/actions\/notes$/},()=>({path:'notes',namespace:'notes-fixture'}));b.onLoad({filter:/.*/,namespace:'notes-fixture'},()=>({contents:'export async function saveNote(){return {ok:false,message:"Not part of this fixture"};}'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`
- let codeFailures=1; let noteFailures=1;
- export async function loadPracticeData(){return {ok:true,data:{note:'Shared question notes',code:location.search.includes('ownerFixture')?'Server code':null,attempts:[]}};}
+ let codeFailures=1; let noteFailures=1;let loadFailures=location.search.includes('loadFailure')?1:0;
+ export async function loadPracticeData(){if(loadFailures-- > 0)throw new Error('offline');return {ok:true,data:{note:'Shared question notes',code:location.search.includes('ownerFixture')?'Server code':null,attempts:[]}};}
  export async function savePracticeCode(){return codeFailures-- > 0 ? {ok:false,message:'Could not save code'} : {ok:true};}
  export async function savePracticeAttempt(){return {ok:true};}
  export async function saveQuestionNotes(){return noteFailures-- > 0 ? {ok:false,message:'Could not save notes'} : {ok:true};}
@@ -46,8 +46,7 @@ test('actual Practice UI runs Python, restores code after reload, and fits the v
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  expect(await page.evaluate(()=>localStorage.getItem('jamieho.practice.v1.fixture.217'))).toBe(problemByNumber(217)!.solution);
  await mount(page);
- const lines=await page.getByRole('textbox',{name:'Python code'}).locator('.cm-line').allTextContents();
- expect(lines.join('\n').trimEnd()).toBe(problemByNumber(217)!.solution.trimEnd());
+ await expect.poll(async()=>(await page.getByRole('textbox',{name:'Python code'}).locator('.cm-line').allTextContents()).join('\n').trimEnd()).toBe(problemByNumber(217)!.solution.trimEnd());
  await page.getByRole('tab',{name:'Solution',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Common pitfalls'})).toBeVisible();
  if(info.project.name==='desktop') {
@@ -95,4 +94,17 @@ test('Notes problem links target the matching arena problem',async({page})=>{
  await expect(link).toHaveAttribute('href','/desktop?app=practice&problem=217');
  await link.click();
  await expect(page).toHaveURL(/\/desktop\?app=practice&problem=217$/);
+});
+
+test('owner can recover saved code after an initial load failure without losing the latest browser draft',async({page})=>{
+ await page.route('**/runner/worker.mjs',r=>r.abort());
+ await mount(page,'ownerFixture&loadFailure');
+ const editor=page.getByRole('textbox',{name:'Python code'});await editor.fill('Draft typed offline');
+ await expect(page.getByRole('button',{name:'Save code',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Retry loading saved data',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Load saved code',exact:true})).toBeVisible();
+ await expect(editor).toHaveText('Draft typed offline');
+ await page.getByRole('button',{name:'Load saved code',exact:true}).click();await expect(editor).toHaveText('Server code');
+ await page.getByRole('button',{name:'Restore browser draft',exact:true}).click();await expect(editor).toHaveText('Draft typed offline');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

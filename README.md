@@ -123,7 +123,9 @@ Code is stored in localStorage per signed-in viewer and problem. It survives rel
 visitor code is not sent to Supabase. Clearing site data clears this browser's code.
 
 TKT-65 adds owner-only **Save code** to sync the current problem between devices. The saved database
-version loads first; **Restore browser draft** can recover a different local draft. Owner Run/Submit
+version loads first; **Restore browser draft** can recover a different local draft. If the saved-data
+load fails, Save code stays disabled until Retry succeeds. **Load saved code** then lets you explicitly
+open the recovered server copy without automatically replacing code typed during recovery. Owner Run/Submit
 automatically saves a private attempt snapshot and result; failed saves offer Retry. Retrying an old
 attempt never replaces the separately saved code. Visitors keep browser-only code and attempts.
 The per-question Notes tab is shared with people allowed to open Practice; only the owner edits it.

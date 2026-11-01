@@ -37,7 +37,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy}:{lc:number;viewerKey:str
  const meta=PRACTICE_LIST.find(p=>p.lc===lc)!;
  const [code,setCode]=useState(()=>readCode(viewerKey,lc)??starterCode(lc));
  const [editorVersion,setEditorVersion]=useState(0);
- const [browserDraft]=useState(()=>readCode(viewerKey,lc));
+ const [browserDraft,setBrowserDraft]=useState(()=>readCode(viewerKey,lc));
  const [notesEditing,setNotesEditing]=useState(false);
  const saved=useSavedPractice(lc,canEdit,remote=>{if(remote!==null){setCode(remote);setEditorVersion(v=>v+1);}});
  const ownerReady=!canEdit||saved.loaded;
@@ -84,12 +84,13 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy}:{lc:number;viewerKey:str
    </div>
    <div className="practice-coding">
     <h3>Python</h3><p className="muted small">{canEdit?"Save code to sync it across devices. Runs and submissions are recorded automatically.":"Code is saved in this browser only."} Run checks examples; Submit checks all local tests.</p>
-    {!ownerReady?<p role="status">Loading saved code…</p>:<CodeEditor key={editorVersion} initial={code} label="Python code" onChange={value=>{setCode(value);setStorageFailed(!storeCode(viewerKey,lc,value));}} />}
+    {!ownerReady?<p role="status">Loading saved code…</p>:<CodeEditor key={editorVersion} initial={code} label="Python code" onChange={value=>{setCode(value);setBrowserDraft(value);setStorageFailed(!storeCode(viewerKey,lc,value));}} />}
     {canEdit&&ownerReady?<div className="practice-owner-save">
-     <button type="button" className="btn ghost small" disabled={saved.savingCode} onClick={()=>void saved.saveCode(code)}>{saved.savingCode?'Saving code…':saved.codeError?'Retry saving code':'Save code'}</button>
+     <button type="button" className="btn ghost small" disabled={saved.savingCode||saved.loading||!!saved.loadError} onClick={()=>void saved.saveCode(code)}>{saved.savingCode?'Saving code…':saved.codeError?'Retry saving code':'Save code'}</button>
      <span role="status">{saved.savingCode?'Saving…':saved.data.code===code?'Saved across devices':'Unsaved changes'}</span>
      {saved.codeError?<p role="alert">{saved.codeError}</p>:null}
      {saved.loadError?<div role="alert"><p>{saved.loadError}</p><button type="button" onClick={()=>void saved.load()}>Retry loading saved data</button></div>:null}
+     {saved.data.code!==null&&saved.data.code!==code&&!saved.loading&&!saved.loadError?<button type="button" className="btn ghost small" disabled={saved.savingCode} onClick={()=>{setCode(saved.data.code!);setEditorVersion(v=>v+1);}}>Load saved code</button>:null}
      {browserDraft!==null&&browserDraft!==code?<button type="button" className="btn ghost small" onClick={()=>{setCode(browserDraft);setEditorVersion(v=>v+1);}}>Restore browser draft</button>:null}
     </div>:null}
     {storageFailed?<p role="status">Browser storage is unavailable or full. Keep a copy of your code before leaving.</p>:null}
