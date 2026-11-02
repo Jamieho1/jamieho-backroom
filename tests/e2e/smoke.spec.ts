@@ -54,7 +54,7 @@ test("Settings is a plain 404 for anyone who isn't the owner", async ({ page }) 
 test("the landing page shows its sections", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Jamie Ho" })).toBeVisible();
-  for (const h of ["About", "Writing & videos", "Contact"]) await expect(page.getByRole("heading", { level: 2, name: h })).toBeVisible();
+  for (const h of ["About", "Writing & videos", "Contact"]) await expect(page.getByRole("heading", { level: 2, name: h, exact:true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit site" })).toHaveCount(0); // only the owner gets this
 });
 
@@ -68,7 +68,7 @@ test("dark/light toggle switches the theme and remembers it", async ({ page }) =
   await page.reload();
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(theme);
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(bg).toBe(theme === "dark" ? "rgb(30, 31, 35)" : "rgb(255, 253, 247)");
+  expect(bg).toBe(theme === "dark" ? "rgb(30, 31, 35)" : "rgb(236, 230, 217)");
 });
 
 test("projects show as windows on the landing page and /projects", async ({ page }) => {

@@ -14,7 +14,7 @@ import { FALLBACK_APPS } from '@/lib/projects';
 beforeEach(()=>{vi.clearAllMocks();m.viewer={status:'anonymous',name:undefined,id:undefined};m.configured=false;m.pathname='/';m.getApps.mockResolvedValue([]);});afterEach(cleanup);
 it('public Home opens without sign-in and is not recorded as a registry app launch',()=>{
  render(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
- expect(screen.getByRole('region',{name:'Home'})).toBeTruthy();expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();expect(screen.getAllByRole('link',{name:'Projects'}).every(a=>a.getAttribute('href')==='/projects')).toBe(true);expect(m.getApps).not.toHaveBeenCalled();expect(m.log).not.toHaveBeenCalled();
+ expect(screen.getByRole('region',{name:'About Me'})).toBeTruthy();expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();expect(screen.getAllByRole('link',{name:'Projects'}).every(a=>a.getAttribute('href')==='/projects')).toBe(true);expect(m.getApps).not.toHaveBeenCalled();expect(m.log).not.toHaveBeenCalled();
 });
 it('signed-in public navigation displays only the server-filtered registry apps',async()=>{
  m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
@@ -81,4 +81,12 @@ it('places Settings on the right rail and in the session menu',async()=>{
  expect(links).toHaveLength(2);
  expect(links.some(link=>link.closest('.desktop-launcher-right'))).toBe(true);
  expect(links.some(link=>link.closest('.desktop-session'))).toBe(true);
+});
+
+it('closed desktop windows leave only wallpaper and app chrome',()=>{
+ render(<Desktop apps={[]} />);
+ expect(screen.queryByText('Your desktop')).toBeNull();
+ expect(screen.queryByText('Choose an app to get started.')).toBeNull();
+ expect(document.querySelector('.desktop-welcome')).toBeNull();
+ expect(screen.getAllByRole('link',{name:'About Me'})).toHaveLength(2);
 });

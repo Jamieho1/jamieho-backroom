@@ -93,3 +93,10 @@ omit them or import unreachable answer rows. Each supported question accepts at 
 
 TKT-71 (domain and subdomain SSO) remains later. Remind Jamie to buy the domain before the first
 external subdomain app or public launch; he handles DNS/account access and every secret.
+
+
+## 2026-11-02 — Resume presentation follow-up (Codex, migration applied)
+- Behavioral now says Resume & Stories, with CV/Questions controls beside Add story; the story library is under Questions and the CV opens a story panel only when requested. Separate category sections reuse the existing owner-only Experience entry/bullet editor. Pasted multiline text is supported; existing bullet IDs remain stable. New entries and bullets start hidden, and public flags still control About Me publication. Existing Other entries stay intact and can be recategorised through Type; do not reinterpret or overwrite Claude's imported content.
+- Home app display name is About Me (route `/`, internal ID `home`); its London content is unchanged. Closing every window leaves wallpaper and app chrome. Non-Home light-mode surfaces use warm stone tones and neutral searches; content gutters align across Behavioral/Articles/Settings/Projects/Privacy. Notes/Practice retain their panel gutters.
+- New migration `20261102194339_resume_sections.sql` only adds certificate/skills to `experience_items_kind_check`. APPLIED live with Jamie’s approval on 2026-11-02, remote version 20261102195356. Ready for Jamie to commit/push and review live. Existing RLS policies, functions, grants, records and publication flags are unchanged. Older owner-policy cleanup was already included in behavioral_stories; no duplicate policy changes are needed.
+- Validation: 435 unit/DB tests, typecheck, production build and all four static assertions passed. Full local browser suite: 88 passed / 2 existing skips, including 390 px phone layout. Local neutral-fixture screenshots reviewed. No live website visit, personal data import, secret handling, commit or push. Jamie reviews live after migration/commit/push; no ticket newly marked Done.

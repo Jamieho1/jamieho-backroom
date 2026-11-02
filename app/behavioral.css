@@ -1,4 +1,4 @@
-.behavioral { padding:clamp(.8rem,2vw,1.5rem); min-width:0; overflow-wrap:anywhere; }
+.behavioral { padding:24px var(--app-gutter); min-width:0; overflow-wrap:anywhere; }
 .behavioral-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; }
 .behavioral-head h2,.behavioral-head h3 { margin:.25rem 0; }
 .behavioral-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.25rem; align-items:start; }
@@ -20,3 +20,27 @@
 .behavioral-question { display:flex; width:100%; text-align:left; flex-direction:column; align-items:flex-start; margin-bottom:.5rem; }
 .behavioral-answer { min-width:0; border:1px solid var(--border); border-radius:8px; padding:1rem; }
 @media(max-width:760px) { .behavioral-filters { grid-template-columns:minmax(0,1fr); } }
+
+.behavioral-toolbar,.resume-section-head,.resume-entry-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.behavioral-tabs { display:flex; gap:4px; padding:4px; border:1px solid var(--border); border-radius:8px; background:var(--bg-accent); }
+.behavioral-tabs button { border:1px solid transparent; border-radius:6px; padding:8px 14px; background:transparent; color:var(--secondary); font:800 14px var(--f-body); cursor:pointer; }
+.behavioral-tabs button[aria-selected=true] { background:var(--bg); color:var(--ink); border-color:var(--border); }
+.behavioral-tabs button:disabled { cursor:default; opacity:.6; }
+.behavioral .muted { color:var(--secondary); }
+.behavioral-resume-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:24px; align-items:start; margin-top:24px; }
+.behavioral-resume-layout.has-story { grid-template-columns:minmax(0,3fr) minmax(0,2fr); }
+.resume-section { background:var(--bg-accent); border:1px solid var(--border); border-radius:12px; padding:clamp(16px,2vw,24px); margin-bottom:24px; }
+.resume-section-head { border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; }
+.resume-section-head h3 { margin:0; font-size:1.2rem; }
+.behavioral-role { background:var(--bg); border:0; border-radius:8px; margin:0 0 12px; }
+.resume-entry-head h4 { font-size:1.05rem; margin:0; }
+.resume-entry-head p:empty { display:none; }
+.behavioral-stories,.behavioral-answer { background:var(--bg-accent); }
+.behavioral .xp-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.behavioral .xp-bullet { min-width:0; }
+@media(max-width:900px) { .behavioral-resume-layout.has-story { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:600px) { .behavioral .xp-grid { grid-template-columns:minmax(0,1fr); } }
+
+.behavioral-story-library { margin:24px 0; padding:16px; border:1px solid var(--border); border-radius:8px; background:var(--bg-accent); }
+.behavioral-story-library summary { cursor:pointer; font-weight:800; }
+.behavioral-story-library nav { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }

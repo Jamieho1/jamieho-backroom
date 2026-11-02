@@ -18,7 +18,7 @@ test("desktop deep links stay behind sign-in", async ({ page }) => {
 
 test('Home, Projects and Privacy share a full-height desktop with no page footer gap',async({page},info)=>{
  if(info.project.name==='desktop')await page.setViewportSize({width:1920,height:900});
- for(const [path,title] of [['/','Home'],['/projects','Projects'],['/privacy','Privacy']] as const){
+ for(const [path,title] of [['/','About Me'],['/projects','Projects'],['/privacy','Privacy']] as const){
   await page.goto(path);
   const win=page.getByRole('region',{name:title,exact:true});
   await expect(win).toBeVisible();
@@ -37,8 +37,8 @@ test('Home, Projects and Privacy share a full-height desktop with no page footer
   await expect(page.locator('.site-footer')).toHaveCount(0);
  }
  await page.goto('/projects');
- await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'Home',exact:true}).click();
- await expect(page).toHaveURL(/\/$/);await expect(page.getByRole('region',{name:'Home',exact:true})).toBeVisible();
+ await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'About Me',exact:true}).click();
+ await expect(page).toHaveURL(/\/$/);await expect(page.getByRole('region',{name:'About Me',exact:true})).toBeVisible();
  await page.locator('.landing-footer').getByRole('link',{name:'Privacy',exact:true}).click();
  await expect(page).toHaveURL(/\/privacy$/);
  await expect(page.getByRole('heading',{name:'Privacy policy',exact:true})).toBeVisible();
@@ -57,7 +57,7 @@ test('Home and Projects use client navigation without replacing the document',as
  await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'Projects',exact:true}).click();
  await expect(page).toHaveURL(/\/projects$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
- await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'Home',exact:true}).click();
+ await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'About Me',exact:true}).click();
  await expect(page).toHaveURL(/\/$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
 });

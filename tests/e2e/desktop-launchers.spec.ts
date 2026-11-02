@@ -24,9 +24,9 @@ test('desktop icons appear together and Settings uses the right rail with a phon
  await expect(page.getByRole('heading',{name:'Landing content'})).toBeVisible();
  await page.evaluate(()=>{(window as unknown as {finishAppDiscovery():void}).finishAppDiscovery()});
  await expect(apps).toHaveAttribute('aria-busy','false');
- for(const name of ['Home','Projects','Articles','Notes','Settings'])await expect(apps.getByRole('link',{name,exact:true})).toBeVisible();
+ for(const name of ['About Me','Projects','Articles','Notes','Settings'])await expect(apps.getByRole('link',{name,exact:true})).toBeVisible();
  const settings=(await apps.getByRole('link',{name:'Settings',exact:true}).boundingBox())!;
- const home=(await apps.getByRole('link',{name:'Home',exact:true}).boundingBox())!;
+ const home=(await apps.getByRole('link',{name:'About Me',exact:true}).boundingBox())!;
  if(info.project.name==='desktop')expect(settings.x).toBeGreaterThan(home.x+500);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

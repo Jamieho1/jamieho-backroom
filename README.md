@@ -275,3 +275,13 @@ Articles' registry visibility stays public; individual entries are published or 
 No content is seeded, no external-platform API/secret is needed, and no video/post content is fetched.
 Privacy and encrypted exports include Articles; owner management is excluded from analytics.
 The Articles index is also checked for pre-rendering. See `Resources/Articles - Content Guide.md`.
+
+
+## Resume and shared app presentation (2026-11-02)
+The public `/` desktop app is labelled **About Me**; its route and London content stay the same. Closing every window leaves wallpaper and app chrome. Behavioral's **Resume & Stories** has adjacent CV/Questions controls and separate Professional experience, Projects, Education, Certificates and Skills sections. Legacy Other entries remain visible until the owner chooses a more specific Type. The story library lives under Questions; a linked/selected story opens only on request.
+
+Owners can add/edit/reorder/remove resume entries and individual bullets using the shared Experience editor, paste multiline text into bullets, and choose publication explicitly. New rows/bullets start hidden. Existing bullet IDs are preserved during edits, and deleting a bullet clears its story link without removing the story. These are the same Experience records shown publicly on About Me when marked Public.
+
+Migration `supabase/migrations/20261102194339_resume_sections.sql` adds `certificate` and `skills` to the existing kind constraint; it is **APPLIED live** with Jamie's approval on 2 November 2026 (remote version `20261102195356`). It changes no records, visibility flags, functions, grants or RLS policies. Existing `other` entries are not automatically reclassified.
+
+Light-mode app surfaces use warm stone tones, search fields use the neutral input color, and content pages use shared horizontal gutters. Notes/Practice retain their panel padding; About Me retains its dedicated visual design.

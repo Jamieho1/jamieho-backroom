@@ -84,7 +84,7 @@ In scope (v1):
 - **Design:**
   - Public Home opens first as a desktop app; Projects and Privacy share the same shell. Privacy links from Home instead of a global footer. Public routes remain pre-rendered; private apps still require access. Windows fill the remaining viewport height and scroll their content internally (Jamie, 2026-11-01).
   - The current PostHog-style tokens, type, light/dark mode and IDE code colours across the whole site.
-  - Home has its own midnight-blue/amber London presentation inside the desktop window; the desktop and other apps retain their current design.
+  - Home has its own midnight-blue/amber London presentation inside the desktop window; the desktop and other apps use warm stone light-mode surfaces, neutral search fields and shared content gutters; Notes and Practice retain their panel spacing.
   - Dark mode follows the system setting, with a toggle.
 - **Data copy:**
   - Copied: coding notes, CV → Experience, stories, Behavioral questions and answers, the latest arena code, per-question notes.
@@ -170,3 +170,5 @@ Each release can be deployed on its own. Each one ends with the tests passing (u
 ---
 
 _After sign-off, proceed with the build. If scope changes mid-build, update this PRD rather than silently drifting from it._
+
+- 2026-11-02 authorized UI follow-up: Home app label becomes About Me, closed desktop windows leave wallpaper only, and Behavioral becomes Resume & Stories with toolbar CV/Questions views, separated resume categories and owner entry/bullet CRUD. Story library is under Questions; selected/linked stories remain reachable. Certificate/Skills categories require the resume_sections migration (applied live with Jamie’s approval on 2026-11-02, remote 20261102195356).

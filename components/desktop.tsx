@@ -93,7 +93,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
                 : <div className="desktop-placeholder"><p>This app&apos;s content is not available yet.</p></div>
             )}
           </section>
-        ) : !initialApp && launchers.length ? <div className="desktop-welcome"><h1>Your desktop</h1><p>Choose an app to get started.</p></div> : null}
+        ) : null}
       </main>
     </div>
   );

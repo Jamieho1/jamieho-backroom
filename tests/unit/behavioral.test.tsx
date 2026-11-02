@@ -2,6 +2,7 @@
 import { beforeEach,afterEach,it,expect,vi } from 'vitest';
 import { render,screen,fireEvent,cleanup,waitFor } from '@testing-library/react';
 const save=vi.hoisted(()=>vi.fn());vi.mock('@/app/actions/behavioral',()=>({saveStory:save,saveAnswer:vi.fn()}));
+vi.mock('@/app/actions/experience',()=>({saveItem:vi.fn(),deleteItem:vi.fn(),moveItem:vi.fn()}));
 import { Behavioral } from '@/components/behavioral/workspace';
 import type { Item } from '@/lib/experience';
 import type { Story } from '@/lib/behavioral';
@@ -33,7 +34,7 @@ it('owner creates a linked story; failed retry keeps every field and stable ID',
 it('owner edits and unlinks; a rejected save keeps its draft; cancel discards',async()=>{
  save.mockResolvedValueOnce({ok:false,message:'Offline'});
  render(<Behavioral items={items} initialStories={[story]} canEdit />);
- fireEvent.click(screen.getByRole('button',{name:'Example story'}));fireEvent.click(screen.getByRole('button',{name:'Edit story'}));
+ fireEvent.click(screen.getByRole('button',{name:'1 story for Example bullet'}));fireEvent.click(screen.getByRole('button',{name:'Edit story'}));
  fireEvent.change(screen.getByLabelText('Result'),{target:{value:'New outcome'}});fireEvent.change(screen.getByLabelText('Linked CV bullet'),{target:{value:''}});
  fireEvent.click(screen.getByRole('button',{name:'Save story'}));await screen.findByText('Offline');
  fireEvent.click(screen.getByRole('button',{name:'Retry'}));await screen.findByRole('article',{name:'Selected STAR story'});
@@ -43,5 +44,5 @@ it('owner edits and unlinks; a rejected save keeps its draft; cancel discards',a
  await waitFor(()=>expect(screen.queryByRole('form')).toBeNull());expect(screen.queryByText('Discard')).toBeNull();
 });
 it('empty views explain missing experience/stories without exposing an editor to readers',()=>{
- render(<Behavioral items={[]} initialStories={[]} />);expect(screen.getByText('No experience has been added yet.')).toBeTruthy();expect(screen.getByText('No stories added yet.')).toBeTruthy();
+ render(<Behavioral items={[]} initialStories={[]} />);expect(screen.getAllByText('No entries yet.')).toHaveLength(5);expect(screen.queryByRole('region',{name:'STAR stories'})).toBeNull();
 });

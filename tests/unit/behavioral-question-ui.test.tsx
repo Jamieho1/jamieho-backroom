@@ -13,7 +13,7 @@ it('owner mappings update coverage only on saved success; failures retain mappin
  render(<Behavioral items={[]} initialStories={[story]} canEdit />);open();
  fireEvent.click(screen.getByRole('button',{name:'Edit answer'}));
  fireEvent.change(screen.getByLabelText('Best story 1'),{target:{value:story.id}});fireEvent.change(screen.getByLabelText('Answer outline'),{target:{value:'Draft outline'}});fireEvent.change(screen.getByLabelText('Follow-ups'),{target:{value:'Draft follow-up'}});
- expect((screen.getByRole('tab',{name:'CV & stories'}) as HTMLButtonElement).disabled).toBe(true);
+ expect((screen.getByRole('tab',{name:'CV'}) as HTMLButtonElement).disabled).toBe(true);
  expect((screen.getByLabelText('Question set') as HTMLSelectElement).disabled).toBe(true);
  fireEvent.click(screen.getByRole('button',{name:'Save answer'}));await screen.findByRole('button',{name:'Retry'});
  expect((screen.getByLabelText('Answer outline') as HTMLTextAreaElement).value).toBe('Draft outline');expect((screen.getByLabelText('Best story 1') as HTMLSelectElement).value).toBe(story.id);

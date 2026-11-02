@@ -5,9 +5,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { readSupabaseEnv } from "@/lib/env";
 
-export const KINDS = ["role", "project", "education", "other"] as const;
+export const KINDS = ["role", "project", "education", "certificate", "skills", "other"] as const;
 export type Kind = (typeof KINDS)[number];
-export const KIND_LABEL: Record<Kind, string> = { role: "Role", project: "Project", education: "Education", other: "Other" };
+export const KIND_LABEL: Record<Kind, string> = { role: "Role", project: "Project", education: "Education", certificate: "Certificate", skills: "Skills", other: "Other" };
 
 export interface Bullet {
   id?: string;

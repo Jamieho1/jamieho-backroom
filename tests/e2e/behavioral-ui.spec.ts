@@ -10,7 +10,7 @@ test.beforeAll(async()=>{
  const items=[{id:'role',kind:'role',title:'Example role',org:'Example org',dates:'',location:'',summary:'',public:false,bullets:[{id:bullet,text:'Example bullet '+ 'long'.repeat(80),public:false}]}];
  const stories=[{id:'00000000-0000-4000-8000-000000000002',bullet_id:bullet,title:'Example story',situation:'Context',task:'Goal',action:'Steps',result:'Outcome',skills:'Ownership',numbers:'Two improvements',updated_at:'2026-11-01T00:00:00Z'}];
  createRoot(document.getElementById('behavioral-test-root')).render(<main className="desktop-os"><div className="desktop-workspace"><section className="desktop-window"><div className="desktop-app-content"><Behavioral items={items} initialStories={stories} initialAnswers={[{question_id:'g-disagree',primary_story_id:stories[0].id,secondary_story_id:null,outline:'Example outline',followups:'Example follow-up',updated_at:'now'}]} canEdit={location.search.includes('owner')} /></div></section></div></main>);
- `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'behavioral-service',setup(b){b.onResolve({filter:/app\/actions\/behavioral$/},()=>({path:'behavioral',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`let answerFail=true;export async function saveAnswer(answer){if(answerFail){answerFail=false;return {ok:false,message:'Could not save answer'};}return {ok:true,answer:{...answer,updated_at:'now'}};} let fail=true;export async function saveStory(story){if(fail){fail=false;return {ok:false,message:'Could not save'};}return {ok:true,story:{...story,updated_at:'2026-11-01T00:00:00Z'}};}`}));}}]});
+ `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'behavioral-service',setup(b){b.onResolve({filter:/app\/actions\/experience$/},()=>({path:'experience',namespace:'experience-fixture'}));b.onLoad({filter:/.*/,namespace:'experience-fixture'},()=>({contents:'export async function saveItem(){return {ok:false,message:"Could not save resume"}};export async function deleteItem(){return {ok:false,message:"Could not delete"}};export async function moveItem(){return {ok:false,message:"Could not move"}};'}));b.onResolve({filter:/app\/actions\/behavioral$/},()=>({path:'behavioral',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`let answerFail=true;export async function saveAnswer(answer){if(answerFail){answerFail=false;return {ok:false,message:'Could not save answer'};}return {ok:true,answer:{...answer,updated_at:'now'}};} let fail=true;export async function saveStory(story){if(fail){fail=false;return {ok:false,message:'Could not save'};}return {ok:true,story:{...story,updated_at:'2026-11-01T00:00:00Z'}};}`}));}}]});
  bundle=out.outputFiles[0].text;
 });
 async function mount(page:Page,owner=false){
@@ -68,11 +68,32 @@ test('owner question mapping retries retain the draft and update coverage at 390
  await expect(page.getByRole('alert')).toContainText('Could not save answer');
  await expect(page.getByRole('textbox',{name:'Answer outline',exact:true})).toHaveValue(outline);
  await expect(page.getByRole('combobox',{name:'Best story 1',exact:true})).toHaveValue('00000000-0000-4000-8000-000000000002');
- await expect(page.getByRole('tab',{name:'CV & stories',exact:true})).toBeDisabled();
+ await expect(page.getByRole('tab',{name:'CV',exact:true})).toBeDisabled();
  await expect(page.getByRole('button',{name:/Impact: 0\//})).toBeDisabled();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('button',{name:'Retry',exact:true}).click();
  await expect(page.getByRole('button',{name:/Impact: 1\//})).toBeEnabled();
  await expect(page.getByRole('article',{name:'Selected question'})).toContainText('Ask for the outcome');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('resume sections, owner editor and neutral search fit desktop and phone',async({page})=>{
+ await mount(page,true);
+ await expect(page.getByRole('heading',{name:'Resume & Stories',exact:true})).toBeVisible();
+ await expect(page.getByRole('region',{name:'STAR stories'})).toHaveCount(0);
+ for(const name of ['Professional experience','Projects','Education','Certificates','Skills'])await expect(page.getByRole('region',{name,exact:true})).toBeVisible();
+ await page.screenshot({path:test.info().outputPath('resume-overview.png')});
+ await page.getByRole('button',{name:'Add skills',exact:true}).click();
+ await page.getByLabel('Title',{exact:true}).fill('Example skills');
+ await page.getByRole('button',{name:'Add bullet',exact:true}).click();
+ await page.getByLabel('Bullet 1',{exact:true}).fill('A pasted line '+ 'long'.repeat(100));
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('Could not save resume');
+ await expect(page.getByLabel('Bullet 1',{exact:true})).toHaveValue('A pasted line '+ 'long'.repeat(100));
+ await expect(page.getByRole('tab',{name:'Questions',exact:true})).toBeDisabled();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.getByRole('button',{name:'Cancel',exact:true}).click();
+ await page.getByRole('tab',{name:'Questions',exact:true}).click();
+ expect(await page.getByRole('searchbox',{name:'Search questions'}).evaluate(el=>{const reference=document.createElement('div');reference.style.backgroundColor='var(--input)';el.parentElement!.append(reference);const matches=getComputedStyle(el).backgroundColor===getComputedStyle(reference).backgroundColor;reference.remove();return matches})).toBe(true);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
