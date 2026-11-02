@@ -1,7 +1,7 @@
 # Claude handoff: R2–R4 data imports and cut-over
 
-Prepared 2026-11-01. Read AGENTS.md and MEMORY.md first. Latest local commit at handoff:
-`4e668d3` (Home width adjustment); implementation and UI checks passed before that commit.
+Updated 2026-11-02. Read AGENTS.md and MEMORY.md first. Latest local implementation commit:
+`113d6af` (complete London Home journey and owner-editable content). This handoff refresh is uncommitted.
 Jamie pushes; do not assume a local commit proves deployment. Jamie checks the live website himself.
 
 ## Implementation available
@@ -10,9 +10,21 @@ Jamie pushes; do not assume a local commit proves deployment. Jamie checks the l
 - TKT-64 browser-only Practice arena, TKT-65 owner saved code/attempts and shared question notes.
 - TKT-67 Behavioral CV / STAR stories, TKT-68 question bank, mappings, outlines, follow-ups and coverage.
 - Home, Projects and Privacy share the public desktop shell; public routes remain pre-rendered.
-  Home content spans its padded window width; no global footer or Open my desktop link.
-- Last complete validation: 378 unit/DB tests, production build/static assertions; 54 localhost
-  headless E2E passed, 2 duplicate phone runtime cases skipped. No production browser checks by Codex.
+  Home has a continuous Three.js/GSAP London scene with readable HTML sections, direct anchors,
+  motion/still controls and phone/reduced-motion/no-WebGL/no-JS fallbacks. No global footer or Open my desktop link.
+- Canonical app routes: `/notes`, `/practices`, `/practices/<problem>`, `/behavioral`; legacy desktop
+  query links redirect. Allowed launcher icons persist across client navigation.
+- Practice now has difficulty/NeetCode tags, search, an owner-only starred review list and collapsible,
+  draggable desktop panels. Owner code/notes drafts survive resizing; phone layout stays stacked.
+- Public Articles: `/articles`, `/articles/<slug>`, owner-only `/articles/manage` with drafts/publishing.
+  See `Resources/Articles - Content Guide.md`. No article content has been seeded by Codex.
+- Home Interests/Technology use optional `site_sections` rows. Empty Interests stays hidden; Technology
+  uses recognised tags from public project cards unless overridden with owner Markdown. Clearing the
+  override restores the automatic list. Personal interest copy and client material remain deferred.
+- Last complete validation: 423 unit/DB tests, production build/typecheck/static assertions; 82 localhost
+  headless E2E passed, 2 existing duplicate phone runtime cases skipped. Final Home-only rerun: 12 passed.
+  All 345 sampled text/frame combinations passed contrast. A supplied CI Retry failure was fixed locally;
+  fresh GitHub CI/deployment status must be verified separately. No production browser checks by Codex.
 
 ## Database migrations already applied live
 
@@ -27,6 +39,13 @@ Do not apply again just because Supabase assigned a different remote timestamp.
 | 20261101005242_practice_owner_data.sql | 20261101080700 |
 | 20261101104828_behavioral_stories.sql | 20261101105507 |
 | 20261101110015_behavioral_answers.sql | 20261101110756 |
+| 20261101142129_practice_stars.sql | 20261101144554 |
+| 20261101145851_articles.sql | 20261101223239 |
+| 20261102005510_home_journey_sections.sql | 20261102081107 |
+
+Home sections migration was approved/applied and verified through MCP on 2026-11-02: both new rows
+are empty, RLS/public reads/owner-only updates remain intact, authenticated INSERT/DELETE stay revoked.
+Do not edit applied migration files.
 
 Codex copied no personal notes, code, attempts, CV, stories or answers. No pending migration is required
 for the current UI. Ask Jamie before any new live migration or content changes under the working agreement.
@@ -46,6 +65,16 @@ No personal content belongs in git. No AI calls or server-side Python execution.
 are catalogued in `lib/behavioral/questions.ts`. Custom/deep-dive questions need review; never silently
 omit them or import unreachable answer rows. Each supported question accepts at most two distinct stories.
 
+## Protect the completed follow-ups during imports
+
+- Read the current import contracts, not an older copy of this handoff. Keep saved attempt UUIDs and
+  story/bullet mappings stable; preserve newer destination edits on reruns. Do not overwrite star
+  preferences or Articles/Home content as part of an unrelated import.
+- CV and private data still belong only in Supabase. Public Home server reads remain anonymous and
+  cookie-free; never feed hidden CV rows into its pre-rendered Experience section.
+- Keep Home CSS/graphics scoped to Home; Notes/Practice layouts remain independent. Do not import
+  Scroll Craft's document-scroll engine/global CSS into the inner desktop scroll pane.
+
 ## Outstanding verification and ticket state
 
 - TKT-60/61 and TKT-67 are Done in Notion. Jamie explicitly verified TKT-67 live.
@@ -56,7 +85,11 @@ omit them or import unreachable answer rows. Each supported question accepts at 
   Behavioral hidden CV access and story links, answer mapping/coverage, and read-only invitee behavior.
 - Membership/invitation removal must remove private access through RLS. Public CV rows remain public
   on the landing page separately; uninvited users must not read private CV, stories or answers.
-- Public Home/Projects pages must stay pre-rendered; do not load cookie-based private data on their server path.
+- Public `/`, `/privacy`, `/projects` and `/articles` must stay pre-rendered; do not load cookie-based
+  private data on their server path. No new collection without matching Privacy changes.
+- Jamie approved the initial Home visual prototype. The full journey has been committed locally;
+  its deployment and full live review are not confirmed by that approval. Ticket statuses above are
+  the last recorded statuses; check Notion before changing them, and mark Done only after explicit live sign-off.
 
 TKT-71 (domain and subdomain SSO) remains later. Remind Jamie to buy the domain before the first
 external subdomain app or public launch; he handles DNS/account access and every secret.

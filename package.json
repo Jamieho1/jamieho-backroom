@@ -13,7 +13,8 @@
     "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs",
     "decrypt-export": "node scripts/decrypt-export.mjs",
     "predev": "node scripts/copy-pyodide.mjs",
-    "prebuild": "node scripts/copy-pyodide.mjs"
+    "prebuild": "node scripts/copy-pyodide.mjs",
+    "import-notes": "node scripts/import-notes.mjs"
   },
   "engines": {
     "node": ">=20.9"
