@@ -24,8 +24,12 @@ it('only the owner can create/update/publish/unpublish/delete; drafts start priv
  await expect(as(db,{role:'anon'},q=>q("insert into public.articles(slug,title) values ('fake','Fake')"))).rejects.toThrow(/permission denied/);
 });
 it('duplicate/reserved slugs, unsafe source links and invalid platform are rejected',async()=>{
- for(const sql of ["insert into public.articles(slug,title) values ('draft-example','Duplicate')","insert into public.articles(slug,title) values ('manage','Reserved')","insert into public.articles(slug,title,source_url) values ('unsafe','Unsafe','javascript:alert(1)')","insert into public.articles(slug,title,platform) values ('invalid','Invalid','unknown')"])await expect(as(db,who(owner.id),q=>q(sql))).rejects.toThrow();
+ for(const sql of ["insert into public.articles(slug,title) values ('draft-example','Duplicate')","insert into public.articles(slug,title) values ('manage','Reserved')","insert into public.articles(slug,title,source_url) values ('unsafe','Unsafe','javascript:alert(1)')","insert into public.articles(slug,title,platform) values ('invalid','Invalid','unknown')","insert into public.articles(slug,title,category) values ('bad-cat','Bad','gossip')","insert into public.articles(slug,title,cover_url) values ('bad-cover','Bad','http://example.com/a.png')","insert into public.articles(slug,title,project_id) values ('bad-project','Bad','no-such-app')"])await expect(as(db,who(owner.id),q=>q(sql))).rejects.toThrow();
 });
 it('registry keeps public Articles visible and prevents owner changing its system visibility',async()=>{
  expect(await as(db,{role:'anon'},q=>q("select visibility,locked from public.apps where id='articles'"))).toEqual([{visibility:'public',locked:true}]);await expect(as(db,who(owner.id),q=>q("update public.apps set visibility='owner_only' where id='articles'"))).rejects.toThrow(/fixed/);
+});
+it('2026-11-03: categories, RedNote platform, cover image and project link are accepted',async()=>{
+ const r=await as(db,who(owner.id),q=>q("insert into public.articles(slug,title,category,platform,cover_url,project_id) values ('rednote-post','RedNote post','building','xiaohongshu','https://example.com/c.png','notes') returning category,platform,project_id"));
+ expect(r).toEqual([{category:'building',platform:'xiaohongshu',project_id:'notes'}]);
 });

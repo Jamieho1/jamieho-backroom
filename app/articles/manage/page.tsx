@@ -14,5 +14,5 @@ export default async function ManageArticles(){
  const sb=await supabaseServer();if(!sb)notFound();
  const {data,error}=await sb.from('articles').select(ARTICLE_SELECT).order('updated_at',{ascending:false});
  const apps=await getDesktopApps();
- return <Desktop signedIn viewerId={viewer.id} apps={apps} initialApp="articles" content={error?<div className="page"><p role="alert">Can&apos;t load your articles right now.</p><a href="/articles/manage">Try again</a></div>:<ArticleEditor initial={(data??[]) as Article[]} />} />;
+ return <Desktop signedIn viewerId={viewer.id} apps={apps} initialApp="articles" content={error?<div className="page"><p role="alert">Can&apos;t load your articles right now.</p><a href="/articles/manage">Try again</a></div>:<ArticleEditor initial={(data??[]) as Article[]} projects={apps.filter(a=>!['settings','articles'].includes(a.id)).map(a=>({id:a.id,name:a.name}))} />} />;
 }
