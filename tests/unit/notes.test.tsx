@@ -8,7 +8,7 @@ import { highlightPython } from "@/components/notes/code-highlight";
 import { Markdown } from "@/components/notes/markdown";
 const visual = { kind: "array", title: "Walk a list", concept: "Walk", values: [2,4], frames: [{ caption: "Start", pointers:[{name:"i",index:0}] }, {caption:"Move", pointers:[{name:"i",index:1}]}] };
 const note: NoteRow = { id: "arrays-hashing", title: "Arrays", free: "", body: 'Intro\n\n### 1. Walk\n- *When*: read each value\n\n**Time** O(n) **Space** O(1)\n\n```python\ndef visit(items):\n    return len(items)\n```\n\nContains Duplicate', visual: [visual], sort:10, updated_at:"2026-10-31T00:00:00Z" };
-afterEach(cleanup);
+afterEach(() => { cleanup(); localStorage.clear(); });
 it("starts concept cards closed and opens/closes all without edit or AI controls", () => {
   render(<NotesReader notes={[note]} />);
   expect(screen.getByRole("button", {name:/1\. Walk/}).getAttribute("aria-expanded")).toBe("false");
@@ -28,13 +28,29 @@ it("searches notes and changes topics", () => {
   fireEvent.click(within(nav).getByRole("button",{name:"Other"}));
   expect(screen.getByRole("heading",{name:"Other"})).toBeTruthy();
 });
-it("Recall mode hides content until explicitly revealed", () => {
-  render(<NotesReader notes={[note]} />);
-  fireEvent.click(screen.getByRole("button",{name:"Recall mode"}));
-  fireEvent.click(screen.getByRole("button",{name:"Open all"}));
-  expect(screen.getAllByRole("button",{name:/Reveal/}).length).toBeGreaterThan(0);
-  fireEvent.keyDown(screen.getAllByRole("button",{name:/Reveal/})[0],{key:"Enter"});
-  expect(document.querySelector(".recall.open")).toBeTruthy();
+it("shows notes and visuals together with one title and toolbar controls", () => {
+  render(<NotesReader notes={[{...note, body: '# Arrays\n\n' + note.body}]} />);
+  expect(screen.getAllByRole("heading", {name:"Arrays"})).toHaveLength(1);
+  expect(screen.getByText("Start")).toBeTruthy();
+  expect(screen.queryByRole("tab")).toBeNull();
+  expect(screen.queryByRole("button", {name:"Recall mode"})).toBeNull();
+  const heading = screen.getByRole("heading", {name:"Arrays"}).closest("header")!;
+  fireEvent.click(within(heading).getByRole("button", {name:"Open all"}));
+  expect(screen.getByRole("button", {name:/1\. Walk/}).getAttribute("aria-expanded")).toBe("true");
+});
+it("resizes both panels, remembers sizes and collapses the topic list", () => {
+  const {unmount} = render(<NotesReader notes={[note]} />);
+  fireEvent.keyDown(screen.getByRole("separator", {name:"Resize topics"}), {key:"ArrowRight"});
+  fireEvent.keyDown(screen.getByRole("separator", {name:"Resize notes and visuals"}), {key:"ArrowLeft"});
+  expect(screen.getByRole("separator", {name:"Resize topics"}).getAttribute("aria-valuenow")).toBe("230");
+  expect(screen.getByRole("separator", {name:"Resize notes and visuals"}).getAttribute("aria-valuenow")).toBe("48");
+  unmount(); render(<NotesReader notes={[note]} />);
+  expect(screen.getByRole("separator", {name:"Resize topics"}).getAttribute("aria-valuenow")).toBe("230");
+  fireEvent.click(screen.getByRole("button", {name:"Collapse topics"}));
+  expect(screen.queryByRole("navigation", {name:"Coding topics"})).toBeNull();
+  expect(screen.getByText("Start")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", {name:"Expand topics"}));
+  expect(screen.getByRole("navigation", {name:"Coding topics"})).toBeTruthy();
 });
 it("opens a concept's visual and steps through its frames", () => {
   render(<NotesReader notes={[note]} />);
@@ -50,7 +66,6 @@ it("handles no notes and malformed visuals without losing the text", () => {
   const {unmount}=render(<NotesReader notes={[]} />);
   expect(screen.getByText("No notes have been added yet.")).toBeTruthy(); unmount();
   render(<NotesReader notes={[{...note,visual:"broken"}]} />);
-  fireEvent.click(screen.getByRole("tab",{name:"Visuals"}));
   expect(screen.getByRole("status").textContent).toMatch(/could not be loaded/);
 });
 it("validates the artifact visual format and preserves Python source exactly", () => {

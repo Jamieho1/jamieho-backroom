@@ -43,7 +43,7 @@ export default function Privacy() {
           <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
           and problem. Only the owner's starred review list, explicitly saved code and run/submission attempts are stored in Supabase to sync
           across devices. Question notes are also stored there; the owner edits them and people allowed to open Practice
-          can read them. Python executes only in the browser. Practice panel sizes and the collapsed question-list preference are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
+          can read them. Python executes only in the browser. Practice and Notes panel sizes, plus their collapsed question/topic-list preferences, are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
           are covered by the retention and encrypted-backup periods below.
         </li>
         <li>

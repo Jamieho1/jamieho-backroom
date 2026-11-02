@@ -268,3 +268,14 @@
   - TKT-63 Notes: 18 coding topics prepared (`notes.json`, 451 visuals = 106 stored + 345 problem visuals materialised with concept/time/space; costs >120 chars shortened; all pass `Visual` + `visualIssues`, none fall in More). 3 system-design notes left for the later System Design app. NOT loaded yet: Jamie runs `npm run import-notes -- "../imports/2026-11-02/notes.json"` (dry run) then `--apply`; script asks for the service_role key, skips notes edited on the website after the copy.
   - TKT-66 Practice: source has no saved arena code (`ar_*`). Only 4 mock-interview sessions with tiny code on reworded questions; awaiting Jamie's decision (suggested: skip).
 
+
+
+### 2026-11-02 — Codex: Notes three-panel layout follow-up
+- Worked in the relocated repository at `~/Documents/Developer/Personal Website/jamieho-backroom`.
+- Notes now shows a collapsible/resizable topic list, note text in the middle and visuals on the right. Both dividers support pointer dragging, arrow keys, Home/End and double-click reset. Sizes/collapse are browser-only and separate from Practice preferences.
+- Removed Notes Recall mode and the Notes/Visuals view switch. Open all / Close all now sits beside the topic heading, replacing Recall. Suppress a matching leading Markdown topic heading in the reader only; stored text and editor content remain intact. Concept Visual links select the corresponding right-panel visual.
+- Narrow windows stack notes and visuals; 390 px viewport has no horizontal page overflow. Existing owner editing/retry/cancel and topic navigation lock remain intact.
+- Updated PRD, README and privacy copy for the layout and browser preferences. No personal content imported or changed.
+- Validation: `npm run check` passed in an environment-file-free temporary source copy (426 unit/DB tests, typecheck, production build and static assertions). Rebuilt after privacy copy update; `/`, `/privacy`, `/projects`, `/articles` remain prerendered. Six targeted local headless browser checks passed (Notes links/layout/resizing and existing Practice resizing, desktop + 390 px phone). `git diff --check` passed. Production website/browser was not accessed.
+- Database: no migration created or applied; no live data changes.
+- Uncommitted: `components/notes/reader.tsx`, `components/notes/concept-cards.tsx`, `components/practice/panels.tsx`, `app/notes.css`, `app/privacy/page.tsx`, `tests/unit/notes.test.tsx`, `tests/e2e/practice-ui.spec.ts`, `PRD.md`, `README.md`, `MEMORY.md`. Jamie commits/pushes and checks live. No ticket status marked Done for this follow-up; live confirmation pending. Claude's import work remains unchanged.

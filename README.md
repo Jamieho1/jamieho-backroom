@@ -103,6 +103,8 @@ RLS-protected `notes` table; applied to production through Supabase MCP with Jam
 The import format for Claude's TKT-63 copy is in `Resources/Notes - Import Contract.md`.
 No personal note content is included in the repository or seeded by this migration.
 
+Notes uses a collapsible/resizable topic list, note content in the middle and a resizable visuals panel on the right. Open all / Close all lives beside the topic heading; there is no Recall mode or Notes/Visuals view switch. Panel preferences are saved only in this browser, separately from Practice. Narrow layouts stack text and visuals.
+
 ## Notes owner editor (TKT-62)
 
 Apply `supabase/migrations/20261031151127_notes_free.sql` before deploying this version. It adds the empty

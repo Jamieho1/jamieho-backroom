@@ -62,7 +62,7 @@ In scope (v1):
   - The OS-style workspace carried over from the artifact (wallpaper, icons, windows, menu bar).
   - A launcher grid on phones.
 - **Notes (coding):**
-  - Concept cards, the Visuals tab, Recall mode, IDE code colours and NeetCode links.
+  - Concept cards, resizable notes and visuals panels, IDE code colours and NeetCode links.
   - The owner edits Markdown; everyone else reads.
   - No AI buttons.
 - **Practice arena (no interview mode):**
@@ -149,7 +149,7 @@ Each release can be deployed on its own. Each one ends with the tests passing (u
    - **Decision point:** check the RLS tests before any private data is loaded.
 2. **R2 — Desktop and Notes**
    1. The `/desktop` shell (ported from the artifact), with the phone launcher.
-   2. The Notes app: cards, visuals, Recall, IDE colours, owner editing.
+   2. The Notes app: cards, resizable notes and visuals, IDE colours, owner editing.
    3. The data copy for the coding notes: export JSON to the folder, load it, verify the counts against the artifact.
 3. **R3 — Practice arena**
    1. Port the arena without interview mode: Pyodide worker, tests, Solution and visuals, the Notes panel.

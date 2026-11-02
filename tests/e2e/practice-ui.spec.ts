@@ -14,7 +14,7 @@ test.beforeAll(async()=>{
    createRoot(document.getElementById('practice-test-root')).render(
      <main className="desktop-os"><div className="desktop-workspace">
        <section className="desktop-window"><div className="desktop-app-content">
-         {params.has('notesFixture') ? <NotesReader notes={[{id:'arrays-hashing',title:'Arrays',body:'Contains Duplicate',free:'',visual:[],sort:1,updated_at:'2026-11-01T00:00:00Z'}]} /> : <PracticeArena viewerKey="fixture" initialProblem={217} canEdit={params.has('ownerFixture')} />}
+         {params.has('notesFixture') ? <NotesReader notes={[{id:'arrays-hashing',title:'Arrays',body:'# Arrays\\n\\n### 1. Walk\\nExample explanation. Contains Duplicate',free:'',visual:[{kind:'array',title:'Walk a list',concept:'Walk',values:[2,4],frames:[{caption:'Start',pointers:[{name:'i',index:0}]},{caption:'Move',pointers:[{name:'i',index:1}]}]}],sort:1,updated_at:'2026-11-01T00:00:00Z'}]} /> : <PracticeArena viewerKey="fixture" initialProblem={217} canEdit={params.has('ownerFixture')} />}
        </div></section>
      </div></main>
    );
@@ -142,5 +142,37 @@ test('Practice question list collapses and panel dividers resize without resetti
   await expect(editor).toHaveText('Keep this draft');
   await mount(page);await expect.poll(async()=>Number(await page.getByRole('separator',{name:'Resize question list'}).getAttribute('aria-valuenow'))).toBeGreaterThan(260);
  }else{await expect(page.getByRole('separator',{name:'Resize question list'})).toHaveCount(0);}
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('Notes shows text and visuals together with resizable panels and fits phones', async({page}, info) => {
+ await mount(page,'notesFixture');
+ await expect(page.getByRole('heading',{name:'Arrays',exact:true})).toHaveCount(1);
+ await expect(page.getByText(/^Step 1\. Start$/)).toBeVisible();
+ await expect(page.getByRole('button',{name:'Recall mode'})).toHaveCount(0);
+ await expect(page.getByRole('tab',{name:/^(Notes|Visuals)$/})).toHaveCount(0);
+ await page.getByRole('button',{name:'Open all',exact:true}).click();
+ await expect(page.getByText('Example explanation.',{exact:false})).toBeVisible();
+ await page.getByRole('button',{name:'Next frame'}).click();
+ await expect(page.getByText(/^Step 2\. Move$/)).toBeVisible();
+ if(info.project.name==='desktop') {
+  const topics=page.getByRole('separator',{name:'Resize topics',exact:true});
+  const split=page.getByRole('separator',{name:'Resize notes and visuals',exact:true});
+  const before=(await split.boundingBox())!.x;
+  const box=(await topics.boundingBox())!;
+  await page.mouse.move(box.x+4,box.y+30); await page.mouse.down(); await page.mouse.move(box.x+54,box.y+30); await page.mouse.up();
+  await expect(topics).toHaveAttribute('aria-valuenow','270');
+  const center=(await split.boundingBox())!;
+  await page.mouse.move(center.x+4,center.y+30); await page.mouse.down(); await page.mouse.move(center.x+44,center.y+30); await page.mouse.up();
+  expect((await split.boundingBox())!.x).toBeGreaterThan(before);
+  await split.focus(); await page.keyboard.press('Home'); await expect(split).toHaveAttribute('aria-valuenow','25');
+  await expect(page.getByText(/^Step 2\. Move$/)).toBeVisible();
+ } else {
+  await expect(page.getByRole('separator',{name:'Resize notes and visuals'})).toBeHidden();
+ }
+ await page.getByRole('button',{name:'Collapse topics'}).click();
+ await expect(page.getByRole('navigation',{name:'Coding topics'})).toBeHidden();
+ await page.getByRole('button',{name:'Expand topics'}).click();
+ await expect(page.getByRole('navigation',{name:'Coding topics'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

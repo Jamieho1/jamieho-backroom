@@ -1,16 +1,16 @@
 "use client";
 /**
  * A coding note as collapsible concept cards (Jamie 2026-10-26). Closed cards show the concept, its "when" line and a
- * time/space badge. The keyword table and complexity box start open. "Visual ▸" opens the Visuals tab at that concept.
+ * time/space badge. The keyword table and complexity box start open. "Visual ▸" selects the right-hand visual at that concept.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Markdown, MdInline, type AutoLink } from "./markdown";
 import { splitConcepts } from "@/lib/notes/concepts";
 
 export const OPEN_CARD = "ip-open-card";
 const START_OPEN = /^(spot the type|how to read|interview method)/i;
 
-export function ConceptCards({ body, links, onVisual, visualConcepts, recall = false }: { body: string; links?: AutoLink[]; onVisual?(concept: string): void; visualConcepts?: Set<string>; recall?: boolean }) {
+export function ConceptCards({ body, links, onVisual, visualConcepts, recall = false, toolbar }: { body: string; links?: AutoLink[]; onVisual?(concept: string): void; visualConcepts?: Set<string>; recall?: boolean; toolbar?(toggle: ReactNode): ReactNode }) {
   const { pre, sections } = useMemo(() => splitConcepts(body), [body]);
   const [open, setOpen] = useState<Set<string>>(() => new Set(sections.filter((s) => START_OPEN.test(s.title)).map((s) => s.id)));
   useEffect(() => {
@@ -32,13 +32,8 @@ export function ConceptCards({ body, links, onVisual, visualConcepts, recall = f
   const allOpen = sections.every((s) => open.has(s.id));
   return (
     <div className="cc-list">
+      {toolbar ? toolbar(<button type="button" className="btn ghost small" onClick={() => setOpen(allOpen ? new Set() : new Set(sections.map((s) => s.id)))}>{allOpen ? "Close all" : "Open all"}</button>) : <div className="actions cc-tools"><button type="button" className="chip-link" onClick={() => setOpen(allOpen ? new Set() : new Set(sections.map((s) => s.id)))}>{allOpen ? "Close all" : "Open all"}</button><span className="hint">{sections.filter((s) => s.numbered).length} concepts</span></div>}
       {pre ? <Markdown text={pre} links={links} recall={recall} /> : null}
-      <div className="actions cc-tools">
-        <button type="button" className="chip-link" onClick={() => setOpen(allOpen ? new Set() : new Set(sections.map((s) => s.id)))}>
-          {allOpen ? "Close all" : "Open all"}
-        </button>
-        <span className="hint">{sections.filter((s) => s.numbered).length} concepts</span>
-      </div>
       {sections.map((s) => {
         const isOpen = open.has(s.id);
         return (
@@ -54,7 +49,7 @@ export function ConceptCards({ body, links, onVisual, visualConcepts, recall = f
                 {s.badge ? <span className="cc-badge mono">{s.badge}</span> : null}
               </button>
               {onVisual && visualConcepts?.has(s.title) ? (
-                <button type="button" className="chip-link cc-vis" onClick={() => onVisual(s.title)} title="Open this concept in the Visuals tab">
+                <button type="button" className="chip-link cc-vis" onClick={() => onVisual(s.title)} title="Show this concept in the visuals panel">
                   Visual ▸
                 </button>
               ) : null}
