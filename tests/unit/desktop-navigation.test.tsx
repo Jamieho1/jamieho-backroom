@@ -55,3 +55,30 @@ it('page remounts keep permitted icons visible while the new route revalidates t
  await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(2));
  finish([]);await waitFor(()=>expect(screen.queryAllByRole('link',{name:'Notes'})).toHaveLength(0));
 });
+
+it('reveals all permitted icons together after discovery, including during initial viewer loading',async()=>{
+ m.viewer={status:'loading',name:undefined,id:'first'};
+ let finish!:(apps:unknown[])=>void; m.getApps.mockReturnValue(new Promise(resolve=>{finish=resolve;}));
+ const {rerender}=render(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
+ expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();
+ expect(screen.queryAllByRole('link',{name:'Projects'})).toHaveLength(0);
+ expect(screen.queryAllByRole('link',{name:'Notes'})).toHaveLength(0);
+ expect(screen.getByRole('navigation',{name:'Desktop apps'}).getAttribute('aria-busy')).toBe('true');
+ await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(1));
+ m.viewer={status:'member',name:'Example',id:'first'};
+ rerender(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
+ expect(m.getApps).toHaveBeenCalledTimes(1);
+ finish([FALLBACK_APPS[0]]);
+ await screen.findAllByRole('link',{name:'Notes'});
+ expect(screen.getAllByRole('link',{name:'Projects'})).toHaveLength(2);
+ expect(screen.getByRole('navigation',{name:'Desktop apps'}).getAttribute('aria-busy')).toBe('false');
+});
+it('places Settings on the right rail and in the session menu',async()=>{
+ m.viewer={status:'owner',name:'Example',id:'first'};
+ m.getApps.mockResolvedValue([{...FALLBACK_APPS[0],id:'settings',name:'Settings',icon:'gear',url:'/settings'}]);
+ render(<Desktop apps={[]} initialApp="home" discoverApps />);
+ const links=await screen.findAllByRole('link',{name:'Settings'});
+ expect(links).toHaveLength(2);
+ expect(links.some(link=>link.closest('.desktop-launcher-right'))).toBe(true);
+ expect(links.some(link=>link.closest('.desktop-session'))).toBe(true);
+});

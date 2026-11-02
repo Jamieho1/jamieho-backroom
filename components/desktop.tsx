@@ -24,10 +24,13 @@ const PLACEHOLDERS: Record<string, string> = {
 export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=false,viewerId }: { apps: AppRow[]; initialApp?: string; content?: ReactNode;discoverApps?:boolean;signedIn?:boolean;viewerId?:string }) {
   const windowTitle=useId();
   const {viewer,configured,editing,setEditing}=useViewer();
-  const {apps:cachedApps,loadError,seed}=useDesktopApps();
+  const {apps:cachedApps,loadError,loading,seed}=useDesktopApps();
   useEffect(()=>{if(viewerId)seed(viewerId,apps);},[viewerId,apps,seed]);
   const registry=discoverApps?cachedApps:apps;
   const launchers=[...DESKTOP_PAGES.map(page=>registry.find(a=>a.id===page.id)??page),...registry.filter(a=>!DESKTOP_PAGES.some(p=>p.id===a.id))];
+  const loadingApps=discoverApps&&loading;
+  const leftLaunchers=launchers.filter(app=>app.id!=="settings");
+  const settingsLauncher=launchers.find(app=>app.id==="settings");
   const active = [...launchers,PRIVACY_WINDOW,SIGNIN_WINDOW].find((a) => a.id === initialApp && a.kind === "internal");
   const authenticated=signedIn||viewer.status==='member'||viewer.status==='owner';
   const [maximised, setMaximised] = useState(false);
@@ -58,8 +61,9 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
     <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{ "--wall-hills": WALL_IMAGES.hills, "--wall-night": WALL_IMAGES.night } as CSSProperties}>
       <header className="desktop-menubar">
         <Link href="/" className="desktop-brand"><AppMark /> Jamie Ho</Link>
-        <nav aria-label="App menu">{launchers.map((app) => appLink(app, false))}</nav>
+        <nav aria-label="App menu" aria-busy={loadingApps}>{!loadingApps?leftLaunchers.map((app) => appLink(app, false)):null}</nav>
         <div className="desktop-session">
+          {!loadingApps&&settingsLauncher?appLink(settingsLauncher,false):null}
           {viewer.status==='owner'&&(active?.id==='home'||active?.id==='projects')?<button type="button" className="desktop-menu-link" aria-pressed={editing} onClick={()=>setEditing(!editing)}>{editing?'Done editing':'Edit site'}</button>:null}
           <ThemeToggle />
           {authenticated?<form action="/auth/signout" method="post"><button className="desktop-menu-link" type="submit">Sign out</button></form>:viewer.status==='anonymous'&&configured?<SignInButton className="desktop-menu-link" />:null}
@@ -67,7 +71,9 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
         <time className="desktop-clock">{clock}</time>
       </header>
       <main className="desktop-workspace">
-        <nav className="desktop-launcher" aria-label="Desktop apps">{launchers.map((app) => appLink(app, true))}</nav>
+        <nav className="desktop-launchers" aria-label="Desktop apps" aria-busy={loadingApps}>
+          {loadingApps ? <div className="desktop-launcher desktop-apps-loading" role="status">Loading apps…</div> : <><div className="desktop-launcher">{leftLaunchers.map((app) => appLink(app, true))}</div>{settingsLauncher ? <div className="desktop-launcher desktop-launcher-right">{appLink(settingsLauncher,true)}</div> : null}</>}
+        </nav>
         {initialApp && !active ? <p className="desktop-notice" role="status">This app is unavailable or you don&apos;t have access to it. Choose an app below.</p> : null}
         {loadError?<p className="desktop-notice" role="status">Can&apos;t load your apps. <a href="/desktop">Try again</a></p>:null}
         {!launchers.length ? <p className="desktop-notice">No apps are available for your account yet.</p> : null}

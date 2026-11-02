@@ -257,3 +257,12 @@ body:has(.desktop-os) .site-header { display: none; }
 
 .desktop-app-content input[type="search"] { background:color-mix(in srgb,var(--blue) 12%,var(--bg)); color:var(--ink); border:1px solid color-mix(in srgb,var(--blue) 50%,var(--border)); border-radius:6px; padding:9px 10px; font:inherit; }
 .desktop-app-content input[type="search"]::placeholder { color:var(--secondary); opacity:1; }
+
+/* App discovery reveals one permission-filtered icon set; Settings uses the right rail. */
+.desktop-launchers { display:contents; }
+.desktop-launcher-right { left:auto; right:12px; }
+.desktop-apps-loading { font:700 13px/18px var(--f-body); color:var(--ink); padding:8px 4px; }
+@media(max-width:1023px) {
+ .desktop-launchers { display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,1fr)); gap:8px; width:100%; margin-bottom:12px; max-height:28dvh; overflow:auto; flex-shrink:0; }
+ .desktop-launchers .desktop-launcher,.desktop-os.is-maximised .desktop-launchers .desktop-launcher { display:contents; }
+}
