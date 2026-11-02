@@ -8,7 +8,7 @@ Jamie's personal website is live with four parts:
 - all of it at £0/month on free tiers.
 
 ## Linked project
-- `01_Projects/Interview Prep` (the Claude artifact) is the predecessor. Its Notes, arena and Behavioral are being ported here.
+- The Interview Prep Claude artifact was the predecessor. Its Notes (incl. system design) and CV were copied here; it is retired (see AGENTS.md).
 - The artifact keeps running until R4 is done; then its Notes and Behavioral become read-only.
 
 ## Source of truth
@@ -21,7 +21,7 @@ Jamie's personal website is live with four parts:
 3. Each release ends with unit + end-to-end tests passing, then Jamie's review. Jamie pushes to GitHub himself.
 
 ## Repo layout
-- `01_Projects/Personal Website/jamieho-backroom/` is the git repo root. It holds the code plus `PRD.md`, `CLAUDE.md`, `MEMORY.md` and `Resources/`.
+- `~/Documents/Developer/Personal Website/jamieho-backroom/` is the git repo root (plans for other projects live in JH OS, `~/Documents/JH OS`). It holds the code plus `PRD.md`, `CLAUDE.md`, `MEMORY.md` and `Resources/`.
 - Nothing else in `Personal Website/` is tracked. Never run `git init` or other git commands in the parent folder.
 - GitHub: https://github.com/Jamieho1/jamieho-backroom · Vercel: jamieho1s-projects/jamieho-backroom.
 
