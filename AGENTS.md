@@ -24,11 +24,10 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 - Home London redesign: Jamie approved the first prototype on 2026-11-02 (commit `85a21d3`) and authorized the complete journey. Full camera route, responsive reading panels and project-linked technology list implemented locally. Migration `20261102005510_home_journey_sections.sql` adds empty Interests/Technology rows to existing `site_sections`; **APPLIED live** on 2026-11-02 after Jamie's approval (remote version `20261102081107`). Existing RLS/privileges remain unchanged. Personal copy and client material have not been seeded; empty Interests stay hidden. Awaiting Jamie's commit/push and full-journey live review. Public routes remain pre-rendered. See MEMORY.md and Resources/Home - Redesign Plan.md for checks/review state.
 
-## The predecessor app (Interview Prep artifact)
-- **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
-  desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.
-- **Data:** Jamie's notes, progress and Behavioral stories live inside the published Claude artifact, not in this code.
-  Other agents can't open it. **Skip the data-copy tickets TKT-63, TKT-66, TKT-69 and the cut-over TKT-70: leave them to Claude.**
+## The predecessor app (Interview Prep artifact): retired
+- Everything worth keeping has been copied (Notes incl. system-design notes, CV). Arena/mocks/study plan were not migrated by
+  Jamie's choice (a new practice app will be built from scratch). Its local source folder was removed on 2026-11-02.
+- Full raw backup of its data: `../imports/2026-11-02/artifact-export.json` (outside git, personal data).
 
 ## Working agreement with Jamie
 - **Ask before starting each ticket**: say which ticket and what it will change, then wait for his go-ahead.
@@ -76,6 +75,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 ## Open follow-ups
 - Remind Jamie to **buy the domain** before the first subdomain app or the public launch (TKT-71).
+- New projects and TKT-71 follow `Resources/Subdomain Apps - Playbook.md`.
 - Experience owner write policies were split into INSERT/UPDATE/DELETE by the TKT-67 migration, applied live 2026-11-01.
 - Desktop wallpaper stays the artifact's for v1; redesign later with Jamie.
 
