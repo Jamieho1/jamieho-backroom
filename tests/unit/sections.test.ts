@@ -21,7 +21,9 @@ describe("getSections", () => {
     const s = await getSections();
     expect(s.about).toEqual({ key: "about", title: "About me", body: "Hi" });
     expect(s.hero).toEqual(FALLBACK_SECTIONS.hero);
-    expect(Object.keys(s)).toEqual(["hero", "about", "writing", "contact"]);
+    expect(Object.keys(s)).toEqual(["hero", "about", "interests", "technology", "writing", "contact"]);
+    expect(s.interests.body).toBe("");
+    expect(s.technology.body).toBe("");
   });
   it("throws when Supabase is down, so Next keeps serving the last good page instead of placeholders", async () => {
     Object.assign(process.env, ENV);

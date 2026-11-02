@@ -1,8 +1,9 @@
 # Home landing-page redesign
 
-Approved: 2026-11-01. First review slice ready locally, 2026-11-02: London opening,
-About camera transition, direct Work/Contact links and separately composed phone view. Local validation passed.
-No database changes or deployment for this redesign.
+Approved: 2026-11-01. Jamie approved the first visual slice on 2026-11-02; committed as 85a21d3.
+The complete journey is now implemented locally and awaits review. Migration
+20261102005510_home_journey_sections.sql was approved and APPLIED live on 2026-11-02 (remote version
+20261102081107). No deployment or existing personal-copy changes.
 
 ## User brief
 
@@ -150,5 +151,39 @@ Decorative captions were removed after failing intermediate-state contrast; rema
 text/frame combinations passed with minimum 7.08:1. Local frames and measurement records are in
 /private/tmp/jamie-home-preview. Physical-phone rendering/performance and live-site sign-off remain for Jamie.
 
-First review should assess the opening, camera movement and phone composition. Remaining complete-page
-storytelling/content refinement is intentionally the next slice of the approved plan, after that review.
+## Complete journey implementation, 2026-11-02
+
+The approved opening continues through optional Interests, Technology, Projects, Experience, Writing
+and Contact. Later views reveal an original Tower Bridge model in the same lit world/reflected river.
+This is an authored London study rather than a claim of geographically accurate travel. Sticky Home
+navigation/motion controls, native anchors, project destinations and a compact Privacy/back-to-top
+footer keep the experience usable. Project cards retain their registry behaviour and owner editors.
+Long panels hold the camera until the next section enters; form interaction has a settled view.
+Section positions are measured from actual layout; browser anchor rounding, resize/maximise and content
+reflow are accounted for. Optional sections create no empty flight leg. Phones use full-width reading
+panels and compact project placeholders; desktop alternates reading sides with wider work/contact views.
+
+Two optional Markdown rows reuse `site_sections`, the existing owner editor/action and RLS. The new
+CLI-generated migration extends only the key constraint and seeds empty Interests/Technology rows;
+it adds no function, privilege or policy and changes no existing personal copy. Interests remain
+unpublished while empty; the owner can reach the editor in Edit site mode. Technology falls back to
+recognised tags actually present on public project cards and links each tool to its project. Owner
+Markdown replaces that list; clearing it restores the automatic list immediately. No skills, clients,
+metrics or personal biography are invented. Client material remains deferred.
+
+Migration: `supabase/migrations/20261102005510_home_journey_sections.sql` — **APPLIED live** after
+Jamie's explicit approval on 2026-11-02, remote version `20261102081107`. API verification confirmed
+both rows empty, RLS enabled, the six-key constraint, public SELECT and owner-only UPDATE with
+USING/WITH CHECK; authenticated INSERT/DELETE remain revoked. Local RLS tests cover public reads and owner-only edits/clearing for
+both new rows; existing field limits, timestamp trigger and API function restrictions are unchanged.
+Local schema/data tests run in PGlite. The live migration adds empty rows; existing personal copy remains unchanged.
+
+Verification: required check passed with 423 unit/database tests, typecheck, production build and
+static assertions for /, /privacy, /projects and /articles. Full desktop/phone headless suite:
+82 passed / 2 existing duplicate runtime cases skipped. Includes all public camera stops, technology
+links, a neutral long Experience/reflow fixture, focus/navigation, no sideways scrolling, motion/still
+fallbacks, resize/maximise and cleanup. After the compact-phone contact link received a dark backing,
+all 12 Home browser checks passed again. All 345 sampled text/frame combinations passed contrast,
+minimum 6.95:1, across every public stop at desktop/390 px/360 px and reduced motion. Final rendered frames and contrast records are stored in
+/private/tmp/jamie-home-full-preview. Jamie reviews the live result himself; no live-site/browser control,
+commit, push or deployment by Codex.

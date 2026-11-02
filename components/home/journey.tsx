@@ -94,7 +94,7 @@ export function HomeJourney({ intro, about, children }: { intro: ReactNode; abou
             </button>
           )}
         </div>
-        <div className="home-intro">
+        <div id="home-arrival" className="home-intro" data-home-stop="arrival" tabIndex={-1}>
           <div className="home-intro-copy">
             <p className="home-eyebrow">London, after hours</p>
             {intro}
@@ -104,7 +104,7 @@ export function HomeJourney({ intro, about, children }: { intro: ReactNode; abou
             </div>
           </div>
         </div>
-        <div id="home-about" className="home-about" ref={aboutRef} tabIndex={-1}>
+        <div id="home-about" className="home-about" data-home-stop="about" ref={aboutRef} tabIndex={-1}>
           <div className="home-about-copy">{about}</div>
         </div>
         <div className="home-rest">{children}</div>

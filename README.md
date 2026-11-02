@@ -191,14 +191,27 @@ icons appear in every desktop launcher. Home's London scene fills the window wid
 content gutters; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
 Owner Edit site and sign-in/theme controls remain in the menu bar.
 
-Home's first London review slice uses pinned Three.js/GSAP and the Scroll Craft design workflow:
-an original procedural opening, an About camera transition and direct Work/Contact anchors. Public
+Home's London journey uses pinned Three.js/GSAP and the Scroll Craft design workflow:
+an original procedural opening, About/Interests, Technology, Projects, Experience, Writing and Contact
+camera stops, with Westminster, the Eye and Tower Bridge in one world. Empty Interests and Experience
+do not create a public section or camera leg. Public
 HTML and owner editing remain intact. Graphics are lazy and render only on input/resize, with a still
 view for reduced motion, missing WebGL or no JavaScript. Desktop and phone posters are original renders
 of the same scene. To regenerate them and capture review frames, run `node scripts/capture-home.mjs
 http://localhost:3100 [chromium-executable] [review-directory]` against a local server (use an .env-free
-copy for placeholder-only screenshots). The full content journey and final asset fidelity follow the
-first-slice review; see `Resources/Home - Redesign Plan.md`. No migration is needed for this slice.
+copy for placeholder-only screenshots). Reading panels get a calm camera hold; the contact form keeps
+its settled view. Navigation and motion controls stay reachable inside Home; section/project links use
+native anchors and keyboard focus. See `Resources/Home - Redesign Plan.md`.
+
+Migration `20261102005510_home_journey_sections.sql` is **APPLIED live** (approved 2026-11-02,
+remote version `20261102081107`). It extends the existing
+`site_sections` key constraint and adds empty Interests/Technology rows, retaining public reads,
+owner-only updates, existing field limits and timestamp trigger. After deploying this version,
+use Edit site to add Interests text and publish it; clearing it hides the section.
+Technology starts with recognised technology tags from public project cards, linked to the matching
+cards. Add Markdown to replace that automatic list; clearing it restores the list immediately. These
+are project technologies, not an inferred personal skills inventory. Personal copy stays in Supabase.
+Client names/logos remain deferred until supplied and approved. Existing site copy is not changed.
 
 A shared provider above the page boundary retains signed-in registry icons across client navigation.
 It revalidates the server's RLS-filtered desktop view in the background on route/account changes,

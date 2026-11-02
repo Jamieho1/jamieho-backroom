@@ -18,9 +18,11 @@ export interface EditableSectionProps {
   save?: (key: string, title: string, body: string) => Promise<SaveResult>;
   className?: string;
   children?: ReactNode;
+  /** Used when the owner clears an optional section with an automatic public fallback. */
+  emptyContent?: ReactNode;
 }
 
-export function EditableSection({ sectionKey, title, body, heading = "h2", save, className, children }: EditableSectionProps) {
+export function EditableSection({ sectionKey, title, body, heading = "h2", save, className, children, emptyContent }: EditableSectionProps) {
   const { editing } = useViewer();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -95,7 +97,7 @@ export function EditableSection({ sectionKey, title, body, heading = "h2", save,
   return (
     <section className={className}>
       {shownTitle ? <H>{shownTitle}</H> : null}
-      {saved ? <Markdown text={shownBody} /> : children ?? <Markdown text={shownBody} />}
+      {!shownBody.trim() && emptyContent ? emptyContent : saved ? <Markdown text={shownBody} /> : children ?? <Markdown text={shownBody} />}
       {editing ? (
         <button type="button" className="btn ghost small edit-btn" onClick={() => setOpen(true)} aria-label={`Edit ${shownTitle || sectionKey}`}>
           Edit

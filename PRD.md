@@ -44,7 +44,7 @@ In scope (v1):
 
 - **Landing `/`:**
   - Hero, About, Experience, Projects (from the registry), Writing/YouTube, Contact.
-  - Home-only cinematic London redesign approved 2026-11-01: one continuous Three.js world with a GSAP camera score, following Scroll Craft's design/verification workflow. Start with the opening and About transition for review; complete the other content stops afterwards. Real HTML and existing owner editing remain usable without WebGL/JavaScript or with reduced motion. Personal/technology/passion content comes from public database data; client material is deferred until supplied and approved.
+  - Home-only cinematic London redesign approved 2026-11-01; initial slice approved 2026-11-02. One continuous Three.js world with a GSAP camera score follows Scroll Craft's design/verification workflow through About/Interests, Technology, Projects, Experience, Writing and Contact. Reading/form stops hold the camera; optional empty sections are skipped. Real HTML and existing owner editing remain usable without WebGL/JavaScript or with reduced motion. Public project tags provide linked technology evidence unless replaced with owner Markdown. Interests and Technology have optional database rows; migration approval is required before live application. Personal copy stays in the database; client material is deferred until supplied and approved.
   - Content is Markdown rows in Supabase.
   - An owner-only "Edit site" mode; saving revalidates the page, with no redeploy.
 - **Projects page:** project cards styled as mini desktop windows (screenshot, description, tech tags, link).

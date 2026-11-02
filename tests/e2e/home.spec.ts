@@ -85,3 +85,52 @@ test("the complete Home remains readable without JavaScript", async ({ browser, 
   await expect(page.locator(".home-canvas canvas")).toHaveCount(0);
   await context.close();
 });
+
+test("technology evidence links to its project and every remaining stop reaches a distinct, settled view", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Interests", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Technology", exact: true })).toBeVisible();
+  await page.locator('.home-toolkit').getByRole('link', { name: 'Notes', exact: true }).first().click();
+  await expect(page.locator('#home-project-notes')).toBeFocused();
+  await expect(page.getByRole('article', { name: 'Notes', exact: true })).toBeInViewport();
+  const canvas = page.locator('.home-canvas');
+  const webgl = await page.evaluate(() => {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    gl?.getExtension('WEBGL_lose_context')?.loseContext(); return !!gl;
+  });
+  if (webgl) await expect(page.locator('.home-journey[data-scene="ready"]')).toBeVisible({ timeout: 15_000 });
+  const poses = new Set<string>();
+  for (const stop of ['technology', 'work', 'writing', 'contact']) {
+    await page.locator(`#home-${stop}`).evaluate(e => e.scrollIntoView({ block: 'start' }));
+    if (webgl) {
+      await expect(canvas).toHaveAttribute('data-home-waypoint', stop);
+      await expect(canvas).toHaveAttribute('data-sc-verify-hold', 'true');
+      poses.add((await canvas.getAttribute('data-sc-verify-state'))!);
+    }
+    expect(await page.locator('.desktop-app-content').evaluate(e => e.scrollWidth <= e.clientWidth)).toBe(true);
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+    await expect(page.getByRole('navigation', { name: 'On this page' })).toBeInViewport();
+  }
+  if (webgl) expect(poses.size).toBe(4);
+  // A neutral DOM fixture exercises reflow when public Experience arrives or its owner edits it.
+  // No personal content, production fixture route or database write is involved.
+  await page.evaluate(() => {
+    const node = document.createElement('div'); node.id = 'home-experience'; node.dataset.homeStop = 'experience'; node.className = 'home-content-stop'; node.tabIndex = -1;
+    const pane = document.createElement('div'); pane.className = 'home-reading-pane';
+    const title = document.createElement('h2'); title.textContent = 'Example experience layout'; pane.append(title);
+    const list = document.createElement('ol'); list.className = 'xp';
+    for (let i = 0; i < 14; i++) { const row = document.createElement('li'); row.textContent = `Example responsibility ${i + 1}: ` + 'example-long-text'.repeat(12); list.append(row); }
+    pane.append(list); node.append(pane); document.querySelector('#home-writing')!.before(node);
+  });
+  await page.locator('#home-experience').evaluate(e => e.scrollIntoView({ block: 'start' }));
+  if (webgl) {
+    await expect(canvas).toHaveAttribute('data-home-waypoint', 'experience');
+    await expect(canvas).toHaveAttribute('data-sc-verify-hold', 'true');
+    const settled = await canvas.getAttribute('data-sc-verify-state');
+    await page.locator('.desktop-app-content').evaluate(e => { e.scrollTop += 80; });
+    await expect(canvas).toHaveAttribute('data-sc-verify-state', settled!);
+  }
+  expect(await page.locator('.desktop-app-content').evaluate(e => e.scrollWidth <= e.clientWidth)).toBe(true);
+  await page.getByRole('link', { name: 'Back to the river' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Jamie Ho' })).toBeInViewport();
+});

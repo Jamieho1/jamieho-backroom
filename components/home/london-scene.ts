@@ -3,9 +3,10 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { Reflector } from "three/addons/objects/Reflector.js";
 import { gsap } from "gsap";
+import { journeyPosition } from "@/lib/home";
 
 type Pose = { x: number; y: number; z: number; tx: number; ty: number; tz: number; fov: number };
-type MaterialName = "stone" | "edge" | "roof" | "shadow" | "metal" | "light" | "dim" | "clock" | "glass";
+type MaterialName = "stone" | "edge" | "roof" | "shadow" | "metal" | "light" | "dim" | "clock" | "glass" | "bridge";
 
 function clockTexture() {
   const canvas = document.createElement("canvas");
@@ -63,6 +64,7 @@ function makeCity(scene: THREE.Scene) {
   const materials: Record<MaterialName, THREE.Material> = {
     stone: stone(0x877c66), edge: stone(0xb4a080), roof: stone(0x172b32), shadow: stone(0x233237),
     metal: new THREE.MeshStandardMaterial({ color: 0x25423e, roughness: 0.55, metalness: 0.65 }),
+    bridge: new THREE.MeshStandardMaterial({ color: 0x658d9a, roughness: 0.52, metalness: 0.5 }),
     light: new THREE.MeshBasicMaterial({ color: 0xffd398, toneMapped: false }),
     dim: new THREE.MeshBasicMaterial({ color: 0x97744a }),
     clock: new THREE.MeshBasicMaterial({ map: texture, toneMapped: false, side: THREE.DoubleSide }),
@@ -190,6 +192,38 @@ function makeCity(scene: THREE.Scene) {
     part(new THREE.SphereGeometry(0.14, 8, 6), "light", x, 5.35, 1);
   }
 
+  // Tower Bridge provides the later work/experience/contact views within this same London study.
+  const bz = -22;
+  for (const x of [-55, -37]) {
+    box(4.8, 1.2, 6.6, x, 0, bz, "shadow");
+    box(3.7, 13.5, 4.6, x, 7, bz);
+    for (const y of [1.4, 5.2, 9.8, 12.5, 13.7]) box(4, 0.22, 4.9, x, y, bz, "edge");
+    for (const dx of [-1.65, 1.65]) for (const dz of [-2, 2]) {
+      box(0.42, 14, 0.42, x + dx, 7.5, bz + dz, "edge");
+      part(new THREE.ConeGeometry(0.49, 2, 4), "roof", x + dx, 15.4, bz + dz, 0, Math.PI / 4);
+    }
+    for (const dx of [-0.9, 0, 0.9]) for (const y of [4, 7, 10.5]) {
+      pointedWindow(x + dx, y, bz + 2.31, 0.44, 1.7, 0, true);
+      box(0.045, 1.35, 0.06, x + dx, y + 0.65, bz + 2.36, "edge");
+    }
+    box(2.6, 0.6, 3.4, x, 14.1, bz, "edge");
+    part(new THREE.ConeGeometry(2.15, 2.5, 4), "roof", x, 15.65, bz, 0, Math.PI / 4);
+    rod(v(x, 16.7, bz), v(x, 17.7, bz), 0.03, "edge");
+  }
+  for (const z of [bz - 1.5, bz + 1.5]) {
+    box(18, 0.55, 0.4, -46, 12.3, z, "bridge");
+    box(18, 0.12, 0.4, -46, 13.1, z, "edge");
+    for (let x = -54; x <= -38; x += 0.55) box(0.04, 0.65, 0.06, x, 12.7, z, "bridge");
+    const cable = new THREE.CatmullRomCurve3([v(-74, 2.3, z), v(-65, 4.4, z), v(-55, 11.8, z), v(-46, 5, z), v(-37, 11.8, z), v(-27, 4.4, z), v(-18, 2.3, z)]);
+    part(new THREE.TubeGeometry(cable, 100, 0.13, 6, false), "bridge", 0, 0, 0);
+    for (let x = -73; x < -18; x += 1.2) {
+      const p = cable.getPoint((x + 74) / 56);
+      rod(v(p.x, 2.5, z), p, 0.025, "bridge");
+    }
+  }
+  box(58, 0.45, 4.1, -46, 2.2, bz, "bridge");
+  const bridgeLight = new THREE.PointLight(0xffd6a3, 140, 32, 2); bridgeLight.position.set(-46, 11, bz + 6); scene.add(bridgeLight);
+
   // Far bank: deliberately subdued, with irregular rooflines and sparse lit windows.
   box(150, 0.9, 8, 0, -0.1, -44, "shadow");
   for (let i = 0; i < 40; i++) {
@@ -203,13 +237,13 @@ function makeCity(scene: THREE.Scene) {
   }
 
   // Near river railing and one warm lantern: the camera passes this in the first transition.
-  box(90, 0.45, 4, 0, -1.1, 30, "shadow");
-  for (let x = -40; x < 40; x += 1.1) {
+  box(180, 0.45, 4, -20, -1.1, 30, "shadow");
+  for (let x = -100; x < 60; x += 1.1) {
     rod(v(x, -0.8, 28), v(x, 0.85, 28), 0.045);
     if (Math.round((x + 40) / 1.1) % 4 === 0) part(new THREE.SphereGeometry(0.09, 6, 4), "metal", x, 0.92, 28);
   }
-  box(90, 0.08, 0.09, 0, 0.82, 28, "metal");
-  box(90, 0.07, 0.09, 0, -0.45, 28, "metal");
+  box(180, 0.08, 0.09, -20, 0.82, 28, "metal");
+  box(180, 0.07, 0.09, -20, -0.45, 28, "metal");
   const lx = 13.8, lz = 24;
   part(new THREE.CylinderGeometry(0.12, 0.27, 6.8, 12), "metal", lx, 2.5, lz);
   for (const y of [-0.7, -0.4, 0, 4.9, 5.25]) part(new THREE.CylinderGeometry(0.26, 0.26, 0.12, 12), "metal", lx, y, lz);
@@ -283,6 +317,8 @@ export function mountLondonScene(host: HTMLElement, scroller: HTMLElement, about
   const camera = new THREE.PerspectiveCamera(43, 1, 0.1, 500);
   const pose: Pose = { x: 1, y: 8.5, z: 45, tx: -7, ty: 10, tz: -10, fov: 43 };
   let timeline: gsap.core.Timeline;
+  let stops: { id: string; top: number }[] = [], scoreTime = 0, holding = true;
+  const story = about.closest<HTMLElement>(".home-story")!;
   let frame = 0, disposed = false, ready = false, compiled = false;
   let pointerX = 0, pointerY = 0;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -291,20 +327,21 @@ export function mountLondonScene(host: HTMLElement, scroller: HTMLElement, about
     if (disposed || !compiled || document.hidden || !host.isConnected) return;
     camera.position.set(pose.x + pointerX, pose.y + pointerY, pose.z);
     camera.fov = pose.fov; camera.lookAt(pose.tx, pose.ty, pose.tz); camera.updateProjectionMatrix();
-    host.parentElement?.style.setProperty("--home-lead-shade", String(1 - (timeline?.progress() ?? 0)));
+    host.parentElement?.style.setProperty("--home-lead-shade", String(Math.max(0, 1 - scoreTime)));
     try { renderer.render(scene, camera); }
     catch { onFailure(); return; }
     // Scroll Craft verification describes the pose actually painted, rather than raw input progress.
     host.dataset.scVerifyState = [camera.position.x, camera.position.y, camera.position.z, pose.tx, pose.ty, pose.tz, pose.fov].map(n => n.toFixed(2)).join(",");
-    host.dataset.scVerifyHold = String(timeline?.progress() === 1);
+    host.dataset.scVerifyHold = String(holding);
+    host.dataset.homeWaypoint = stops[Math.floor(scoreTime)]?.id ?? "arrival";
     if (!ready) { ready = true; onReady(); }
   };
   const requestDraw = () => { if (!frame && !disposed && !document.hidden) frame = requestAnimationFrame(draw); };
   function scroll() {
-    // Offset within the pane, including a restored fragment scroll on initial navigation.
-    const distance = about.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
-    const progress = THREE.MathUtils.clamp(scroller.scrollTop / Math.max(1, distance), 0, 1);
-    timeline?.progress(progress); waterMaterial.uniforms.uTime.value = progress * 3;
+    const current = journeyPosition(stops.map(stop => stop.top), scroller.scrollTop, scroller.clientHeight);
+    scoreTime = current.time; holding = current.hold;
+    timeline?.time(scoreTime); waterMaterial.uniforms.uTime.value = scoreTime * 3;
+    if (holding && scoreTime >= 1) pointerX = pointerY = 0;
     requestDraw();
   }
   function resize() {
@@ -318,12 +355,27 @@ export function mountLondonScene(host: HTMLElement, scroller: HTMLElement, about
     const end: Pose = phone
       ? { x: 15, y: 9, z: 48, tx: 14, ty: 15, tz: -10, fov: 48 }
       : { x: 15, y: 6.7, z: 34, tx: 20, ty: 9, tz: -10, fov: 43 };
+    const poses: Record<string, Pose> = {
+      arrival: start, about: end,
+      interests: phone ? { x: 8, y: 11, z: 52, tx: 7, ty: 16, tz: -18, fov: 48 } : { x: 4, y: 7, z: 35, tx: -1, ty: 9, tz: -20, fov: 43 },
+      technology: phone ? { x: -10, y: 12, z: 49, tx: -7, ty: 16, tz: -28, fov: 48 } : { x: -2, y: 7, z: 34, tx: -10, ty: 10, tz: -30, fov: 43 },
+      work: phone ? { x: -42, y: 11, z: 53, tx: -46, ty: 14, tz: -10, fov: 48 } : { x: -34, y: 7, z: 38, tx: -46, ty: 9, tz: -10, fov: 43 },
+      experience: phone ? { x: -58, y: 10, z: 46, tx: -45, ty: 14, tz: -10, fov: 48 } : { x: -62, y: 6, z: 40, tx: -68, ty: 9, tz: -10, fov: 43 },
+      writing: phone ? { x: -48, y: 12, z: 52, tx: -46, ty: 15, tz: -10, fov: 48 } : { x: -54, y: 9, z: 45, tx: -27, ty: 9, tz: -10, fov: 43 },
+      contact: phone ? { x: -44, y: 10, z: 55, tx: -46, ty: 13, tz: -10, fov: 48 } : { x: -41, y: 7, z: 46, tx: -47, ty: 8, tz: -10, fov: 43 },
+    };
+    const inset = story.querySelector<HTMLElement>(".home-wayfinding")?.offsetHeight ?? 0;
+    const paneTop = scroller.getBoundingClientRect().top, maxScroll = scroller.scrollHeight - scroller.clientHeight;
+    stops = [...story.querySelectorAll<HTMLElement>("[data-home-stop]")]
+      .filter(node => node.getClientRects().length && poses[node.dataset.homeStop!])
+      .map(node => ({ id: node.dataset.homeStop!, top: Math.max(0, Math.min(maxScroll, node.getBoundingClientRect().top - paneTop + scroller.scrollTop - inset)) }));
     timeline?.kill(); Object.assign(pose, start);
-    timeline = gsap.timeline({ paused: true }).to(pose, { ...end, duration: 1, ease: "power2.inOut" });
+    timeline = gsap.timeline({ paused: true });
+    for (const stop of stops.slice(1)) timeline.to(pose, { ...poses[stop.id], duration: 1, ease: "power2.inOut" });
     scroll();
   }
   function pointer(event: PointerEvent) {
-    if (!finePointer.matches) return;
+    if (!finePointer.matches || holding && scoreTime >= 1) return;
     const r = host.getBoundingClientRect();
     pointerX = THREE.MathUtils.clamp((event.clientX - r.left) / r.width - 0.5, -0.5, 0.5) * 0.45;
     pointerY = THREE.MathUtils.clamp(0.5 - (event.clientY - r.top) / r.height, -0.5, 0.5) * 0.2;
@@ -332,7 +384,7 @@ export function mountLondonScene(host: HTMLElement, scroller: HTMLElement, about
   function leave() { pointerX = pointerY = 0; requestDraw(); }
   function contextLost(event: Event) { event.preventDefault(); onFailure(); }
   host.append(canvas);
-  const observer = new ResizeObserver(resize); observer.observe(host); observer.observe(about);
+  const observer = new ResizeObserver(resize); observer.observe(host); observer.observe(story);
   scroller.addEventListener("scroll", scroll, { passive: true });
   scroller.addEventListener("pointermove", pointer, { passive: true }); scroller.addEventListener("pointerleave", leave);
   document.addEventListener("visibilitychange", requestDraw); canvas.addEventListener("webglcontextlost", contextLost);

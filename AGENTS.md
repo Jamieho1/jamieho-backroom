@@ -22,6 +22,8 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 - New authorized follow-up: Practice collapse/resize and CI Retry fix implemented locally. Public Articles app with owner drafts/publishing implemented; migration `20261101145851_articles.sql` was approved/applied live on 2026-11-01; deployment/live review pending. `/articles` is pre-rendered; `/articles/manage` is owner-only.
 
+- Home London redesign: Jamie approved the first prototype on 2026-11-02 (commit `85a21d3`) and authorized the complete journey. Full camera route, responsive reading panels and project-linked technology list implemented locally. Migration `20261102005510_home_journey_sections.sql` adds empty Interests/Technology rows to existing `site_sections`; **APPLIED live** on 2026-11-02 after Jamie's approval (remote version `20261102081107`). Existing RLS/privileges remain unchanged. Personal copy and client material have not been seeded; empty Interests stay hidden. Awaiting Jamie's commit/push and full-journey live review. Public routes remain pre-rendered. See MEMORY.md and Resources/Home - Redesign Plan.md for checks/review state.
+
 ## The predecessor app (Interview Prep artifact)
 - **Code:** `../../Interview Prep/artifact/` (its own git repo; latest commit da5e0a7). Port look and behaviour from here:
   desktop shell, wallpaper and icons in `src/ui/`, notes rendering, the arena editor, `code-highlight.tsx` for colours.

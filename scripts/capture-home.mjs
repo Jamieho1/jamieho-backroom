@@ -29,6 +29,15 @@ try {
       await page.screenshot({ path: path.join(review, `${name}-${frame}.png`) });
       report.push({ name, frame, pose: await page.locator(".home-canvas").getAttribute("data-sc-verify-state"), paneScroll: await pane.evaluate(e => e.scrollTop), documentScroll: await page.evaluate(() => scrollY) });
     }
+    for (const stop of await page.locator('.home-rest [data-home-stop]').all()) {
+      const frame = await stop.getAttribute('data-home-stop');
+      await stop.evaluate(e => e.scrollIntoView({ block: 'start' }));
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await page.screenshot({ path: path.join(review, `${name}-${frame}.png`) });
+      report.push({ name, frame, pose: await page.locator('.home-canvas').getAttribute('data-sc-verify-state'), paneScroll: await pane.evaluate(e => e.scrollTop), documentScroll: await page.evaluate(() => scrollY) });
+    }
+    await pane.evaluate(e => { e.scrollTop = e.scrollHeight; });
+    await page.screenshot({ path: path.join(review, `${name}-footer.png`) });
     if (errors.length) throw new Error(errors.join("\n"));
     await context.close();
   }
