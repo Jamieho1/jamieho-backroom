@@ -24,9 +24,9 @@ test('Home, Projects and Privacy share a full-height desktop with no page footer
   await expect(win).toBeVisible();
   if(path==='/'){
    const widthFits=await page.locator('.landing').evaluate(el=>{
-    const pane=el.parentElement!;const style=getComputedStyle(el);
-    const inner=el.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-    return Math.abs(el.getBoundingClientRect().width-pane.clientWidth)<2&&Array.from(el.querySelectorAll('.block,.hero .md p')).every(b=>Math.abs(b.getBoundingClientRect().width-inner)<2);
+    const pane=el.parentElement!;
+    const stage=el.querySelector('.home-stage')!;
+    return Math.abs(el.getBoundingClientRect().width-pane.clientWidth)<2&&Math.abs(stage.getBoundingClientRect().width-pane.clientWidth)<2&&pane.scrollWidth<=pane.clientWidth;
    });expect(widthFits).toBe(true);
   }
   const box=await win.boundingBox();

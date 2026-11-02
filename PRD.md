@@ -44,6 +44,7 @@ In scope (v1):
 
 - **Landing `/`:**
   - Hero, About, Experience, Projects (from the registry), Writing/YouTube, Contact.
+  - Home-only cinematic London redesign approved 2026-11-01: one continuous Three.js world with a GSAP camera score, following Scroll Craft's design/verification workflow. Start with the opening and About transition for review; complete the other content stops afterwards. Real HTML and existing owner editing remain usable without WebGL/JavaScript or with reduced motion. Personal/technology/passion content comes from public database data; client material is deferred until supplied and approved.
   - Content is Markdown rows in Supabase.
   - An owner-only "Edit site" mode; saving revalidates the page, with no redeploy.
 - **Projects page:** project cards styled as mini desktop windows (screenshot, description, tech tags, link).
@@ -83,7 +84,7 @@ In scope (v1):
 - **Design:**
   - Public Home opens first as a desktop app; Projects and Privacy share the same shell. Privacy links from Home instead of a global footer. Public routes remain pre-rendered; private apps still require access. Windows fill the remaining viewport height and scroll their content internally (Jamie, 2026-11-01).
   - The current PostHog-style tokens, type, light/dark mode and IDE code colours across the whole site.
-  - The landing page uses an editorial layout.
+  - Home has its own midnight-blue/amber London presentation inside the desktop window; the desktop and other apps retain their current design.
   - Dark mode follows the system setting, with a toggle.
 - **Data copy:**
   - Copied: coding notes, CV → Experience, stories, Behavioral questions and answers, the latest arena code, per-question notes.
@@ -96,7 +97,7 @@ Out of scope (later):
 
 - Any AI, including interview mode, Alex, grading, quiz generation, Draft with Claude and voice.
 - A system design app (it needs its own design and its own grill).
-- GSAP / three.js animation.
+- Animation outside the approved Home-only London redesign.
 - Saving visitors' work to the database (multi-user).
 - Payments or subscriptions.
 - External subdomain apps. The registry and the shared login are ready for them, but the first one comes after v1.

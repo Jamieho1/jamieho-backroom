@@ -187,9 +187,18 @@ personal preparation stays in Supabase and encrypted exports. Claude handles the
 Home (`/`) opens first as a desktop app, with Projects (`/projects`) in the same shell. Privacy
 (`/privacy`) also uses the shell and is linked from the bottom of Home; there is no global footer
 under the desktop. All three public routes remain pre-rendered and need no sign-in. Home and Projects
-icons appear in every desktop launcher. Home content fills the available window width within its 24 px
-side padding; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
+icons appear in every desktop launcher. Home's London scene fills the window width, with its own fluid
+content gutters; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
 Owner Edit site and sign-in/theme controls remain in the menu bar.
+
+Home's first London review slice uses pinned Three.js/GSAP and the Scroll Craft design workflow:
+an original procedural opening, an About camera transition and direct Work/Contact anchors. Public
+HTML and owner editing remain intact. Graphics are lazy and render only on input/resize, with a still
+view for reduced motion, missing WebGL or no JavaScript. Desktop and phone posters are original renders
+of the same scene. To regenerate them and capture review frames, run `node scripts/capture-home.mjs
+http://localhost:3100 [chromium-executable] [review-directory]` against a local server (use an .env-free
+copy for placeholder-only screenshots). The full content journey and final asset fidelity follow the
+first-slice review; see `Resources/Home - Redesign Plan.md`. No migration is needed for this slice.
 
 A shared provider above the page boundary retains signed-in registry icons across client navigation.
 It revalidates the server's RLS-filtered desktop view in the background on route/account changes,
