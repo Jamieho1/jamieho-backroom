@@ -40,3 +40,13 @@ export function parseVisuals(raw: unknown): { visuals: VisualData[]; invalid: bo
     return { visuals: [], invalid: true };
   }
 }
+
+/** Notes are split into two shelves (2026-11-02): coding topics and system-design notes (ids starting `sd-`). */
+export const NOTE_TRACKS = [
+  { id: "coding", label: "Coding", nav: "Coding topics" },
+  { id: "system-design", label: "System design", nav: "System design topics" },
+] as const;
+export type NoteTrack = (typeof NOTE_TRACKS)[number]["id"];
+export const noteTrack = (id: string): NoteTrack => (id.startsWith("sd-") ? "system-design" : "coding");
+/** Sidebar label: drop a "System design: " prefix, since the shelf already says so. */
+export const shelfTitle = (title: string) => title.replace(/^system design:\s*/i, "");

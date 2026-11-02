@@ -80,3 +80,20 @@ it("does not turn headings inside code fences into cards or render raw HTML", ()
   expect(container.querySelector('script')).toBeNull();
   expect(container.querySelector('a')).toBeNull();
 });
+it("separates Coding and System design notes", () => {
+  const sd: NoteRow = { ...note, id: "sd-rate-limiter", title: "System design: Rate limiter", body: "### 1. Requirements\nLimit requests", visual: [] };
+  render(<NotesReader notes={[note, sd]} />);
+  const group = screen.getByRole("group", { name: "Note type" });
+  expect(within(group).getByRole("button", { name: "Coding" }).getAttribute("aria-pressed")).toBe("true");
+  expect(within(screen.getByRole("navigation", { name: "Coding topics" })).queryByRole("button", { name: "Rate limiter" })).toBeNull();
+  fireEvent.click(within(group).getByRole("button", { name: "System design" }));
+  const nav = screen.getByRole("navigation", { name: "System design topics" });
+  expect(within(nav).getByRole("button", { name: "Rate limiter" }).getAttribute("aria-current")).toBe("page");
+  expect(within(nav).queryByRole("button", { name: "Arrays" })).toBeNull();
+  expect(screen.getByRole("heading", { name: "System design: Rate limiter" })).toBeTruthy();
+  expect(screen.queryByRole("region", { name: "Visuals" })).toBeNull(); // no empty visuals panel
+});
+it("hides the switch when there is only one kind of note", () => {
+  render(<NotesReader notes={[note]} />);
+  expect(screen.queryByRole("group", { name: "Note type" })).toBeNull();
+});
