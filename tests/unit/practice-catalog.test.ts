@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { solutionOf, extraOf } from "@/lib/practice/solutions";
 import { Visual } from "@/lib/notes/visual";
 import { ARENA_FILES } from "@/lib/practice/problems";
-import { NEETCODE_150 } from "@/lib/notes/neetcode150";
+import { PRACTICE_ANCHORS } from "@/lib/notes/neetcode150";
 
 const HARNESS_DIR = fileURLToPath(new URL("../../public/runner/", import.meta.url));
 const PY = `
@@ -23,8 +23,8 @@ function runPy(code: string, method: string, tests: unknown[], extra: unknown) {
 for (const [topic, problems] of Object.entries(ARENA_FILES)) {
   if (!problems.length) continue;
   describe(`arena ${topic}`, () => {
-    it("covers every NeetCode problem of the topic once", () => {
-      const want = NEETCODE_150.filter((a) => a.topic === topic).map((a) => a.lc).sort((a, b) => a - b);
+    it("covers every practice problem (NeetCode 150 + extras) of the topic once", () => {
+      const want = PRACTICE_ANCHORS.filter((a) => a.topic === topic).map((a) => a.lc).sort((a, b) => a - b);
       expect(problems.map((p) => p.lc).sort((a, b) => a - b)).toEqual(want);
     });
     for (const p of problems) {

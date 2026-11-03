@@ -8,6 +8,7 @@
  * - 739 Daily Temperatures (Medium)
  * - 853 Car Fleet (Medium)
  * - 84 Largest Rectangle in Histogram (Hard)
+ * - 32 Longest Valid Parentheses (Hard, extra)
  */
 import type { Solution, Variation } from "../solutions";
 
@@ -19,7 +20,7 @@ export const variations: Variation[] = [
     topic: "stack",
     name: "Push, then pop to match or combine",
     change: "Base pattern. Push items as they arrive; when something ==closes or acts on the latest items==, pop them off the top and use them.",
-    problems: [20, 150],
+    problems: [20, 150, 32],
   },
   {
     id: "aux-stack",
@@ -346,6 +347,46 @@ export const solutions: Solution[] = [
     n = len(heights)
     for idx, ht in stack:
         best = max(best, ht * (n - idx))
+    return best`,
+    complexity: "Time O(n) · Space O(n)",
+  },
+  {
+    lc: 32,
+    variation: "push-pop",
+    question: "Given a string of ( and ), return the length of the longest contiguous substring whose brackets are properly matched.",
+    intuition: `Matching is still last-in-first-out, but we need a ==length==, so push ==indexes==, not characters. Keep the index ==just before the current matched run== at the bottom of the stack (start with \`-1\`). On \`)\`, pop: if something is left, the run ends here and has length \`i - stack[-1]\`; if the stack is empty, this \`)\` is unmatched, so ==it becomes the new bottom== (runs can't cross it).`,
+    algorithm: `1. \`stack = [-1]\`, \`best = 0\`.
+2. For each index \`i\` and character \`c\`:
+   * \`(\`: push \`i\`.
+   * \`)\`: pop.
+      * Stack empty → push \`i\` (==new base==).
+      * Otherwise \`best = max(best, i - stack[-1])\`.
+3. Return \`best\`.`,
+    visual: {
+      kind: "array",
+      title: "Longest valid parentheses · \")()())\"",
+      values: [")", "(", ")", "(", ")", ")"],
+      frames: [
+        { caption: "Start with base -1 on the stack.", vars: kv({ stack: "[-1]", best: "0" }) },
+        { caption: "')' at 0: pop -1 → empty, so 0 becomes the new base.", pointers: [{ name: "i", index: 0 }], highlight: [0], vars: kv({ stack: "[0]", best: "0" }) },
+        { caption: "'(' at 1: push its index.", pointers: [{ name: "i", index: 1 }], highlight: [1], vars: kv({ stack: "[0, 1]", best: "0" }) },
+        { caption: "')' at 2: pop 1; base 0 left → length 2 - 0 = 2.", pointers: [{ name: "i", index: 2 }], highlight: [1, 2], vars: kv({ stack: "[0]", best: "2" }) },
+        { caption: "'(' at 3: push.", pointers: [{ name: "i", index: 3 }], highlight: [3], done: [1, 2], vars: kv({ stack: "[0, 3]", best: "2" }) },
+        { caption: "')' at 4: pop 3; base 0 left → length 4 - 0 = 4. The two pairs join up.", pointers: [{ name: "i", index: 4 }], highlight: [1, 2, 3, 4], vars: kv({ stack: "[0]", best: "4" }) },
+        { caption: "')' at 5: pop 0 → empty, so 5 is the new base. Answer 4.", pointers: [{ name: "i", index: 5 }], highlight: [5], done: [1, 2, 3, 4], vars: kv({ stack: "[5]", answer: "4" }) },
+      ],
+    },
+    code: `def longestValidParentheses(s: str) -> int:
+    stack, best = [-1], 0          # bottom = index just before the current run
+    for i, c in enumerate(s):
+        if c == "(":
+            stack.append(i)
+        else:
+            stack.pop()
+            if not stack:
+                stack.append(i)    # unmatched ')' → new base
+            else:
+                best = max(best, i - stack[-1])
     return best`,
     complexity: "Time O(n) · Space O(n)",
   },

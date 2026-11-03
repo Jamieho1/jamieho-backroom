@@ -4,7 +4,7 @@ import { practiceHref } from "@/lib/desktop-pages";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { NOTE_TRACKS, type NoteRow, type NoteTrack, noteTrack, parseVisuals, shelfTitle } from "@/lib/notes";
-import { NEETCODE_150 } from "@/lib/notes/neetcode150";
+import { PRACTICE_ANCHORS } from "@/lib/notes/neetcode150";
 import { galleryGroups } from "@/lib/notes/concepts";
 import { ResizeHandle, useResizablePanels } from "../practice/panels";
 import { ConceptCards } from "./concept-cards";
@@ -72,7 +72,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { spl
   const parsed = useMemo(() => parseVisuals(note.visual), [note.visual]);
   const groups = useMemo(() => galleryGroups(note.body, parsed.visuals), [note.body, parsed]);
   const concepts = useMemo(() => new Set(groups.map((g) => g.concept)), [groups]);
-  const problems = NEETCODE_150.filter((p) => p.topic === note.id);
+  const problems = PRACTICE_ANCHORS.filter((p) => p.topic === note.id);
   const links: AutoLink[] = problems.map((p) => ({ alias: p.title, href: practiceHref(p.lc), exact: false }));
   const showVisuals = groups.length > 0 || parsed.invalid || noteTrack(note.id) === "coding";
   return (
@@ -82,7 +82,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { spl
         {savedMessage ? <p role="status">{savedMessage}</p> : null}
         {!body ? <p>No content for this topic yet.</p> : null}
         {note.free ? <section className="notes-free" aria-label="Free notes"><h3>Free notes</h3><Markdown text={note.free} links={links} /></section> : null}
-        {problems.length ? <section className="notes-problems" aria-label="NeetCode problems"><h3>NeetCode problems</h3><ul>{problems.map((p) => <li key={p.lc}><Link prefetch={false} href={practiceHref(p.lc)}>{p.title} →</Link></li>)}</ul></section> : null}
+        {problems.length ? <section className="notes-problems" aria-label="Practice problems"><h3>Practice problems</h3><ul>{problems.map((p) => <li key={p.lc}><Link prefetch={false} href={practiceHref(p.lc)}>{p.title} →</Link>{p.extra ? <span className="notes-extra"> · extra</span> : null}</li>)}</ul></section> : null}
       </section>
       {showVisuals ? <>
       <ResizeHandle className="notes-resizer" label="Resize notes and visuals" value={split} min={25} max={75} reset={50} unit="percent" scale={100 / Math.max(1, width - 8)} onChange={onSplit} />

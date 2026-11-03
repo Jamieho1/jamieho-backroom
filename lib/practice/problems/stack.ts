@@ -7,6 +7,7 @@
  * - 739 Daily Temperatures (Medium)
  * - 853 Car Fleet (Medium)
  * - 84 Largest Rectangle in Histogram (Hard)
+ * - 32 Longest Valid Parentheses (Hard, extra)
  */
 import type { ArenaProblem } from "../types";
 
@@ -369,6 +370,58 @@ Return **how many fleets reach the destination**.`,
     clarify: [
       { question: "Can heights be zero?", answer: "Yes; a zero bar splits the histogram." },
       { question: "Must the rectangle be axis-aligned?", answer: "Yes, and it covers whole bars." },
+    ],
+  },
+  {
+    lc: 32,
+    kind: "algorithm",
+    statement: `You get a string \`s\` made only of \`(\` and \`)\`. Return the length of the **longest contiguous substring** of \`s\` whose parentheses are **properly matched**.
+
+A substring is properly matched when every \`(\` in it is closed by a later \`)\` in it, every \`)\` closes an earlier \`(\` in it, and pairs nest correctly (so \`"()()"\` and \`"(())"\` count, \`")("\` does not).
+
+If no such substring exists (including when \`s\` is empty), return \`0\`.`,
+    examples: [
+      { input: "s = \"(()\"", output: "2", explanation: "The last two characters \"()\" are matched; the first ( never closes." },
+      { input: "s = \")()())\"", output: "4", explanation: "\"()()\" in the middle is matched; the ) at either end breaks it." },
+      { input: "s = \"\"", output: "0" },
+    ],
+    constraints: ["0 <= s.length <= 3 * 10^4", "s[i] is '(' or ')'"],
+    signature: `class Solution:
+    def longestValidParentheses(self, s: str) -> int:`,
+    method: "longestValidParentheses",
+    tests: [
+      { id: "ex1", input: "[\"(()\"]", expected: "2", visible: true },
+      { id: "ex2", input: "[\")()())\"]", expected: "4", visible: true },
+      { id: "ex3", input: "[\"\"]", expected: "0", visible: true },
+      { id: "nested", input: "[\"((()))\"]", expected: "6", visible: false },
+      { id: "broken-join", input: "[\"()(()\"]", expected: "2", visible: false },
+      { id: "joined", input: "[\"()(())\"]", expected: "6", visible: false },
+      { id: "reversed", input: "[\")(\"]", expected: "0", visible: false },
+      { id: "only-opens", input: "[\"(((\"]", expected: "0", visible: false },
+      { id: "split-by-close", input: "[\"())(())(()\"]", expected: "4", visible: false },
+      { id: "big-pairs", input: "[\"()\" * 5000]", expected: "10000", visible: false },
+      { id: "big-unbalanced", input: "[\"(\" * 3000 + \")\" * 2000]", expected: "4000", visible: false },
+    ],
+    solution: `class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        stack, best = [-1], 0
+        for i, c in enumerate(s):
+            if c == "(":
+                stack.append(i)
+            else:
+                stack.pop()
+                if not stack:
+                    stack.append(i)
+                else:
+                    best = max(best, i - stack[-1])
+        return best`,
+    hints: [
+      "Store indexes, not characters: the length of a matched run is a difference of two indexes.",
+      "Keep the index just before the current matched run at the bottom of the stack (start with -1). After popping a match, the length is i - stack[-1]; an unmatched ) becomes the new bottom.",
+    ],
+    clarify: [
+      { question: "Must the substring be contiguous?", answer: "Yes; you can't skip characters." },
+      { question: "What if the string is empty or has no match?", answer: "Return 0." },
     ],
   },
 ];

@@ -12,6 +12,8 @@ export interface Anchor {
   difficulty: D;
   topic: TopicId;
   slug?: string; // only where LeetCode's slug differs from the title
+  /** True for problems Jamie added beyond NeetCode 150. */
+  extra?: boolean;
 }
 
 const g = (topic: TopicId, rows: [number, string, D, string?][]): Anchor[] => rows.map(([lc, title, difficulty, slug]) => ({ lc, title, difficulty, topic, slug }));
@@ -97,6 +99,15 @@ export const NEETCODE_150: Anchor[] = [
     [50, "Pow(x, n)", "Medium"], [43, "Multiply Strings", "Medium"], [2013, "Detect Squares", "Medium"],
   ]),
 ];
+
+/** Extra practice beyond NeetCode 150 (Jamie 2026-11-03), shown in the arena and notes beside their topic. */
+export const EXTRA_PRACTICE: Anchor[] = [
+  ...g("stack", [[32, "Longest Valid Parentheses", "Hard"]]),
+  ...g("graphs", [[773, "Sliding Puzzle", "Hard"]]),
+].map((a) => ({ ...a, extra: true }));
+
+/** Everything the arena and notes list: NeetCode 150 first, then the extras. */
+export const PRACTICE_ANCHORS: Anchor[] = [...NEETCODE_150, ...EXTRA_PRACTICE];
 
 export const leetcodeSlug = (title: string) =>
   title.toLowerCase().replace(/[()',]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

@@ -125,4 +125,14 @@ export const extras: Extras = {
       "Forgetting the early exit when `endWord` isn't in `wordList`, or assuming `beginWord` must be in the list (it doesn't have to be).",
     ],
   },
+  773: {
+    time: { o: "O((mn)! · mn)", why: "At most ==6! = 720 boards== (states); each is built and compared as a 6-char string, with ≤ 3 neighbours." },
+    space: { o: "O((mn)!)", why: "`seen` and the queue can hold every reachable board." },
+    pitfalls: [
+      "Storing the board as a list of lists in `seen`: lists aren't hashable. Flatten to a string (or tuple).",
+      "Computing neighbours with 2D row/col maths on the flat string and forgetting row wrap: position 2 is NOT next to position 3. Use the precomputed `nbrs` table.",
+      "Marking a state seen when popped instead of when pushed: the same board is queued many times and BFS slows down a lot.",
+      "Running DFS: it finds a path, not the fewest moves. Fewest moves on unweighted edges = BFS.",
+    ],
+  },
 };

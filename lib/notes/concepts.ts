@@ -2,7 +2,7 @@
  * Concept sections of a coding note (Jamie 2026-10-26): every `### ` heading is a card; numbered ones (`### 3. …`) are
  * concepts. Each concept lists its NeetCode variations, so the Visuals tab can show those problems' visuals.
  */
-import { NEETCODE_150 } from "./neetcode150";
+import { PRACTICE_ANCHORS } from "./neetcode150";
 import { Visual } from "./visual";
 
 
@@ -20,9 +20,9 @@ export interface ConceptSection {
 }
 
 export const cardId = (title: string) => "sec-" + title.replace(/[*`]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const BY_TITLE = new Map(NEETCODE_150.map((a) => [a.title.toLowerCase(), a.lc]));
+const BY_TITLE = new Map(PRACTICE_ANCHORS.map((a) => [a.title.toLowerCase(), a.lc]));
 
-/** NeetCode problems named in the section's "Variations:" lines, in order, without repeats. */
+/** Practice problems (NeetCode 150 + extras) named in the section's "Variations:" lines, in order, without repeats. */
 export function variationLcs(body: string): number[] {
   const out: number[] = [];
   for (const line of body.split("\n")) {

@@ -69,4 +69,14 @@ export const extras: Extras = {
       "Brute force over every pair `(l, r)` is O(n²) and times out at n = 10^5; mention it, then explain why each bar is popped only once.",
     ],
   },
+  32: {
+    time: { o: "O(n)", why: "One pass over `s`; each index is ==pushed and popped at most once==." },
+    space: { o: "O(n)", why: "All openers (e.g. `((((`) sit on the stack at once." },
+    pitfalls: [
+      "Pushing characters instead of indexes: you can match pairs but can't measure the length of a run.",
+      "Forgetting the starting `-1`: a run that begins at index 0 (`()`) has nothing below it to measure from, giving `i - stack[-1]` an empty-stack crash or a short answer.",
+      "Measuring from the popped opener (`i - popped + 1`) only counts the last pair: `()()` gives 2. Measure from the new top so adjacent pairs join.",
+      "Counting all matched pairs in the whole string (`2 * matches`) ignores that an unmatched `)` splits runs: `())()` would give 4 instead of 2.",
+    ],
+  },
 };

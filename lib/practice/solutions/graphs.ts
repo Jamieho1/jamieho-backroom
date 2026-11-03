@@ -14,6 +14,7 @@
  * - 323 Number of Connected Components in an Undirected Graph (Medium)
  * - 684 Redundant Connection (Medium)
  * - 127 Word Ladder (Hard)
+ * - 773 Sliding Puzzle (Hard, extra)
  */
 import type { Solution, Variation } from "../solutions";
 
@@ -39,7 +40,7 @@ export const variations: Variation[] = [
     topic: "graphs",
     name: "BFS by layers (shortest steps)",
     change: "Swap DFS for a queue: ==one BFS layer = one step==, so the first time you reach a cell or word is the shortest distance. Put ==every source in the queue at the start== when there are several.",
-    problems: [286, 994, 127],
+    problems: [286, 994, 127, 773],
   },
   {
     id: "clone-map",
@@ -748,6 +749,53 @@ def ladderLength(beginWord: str, endWord: str, wordList: list[str]) -> int:
         steps += 1
     return 0`,
     complexity: "Time O(N · L² · 26) for N words of length L · Space O(N · L)",
+  },
+  {
+    lc: 773,
+    variation: "bfs-layers",
+    question: "On a 2×3 board of tiles 1–5 and an empty 0, swap the 0 with a neighbour each move. Return the fewest moves to reach [[1,2,3],[4,5,0]], or -1.",
+    intuition: `There is no real graph: ==each whole board is a node== and each legal swap is an edge. Fewest moves = shortest path, so ==BFS over board states==. Flatten the board to a string like \`"123405"\` so it can sit in \`seen\`, and precompute which flat positions touch each position of the \`0\`. Only 6! = 720 boards exist, so BFS is tiny.`,
+    algorithm: `1. \`start\` = the board flattened to a string; \`target = "123450"\`.
+2. \`nbrs[i]\` = flat positions next to \`i\`: \`[(1,3), (0,2,4), (1,5), (0,4), (1,3,5), (2,4)]\`.
+3. BFS from \`(start, 0)\` with \`seen = {start}\`:
+   * Pop \`(s, d)\`; if \`s == target\` return \`d\`.
+   * \`z = s.index("0")\`; for each \`j\` in \`nbrs[z]\`, swap \`z\` and \`j\` to get \`t\`.
+   * If \`t\` is new: add to \`seen\`, push \`(t, d + 1)\`.
+4. Queue empty → return -1 (unsolvable).`,
+    visual: {
+      kind: "grid",
+      title: "Sliding puzzle · [[1,2,3],[0,4,5]]",
+      rows: [
+        [1, 2, 3],
+        [0, 4, 5],
+      ],
+      frames: [
+        { caption: "Start state \"123045\". The 0 is at (1,0); it can swap with (0,0) or (1,1).", highlight: ["1,0"], vars: kv({ state: "123045", moves: "0" }) },
+        { caption: "Layer 1: swapping with the 4 gives \"123405\" (the other swap gives \"023145\", also queued).", highlight: ["1,1"], cells: [{ at: "1,0", value: 4 }, { at: "1,1", value: 0 }], vars: kv({ state: "123405", moves: "1" }) },
+        { caption: "Layer 2: swapping the 0 with the 5 gives \"123450\" = target.", highlight: ["1,2"], cells: [{ at: "1,0", value: 4 }, { at: "1,1", value: 5 }, { at: "1,2", value: 0 }], vars: kv({ state: "123450", moves: "2" }) },
+        { caption: "First time BFS reaches the target is the fewest moves → 2.", done: ["0,0", "0,1", "0,2", "1,0", "1,1"], cells: [{ at: "1,0", value: 4 }, { at: "1,1", value: 5 }, { at: "1,2", value: 0 }], vars: kv({ answer: "2" }) },
+      ],
+    },
+    code: `from collections import deque
+
+def slidingPuzzle(board: list[list[int]]) -> int:
+    start = "".join(str(x) for row in board for x in row)
+    nbrs = [(1, 3), (0, 2, 4), (1, 5), (0, 4), (1, 3, 5), (2, 4)]
+    q, seen = deque([(start, 0)]), {start}
+    while q:
+        s, d = q.popleft()
+        if s == "123450":
+            return d
+        z = s.index("0")
+        for j in nbrs[z]:
+            t = list(s)
+            t[z], t[j] = t[j], t[z]
+            t = "".join(t)
+            if t not in seen:
+                seen.add(t)
+                q.append((t, d + 1))
+    return -1`,
+    complexity: "Time O((mn)! · mn) · Space O((mn)!), with mn = 6 here",
   },
 ];
 

@@ -13,6 +13,7 @@
  * - 323 Number of Connected Components in an Undirected Graph (Medium)
  * - 684 Redundant Connection (Medium)
  * - 127 Word Ladder (Hard)
+ * - 773 Sliding Puzzle (Hard, extra)
  */
 import type { ArenaProblem } from "../types";
 
@@ -786,6 +787,61 @@ Return the **number of words** in the shortest such sequence, counting both \`be
     clarify: [
       { question: "Does beginWord need to be in the word list?", answer: "No, but every later word, including endWord, must be." },
       { question: "Is the answer the number of words or the number of changes?", answer: "The number of words in the sequence, so it is the number of changes + 1." },
+    ],
+  },
+  {
+    lc: 773,
+    kind: "algorithm",
+    statement: `A \`2 x 3\` board holds the tiles \`1\` to \`5\` and one empty space shown as \`0\`. In one **move** you swap the \`0\` with a tile directly above, below, left or right of it (no diagonals).
+
+The board is **solved** when it reads \`[[1,2,3],[4,5,0]]\`. Return the **fewest moves** needed to solve the given board, or \`-1\` if it can never be solved.`,
+    examples: [
+      { input: "board = [[1,2,3],[4,0,5]]", output: "1", explanation: "Swap the 0 with the 5 on its right." },
+      { input: "board = [[1,2,3],[5,4,0]]", output: "-1", explanation: "No sequence of moves reaches the solved board." },
+      { input: "board = [[4,1,2],[5,0,3]]", output: "5" },
+    ],
+    constraints: ["board.length == 2", "board[i].length == 3", "board holds each of 0, 1, 2, 3, 4, 5 exactly once"],
+    signature: `class Solution:
+    def slidingPuzzle(self, board: List[List[int]]) -> int:`,
+    method: "slidingPuzzle",
+    tests: [
+      { id: "ex1", input: "[[[1,2,3],[4,0,5]]]", expected: "1", visible: true },
+      { id: "ex2", input: "[[[1,2,3],[5,4,0]]]", expected: "-1", visible: true },
+      { id: "ex3", input: "[[[4,1,2],[5,0,3]]]", expected: "5", visible: true },
+      { id: "solved", input: "[[[1,2,3],[4,5,0]]]", expected: "0", visible: false },
+      { id: "two-moves", input: "[[[1,2,3],[0,4,5]]]", expected: "2", visible: false },
+      { id: "far-1", input: "[[[3,2,4],[1,5,0]]]", expected: "14", visible: false },
+      { id: "far-2", input: "[[[0,1,2],[3,4,5]]]", expected: "15", visible: false },
+      { id: "reversed", input: "[[[5,4,3],[2,1,0]]]", expected: "14", visible: false },
+      { id: "swapped-pair", input: "[[[2,1,3],[4,5,0]]]", expected: "-1", visible: false },
+    ],
+    solution: `from collections import deque
+
+class Solution:
+    def slidingPuzzle(self, board: List[List[int]]) -> int:
+        start = "".join(str(x) for row in board for x in row)
+        nbrs = [(1, 3), (0, 2, 4), (1, 5), (0, 4), (1, 3, 5), (2, 4)]
+        q, seen = deque([(start, 0)]), {start}
+        while q:
+            s, d = q.popleft()
+            if s == "123450":
+                return d
+            z = s.index("0")
+            for j in nbrs[z]:
+                t = list(s)
+                t[z], t[j] = t[j], t[z]
+                t = "".join(t)
+                if t not in seen:
+                    seen.add(t)
+                    q.append((t, d + 1))
+        return -1`,
+    hints: [
+      "Fewest moves between configurations: treat each whole board as one node and each legal swap as an edge, then BFS.",
+      "Flatten the board to a 6-character string so it can go in a set; precompute which flat positions are next to each position of the 0.",
+    ],
+    clarify: [
+      { question: "Can tiles move diagonally?", answer: "No, only up, down, left or right into the empty space." },
+      { question: "Is every board solvable?", answer: "No; half of all arrangements can't be solved, so return -1 for those." },
     ],
   },
 ];

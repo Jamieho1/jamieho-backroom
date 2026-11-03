@@ -90,7 +90,7 @@ test('owner controls preserve code and question-note drafts on failure',async({p
 });
 test('Notes problem links target the matching arena problem',async({page})=>{
  await mount(page,'notesFixture');
- const link=page.getByRole('region',{name:'NeetCode problems'}).getByRole('link',{name:'Contains Duplicate →'});
+ const link=page.getByRole('region',{name:'Practice problems'}).getByRole('link',{name:'Contains Duplicate →'});
  await expect(link).toHaveAttribute('href','/practices/217');
  await link.click();
  await expect(page).toHaveURL(/\/practices\/217$/);
