@@ -86,3 +86,4 @@
 }
 .article-related .articles-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr)); }
 .article-related .article-card-cover { aspect-ratio:16/8; }
+.article-upload { display:inline-flex; flex-wrap:wrap; align-items:center; gap:8px; margin:-8px 0 16px; }

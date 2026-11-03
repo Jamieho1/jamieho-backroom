@@ -41,3 +41,22 @@ it('footer shows the name and year with icon links to the channels',async()=>{
  expect(within(nav).getByRole('link',{name:'LinkedIn'}).getAttribute('target')).toBe('_blank');
  expect(within(nav).getByRole('link',{name:'RedNote (小红书)'}).querySelector('img')?.getAttribute('src')).toBe('/social/xiaohongshu.png');
 });
+it('picture helpers keep stable names, refuse bad files and write Markdown',async()=>{
+ const {imageName,imagePath,imageProblem,imageMarkdown}=await import('@/lib/article-images');
+ expect(imageName('My Slide 01.PNG')).toBe('my-slide-01.png');expect(imageName('photo.jpeg')).toBe('photo.jpg');
+ expect(imagePath('3-agents','Slide 02.jpg')).toBe('3-agents/slide-02.jpg');
+ expect(imageProblem({name:'a.pdf',type:'application/pdf',size:1})).toMatch(/PNG/);expect(imageProblem({name:'a.png',type:'image/png',size:6e6})).toMatch(/5 MB/);expect(imageProblem({name:'a.png',type:'image/png',size:1})).toBeNull();
+ expect(imageMarkdown('https://x/a.png','slide-01.png')).toBe('![slide 01](https://x/a.png)');
+});
+it('owner adds pictures and a cover through the editor, in file-name order',async()=>{
+ const upload=vi.fn(async(files:File[],slug:string)=>files.map(f=>({name:f.name,url:`https://cdn.example/${slug}/${f.name}`})));
+ render(<ArticleEditor initial={[article]} upload={upload} />);fireEvent.click(screen.getByRole('button',{name:'Edit Example reference'}));
+ const add=screen.getByLabelText('Add pictures') as HTMLInputElement;
+ fireEvent.change(add,{target:{files:[new File(['b'],'slide-02.png',{type:'image/png'}),new File(['a'],'slide-01.png',{type:'image/png'})]}});
+ await screen.findByText('Uploaded 2.');
+ const body=(screen.getByLabelText('Article (Markdown)') as HTMLTextAreaElement).value;
+ expect(body.indexOf('slide 01')).toBeLessThan(body.indexOf('slide 02'));expect(upload.mock.calls[0][1]).toBe('example');
+ fireEvent.change(screen.getByLabelText('Upload cover'),{target:{files:[new File(['c'],'cover.jpg',{type:'image/jpeg'})]}});
+ await screen.findByText('Uploaded 1.');
+ expect((screen.getByLabelText('Cover image URL (optional)') as HTMLInputElement).value).toBe('https://cdn.example/example/cover.jpg');
+});
