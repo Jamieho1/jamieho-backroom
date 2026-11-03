@@ -1,6 +1,6 @@
-# Desktop introduction — art direction, 2 November 2026
+# Desktop introduction — art direction, updated 3 November 2026
 
-Status: revised rigid whole-character proof built on 2026-11-02, awaiting Jamie’s visual review. The first deformation-based proof was rejected for making figures look compressed. Production code, initial route behavior and wallpaper have not changed. The user confirmed the intended first arrival is the desktop introduction; About Me opens when clicked. Do not replace the detailed artwork with the earlier simplified motion-study characters.
+Status: latest standalone proof updated on 2026-11-03 with crossing middle boat, independent Check Here cue, rotating Eye, clockwise sunlight and timed purple cloud lightning; awaiting Jamie’s visual review. The first deformation-based proof was rejected for making figures look compressed. Production code, initial route behavior and wallpaper have not changed. The user confirmed the intended first arrival is the desktop introduction; About Me opens when clicked. Do not replace the detailed artwork with the earlier simplified motion-study characters.
 
 ## Revised visual direction
 
@@ -83,3 +83,19 @@ Jamie requested slow ships on the Thames, with gradual departures and new arriva
 - Local ship checks cover 218 visible hull-waterline samples across 360 seconds, safe open-water routes, slow speeds, transparent departure/replacement, theme continuity, identical paused frames, covered-window freeze and reduced motion. Existing rendering/reference, 390 px, rigid-character, context-loss and fallback checks pass. Reports: ship-verification.json, verification.json, rigidity-verification.json and behavior-verification.json.
 
 This remains the standalone review proof in london-animation-proof-rigid/, outside Git. Await Jamie's visual review before website integration. No application source, database, migration, deployment or ticket status changed.
+
+
+## 3 November update — current review version
+
+This update supersedes the earlier along-river middle boat, Start with About Me copy, static painted sunlight and candidate lightning intervals. The existing standalone london-animation-proof-rigid/index.html remains the review file, with every library/image embedded. No website integration is included.
+
+- **Middle boat:** the smaller central commuter now crosses the channel toward the opposite bank with its bow aligned to that course. It follows a 36-second bounded crossing; the other boats keep their along-river journeys. All use the shared clock, soft arrivals/departures, wakes and night reflections. Checks now test the actual rotated hull waterline against the bank/bridge corridors (206 visible samples across 360 seconds).
+- **Invitation:** the copy is Check Here. introduction-cue.js owns its button, curly SVG arrow, styles, positioning and About Me action. Label updates require no background edit; a real-pixel check confirms the canvas is identical after changing its text. Keyboard use and 390 px layout are checked.
+- **Daylight:** long baked beam streaks are removed from the empty upper daytime plate. Separate soft rays rotate clockwise at 0.003 radians/second, with different continuous brightness envelopes. Some brighten as others fade. A subtle corresponding warmth affects character colours while their geometry remains rigid. The source masters remain available unchanged in Still reference.
+- **Eye:** turns slowly in day and night on a 1,200-second proof cycle. Rim/spoke silhouettes use an aligned extracted alpha layer and original master colours. Colour/radial-line filtering removes residual background between the metalwork. The fitted circular perspective layer moves independently of its fixed original hub/A-frame. Thirty-two capsule sprites reuse one original detail and remain upright. This is a layered-art mechanism, not a complete 3D reconstruction or an exact-pixel fidelity claim. Clean local day/night plates fill the revealed background.
+- **Night lightning:** one soft purple cloud glow at a time, two seconds lit then three seconds dark (five seconds between starts). Five cloud locations cycle. The old permanently painted purple glow is removed in the moving view. No audio. Rendered-pixel comparisons confirm localized purple light while active, exactly zero added lightning light after the two-second interval, and no day lightning.
+- **Additional daytime suggestion:** an occasional distant flock of birds. Suggested only; no birds added.
+
+New files and their full asset-generation prompts/checksums are listed in the proof's asset-manifest.json and scene-extension-assets.json. Built-in Imagegen supplied the local clean plates/extraction; Three.js/GSAP and native components supply the actual movement. New reports: layer-verification.json and eye-detail-review.png. Existing still-reference, rigid-character, ship, pause/fallback and phone reports remain alongside them. The actual code video remains day-night-proof.mp4 (24 seconds, 12 day/12 night, 1280×764, 24 fps).
+
+All imagery/proof source stays outside Git. Repo changes are this handoff document and MEMORY.md only. No application code, private content, database, migration, secret, dependency, deployment, ticket completion, commit or push change. Jamie reviews the standalone proof before any website integration.

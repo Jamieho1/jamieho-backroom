@@ -64,3 +64,6 @@
 .practice-resizer:hover,.practice-resizer:focus-visible { background:color-mix(in srgb,var(--blue) 30%,var(--bg)); outline:2px solid var(--blue); outline-offset:-2px; }
 @container practice (max-width:850px) { .practice-columns { grid-template-columns:minmax(0,1fr); } .practice-columns>.practice-resizer { display:none; } .practice-description,.practice-coding { padding:0; } }
 @media(max-width:800px) { .practice-arena { grid-template-columns:minmax(0,1fr); } .practice-arena>.practice-resizer,.practice-resizer-spacer { display:none; } .sidebar-collapsed .practice-sidebar { padding:8px 16px; } .practice-sidebar-heading h2,.practice-sidebar-heading button { margin-bottom:4px; } }
+.practice-timer { display:inline-flex; align-items:center; gap:6px; }
+.practice-timer-time { font-variant-numeric:tabular-nums; font-family:var(--font-mono, ui-monospace, monospace); color:var(--secondary); min-width:5ch; }
+.practice-timer-time.running { color:inherit; font-weight:600; }

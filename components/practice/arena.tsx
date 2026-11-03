@@ -13,6 +13,7 @@ import { CodeBlock } from "@/components/notes/code-highlight";
 import { TraceVisual } from "@/components/notes/trace-visual";
 import { CodeEditor } from "./code-editor";
 import { QuestionNotes } from "./question-notes";
+import { PracticeTimer } from "./timer";
 import { usePracticePanels,ResizeHandle } from "./panels";
 import { usePracticeStars } from "./use-practice-stars";
 import { useSavedPractice } from "./use-saved-practice";
@@ -86,7 +87,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,sta
   if(mounted.current){setResult(out);setPhase("loading");void prepare(current);if(canEdit)void saved.record(snapshot,nextMode,out);}
  }
  return <section className="practice-workspace" aria-label={meta.title}>
-  <header className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">{meta.extra?"Extra":"NeetCode 150"}</span><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canEdit?<button type="button" className="btn ghost small practice-star" aria-label={`${starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
+  <header className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">{meta.extra?"Extra":"NeetCode 150"}</span><PracticeTimer title={meta.title} /><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canEdit?<button type="button" className="btn ghost small practice-star" aria-label={`${starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
   <div className="practice-columns" ref={columns} style={{'--practice-columns':`${split}fr 8px ${100-split}fr`} as CSSProperties}>
    <div className="practice-description">
     <div className="notes-tabs" role="tablist" aria-label="Problem view">{["Problem","Solution","Notes"].map(t=><button type="button" role="tab" key={t} disabled={notesEditing&&t!=="Notes"} id={`practice-tab-${t}`} aria-selected={tab===t} aria-controls="practice-panel" onClick={()=>setTab(t)}>{t}</button>)}</div>
