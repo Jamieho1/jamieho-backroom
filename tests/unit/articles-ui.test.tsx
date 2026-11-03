@@ -60,3 +60,27 @@ it('owner adds pictures and a cover through the editor, in file-name order',asyn
  await screen.findByText('Uploaded 1.');
  expect((screen.getByLabelText('Cover image URL (optional)') as HTMLInputElement).value).toBe('https://cdn.example/example/cover.jpg');
 });
+it('lists ## sections (not code), marks end matter, orders previous/next by date and reads code options',async()=>{
+ const {articleSections,adjacentArticles,codeMeta,isEndMatter,sectionId}=await import('@/lib/articles');
+ expect(articleSections('## Watch the **video**\ntext\n```md\n## not a heading\n```\n## [Prompts](https://x)\n### sub')).toEqual([{id:'watch-the-video',text:'Watch the video'},{id:'prompts',text:'Prompts'}]);
+ expect(sectionId('Links & sources')).toBe('links-sources');expect(isEndMatter('Links and sources')).toBe(true);expect(isEndMatter('Additional resources')).toBe(true);expect(isEndMatter('Set up the folder')).toBe(false);
+ const posts=[{...article,id:'old',created_at:'2026-01-01'},{...article,id:'mid',created_at:'2026-02-01'},{...article,id:'new',created_at:'2026-03-01'}];
+ const {prev,next}=adjacentArticles(posts,'mid');expect([prev?.id,next?.id]).toEqual(['old','new']);expect(adjacentArticles(posts,'new').next).toBeUndefined();
+ expect(codeMeta('title="Tidy my Downloads" collapsed')).toEqual({title:'Tidy my Downloads',collapsed:true});expect(codeMeta(undefined)).toEqual({title:'',collapsed:false});
+});
+it('renders prompts as copyable blocks, folded when asked, with anchored sections',async()=>{
+ const {ArticleMarkdown}=await import('@/components/articles/article-markdown');
+ const writeText=vi.fn(async()=>{});Object.assign(navigator,{clipboard:{writeText}});
+ const {container}=render(<ArticleMarkdown text={'## Prompts\n\n```text title="Organise my files"\nSort ~/Downloads by type\n```\n\n```bash collapsed\nmkdir -p "00 Inbox"\n```\n\n## Links and sources\n- [A](https://a.example)'} />);
+ expect(container.querySelector('h2#prompts')).toBeTruthy();expect(container.querySelector('h2.article-endmatter')?.textContent).toBe('Links and sources');
+ fireEvent.click(screen.getByRole('button',{name:'Copy Organise my files'}));await screen.findByText('Copied ✓');expect(writeText).toHaveBeenCalledWith('Sort ~/Downloads by type');
+ const folded=container.querySelector('details.article-code') as HTMLDetailsElement;expect(folded.open).toBe(false);expect(folded.querySelector('summary')?.textContent).toContain('Terminal');
+});
+it('"On this page" lists Overview then each section and follows clicks',async()=>{
+ const {OnThisPage}=await import('@/components/articles/on-this-page');
+ const scrolled=vi.fn();Element.prototype.scrollIntoView=scrolled;
+ render(<><h1 id="overview">T</h1><h2 id="setup">Setup</h2><OnThisPage topId="overview" sections={[{id:'setup',text:'Setup'},{id:'prompts',text:'Prompts'}]} /></>);
+ const nav=screen.getByRole('navigation',{name:'On this page'});
+ expect(within(nav).getAllByRole('link').map(a=>a.textContent)).toEqual(['Overview','Setup','Prompts']);
+ fireEvent.click(within(nav).getByRole('link',{name:'Setup'}));expect(scrolled).toHaveBeenCalled();expect(within(nav).getByRole('link',{name:'Setup'}).getAttribute('aria-current')).toBe('location');
+});

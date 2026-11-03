@@ -6,11 +6,12 @@ import {ArticlesShell,ArticleCardView} from '@/components/articles/library';
 import {ArticleMarkdown} from '@/components/articles/article-markdown';
 import {ArticlesFooter} from '@/components/articles/footer';
 import {YouTubeEmbed} from '@/components/articles/youtube';
+import {OnThisPage} from '@/components/articles/on-this-page';
 import {getPublicArticle,getPublicArticles} from '@/lib/articles-public';
 import {getSections} from '@/lib/sections';
 import {getProjectApps} from '@/lib/projects';
 import {socialLinks} from '@/lib/social';
-import {CATEGORY_LABEL,PLATFORM_LABEL,articleDate,articleHref,relatedArticles,youtubeId} from '@/lib/articles';
+import {CATEGORY_LABEL,PLATFORM_LABEL,adjacentArticles,articleDate,articleHref,articleSections,relatedArticles,youtubeId} from '@/lib/articles';
 import '../../articles.css';
 export const dynamic='force-dynamic';
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
@@ -24,9 +25,12 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
  const project=article.project_id?(await getProjectApps().catch(()=>[])).find(p=>p.id===article.project_id):undefined;
  const video=article.source_url?youtubeId(article.source_url):null;
  const related=relatedArticles(all,article);
+ const {prev,next}=adjacentArticles(all,article.id);
+ const toc=articleSections(article.body);
  return <Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
+  <div className="article-layout">
   <article className="article-read">
-   <p className="article-meta">{articleDate(article.created_at)} · {CATEGORY_LABEL[article.category]}</p>
+   <p className="article-meta" id="overview">{articleDate(article.created_at)} · {CATEGORY_LABEL[article.category]}</p>
    <h1>{article.title}</h1>
    {article.summary?<p className="article-summary">{article.summary}</p>:null}
    {project?<p className="article-project">Part of <Link href="/projects" prefetch={false}>{project.name}</Link></p>:null}
@@ -34,7 +38,13 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
    {article.cover_url?<img className="article-cover" src={article.cover_url} alt="" referrerPolicy="no-referrer" />:null}
    {video?<YouTubeEmbed id={video} title={article.title} />:article.source_url?<p><a className="btn ghost" href={article.source_url} target="_blank" rel="noopener noreferrer">Watch on {PLATFORM_LABEL[article.platform]} ↗</a></p>:null}
    <ArticleMarkdown text={article.body} />
+   {prev||next?<nav className="article-pager" aria-label="More articles">
+    {prev?<Link className="article-pager-prev" href={articleHref(prev.slug)} prefetch={false}><small>← Previous</small><span>{prev.title}</span></Link>:<span />}
+    {next?<Link className="article-pager-next" href={articleHref(next.slug)} prefetch={false}><small>Next →</small><span>{next.title}</span></Link>:null}
+   </nav>:null}
    {related.length?<section className="article-related" aria-labelledby="related-h"><h2 id="related-h">If you liked this, you might also like</h2><div className="articles-grid">{related.map(a=><ArticleCardView key={a.id} a={a} />)}</div></section>:null}
   </article>
+  <OnThisPage sections={toc} topId="overview" />
+  </div>
  </ArticlesShell>} />;
 }

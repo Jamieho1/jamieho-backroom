@@ -30,3 +30,31 @@ export function youtubeId(url:string):string|null{
   return id&&/^[\w-]{6,20}$/.test(id)?id:null;
  }catch{return null;}
 }
+
+/** Heading text → anchor id (shared by the renderer and the "On this page" list). */
+export const sectionId=(text:string)=>text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-|-$/g,'').slice(0,80);
+/** Markdown inline → the plain text a reader sees (links, emphasis and code marks removed). */
+export const plainText=(md:string)=>md.replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/[*_`~]/g,'').trim();
+/** The article's ## sections, in order, skipping code blocks. */
+export function articleSections(md:string):{id:string;text:string}[]{
+ const out:{id:string;text:string}[]=[];let fence=false;
+ for(const line of md.split('\n')){
+  if(/^\s*(```|~~~)/.test(line)){fence=!fence;continue;}
+  const m=!fence&&/^##\s+(.+?)\s*#*\s*$/.exec(line);
+  if(m){const text=plainText(m[1]);if(text)out.push({id:sectionId(text),text});}
+ }
+ return out;
+}
+/** Headings that close an article (links, sources, further reading) are styled as end matter. */
+export const isEndMatter=(text:string)=>/^(links|sources|references|resources|additional resources|further reading|links (and|&) sources)\b/i.test(text.trim());
+/** Reading order is by date: Previous = the older post, Next = the newer one. */
+export function adjacentArticles(all:ArticleCard[],currentId:string):{prev?:ArticleCard;next?:ArticleCard}{
+ const byDate=[...all].sort((a,b)=>a.created_at.localeCompare(b.created_at));
+ const i=byDate.findIndex(a=>a.id===currentId);
+ return i<0?{}:{prev:byDate[i-1],next:byDate[i+1]};
+}
+/** Fenced-code options: ```text title="My prompt" collapsed */
+export function codeMeta(meta:string|undefined):{title:string;collapsed:boolean}{
+ const m=meta??'';
+ return {title:/title="([^"]{1,120})"/.exec(m)?.[1]??'',collapsed:/(^|\s)collapsed(\s|$)/.test(m)};
+}

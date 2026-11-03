@@ -5,7 +5,7 @@ Implemented locally on 2026-11-01. Migration `20261101145851_articles.sql` is AP
 1. Sign in as the owner and open Articles → Manage articles.
 2. Choose New article. Give it a title and a unique slug, such as `video-reading-list`.
 3. Add a summary (shown under the title), pick a category (AI, Career, Productivity & Tools, Building in Public) and a platform (YouTube, Instagram, RedNote, Other). Optionally add a cover image URL, the original video/post link (a YouTube link plays inside the article) and the project it belongs to.
-4. Write the article in Markdown: `## Section` headings, `![Caption](https://…image.png)` pictures, and a YouTube link on its own line for an extra video.
+4. Write the article in Markdown (each `## Section` appears in the "On this page" list on wide screens; a `## Links and sources` or `## Additional resources` section is styled as the article's closing notes; prompts or commands go in fenced blocks, e.g. ```` ```text title="Prompt: organise my files" ```` for a copyable block, add `collapsed` to fold it): `## Section` headings, `![Caption](https://…image.png)` pictures, and a YouTube link on its own line for an extra video.
 5. Save with Publish publicly unticked for a private draft. Retry keeps the same draft if saving fails.
 6. Tick Publish publicly and Save when ready. Open article gives the shareable `/articles/video-reading-list` URL.
 7. Put that URL in the video description or post/profile reference. Keep the slug stable; renaming changes the shared URL.

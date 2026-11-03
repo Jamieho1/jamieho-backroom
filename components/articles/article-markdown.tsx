@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import type {ReactNode} from 'react';
-import {youtubeId} from '@/lib/articles';
+import {codeMeta,isEndMatter,sectionId,youtubeId} from '@/lib/articles';
+import {ArticleCode} from './code-block';
 import {YouTubeEmbed} from './youtube';
 
-/** Heading text → anchor id, so each section can be linked to. */
-export const sectionId=(text:string)=>text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-|-$/g,'').slice(0,80);
+export {sectionId};
 const text=(n:ReactNode):string=>typeof n==='string'||typeof n==='number'?String(n):Array.isArray(n)?n.map(text).join(''):n&&typeof n==='object'&&'props' in n?text((n as {props:{children?:ReactNode}}).props.children):'';
 
 /**
@@ -15,8 +15,15 @@ const text=(n:ReactNode):string=>typeof n==='string'||typeof n==='number'?String
 export function ArticleMarkdown({text:md}:{text:string}){
  return <div className="md article-md"><ReactMarkdown skipHtml components={{
   a:({href='',children})=>{if(href.startsWith('/')&&!href.startsWith('//'))return <Link href={href} prefetch={false}>{children}</Link>;const ext=/^https?:\/\//.test(href);return <a href={href} {...(ext?{target:'_blank',rel:'noopener noreferrer'}:{})}>{children}</a>;},
-  h2:({children})=><h2 id={sectionId(text(children))}>{children}</h2>,
+  h2:({children})=>{const t=text(children);return <h2 id={sectionId(t)} className={isEndMatter(t)?'article-endmatter':undefined}>{children}</h2>;},
   h3:({children})=><h3 id={sectionId(text(children))}>{children}</h3>,
+  pre:({node})=>{
+   const code=node?.children?.[0];
+   if(!code||code.type!=='element'||code.tagName!=='code')return null;
+   const cls=String((code.properties?.className as string[]|undefined)?.[0]??'');
+   const raw=code.children.map(c=>c.type==='text'?c.value:'').join('').replace(/\n$/,'');
+   const {title,collapsed}=codeMeta((code.data as {meta?:string}|undefined)?.meta);
+   return <ArticleCode code={raw} lang={cls.replace(/^language-/,'')} title={title} collapsed={collapsed} />;},
   img:({src,alt})=>{const s=typeof src==='string'?src:'';if(!/^https:\/\//.test(s))return null;
    // eslint-disable-next-line @next/next/no-img-element
    return <span className="article-figure"><img src={s} alt={alt??''} loading="lazy" decoding="async" referrerPolicy="no-referrer" />{alt?<span className="article-caption">{alt}</span>:null}</span>;},
