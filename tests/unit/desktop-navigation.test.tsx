@@ -25,7 +25,7 @@ it('signed-in public navigation displays only the server-filtered registry apps'
 it('logout clears discovered app icons',async()=>{
  m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
  const {rerender}=render(<Desktop apps={[]} initialApp="home" discoverApps />);
- await waitFor(()=>expect(screen.getAllByRole('link',{name:FALLBACK_APPS[0].name}).length).toBe(2));
+ await waitFor(()=>expect(screen.getAllByRole('link',{name:FALLBACK_APPS[0].name}).length).toBe(1));
  m.viewer={status:'anonymous',name:undefined,id:undefined};rerender(<Desktop apps={[]} initialApp="home" discoverApps />);
  await waitFor(()=>expect(screen.queryAllByRole('link',{name:FALLBACK_APPS[0].name})).toHaveLength(0));
 });
@@ -51,7 +51,7 @@ it('page remounts keep permitted icons visible while the new route revalidates t
  await screen.findAllByRole('link',{name:'Notes'});
  let finish!:(apps:unknown[])=>void;m.getApps.mockReturnValue(new Promise(resolve=>{finish=resolve;}));m.pathname='/projects';
  rerender(<Desktop key="projects" apps={[]} initialApp="projects" discoverApps content={<h1>Project content</h1>} />);
- expect(screen.getAllByRole('link',{name:'Notes'})).toHaveLength(2);expect(screen.getByRole('heading',{name:'Project content'})).toBeTruthy();
+ expect(screen.getAllByRole('link',{name:'Notes'})).toHaveLength(1);expect(screen.getByRole('heading',{name:'Project content'})).toBeTruthy();
  await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(2));
  finish([]);await waitFor(()=>expect(screen.queryAllByRole('link',{name:'Notes'})).toHaveLength(0));
 });
@@ -70,23 +70,23 @@ it('reveals all permitted icons together after discovery, including during initi
  expect(m.getApps).toHaveBeenCalledTimes(1);
  finish([FALLBACK_APPS[0]]);
  await screen.findAllByRole('link',{name:'Notes'});
- expect(screen.getAllByRole('link',{name:'Projects'})).toHaveLength(2);
+ expect(screen.getAllByRole('link',{name:'Projects'})).toHaveLength(1);
  expect(screen.getByRole('navigation',{name:'Desktop apps'}).getAttribute('aria-busy')).toBe('false');
 });
-it('places Settings on the right rail and in the session menu',async()=>{
+it('places Settings once at the right of the top app navigation',async()=>{
  m.viewer={status:'owner',name:'Example',id:'first'};
  m.getApps.mockResolvedValue([{...FALLBACK_APPS[0],id:'settings',name:'Settings',icon:'gear',url:'/settings'}]);
  render(<Desktop apps={[]} initialApp="home" discoverApps />);
  const links=await screen.findAllByRole('link',{name:'Settings'});
- expect(links).toHaveLength(2);
+ expect(links).toHaveLength(1);
  expect(links.some(link=>link.closest('.desktop-launcher-right'))).toBe(true);
- expect(links.some(link=>link.closest('.desktop-session'))).toBe(true);
+ expect(links.every(link=>link.closest('nav[aria-label="Desktop apps"]'))).toBe(true);
 });
 
-it('closed desktop windows leave only wallpaper and app chrome',()=>{
+it('closed windows reveal the introduction and its independent About Me link',()=>{
  render(<Desktop apps={[]} />);
  expect(screen.queryByText('Your desktop')).toBeNull();
  expect(screen.queryByText('Choose an app to get started.')).toBeNull();
- expect(document.querySelector('.desktop-welcome')).toBeNull();
- expect(screen.getAllByRole('link',{name:'About Me'})).toHaveLength(2);
+ expect(document.querySelector('.desktop-welcome')).toBeNull();expect(screen.getByRole('heading',{name:'Jamie Ho'})).toBeTruthy();expect(screen.getByRole('link',{name:'Check Here: open About Me'}).getAttribute('href')).toBe('/about');
+ expect(screen.getAllByRole('link',{name:'About Me'})).toHaveLength(1);
 });

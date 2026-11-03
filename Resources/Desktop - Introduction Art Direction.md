@@ -1,6 +1,29 @@
 # Desktop introduction — art direction, updated 3 November 2026
 
-Status: latest standalone proof updated on 2026-11-03 with crossing middle boat, independent Check Here cue, rotating Eye, clockwise sunlight and timed purple cloud lightning; awaiting Jamie’s visual review. The first deformation-based proof was rejected for making figures look compressed. Production code, initial route behavior and wallpaper have not changed. The user confirmed the intended first arrival is the desktop introduction; About Me opens when clicked. Do not replace the detailed artwork with the earlier simplified motion-study characters.
+Status: finalized with Jamie's requested corrections and **integrated in the website locally on 2026-11-03**. Awaiting Jamie's commit/push and live verification. `/` starts on the introduction and About Me opens at `/about`. The following current-behaviour section supersedes earlier candidate timings, separate robot layers, middle-boat crossing and suggestion-only birds. The rejected deformation proof must not be reintroduced.
+
+## Current implemented behaviour
+
+| Element | Final behaviour |
+| --- | --- |
+| Figures | Two rigid layers: whole owner; ALL robots/mascots/scarf together. No ownership seam through Claude or the main robot's foot. Fixed unit scale, no body warping. |
+| Ships | Middle/cross-river ship removed. Three animated along-river vessels remain, with bounded paths, fades, wakes and night reflections. |
+| Eye | Both modes; one artistic turn every four minutes, with fixed hub/supports and upright capsules. Clearly more visible than the earlier twenty-minute proof. |
+| Birds | Implemented: seven birds, thirty-second passes every forty-eight seconds. First arrival starts partway into a pass so birds are already visible. Day only. |
+| Lightning | Sharp purple branched bolts with cloud glow. One four-second event, five quiet seconds, then the next location. Night only, no audio. |
+| Sun | Separate clockwise rays with independent smooth brightening/dimming. Long fixed painted beam streaks removed from the upper day plate. |
+| Text | Title, short introduction and invitation are responsive overlays, editable together in `lib/desktop-introduction.ts` for both themes. Public desktop UI copy is separate from About Me database content. |
+| Invitation | Check Here and curly arrow are an independent React component linking to `/about`; no text/arrow baked into the image. |
+| Navigation | All permitted icons in top bar, Settings at right; phone grid. Public `/` opens on the intro, About Me on click. Existing auth/RLS/client cache/external tabs retained. |
+| Delivery | Immediate still; deferred/cancellable optional graphics and theme-specific loads; native image proportions/full composition; pause, hidden/offscreen/covered cleanup, reduced-motion/no-JS/no-WebGL fallbacks. |
+
+Jamie explicitly allowed these approved public wallpaper images in Git. Twelve optimized content-hashed WebP layers total about 5.75 MB across both themes; original layered PNGs/prompts stay outside Git. CV/private content remains database-only. Source contracts and inventory: components/desktop-scene/, components/desktop-introduction-cue.tsx, Resources/Desktop - Asset Manifest.json.
+
+Validation: 450 unit/DB tests, typecheck/build, five static pages and 95 localhost desktop/phone browser tests passed (3 expected skips). Final targeted checks/screenshots and any remaining live review are recorded in MEMORY.md. No migration, live data write, commit, push or deployment was performed. No public/private app content was replaced with the standalone proof's navigation placeholders.
+
+## Historical design and proof notes
+
+The sections below retain prior reasoning/review history. Their candidate settings are superseded by the current implemented behaviour above.
 
 ## Revised visual direction
 

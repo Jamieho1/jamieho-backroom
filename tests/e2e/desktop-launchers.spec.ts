@@ -12,7 +12,7 @@ test.beforeAll(async()=>{
  b.onLoad({filter:/.*/,namespace:'fixture'},args=>({resolveDir:process.cwd(),contents:args.path==='apps'?`import {useState,useEffect} from 'react';const seed=()=>{};export function useDesktopApps(){const [loading,setLoading]=useState(true);useEffect(()=>{window.finishAppDiscovery=()=>setLoading(false)},[]);return {loading,loadError:false,seed,apps:loading?[]:[{id:'notes',name:'Notes',kind:'internal',icon:'notes',url:'/notes'},{id:'settings',name:'Settings',kind:'internal',icon:'gear',url:'/settings'}]}}`:args.path==='viewer'?`export const useViewer=()=>({viewer:{status:'owner',id:'fixture'},configured:false,editing:false,setEditing(){}});`:args.path==='actions'?`export async function logDesktopOpen(){}`:args.path==='theme'?`export const ThemeToggle=()=>null;`:args.path==='signin'?`export const SignInButton=()=>null;`:`import React from 'react';export default function Link({prefetch,children,...props}){return React.createElement('a',props,children)}`}));
  }}]});bundle=output.outputFiles[0].text;
 });
-test('desktop icons appear together and Settings uses the right rail with a phone grid fallback',async({page},info)=>{
+test('app icons appear together in the top bar with Settings on the right and a phone grid',async({page},info)=>{
  await page.route('**/__desktop_fixture.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));
  await page.goto('/privacy');
  await page.addStyleTag({content:'body>:not(#desktop-fixture){display:none!important}'});

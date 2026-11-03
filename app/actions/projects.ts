@@ -23,6 +23,7 @@ export async function saveCard(id: string, card: CardEdit): Promise<CardResult> 
     .select("id");
   if (error || !data?.length) return { ok: false, message: "Couldn't save. Your changes are still here, try again." };
   revalidatePath("/");
+  revalidatePath("/about");
   revalidatePath("/projects");
   return { ok: true, message: "Saved." };
 }

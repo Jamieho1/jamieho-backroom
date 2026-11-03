@@ -24,6 +24,8 @@ Read these first, in order. They are the source of truth and apply to every agen
 
 - Home London redesign: Jamie approved the first prototype on 2026-11-02 (commit `85a21d3`) and authorized the complete journey. Full camera route, responsive reading panels and project-linked technology list implemented locally. Migration `20261102005510_home_journey_sections.sql` adds empty Interests/Technology rows to existing `site_sections`; **APPLIED live** on 2026-11-02 after Jamie's approval (remote version `20261102081107`). Existing RLS/privileges remain unchanged. Personal copy and client material have not been seeded; empty Interests stay hidden. Awaiting Jamie's commit/push and full-journey live review. Public routes remain pre-rendered. See MEMORY.md and Resources/Home - Redesign Plan.md for checks/review state.
 
+- Desktop introduction follow-up (2026-11-03): Jamie approved the composition with final fixes and authorized website integration. Removed the middle ship, grouped all robots, made the Eye clearly rotate, implemented long bird passes and sharp purple cloud lightning. Approved public artwork can be committed as an explicit content-rule exception. No new migration; public routes remain pre-rendered. Full local validation and current state are in MEMORY.md.
+
 ## The predecessor app (Interview Prep artifact): retired
 - Everything worth keeping has been copied (Notes incl. system-design notes, CV). Arena/mocks/study plan were not migrated by
   Jamie's choice (a new practice app will be built from scratch). Its local source folder was removed on 2026-11-02.
@@ -50,6 +52,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 - **Privacy:** `/privacy` must match what the code collects. Update it in the same change as any new data collection.
 - **Content:**
   - CV and personal content live only in the database, never in git.
+  - **Explicit exception approved by Jamie on 2026-11-03:** the approved public illustrated London wallpaper assets may be versioned in `public/desktop-art/`. Jamie's follow-up also permits the public desktop title/short-intro/invitation UI copy in `lib/desktop-introduction.ts`, editable independently of the artwork. This does not allow CV, resume, notes or other private content in git.
   - Problem content in our own words, no LeetCode text, no scraping.
   - No AI/LLM calls in v1.
   - No server-side code execution; Python runs only in the browser Pyodide worker.
@@ -77,7 +80,7 @@ Read these first, in order. They are the source of truth and apply to every agen
 - Remind Jamie to **buy the domain** before the first subdomain app or the public launch (TKT-71).
 - New projects and TKT-71 follow `Resources/Subdomain Apps - Playbook.md`.
 - Experience owner write policies were split into INSERT/UPDATE/DELETE by the TKT-67 migration, applied live 2026-11-01.
-- Desktop wallpaper stays the artifact's for v1; redesign later with Jamie.
+- Desktop introduction: the approved London art is now integrated locally; `/` shows the introduction, About Me opens at `/about`, and all allowed app icons are in the top bar (phone grid). Awaiting Jamie's commit/push and live verification. See `Resources/Desktop - Introduction Art Direction.md`.
 
 ## Handing back
 Before you stop, leave the work in a state another agent can pick up:

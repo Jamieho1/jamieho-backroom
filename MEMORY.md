@@ -368,3 +368,75 @@
 - All five final proof reports pass: verification.json, ship-verification.json, layer-verification.json, behavior-verification.json and rigidity-verification.json. Still reference reproduces its clean master within one RGB channel level at 1440×810. Thirty rigid-character combinations preserve unit scale/no shear. Actual rendered-pixel checks verify visible Eye metalwork (6,946 changed pixels in its bounded footprint), fixed supports/upright capsules, theme continuity, clockwise ray displacement with independent brightening/dimming, purple events localized to about 1.4–2.1% of the frame, and exactly zero added lightning pixels after two seconds. Cue text changes leave art pixels identical. Pause/covered freeze, reduced motion, context loss/restoration, no-WebGL still fallback, phone layout, zero remote HTTP requests, zero page/graphics errors and JS syntax checks pass. A media-event check timed out under simultaneous software-rendering export load; its final isolated timer-polled run passed. Application tests were not rerun because app code is untouched.
 - Final actual-code video day-night-proof.mp4 is 24 seconds (12 day/12 night), 1280×764, 24 fps, 576 frames; ffprobe confirms metadata. Final decoded day/night frames and eye-detail-review.png were inspected. Updated proof README and Resources/Desktop - Introduction Art Direction.md with current behaviour, component/settings, evidence and limitations. Local file: /Users/jamieho/.codex/visualizations/2026/10/31/01a19242-e170-7603-bb68-be12ae48066b/london-animation-proof-rigid/index.html .
 - No website source/startup/routes/auth/storage/data collection, personal-content import, dependency, secret, live DB/schema/migration, deployment, commit or push change. Migrations: none added/applied; previously applied state unchanged. No live website or user browser/computer UI control; verification used local headless Chromium. Repo uncommitted files: MEMORY.md and Resources/Desktop - Introduction Art Direction.md. All prototype code/personal imagery remains outside Git. Await Jamie's visual review before website integration.
+
+
+### 2026-11-03 — Codex: final London motion corrections and website integration
+- Jamie authorized finalizing the animation corrections and proceeding to website integration. He explicitly approved committing these public illustrated wallpaper assets to Git. This is a narrow exception to the personal-content rule: CV/private content, reference portraits, source prompts and imports remain outside Git. Updated AGENTS.md to record the exception. No new ticket started or marked Done; live review remains Jamie's responsibility.
+- Supersedes the preceding proof entry: removed the middle/cross-river vessel entirely. Three along-river ships remain, with staggered voyages, fades/replacements, small wakes and night reflections. All overlapping robots, mascots and the scarf now move as ONE rigid layer; the owner is a second rigid layer. No separation through Claude or the main robot's foot, UV body deformation, scale animation or camera tilt. The two-layer ownership boundary is between the reaching fingertips.
+- The Eye's artistic cycle is now 240 seconds in both themes, with fixed hub/supports and upright capsules. Added seven clearly visible distant daytime birds: 30-second passes on a 48-second cycle, already in progress on initial arrival. Purple night lightning now has sharp branches and localized glow, lasts four seconds, then stays quiet for five seconds before the next event; locations cycle. No thunder audio. Day sunlight rotates clockwise and rays independently brighten/dim. Check Here and its curly arrow are a separate React component, editable without changing art/canvas pixels.
+- Integrated the approved composition into the real website. Public / opens the desktop introduction without auto-opening an app. Existing full About Me/Home journey, public Experience/projects, owner editors and contact form moved intact to /about. Updated canonical/legacy app navigation and owner-action cache invalidation accordingly. Existing app discovery/cache, sign-in gates, RLS enforcement, app-open records and external new-tab behavior are retained. /desktop remains protected for anonymous users. Allowed app icons are in one top bar, Settings on its right; phones have the responsive app grid. Closed windows reveal the introduction; open windows retain full-height behavior.
+- Added dedicated desktop CSS and native-ratio art framing: the whole illustration remains visible, including outer bots, sun/moon and foreground river; ambient blurred art fills other aspect ratios. Fixed inherited dark heading color in light mode and bounded bio text. Existing Notes/Practice panels and other app gutters remain their own layouts. Reviewed final light 1280, dark 1920 and 390 px phone screenshots; six theme/size captures show no horizontal/vertical page overflow, no normal page/graphics errors and correctly separated caption/art.
+- Twelve content-hashed WebP assets total 5,751,394 bytes across both themes. A manual Sharp preparation script and public asset manifest record dimensions/hashes/permission; no dependency/version changes. Source PNGs/prompts stay in the external proof folder. Static poster paints first; Three/GSAP graphics start lazily, unused night layers wait for theme selection, and pending/active renderers cancel/release at app navigation. Reduced motion, no JavaScript, missing WebGL/context loss and explicit Motion off retain a usable still/navigation view. Renderer stops when hidden/offscreen/covered, caps frame rate/pixel ratio and disposes GPU/listener resources. No new storage, data collection, runtime AI, secret or server execution.
+- Validation in the isolated environment-file-free source copy /private/tmp/jamie-desktop-check-92lx0gh_: typecheck, 450 unit/database tests, production build and static assertions for /, /about, /privacy, /projects and /articles pass. The existing pinned dependencies were cloned locally into that copy; no keys/environment files or personal imports were read. Full local headless desktop/390 px browser suite: 95 passed / 3 expected duplicate-phone runtime skips. After final framing/heading changes, rebuilt/static checks passed and targeted introduction/navigation suite passed 17 / 1 duplicate-phone graphics skip. All 43 changed source/asset/test files match the checked copy byte-for-byte. git diff --check passed. No production website or user browser/computer UI control. Temporary production preview server stopped after verification.
+- Updated external london-animation-proof-rigid source/build/docs to the same motion settings; current index.html is offline. Final rigidity report: two layers, 30 sampled combinations, unit scales, zero orthogonality error and length error <=2.22e-16. Behavior report passes fixed camera, primary motion, pause/covered pause, day/night, context loss/restoration, reduced motion, no-WebGL fallback, phone fit, zero remote requests and zero page errors. Updated ship/layer reports cover the removed crossing boat, visible birds and longer lightning. The old day-night-proof.mp4 is explicitly historical, not a capture of this final revision. No new image generation for this integration; approved existing art is reused.
+- Updated README, PRD, AGENTS, Resources/Desktop - Introduction Art Direction.md, Resources/Desktop - Asset Manifest.json and Resources/Claude - R2-R4 Handoff.md. Appended current implementation/validation status to the existing Notion Personal Website project (40858664-d2d2-8191-b83d-f677a1e28165); project/ticket completion statuses unchanged. No message sent to Claude or others.
+- Database: NO migration added or applied; previously applied migration state unchanged. No live database/content/auth/permission/storage writes. No Git commit, push or deployment performed. Ready for Jamie's commit/push and live visual/navigation check. No migration or approval question remains for this change. Domain purchase/TKT-71 remains later. Native art is 1672×941 layered artwork; this preserves the approved detail and proportions, not a claim of new 4K masters/full 3D character rigs or a literal 99% comparison with the original UI composite.
+- All implementation and documentation remain uncommitted. Current file list (directories expanded below; this entry included):
+  - `AGENTS.md`
+  - `MEMORY.md`
+  - `PRD.md`
+  - `README.md`
+  - `Resources/Claude - R2-R4 Handoff.md`
+  - `Resources/Desktop - Asset Manifest.json`
+  - `Resources/Desktop - Introduction Art Direction.md`
+  - `app/about/page.tsx`
+  - `app/actions/experience.ts`
+  - `app/actions/projects.ts`
+  - `app/actions/site.ts`
+  - `app/desktop.css`
+  - `app/globals.css`
+  - `app/layout.tsx`
+  - `app/page.tsx`
+  - `components/desktop-introduction-cue.tsx`
+  - `components/desktop-scene/assets.ts`
+  - `components/desktop-scene/backdrop.tsx`
+  - `components/desktop-scene/boats.js`
+  - `components/desktop-scene/eye.js`
+  - `components/desktop-scene/layers.js`
+  - `components/desktop-scene/runtime.d.ts`
+  - `components/desktop-scene/runtime.js`
+  - `components/desktop-scene/weather.js`
+  - `components/desktop.tsx`
+  - `components/theme-toggle.tsx`
+  - `lib/desktop-pages.ts`
+  - `next.config.ts`
+  - `public/desktop-art/clouds-77f5d270b155.webp`
+  - `public/desktop-art/cutout-b47f7343b1ed.webp`
+  - `public/desktop-art/cutoutNight-58dde35bd825.webp`
+  - `public/desktop-art/day-e402d0814d88.webp`
+  - `public/desktop-art/emptyNight-c94bf294fda1.webp`
+  - `public/desktop-art/eyeDay-70db3fb1f7d3.webp`
+  - `public/desktop-art/eyeMatte-7f9bd22ed9f6.webp`
+  - `public/desktop-art/eyeNight-cbd3487049fe.webp`
+  - `public/desktop-art/night-4041a2e93fb1.webp`
+  - `public/desktop-art/riverDay-5d1b14570f9b.webp`
+  - `public/desktop-art/riverNight-af1de0df51b6.webp`
+  - `public/desktop-art/sunDay-00001a5e6623.webp`
+  - `scripts/assert-static.mjs`
+  - `scripts/capture-desktop.mjs`
+  - `scripts/prepare-desktop-art.mjs`
+  - `tests/e2e/desktop-introduction.spec.ts`
+  - `tests/e2e/desktop-launchers.spec.ts`
+  - `tests/e2e/desktop.spec.ts`
+  - `tests/e2e/home.spec.ts`
+  - `tests/e2e/smoke.spec.ts`
+  - `tests/unit/desktop-navigation.test.tsx`
+  - `tests/unit/desktop.test.tsx`
+
+
+### 2026-11-03 — Codex: desktop text editable together in code
+- Jamie reminded that the desktop text must appear with the artwork and be easy to edit in the codebase. Kept it as real responsive text above the image, and centralized the public title, short introduction and Check Here label in lib/desktop-introduction.ts (title/body/invitation). Both day/night and the closed-window desktop use this file. Current defaults match the reviewed public preview: Jamie Ho / Software engineer in London. / Check Here. No bitmap regeneration is needed for copy edits.
+- Desktop and its independent cue consume this config. The landing route no longer fetches the public Hero row for its overlay; About Me's existing database-backed Hero/editor/content remain separate. This follows Jamie's explicit request for editable public desktop UI copy, recorded as a narrow content-rule exception in AGENTS.md. No private/CV/notes content copied or accessed.
+- README, art direction, Claude handoff and the existing Notion project status now identify the exact copy file. No ticket started or marked Done. The previous full integration remains uncommitted and unchanged apart from this follow-up.
+- Validation in the same environment-file-free isolated source copy: typecheck, 13 existing desktop unit tests, production build, all five static-page assertions, and four existing local headless desktop/390 px introduction/navigation/reduced-motion/no-JS cases pass. All 44 changed source/asset/test files match the checked copy. git diff --check passes. No new tests or dependency changes needed for this copy/config follow-up; earlier broader integration validation remains recorded above. No live website or user browser/computer UI accessed.
+- Database: no migration added/applied and no live data writes. No commit, push or deployment. Uncommitted follow-up files: lib/desktop-introduction.ts (new), app/page.tsx, components/desktop.tsx, components/desktop-introduction-cue.tsx, AGENTS.md, README.md, Resources/Desktop - Introduction Art Direction.md, Resources/Claude - R2-R4 Handoff.md and MEMORY.md. All previously listed uncommitted integration files remain for Jamie's commit/push. No open approval question.

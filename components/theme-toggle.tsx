@@ -10,8 +10,11 @@ export const THEME_BOOT = `try{var t=localStorage.getItem("${THEME_KEY}");if(t==
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme | null>(null);
   useEffect(() => {
-    const set = document.documentElement.dataset.theme as Theme | undefined;
-    setTheme(set ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+    const media=window.matchMedia('(prefers-color-scheme: dark)');
+    const sync=()=>{const saved=document.documentElement.dataset.theme as Theme|undefined;setTheme(saved??(media.matches?'dark':'light'))};
+    sync();media.addEventListener?.('change',sync);
+    const observer=new MutationObserver(sync);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    return()=>{media.removeEventListener?.('change',sync);observer.disconnect()};
   }, []);
   if (!theme) return <span className="theme-slot" aria-hidden="true" />;
   const next: Theme = theme === "dark" ? "light" : "dark";

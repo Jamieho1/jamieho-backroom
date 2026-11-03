@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useId, type ReactNode, type CSSProperties } from "react";
+import { useEffect, useState, useId, type ReactNode,type CSSProperties } from "react";
 import type { AppRow } from "@/lib/apps";
-import { WALL_IMAGES } from "@/lib/desktop-wallpaper";
+import {DESKTOP_ASSETS} from "./desktop-scene/assets";
+import {DESKTOP_INTRODUCTION_COPY} from "@/lib/desktop-introduction";
+import {DesktopBackdrop} from "./desktop-scene/backdrop";
+import {DesktopIntroductionCue} from "./desktop-introduction-cue";
+import {Markdown} from "./markdown";
 import { ICONS, AppMark } from "./desktop-icons";
 import { logDesktopOpen } from "@/app/actions/desktop";
 import { ThemeToggle } from "./theme-toggle";
@@ -21,7 +25,7 @@ const PLACEHOLDERS: Record<string, string> = {
   behavioral: "Your experience, stories and interview questions will be here once Behavioral is ported.",
 };
 
-export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=false,viewerId }: { apps: AppRow[]; initialApp?: string; content?: ReactNode;discoverApps?:boolean;signedIn?:boolean;viewerId?:string }) {
+export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=false,viewerId,notice }: { apps: AppRow[]; initialApp?: string; content?: ReactNode;discoverApps?:boolean;signedIn?:boolean;viewerId?:string;notice?:ReactNode }) {
   const windowTitle=useId();
   const {viewer,configured,editing,setEditing}=useViewer();
   const {apps:cachedApps,loadError,loading,seed}=useDesktopApps();
@@ -48,7 +52,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
 
   function appLink(app: AppRow, icon: boolean) {
     const content = <>{icon ? (ICONS[ICON_KEY[app.icon] ?? app.icon] ?? ICONS.notes) : null}<span>{app.name}{app.kind === "external" ? " ↗" : ""}</span></>;
-    const props = { className: icon ? "desktop-icon" : "desktop-menu-link", "aria-current": active?.id === app.id ? "page" as const : undefined };
+    const props = { className: "desktop-menu-link", "data-desktop-app":app.id, "aria-current": active?.id === app.id ? "page" as const : undefined };
     if (app.kind === "external") {
       // Registry rows are owner-edited, but only web links are launchable.
       if (!/^https?:\/\//i.test(app.url)) return null;
@@ -58,12 +62,14 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
   }
 
   return (
-    <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{ "--wall-hills": WALL_IMAGES.hills, "--wall-night": WALL_IMAGES.night } as CSSProperties}>
+    <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`} as CSSProperties}>
       <header className="desktop-menubar">
         <Link href="/" className="desktop-brand"><AppMark /> Jamie Ho</Link>
-        <nav aria-label="App menu" aria-busy={loadingApps}>{!loadingApps?leftLaunchers.map((app) => appLink(app, false)):null}</nav>
+        <nav className="desktop-launchers" aria-label="Desktop apps" aria-busy={loadingApps}>
+          {loadingApps?<span className="desktop-apps-loading" role="status">Loading apps…</span>:<><div className="desktop-launcher">{leftLaunchers.map(app=>appLink(app,true))}</div>{settingsLauncher?<div className="desktop-launcher-right">{appLink(settingsLauncher,true)}</div>:null}</>}
+        </nav>
+        <noscript><nav className="desktop-noscript-nav" aria-label="Public pages"><a href="/about">Open About Me</a><a href="/projects">Open Projects</a><a href="/articles">Open Articles</a></nav></noscript>
         <div className="desktop-session">
-          {!loadingApps&&settingsLauncher?appLink(settingsLauncher,false):null}
           {viewer.status==='owner'&&(active?.id==='home'||active?.id==='projects')?<button type="button" className="desktop-menu-link" aria-pressed={editing} onClick={()=>setEditing(!editing)}>{editing?'Done editing':'Edit site'}</button>:null}
           <ThemeToggle />
           {authenticated?<form action="/auth/signout" method="post"><button className="desktop-menu-link" type="submit">Sign out</button></form>:viewer.status==='anonymous'&&configured?<SignInButton className="desktop-menu-link" />:null}
@@ -71,9 +77,13 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
         <time className="desktop-clock">{clock}</time>
       </header>
       <main className="desktop-workspace">
-        <nav className="desktop-launchers" aria-label="Desktop apps" aria-busy={loadingApps}>
-          {loadingApps ? <div className="desktop-launcher desktop-apps-loading" role="status">Loading apps…</div> : <><div className="desktop-launcher">{leftLaunchers.map((app) => appLink(app, true))}</div>{settingsLauncher ? <div className="desktop-launcher desktop-launcher-right">{appLink(settingsLauncher,true)}</div> : null}</>}
-        </nav>
+        <DesktopBackdrop covered={!!active}/>
+        {!initialApp&&<section className="desktop-introduction" aria-labelledby="desktop-introduction-title">
+          <h1 id="desktop-introduction-title">{DESKTOP_INTRODUCTION_COPY.title}</h1>
+          <div className="desktop-introduction-copy"><Markdown text={DESKTOP_INTRODUCTION_COPY.body}/></div>
+        </section>}
+        {!initialApp&&<DesktopIntroductionCue/>}
+        {notice?<div className="desktop-notice-layer">{notice}</div>:null}
         {initialApp && !active ? <p className="desktop-notice" role="status">This app is unavailable or you don&apos;t have access to it. Choose an app below.</p> : null}
         {loadError?<p className="desktop-notice" role="status">Can&apos;t load your apps. <a href="/desktop">Try again</a></p>:null}
         {!launchers.length ? <p className="desktop-notice">No apps are available for your account yet.</p> : null}
@@ -84,7 +94,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
               <h2 id={windowTitle}>{active.name}</h2>
               <div className="desktop-controls">
                 <button type="button" onClick={() => setMaximised(!maximised)} aria-label={maximised ? "Restore window" : "Maximise window"}>{maximised ? "⧉" : "□"}</button>
-                <Link href="/desktop" aria-label="Close window">×</Link>
+                <Link href="/" aria-label="Close window">×</Link>
               </div>
             </div>
             {content ? <div className="desktop-app-content">{content}</div> : PLACEHOLDERS[active.id] ? <div className="desktop-placeholder"><h2>{active.name}</h2><p>{PLACEHOLDERS[active.id]}</p></div> : (

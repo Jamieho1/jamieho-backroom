@@ -186,10 +186,10 @@ personal preparation stays in Supabase and encrypted exports. Claude handles the
 
 ## Shared public desktop and window sizing
 
-Home (`/`) opens first as a desktop app, with Projects (`/projects`) in the same shell. Privacy
-(`/privacy`) also uses the shell and is linked from the bottom of Home; there is no global footer
-under the desktop. All three public routes remain pre-rendered and need no sign-in. Home and Projects
-icons appear in every desktop launcher. Home's London scene fills the window width, with its own fluid
+`/` opens on the illustrated desktop introduction. About Me (`/about`) opens only when selected, with Projects (`/projects`) in the same shell. Privacy
+(`/privacy`) also uses the shell and is linked from the introduction and About Me; there is no global footer
+under the desktop. All public routes remain pre-rendered and need no sign-in. Public app icons
+appear in the top bar, alongside permitted registry apps. Home's London scene fills the window width, with its own fluid
 content gutters; there is no redundant Open my desktop link. Notes and Practice retain their own layouts.
 Owner Edit site and sign-in/theme controls remain in the menu bar.
 
@@ -278,10 +278,23 @@ The Articles index is also checked for pre-rendering. See `Resources/Articles - 
 
 
 ## Resume and shared app presentation (2026-11-02)
-The public `/` desktop app is labelled **About Me**; its route and London content stay the same. Closing every window leaves wallpaper and app chrome. Behavioral's **Resume & Stories** has adjacent CV/Questions controls and separate Professional experience, Projects, Education, Certificates and Skills sections. Legacy Other entries remain visible until the owner chooses a more specific Type. The story library lives under Questions; a linked/selected story opens only on request.
+The public **About Me** app is at `/about`; its London content stays in its window. Closing a window returns to `/` and reveals the introduction and app chrome. Behavioral's **Resume & Stories** has adjacent CV/Questions controls and separate Professional experience, Projects, Education, Certificates and Skills sections. Legacy Other entries remain visible until the owner chooses a more specific Type. The story library lives under Questions; a linked/selected story opens only on request.
 
 Owners can add/edit/reorder/remove resume entries and individual bullets using the shared Experience editor, paste multiline text into bullets, and choose publication explicitly. New rows/bullets start hidden. Existing bullet IDs are preserved during edits, and deleting a bullet clears its story link without removing the story. These are the same Experience records shown publicly on About Me when marked Public.
 
 Migration `supabase/migrations/20261102194339_resume_sections.sql` adds `certificate` and `skills` to the existing kind constraint; it is **APPLIED live** with Jamie's approval on 2 November 2026 (remote version `20261102195356`). It changes no records, visibility flags, functions, grants or RLS policies. Existing `other` entries are not automatically reclassified.
 
 Light-mode app surfaces use warm stone tones, search fields use the neutral input color, and content pages use shared horizontal gutters. Notes/Practice retain their panel padding; About Me retains its dedicated visual design.
+
+
+## Illustrated desktop introduction (2026-11-03)
+
+The landing route `/` starts with the approved London illustration, name/short introduction from `lib/desktop-introduction.ts`, and an independent **Check Here** link to `/about`. About Me contains the existing complete profile, public Experience/projects, owner editors and contact form. Saves revalidate both routes. All permitted apps are in the top bar; Settings stays on its right and phones use a compact grid. Existing protected routes, RLS-filtered discovery, saved navigation icons, app-open logging and external new-tab links remain in use.
+
+The owner figure and all overlapping robots each move as one rigid layer. The middle/crossing ship is removed. Three boats cruise along the river, the Eye turns on a four-minute artistic loop, and seven birds remain visible during thirty-second passes on a forty-eight-second loop. Day rays move clockwise with different brightness envelopes. Night has sharp purple forks/cloud light for four seconds followed by five quiet seconds. These are visual effects; no thunder audio is added.
+
+Edit `title`, `body` and `invitation` in `lib/desktop-introduction.ts` to change the visible overlay copy in both day and night. This public desktop UI copy is separate from the database-backed About Me Hero. `components/desktop-introduction-cue.tsx` owns the invitation/arrow separately from the art. `components/desktop-scene/` owns the deferred Three.js/GSAP renderer. A still paints first; optional graphics mount after idle, load only the needed theme layers, cap resolution/frame rate, pause for hidden/offscreen state and release on app-navigation intent or an open app. Motion controls, reduced motion, no JavaScript, missing WebGL and context loss retain a usable still/navigation view. Artwork keeps its native proportions and full composition, with ambient edges filling other screen ratios.
+
+Jamie explicitly approved the **public illustrated wallpaper assets** in Git on 2026-11-03. This exception does not cover CV/private text or imports. The twelve content-hashed WebP layers in `public/desktop-art/` total about 5.75 MB across both themes; the first still is about 0.48 MB and unused night layers are deferred. `Resources/Desktop - Asset Manifest.json` records source scope, hashes and dimensions. Original layered PNGs/prompts remain outside Git. To re-encode approved source layers, run `node scripts/prepare-desktop-art.mjs /path/to/approved/layers`; it uses Sharp already installed with Next. Builds use the committed WebP files and need no source art, generation key or new secret.
+
+Local visual review: `node scripts/capture-desktop.mjs http://127.0.0.1:3100 /private/tmp/desktop-review` (optional `PLAYWRIGHT_EXECUTABLE_PATH` for a locally installed Chromium). The helper accepts localhost only. Full checks remain `npm run check` and `npm run test:e2e`; `/`, `/about`, `/privacy`, `/projects` and `/articles` are required to remain pre-rendered. No database migration is needed for this integration. Jamie commits/pushes and verifies the live site.

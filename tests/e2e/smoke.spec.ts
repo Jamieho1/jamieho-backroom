@@ -31,7 +31,7 @@ test("a callback without a code comes back with a clear message", async ({ page 
 
 test("the privacy policy is public and linked from Home without a global footer", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".landing-footer").getByRole("link", { name: "Privacy" }).click();
+  await page.getByRole("link", { name: "Privacy",exact:true }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole("heading", { name: "Privacy policy" })).toBeVisible();
   for (const h of ["What is collected", "Why it is used", "Who processes it", "How long it is kept", "Your rights"]) {
@@ -52,7 +52,7 @@ test("Settings is a plain 404 for anyone who isn't the owner", async ({ page }) 
 });
 
 test("the landing page shows its sections", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.getByRole("heading", { level: 1, name: "Jamie Ho" })).toBeVisible();
   for (const h of ["About", "Writing & videos", "Contact"]) await expect(page.getByRole("heading", { level: 2, name: h, exact:true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit site" })).toHaveCount(0); // only the owner gets this
@@ -72,7 +72,7 @@ test("dark/light toggle switches the theme and remembers it", async ({ page }) =
 });
 
 test("projects show as windows on the landing page and /projects", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const section = page.getByRole("region", { name: "Projects" });
   await expect(section.getByRole("article").first()).toBeVisible();
   await page.getByRole("navigation", { name: "Desktop apps" }).getByRole("link", { name: "Projects", exact:true }).click();
@@ -84,7 +84,7 @@ test("projects show as windows on the landing page and /projects", async ({ page
 });
 
 test("the contact form checks fields and quietly drops bot submissions", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const form = page.getByRole("region", { name: "Send a message" });
   await form.getByRole("button", { name: "Send" }).click(); // the browser blocks it: every field is required
   await expect(form.locator(":invalid")).toHaveCount(5); // form + name, email, need, budget
@@ -104,6 +104,6 @@ test("settings (and so the inbox) is hidden from visitors", async ({ page }) => 
 });
 
 test("reading the public pages sets no cookies (so no cookie banner is needed)", async ({ page, context }) => {
-  for (const path of ["/", "/projects", "/privacy"]) await page.goto(path);
+  for (const path of ["/", "/about", "/projects", "/privacy"]) await page.goto(path);
   expect(await context.cookies()).toEqual([]);
 });

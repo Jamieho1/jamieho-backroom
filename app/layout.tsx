@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./desktop.css";
 import { SiteHeader } from "@/components/site-header";
 import { DesktopAppsProvider } from "@/components/desktop-apps-provider";
 import { ViewerProvider } from "@/components/viewer-provider";

@@ -53,6 +53,7 @@ export async function saveItem(item: Item): Promise<ExpResult> {
   }
 
   revalidatePath("/");
+  revalidatePath("/about");
   revalidatePath("/behavioral");
   return { ok: true, message: "Saved.", items: await all(sb) };
 }
@@ -63,6 +64,7 @@ export async function deleteItem(id: string): Promise<ExpResult> {
   const { error } = await sb.from("experience_items").delete().eq("id", id);
   if (error) return { ok: false, message: "Couldn't delete. Try again." };
   revalidatePath("/");
+  revalidatePath("/about");
   revalidatePath("/behavioral");
   return { ok: true, message: "Deleted.", items: await all(sb) };
 }
@@ -84,6 +86,7 @@ export async function moveItem(id: string, direction: -1 | 1): Promise<ExpResult
     }
   }
   revalidatePath("/");
+  revalidatePath("/about");
   revalidatePath("/behavioral");
   return { ok: true, message: "", items: await all(sb) };
 }

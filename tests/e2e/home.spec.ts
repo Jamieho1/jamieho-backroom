@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("Home waypoints scroll its pane, focus the destination and keep the form usable", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await page.getByRole("link", { name: "Explore my work" }).click();
   await expect(page.locator("#home-work")).toBeFocused();
   expect(await page.locator(".desktop-app-content").evaluate(e => e.scrollTop)).toBeGreaterThan(0);
@@ -14,7 +14,7 @@ test("Home waypoints scroll its pane, focus the destination and keep the form us
 
 test("reduced motion starts with the exact-scene still and keeps all content reachable", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.getByRole("button", { name: "Enable London motion" })).toBeVisible();
   await expect(page.locator(".home-canvas canvas")).toHaveCount(0);
   expect(await page.locator(".home-poster img").evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -31,7 +31,7 @@ test("a missing WebGL context falls back to a complete still view", async ({ pag
       return String(kind).includes('webgl') ? null : get.call(this, kind, ...args);
     };
   })()`);
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.locator('.home-journey[data-scene="unavailable"]')).toBeVisible();
   await expect(page.locator(".home-motion-label")).toHaveText("Still view");
   await expect(page.getByRole("button", { name: "Pause London motion" })).toHaveCount(0);
@@ -42,7 +42,7 @@ test("a missing WebGL context falls back to a complete still view", async ({ pag
 });
 
 test("London follows the inner scroll, resizes with the window and releases its canvas", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const webgl = await page.evaluate(() => {
     const c = document.createElement("canvas"), gl = c.getContext("webgl2");
     gl?.getExtension("WEBGL_lose_context")?.loseContext(); return !!gl;
@@ -78,7 +78,7 @@ test("London follows the inner scroll, resizes with the window and releases its 
 
 test("the complete Home remains readable without JavaScript", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
-  const page = await context.newPage(); await page.goto(baseURL!);
+  const page = await context.newPage(); await page.goto(baseURL!+"/about");
   await expect(page.getByRole("heading", { level: 1, name: "Jamie Ho" })).toBeVisible();
   await page.getByRole("link", { name: "Explore my work" }).click();
   await expect(page.getByRole("region", { name: "Projects" })).toBeInViewport();
@@ -87,7 +87,7 @@ test("the complete Home remains readable without JavaScript", async ({ browser, 
 });
 
 test("technology evidence links to its project and every remaining stop reaches a distinct, settled view", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.getByRole("heading", { name: "Interests", exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Technology", exact: true })).toBeVisible();
   await page.locator('.home-toolkit').getByRole('link', { name: 'Notes', exact: true }).first().click();

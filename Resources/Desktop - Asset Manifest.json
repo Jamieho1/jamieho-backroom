@@ -1,0 +1,102 @@
+{
+  "approval": "Jamie approved committing these public illustrated wallpaper assets on 2026-11-03. This exception does not include CV/private content.",
+  "tool": "Built-in Imagegen; WebP encoding with Sharp for delivery. Original layered masters and prompts stay outside Git.",
+  "assets": [
+    {
+      "key": "day",
+      "file": "/desktop-art/day-e402d0814d88.webp",
+      "bytes": 482752,
+      "width": 1672,
+      "height": 941,
+      "sha256": "e402d0814d88f177ef00f05f7b3700baf6b1e5a57b45d71cc601019d6578495c"
+    },
+    {
+      "key": "night",
+      "file": "/desktop-art/night-4041a2e93fb1.webp",
+      "bytes": 542432,
+      "width": 1672,
+      "height": 941,
+      "sha256": "4041a2e93fb1d1be1464f1d037b6274047648abeb34974c1537626a60c08791c"
+    },
+    {
+      "key": "clouds",
+      "file": "/desktop-art/clouds-77f5d270b155.webp",
+      "bytes": 535768,
+      "width": 2172,
+      "height": 724,
+      "sha256": "77f5d270b1553556aa58c01280811f4086e6ad5ce2a5532ef0c68ca421558f7d"
+    },
+    {
+      "key": "sunDay",
+      "file": "/desktop-art/sunDay-00001a5e6623.webp",
+      "bytes": 433442,
+      "width": 1672,
+      "height": 941,
+      "sha256": "00001a5e66233064dc83fb5aaa816f1a6d9e859edbedef5f47137c17525027f7"
+    },
+    {
+      "key": "emptyNight",
+      "file": "/desktop-art/emptyNight-c94bf294fda1.webp",
+      "bytes": 460382,
+      "width": 1671,
+      "height": 941,
+      "sha256": "c94bf294fda180b21936289809dde6ac3c2aed897cc050db07b0c00067e70b43"
+    },
+    {
+      "key": "cutout",
+      "file": "/desktop-art/cutout-b47f7343b1ed.webp",
+      "bytes": 608418,
+      "width": 1671,
+      "height": 941,
+      "sha256": "b47f7343b1edb0904b0b603aff632c5e8e062215c432513965ef280deea12991"
+    },
+    {
+      "key": "cutoutNight",
+      "file": "/desktop-art/cutoutNight-58dde35bd825.webp",
+      "bytes": 666588,
+      "width": 1670,
+      "height": 941,
+      "sha256": "58dde35bd825f99b05f46a1386bda6ec4b9f2856b604d4c3a267a230c2785d87"
+    },
+    {
+      "key": "riverDay",
+      "file": "/desktop-art/riverDay-5d1b14570f9b.webp",
+      "bytes": 473380,
+      "width": 1672,
+      "height": 941,
+      "sha256": "5d1b14570f9bc59c6d0873ae72e7c2acd0434032a3a5a61d44ce64a97f9bcd1a"
+    },
+    {
+      "key": "riverNight",
+      "file": "/desktop-art/riverNight-af1de0df51b6.webp",
+      "bytes": 532902,
+      "width": 1672,
+      "height": 941,
+      "sha256": "af1de0df51b6666990a728c435b040571b1d7b573693a06be0d64ae444c506a2"
+    },
+    {
+      "key": "eyeDay",
+      "file": "/desktop-art/eyeDay-70db3fb1f7d3.webp",
+      "bytes": 465556,
+      "width": 1672,
+      "height": 941,
+      "sha256": "70db3fb1f7d34d6e99164142edea0a41af3187bb6a6afcef75feee62b4bffba1"
+    },
+    {
+      "key": "eyeNight",
+      "file": "/desktop-art/eyeNight-cbd3487049fe.webp",
+      "bytes": 501522,
+      "width": 1672,
+      "height": 941,
+      "sha256": "cbd3487049fedd5107234220834de417eb4f73ef0277b516242a2320265ea218"
+    },
+    {
+      "key": "eyeMatte",
+      "file": "/desktop-art/eyeMatte-7f9bd22ed9f6.webp",
+      "bytes": 48252,
+      "width": 1672,
+      "height": 941,
+      "sha256": "7f9bd22ed9f6da5cb9cd2261f7b3fe45cc69c953c54bfbf66bef53db08e8cbe6"
+    }
+  ]
+}

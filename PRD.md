@@ -20,7 +20,7 @@ Jamie needs one personal website that is three things at once:
 
 **Success Criteria**
 
-1. **Public pages:** anyone can open `/` with no login. They see Hero, About, Experience (only bullets Jamie marked public), Projects, Writing/YouTube and Contact. It loads fast, is pre-rendered (indexable) and reads well at 390 px.
+1. **Public pages:** anyone can open `/` with no login and see the illustrated desktop introduction. About Me (`/about`) opens on click and contains Hero, About, Experience (only bullets Jamie marked public), Projects, Writing/YouTube and Contact. It loads fast, is pre-rendered (indexable) and reads well at 390 px.
 2. **Sign-in and the desktop:** anyone with a Google account can sign in and open `/desktop`. They can read Notes and use the practice arena. Run/Submit works in their browser, and their code is saved only in their browser.
 3. **Owner powers:** only Jamie (the owner) can:
    - edit landing sections, notes, arena notes and Behavioral content;
@@ -82,7 +82,7 @@ In scope (v1):
   - A free-tier banner.
 - **Analytics:** Vercel Web Analytics (cookieless, no banner).
 - **Design:**
-  - Public Home opens first as a desktop app; Projects and Privacy share the same shell. Privacy links from Home instead of a global footer. Public routes remain pre-rendered; private apps still require access. Windows fill the remaining viewport height and scroll their content internally (Jamie, 2026-11-01).
+  - The public `/` opens on the desktop introduction, with About Me opening only when selected at `/about` (Jamie, 2026-11-03). Projects and Privacy share the same shell. Privacy links from the introduction and About Me instead of a global footer. Public routes remain pre-rendered; private apps still require access. Windows fill the remaining viewport height and scroll their content internally (Jamie, 2026-11-01).
   - The current PostHog-style tokens, type, light/dark mode and IDE code colours across the whole site.
   - Home has its own midnight-blue/amber London presentation inside the desktop window; the desktop and other apps use warm stone light-mode surfaces, neutral search fields and shared content gutters; Notes and Practice retain their panel spacing.
   - Dark mode follows the system setting, with a toggle.
@@ -97,7 +97,7 @@ Out of scope (later):
 
 - Any AI, including interview mode, Alex, grading, quiz generation, Draft with Claude and voice.
 - A system design app (it needs its own design and its own grill).
-- Animation outside the approved Home-only London redesign.
+- Animation outside the approved About Me London journey and desktop introduction.
 - Saving visitors' work to the database (multi-user).
 - Payments or subscriptions.
 - External subdomain apps. The registry and the shared login are ready for them, but the first one comes after v1.
@@ -165,10 +165,12 @@ Each release can be deployed on its own. Each one ends with the tests passing (u
 **Resolved at sign-off**
 
 - Name: **jamieho-backroom** is used for the repo, the Vercel project and the Supabase project.
-- Desktop wallpaper: the artifact's current one for v1. It will be redesigned later, together with Jamie.
+- Desktop wallpaper: approved illustrated London day/night introduction, integrated locally on 2026-11-03. Public optimized wallpaper assets may be committed by Jamie's explicit exception; private CV/content remains database-only.
 
 ---
 
 _After sign-off, proceed with the build. If scope changes mid-build, update this PRD rather than silently drifting from it._
 
 - 2026-11-02 authorized UI follow-up: Home app label becomes About Me, closed desktop windows leave wallpaper only, and Behavioral becomes Resume & Stories with toolbar CV/Questions views, separated resume categories and owner entry/bullet CRUD. Story library is under Questions; selected/linked stories remain reachable. Certificate/Skills categories require the resume_sections migration (applied live with Jamie’s approval on 2026-11-02, remote 20261102195356).
+
+- 2026-11-03 authorized desktop integration: all permitted app icons are in the top bar, Settings stays on the right, and phones use a grid. `/` starts on the illustrated introduction; About Me lives at `/about`. The whole owner and the whole robot ensemble move as two rigid layers. The middle ship is removed; three along-river boats remain. The Eye turns visibly on a four-minute artistic cycle, seven birds pass for thirty seconds every forty-eight seconds, sunlight rotates clockwise with independent brightness, and sharp purple lightning lasts four seconds with five quiet seconds between events. Check Here is separate UI. Motion is deferred, optional and released while an app is open; reduced motion/no JavaScript/no WebGL retain the still. No new collection, schema or runtime AI calls. This is implemented locally, awaiting Jamie's push/live review.

@@ -1,15 +1,24 @@
 # Claude handoff: R2–R4 data imports and cut-over
 
-Updated 2026-11-02. Read AGENTS.md and MEMORY.md first. Latest local implementation commit:
-`113d6af` (complete London Home journey and owner-editable content). This handoff refresh is uncommitted.
-Jamie pushes; do not assume a local commit proves deployment. Jamie checks the live website himself.
+Updated 2026-11-03. Read AGENTS.md and MEMORY.md first. The illustrated desktop follow-up is implemented in the current working tree and is **uncommitted / not deployed by Codex**. Jamie commits/pushes and verifies the live website himself; local checks do not prove deployment.
+
+## Latest UI follow-up — integrated locally
+
+- `/` now starts on the illustrated desktop introduction. About Me opens only on selection at `/about`; it retains the complete London journey, public profile/content, owner editors and contact delivery. Projects, Articles, Privacy and all protected routes still work. All five public routes are pre-rendered.
+- All allowed app icons are in the top bar; Settings is on the right and phones use a grid. Discovery/cache/access rules are retained. Closing a window returns to `/`.
+- Final requested fixes are implemented: middle ship removed; all robots share one rigid layer; visible Eye rotation; thirty-second bird passes; stronger sharp purple lightning for four seconds followed by five quiet seconds; moving clockwise day rays. The owner figure is a second rigid layer. No body warping or scaling.
+- Check Here is its own React component. The desktop title, short intro and invitation are editable in `lib/desktop-introduction.ts` and rendered over the image in both themes. About Me Hero content remains database-backed. Jamie explicitly approved committing this public illustrated wallpaper asset set in `public/desktop-art/`; private CV/notes/import content remains outside Git. No new schema, migration, secret, collection or runtime AI call.
+- 450 unit/DB tests, production build/typecheck and five static assertions pass. Full localhost headless desktop/390 px suite: 95 passed / 3 expected skipped duplicate phone runtime cases. The final visual-layout correction is additionally checked with the targeted desktop/navigation suite; see MEMORY.md for its final result and screenshots.
+- No new data-copy or cut-over work was started in this follow-up, and no ticket was newly marked Done. Original source art and standalone proof stay outside Git. Current design: `Resources/Desktop - Introduction Art Direction.md`; optimized asset inventory: `Resources/Desktop - Asset Manifest.json`.
+
+Earlier release/import information follows. For conflicts, the dated MEMORY.md entries and current AGENTS.md take precedence.
 
 ## Implementation available
 
 - TKT-60 desktop, TKT-61 Notes reader, TKT-62 owner Notes editor.
 - TKT-64 browser-only Practice arena, TKT-65 owner saved code/attempts and shared question notes.
 - TKT-67 Behavioral CV / STAR stories, TKT-68 question bank, mappings, outlines, follow-ups and coverage.
-- Home, Projects and Privacy share the public desktop shell; public routes remain pre-rendered.
+- About Me (`/about`), Projects and Privacy share the public desktop shell; public routes remain pre-rendered.
   Home has a continuous Three.js/GSAP London scene with readable HTML sections, direct anchors,
   motion/still controls and phone/reduced-motion/no-WebGL/no-JS fallbacks. No global footer or Open my desktop link.
 - Canonical app routes: `/notes`, `/practices`, `/practices/<problem>`, `/behavioral`; legacy desktop
