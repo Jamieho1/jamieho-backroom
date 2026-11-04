@@ -32,7 +32,7 @@ Done means:
 **Scope**
 
 - **In v1:**
-  - The 4 chapters above, with 7 stills (S1, S2a, S2c, S3–S6) and 8 chained clips (C1, C2, C3a, C3b, C4–C7) (see Scene Prompts).
+  - The 4 chapters above, with stills S1, S2b, S2c, S3a–S3c, S4–S6 and 10 chained clips (C1, C2, C3a–C3d, C4–C7) (see Scene Prompts).
   - The start screen and preloader.
   - The monitor launcher and contact form.
   - The zoom transition and "Back to desk".

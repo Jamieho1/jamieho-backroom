@@ -15,3 +15,6 @@ supabase/.temp/
 /public/pyodide/
 
 __pycache__/
+
+# Home journey media (not in git; see Resources/Home v1 - PRD.md)
+/public/home-media/
