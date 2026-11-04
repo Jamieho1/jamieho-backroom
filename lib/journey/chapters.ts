@@ -5,6 +5,7 @@
  * Pacing notes (measured on the 4 Nov clips, 7.92 s each unless noted):
  * - c3a: an extra sign appears on the door canopy at ~5.2–6.4 s (0.66–0.81), so that range gets very little scroll.
  * - c7a: the generator slipped in a ~0.7 s dissolve at ~3.5–4.2 s (0.44–0.53), passed over quickly the same way.
+ * - c5b: only 3.9 s long, so it gets a short scroll; its exit goes straight into the black (C6 in code).
  * - c3b: its first frame is framed ~7% tighter than c3a's last frame; `align` (ECC-measured) hides the jump.
  */
 import type { Chapter } from "./timeline";
@@ -40,9 +41,18 @@ export const HOME_CHAPTERS: Chapter[] = [
     id: "to-westminster", label: "Westminster", kind: "fade", color: "#f6f3ee", tone: "dark", scroll: 1.2,
     panels: [{ id: "experience", from: 0.25, to: 0.75, side: "left", eyebrow: "Chapter 2", title: "Experience", body: PLACEHOLDER }],
   },
-  // C5a / C5b (Westminster walk + under the arch) slot in here once Jamie renders them:
-  // { id: "westminster", label: "Westminster", kind: "video", src: "c5a", scroll: 2, ... },
-  // { id: "arch", label: "Under the bridge", kind: "video", src: "c5b", scroll: 1.4, join: 0.03 },
+  // Westminster walk: the experience timeline steps in while the camera walks slowly along the railing (TKT-77
+  // replaces these with one panel per public experience entry).
+  {
+    id: "westminster", label: "Westminster", kind: "video", src: "c5a", scroll: 2.8,
+    keys: [[0, 0], [0.7, 0.5], [1, 1]],
+    panels: [
+      { id: "m1", from: 0.04, to: 0.26, side: "left", eyebrow: "Milestone", title: "University", body: PLACEHOLDER },
+      { id: "m2", from: 0.27, to: 0.48, side: "left", eyebrow: "Milestone", title: "Internships", body: PLACEHOLDER },
+      { id: "m3", from: 0.49, to: 0.7, side: "left", eyebrow: "Milestone", title: "Now", body: PLACEHOLDER },
+    ],
+  },
+  { id: "arch", label: "Under the bridge", kind: "video", src: "c5b", scroll: 1.1, join: 0.05 },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   {
