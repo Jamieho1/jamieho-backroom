@@ -53,3 +53,8 @@
 .journey-panel, .journey-panel h1, .journey-panel h2, .journey-panel p,
 .journey-still-panel, .journey-still-panel h1, .journey-still-panel h2, .journey-still-panel p { color: #f4f6f9; }
 .journey-tone-dark .journey-panel, .journey-tone-dark .journey-panel h2, .journey-tone-dark .journey-panel p { color: #172637; }
+.journey-meta { font-size: 14px; opacity: 0.8 !important; margin: -2px 0 8px !important; }
+.journey-md .md p { margin: 0 0 8px; } .journey-md .md p:last-child { margin: 0; }
+.journey-md a { color: #8bbbe9; }
+.journey-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; }
+.journey-chips li { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: rgb(255 255 255 / 0.14); border: 1px solid rgb(255 255 255 / 0.18); }

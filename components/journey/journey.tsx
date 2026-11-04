@@ -8,6 +8,8 @@ import {
   type Chapter, type VideoChapter, alignAt, approach, fadeCover, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf,
 } from "@/lib/journey/timeline";
 import { LibraryScene, type LibrarySceneHandle } from "./library-scene";
+import { Markdown } from "@/components/markdown";
+import type { Panel } from "@/lib/journey/timeline";
 
 /**
  * Home v1 scroll engine (TKT-74). One scroll owner: Lenis smooths native scroll, ScrollTrigger reports progress over
@@ -113,9 +115,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
                     className={`journey-panel journey-panel-${p.side ?? "left"}`} aria-label={p.title}>
-                    {p.eyebrow ? <p className="journey-eyebrow">{p.eyebrow}</p> : null}
-                    {c.id === "sky" ? <h1>{p.title}</h1> : <h2>{p.title}</h2>}
-                    {p.body ? <p>{p.body}</p> : null}
+                    <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
                   </section>
                 ))}
               </div>
@@ -151,13 +151,22 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
           <img src={c.kind === "video" ? `${base}/${c.src}-${c.id === "sky" ? "first" : "last"}.jpg` : `${base}/lib-plate.jpg`} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
           {(c.panels ?? []).map((p) => (
             <section key={p.id} className="journey-still-panel" aria-label={p.title}>
-              {p.eyebrow ? <p className="journey-eyebrow">{p.eyebrow}</p> : null}
-              {c.id === "sky" ? <h1>{p.title}</h1> : <h2>{p.title}</h2>}
-              {p.body ? <p>{p.body}</p> : null}
+              <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
             </section>
           ))}
         </li>
       ))}
     </ol>
   );
+}
+
+function PanelBody({ p, heading }: { p: Panel; heading: "h1" | "h2" }) {
+  const H = heading;
+  return <>
+    {p.eyebrow ? <p className="journey-eyebrow">{p.eyebrow}</p> : null}
+    <H>{p.title}</H>
+    {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
+    {p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p>{p.body}</p>) : null}
+    {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
+  </>;
 }

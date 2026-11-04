@@ -19,6 +19,7 @@ export async function saveSection(key: string, title: string, body: string): Pro
   const { data, error } = await sb.from("site_sections").update({ title, body }).eq("key", key).select("key");
   if (error || !data?.length) return { ok: false, message: "Couldn't save. Your text is still here, try again." };
   revalidatePath("/");
+  revalidatePath("/journey");
   revalidatePath("/about");
   return { ok: true, message: "Saved." };
 }

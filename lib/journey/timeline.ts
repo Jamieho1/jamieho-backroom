@@ -14,7 +14,13 @@ export interface Panel {
   side?: "left" | "right";
   eyebrow?: string;
   title: string;
+  /** Small line under the title (e.g. organisation · dates). */
+  meta?: string;
   body?: string;
+  /** Render `body` as safe Markdown (site sections) rather than plain text. */
+  md?: boolean;
+  /** Short tags shown under the body (e.g. technologies). */
+  chips?: string[];
 }
 
 interface Base {
