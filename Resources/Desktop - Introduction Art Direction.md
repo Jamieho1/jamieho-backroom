@@ -1,6 +1,16 @@
 # Desktop introduction — art direction, updated 3 November 2026
 
-Status: finalized with Jamie's requested corrections and **integrated in the website locally on 2026-11-03**. Awaiting Jamie's commit/push and live verification. `/` starts on the introduction and About Me opens at `/about`. The following current-behaviour section supersedes earlier candidate timings, separate robot layers, middle-boat crossing and suggestion-only birds. The rejected deformation proof must not be reintroduced.
+Status: finalized with Jamie's requested corrections and **integrated in the website locally on 2026-11-03**. The baseline is now in local commit `4e79264`; deployment/live verification is not inferred from that commit. Jamie has requested the next revision below. `/` starts on the introduction and About Me opens at `/about`. The following current-behaviour section supersedes earlier candidate timings, separate robot layers, middle-boat crossing and suggestion-only birds. The rejected deformation proof must not be reintroduced.
+
+## Main-page journey now under discussion
+
+The latest decisions and first complete proposal are in `Resources/Home - London Journey Plan.md`. Exterior side-launcher/standalone About Me requirements here are superseded: pages open via the room monitor and close to the desk. Keep this document as earlier evidence and read the new plan before implementation.
+
+Jamie is replacing the separate About Me design with a continuous London main-page journey and has tightened original-colour/cloud/character/foot fidelity requirements. See `Resources/Home - London Journey Discovery.md` before further artwork, video or application edits. Existing apps remain; their internal visual redesign is later. No new media/code in this discussion stage.
+
+## New revision requested — planning only
+
+Jamie requested a new desktop/art/colour revision on 2026-11-03 after reviewing the implementation. See `Resources/Desktop - Revision 2 Plan.md` for all requested changes, generated edge studies, colour choices and proposed implementation order. Those changes are **not implemented yet**. Jamie has selected Cloud & Ink and confirmed that top-bar socials reuse Articles' existing Contact-link configuration; edge joins and window spacing remain under design review. The implemented baseline below remains the current code.
 
 ## Current implemented behaviour
 

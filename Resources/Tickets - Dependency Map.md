@@ -77,3 +77,33 @@ TKT-70 Artifact cut-over ← TKT-63 + TKT-66 + TKT-69
 ## Reminder
 
 - TKT-71: remind Jamie to buy the domain before the first external subdomain app or the public launch.
+
+## Home v1: cinematic London journey (TKT-72 – TKT-81)
+
+PRD: `Resources/Home v1 - PRD.md` (from the 4 Nov 2026 grill-me). Creative pack + Scene Prompts: Website HQ › `01 Reference/Home Redesign Handoff 2026-11-04/`.
+
+**Unblocked now (can run in parallel):**
+- TKT-72 Media (Jamie): stills S2–S6. P0
+- TKT-74 Scroll engine + chapter data model (preview route). P0
+- TKT-75 Media pipeline: encode script + `home-media` bucket (migration applied live only after Jamie approves). P0
+
+**Blocking chains:**
+
+```
+TKT-72 stills ──► TKT-73 clips C1–C7 (Jamie) ─────────────────────────────┐
+TKT-74 engine ─┬► TKT-77 panels + timeline ─┐                            │
+               ├► TKT-78 monitor ───────────┼─► TKT-79 retire desktop, / ─┼─► TKT-81 final media + verify
+               └► TKT-76 start + preload ◄──┤   TKT-80 phone + fallbacks ─┤
+TKT-75 media pipeline ─► TKT-76            └────────────────────────────┘
+TKT-75 ───────────────────────────────────────────────────────────────────► TKT-81
+```
+
+| Ticket | Blocked by |
+|---|---|
+| TKT-73 clips | 72 |
+| TKT-76 start screen + preloader | 74, 75 |
+| TKT-77 chapter panels | 74 |
+| TKT-78 room monitor | 74 |
+| TKT-79 retire homepage desktop + go live on / | 76, 77, 78 |
+| TKT-80 phone + fallbacks | 76, 77, 78 |
+| TKT-81 final media, tune, verify | 73, 75, 79, 80 |

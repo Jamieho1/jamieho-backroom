@@ -1,5 +1,7 @@
 # Home landing-page redesign
 
+2026-11-03: Jamie has requested retiring this separate About Me visual design in favour of a continuous London journey on the main page. See `Resources/Home - London Journey Discovery.md` for the current discussion. The first replacement plan is now in `Resources/Home - London Journey Plan.md`, following the user's answers; existing app code has not been changed by this request. This document remains historical implementation context.
+
 Approved: 2026-11-01. Jamie approved the first visual slice on 2026-11-02; committed as 85a21d3.
 The complete journey is now implemented locally and awaits review. Migration
 20261102005510_home_journey_sections.sql was approved and APPLIED live on 2026-11-02 (remote version
