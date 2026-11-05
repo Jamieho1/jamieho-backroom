@@ -78,7 +78,8 @@ test("projects show as windows on the landing page and /projects", async ({ page
   await page.getByRole("navigation", { name: "Desktop apps" }).getByRole("link", { name: "Projects", exact:true }).click();
   await expect(page).toHaveURL(/\/projects$/);
   await expect(page.getByRole("heading", { level: 1, name: "Projects" })).toBeVisible();
-  await expect(page.getByRole("article", { name: "Behavioral" })).toContainText("Invite-only");
+  // v1.1 (TKT-83): /projects lists portfolio projects, not desktop apps; without data it shows its empty state.
+  await expect(page.getByText("Projects are on their way.")).toBeVisible();
   const noSideScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(noSideScroll).toBe(true);
 });

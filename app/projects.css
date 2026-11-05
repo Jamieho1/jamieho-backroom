@@ -1,0 +1,26 @@
+/* Home v1.1 projects (TKT-83): the list reuses the desktop "window" cards; a project page reads like a case study. */
+.project-list { list-style: none; padding: 0; }
+.project-list > li { display: flex; }
+.project-tile { flex: 1; color: inherit; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.project-tile:hover, .project-tile:focus-visible { transform: translateY(-3px); box-shadow: 0 18px 40px -18px var(--shadow); outline: none; }
+.project-tile:focus-visible { outline: 2px solid var(--cta-edge); outline-offset: 2px; }
+.project-tile .win-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; flex: 1; }
+.project-tile-name { font: 700 18px/1.2 var(--f-head); color: var(--heading); }
+.project-tile-tagline { color: var(--muted); line-height: 1.5; }
+.project-tile-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.project-tile-tags > span { font: 700 11px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
+.project-tile-go { margin-top: auto; font-weight: 700; color: var(--yellow-text); }
+
+.project-read { max-width: 860px; }
+.project-back { margin: 0 0 18px; }
+.project-back a { color: var(--muted); text-decoration: none; font-weight: 700; }
+.project-back a:hover { color: var(--heading); }
+.project-head h1 { margin-bottom: 8px; }
+.project-tagline { font-size: 1.15rem; color: var(--muted); margin: 0 0 14px; }
+.project-visit { margin: 18px 0 26px; }
+.project-frame { margin: 0 0 28px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 18px 50px -24px var(--shadow); background: var(--bg); }
+.project-frame img { display: block; width: 100%; height: auto; }
+.project-body { margin-bottom: 28px; }
+.project-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 14px; margin-bottom: 28px; }
+.project-gallery img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.project-visit .btn { text-decoration: none; display: inline-block; }
