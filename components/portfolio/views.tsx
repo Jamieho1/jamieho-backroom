@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { Markdown } from "@/components/markdown";
 import { projectHref, siteHost, type Project } from "@/lib/portfolio-core";
+import { ProjectManageLink } from "./manage-link";
 
 export function ProjectList({ projects }: { projects: Project[] }) {
   if (!projects.length) return <p className="muted">Projects are on their way.</p>;
@@ -36,7 +37,7 @@ export function ProjectDetail({ p }: { p: Project }) {
   const host = p.url ? siteHost(p.url) : "";
   return (
     <article className="page project-read">
-      <p className="project-back"><Link href="/projects" prefetch={false}>← All projects</Link></p>
+      <p className="project-back"><Link href="/projects" prefetch={false}>← All projects</Link> <ProjectManageLink slug={p.slug} /></p>
       <header className="project-head">
         <h1>{p.name}</h1>
         {p.tagline ? <p className="project-tagline">{p.tagline}</p> : null}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Desktop } from "@/components/desktop";
 import { getPublicProjects } from "@/lib/portfolio";
 import { ProjectList } from "@/components/portfolio/views";
+import { ProjectManageLink } from "@/components/portfolio/manage-link";
 import "../projects.css";
 
 export const metadata: Metadata = { title: "Projects · Jamie Ho", description: "Things Jamie Ho has built." };
@@ -14,7 +15,7 @@ export default async function ProjectsPage() {
   const projects = await getPublicProjects();
   return (
     <Desktop apps={[]} initialApp="projects" discoverApps content={<div className="page projects-page">
-      <h1>Projects</h1>
+      <header className="articles-heading"><h1>Projects</h1><ProjectManageLink /></header>
       <p className="muted">Things I&apos;ve built: what each one does, how it works and where to try it.</p>
       <ProjectList projects={projects} />
     </div>} />

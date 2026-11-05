@@ -6,17 +6,18 @@ import {IMAGE_BUCKET,IMAGE_TYPES,imagePath,imageProblem} from '@/lib/article-ima
 export type Uploader=(files:File[],slug:string)=>Promise<{name:string;url:string}[]>;
 
 /** Uploads with the signed-in owner's session; Storage policies refuse anyone else. Same name = replaced. */
-export const uploadToStorage:Uploader=async(files,slug)=>{
+export const makeUploader=(bucket:string):Uploader=>async(files,slug)=>{
  const sb=supabaseBrowser(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
  const out=[];
  for(const f of files){
   const path=imagePath(slug,f.name);
-  const {error}=await sb.storage.from(IMAGE_BUCKET).upload(path,f,{upsert:true,contentType:f.type,cacheControl:'31536000'});
+  const {error}=await sb.storage.from(bucket).upload(path,f,{upsert:true,contentType:f.type,cacheControl:'31536000'});
   if(error)throw new Error(`${f.name}: ${error.message}`);
-  out.push({name:f.name,url:sb.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl});
+  out.push({name:f.name,url:sb.storage.from(bucket).getPublicUrl(path).data.publicUrl});
  }
  return out;
 };
+export const uploadToStorage:Uploader=makeUploader(IMAGE_BUCKET);
 
 export function ImageUploadButton({slug,label,multiple=false,disabled,onUploaded,upload=uploadToStorage}:{slug:string;label:string;multiple?:boolean;disabled?:boolean;onUploaded(files:{name:string;url:string}[]):void;upload?:Uploader}){
  const input=useRef<HTMLInputElement>(null);const [busy,setBusy]=useState(false);const [msg,setMsg]=useState('');
