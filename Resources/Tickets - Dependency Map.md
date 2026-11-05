@@ -107,3 +107,33 @@ TKT-75 ────────────────────────�
 | TKT-79 retire homepage desktop + go live on / | 76, 77, 78 |
 | TKT-80 phone + fallbacks | 76, 77, 78 |
 | TKT-81 final media, tune, verify | 73, 75, 79, 80 |
+
+---
+
+## Home v1.1 — shorter journey with BMW-style sections (added 2026-11-05)
+
+PRD: `Resources/Home v1 - PRD.md`, section "Home v1.1" (signed off 5 Nov 2026). Notion: Tickets database.
+
+**Startable now (no blockers):**
+- **TKT-82** Section engine + Pivot section (first slice) — P0
+- **TKT-83** Projects table + /projects list + /projects/<slug> page — P0 (gate: Jamie approves the migration)
+- **TKT-84** Copy draft doc for every section + first projects — P1
+
+**Blocking chain:**
+
+```
+TKT-82 Section engine + Pivot ──┬─> TKT-85 Experience ───────────────┐
+                                ├─> TKT-88 Toolkit stack ────────────┤
+                                ├─> TKT-89 Creator + Desk trim ──────┼─> TKT-90 Phones + fallbacks ─┐
+TKT-83 Projects table + pages ──┼─> TKT-87 Projects showcase ────────┘                              │
+                                └─> TKT-86 Projects editor ─────────────────────────────────────────┤
+TKT-84 Copy draft doc ──> (Jamie enters content) ───────────────────────────────────────────────────┤
+TKT-76 Start screen + preloader (in review) ────────────────────────────────────────────────────────┴─> TKT-79 Content gate → journey on /, desktop to /desktop ─> TKT-81 Final media check
+```
+
+**Changes to v1 tickets:**
+- TKT-77 Done (library/Westminster mapping superseded).
+- TKT-78 Done (clickable room replaced by Switch on).
+- TKT-80 Done as superseded by TKT-90.
+- TKT-79 re-scoped as the content gate.
+- TKT-81 re-scoped to the final media check.

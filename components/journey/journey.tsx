@@ -6,9 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
   type Chapter, type Panel, type VideoChapter, alignAt, approach, displayOpacity, fadeCover, joinOpacity, layout, locate,
-  ctaOpacity, mapKeys, panelOpacity, progressOf, wordReveal,
+  ctaOpacity, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
 } from "@/lib/journey/timeline";
-import { LibraryScene, type LibrarySceneHandle } from "./library-scene";
 import { Motes, type MotesHandle } from "./motes";
 import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
 import { StartScreen } from "./start-screen";
@@ -33,7 +32,8 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
-  const library = useRef<LibrarySceneHandle>(null);
+  const stills = useRef<(HTMLImageElement | null)[]>([]);
+  const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
   const cta = useRef<ScreenCtaHandle>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
@@ -113,7 +113,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0;
     // The computer is the very end of the track (where "Switch on" appears); other chapters jump to their start.
-    const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * progressOf(chapters, id, lay) + 1;
+    const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
@@ -130,19 +130,25 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       last = now;
       const { index, local } = locate(chapters, shown, lay);
       const active = chapters[index];
+      // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
+      const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe) : 0;
       chapters.forEach((c, i) => {
         const el = layers.current[i];
         if (!el) return;
         // Visible: the active chapter, the one beneath it while it joins in, and both sides of a fade.
         let opacity = 0;
-        if (i === index) opacity = active.kind === "fade" ? 1 : joinOpacity(c, local);
-        else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : joinOpacity(active, local) < 1)) opacity = 1;
+        if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : 1;
+        else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 : joinOpacity(active, local) < 1)) opacity = 1;
         else if (active.kind === "fade" && i === index + 1 && local >= 0.5) opacity = 1;
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
         if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base);
-        if (c.kind === "layers" && opacity > 0) library.current?.setProgress(at);
+        if (c.kind === "section") {
+          el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
+          const img = stills.current[i];
+          if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
+        }
         const d = displays.current[i];
         if (d) {
           const o = i === index ? displayOpacity(local) : 0;
@@ -173,7 +179,9 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       const cv = active.id === "screen" ? videos.current[index] : null;
       const filled = !!cv && (!ready.current[index] || (cv.duration > 0 && !cv.seeking && cv.currentTime >= cv.duration * 0.8));
       cta.current?.setOpacity(filled ? ctaOpacity(local) : 0);
-      motes.current?.setIntensity(active.kind === "fade" ? 0 : active.motes ?? 0);
+      motes.current?.setIntensity(active.kind === "video" ? active.motes ?? 0 : 0);
+      // The film vignette belongs to the footage; it lifts off as a flat section covers the screen.
+      if (vignette.current) vignette.current.style.opacity = active.kind === "section" ? wipeIn.toFixed(3) : "1";
       if (fadeEl.current) {
         fadeEl.current.style.opacity = active.kind === "fade" ? String(fadeCover(local)) : "0";
         if (active.kind === "fade") fadeEl.current.style.background = active.color;
@@ -208,24 +216,29 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
-              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : ""}`} data-chapter={c.id}>
+              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id}>
                 {c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
-                ) : c.kind === "layers" ? <LibraryScene ref={library} base={base} /> : null}
+                ) : c.kind === "section" && c.still ? (
+                  <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img ref={(el) => { stills.current[i] = el; }} src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
+                  </figure>
+                ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    className={`journey-panel journey-panel-${p.side ?? "left"}`} aria-label={p.title}>
+                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={p.title}>
                     <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} split />
                   </section>
                 ))}
               </div>
             ))}
-            <div className="journey-vignette" aria-hidden="true" />
+            <div ref={vignette} className="journey-vignette" aria-hidden="true" />
             <ScreenCta ref={cta} href={DESKTOP_HREF} />
             <Motes ref={motes} />
             <div className="journey-grain" aria-hidden="true" />
@@ -275,11 +288,19 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} id={c.id === "room" ? "desk" : undefined} className="journey-still">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={mediaUrl(base, c.kind === "video" ? `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg` : "lib-plate.jpg")} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
+        <li key={c.id} id={c.id === "room" ? "desk" : undefined}
+          className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
+          {c.kind === "video" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mediaUrl(base, `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg`)} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
+          ) : c.kind === "section" && c.still ? (
+            <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
+            </figure>
+          ) : null}
           {(c.panels ?? []).map((p) => (
-            <section key={p.id} className="journey-still-panel" aria-label={p.title}>
+            <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={p.title}>
               <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
             </section>
           ))}

@@ -1,10 +1,8 @@
 /**
  * TKT-77: fill the journey's placeholder panels with the site's existing content (no new content store, nothing
  * personal in git). Mapping agreed 2026-11-04:
- * - Sky: `hero` section.
- * - Imperial: the first public education entry (title · org · dates).
- * - Library: `about`, `interests`, `technology` (+ technologies used by public projects).
- * - Westminster: every other public experience entry, in order, stepping in one after another.
+ * - Sky: `hero` section (+ "Go straight to my desktop").
+ * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
  * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
  *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
@@ -37,6 +35,8 @@ export function excerpt(markdown: string, max = 320): string {
 }
 
 const meta = (i: Item) => [i.org, i.dates].map((s) => s.trim()).filter(Boolean).join(" · ");
+/** "MEng Biomedical Engineering · Imperial College London · 2016–2020" from the education entry. */
+export const educationLine = (i: Item) => [i.title, meta(i)].map((s) => s.trim()).filter(Boolean).join(" · ");
 const plain = (s: string) => s.replace(/[*_`#>]/g, "").trim();
 
 /** Spread `n` panels evenly over [from, to] with a small gap between them. */
@@ -49,7 +49,6 @@ export function spread(n: number, from: number, to: number, gap = 0.01): { from:
 export function withContent(chapters: readonly Chapter[], content: JourneyContent): Chapter[] {
   const s = content.sections;
   const education = content.experience.find((i) => i.kind === "education");
-  const journey = content.experience.filter((i) => i !== education && ["role", "project", "education", "other"].includes(i.kind));
 
   return chapters.map((c) => {
     const panels: Panel[] = [];
@@ -71,33 +70,16 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           panels.push(at({ links, foot }));
           break;
         }
-        case "imperial:imperial":
-          if (education) panels.push(at({ eyebrow: "Where it started", title: education.title, meta: meta(education), body: excerpt(education.summary), md: false }));
+        case "pivot:pivot":
+          // The About title is the giant statement; the education line rides under it as meta.
+          if (plain(s.about.body) || plain(s.about.title)) {
+            panels.push(at({ title: s.about.title || p.title, body: excerpt(s.about.body), md: true, meta: education ? educationLine(education) : undefined }));
+          }
           break;
-        case "library:about":
-        case "library:interests": {
-          const sec = p.id === "about" ? s.about : s.interests;
-          if (plain(sec.body)) panels.push(at({ eyebrow: undefined, title: sec.title || p.title, body: excerpt(sec.body), md: true }));
-          break;
-        }
-        case "library:technology": {
-          const body = excerpt(s.technology.body);
-          if (plain(body) || content.technologies.length) panels.push(at({ eyebrow: undefined, title: s.technology.title || p.title, body, md: true, chips: content.technologies.slice(0, 12) }));
-          break;
-        }
-        case "westminster:m1":
-          spread(journey.length, 0.04, 0.7).forEach((w, k) => {
-            const item = journey[k];
-            panels.push({ ...p, id: `m${k + 1}`, ...w, eyebrow: item.dates || "Milestone", title: item.title, meta: item.org, body: excerpt(item.summary, 220), md: false });
-          });
-          break;
-        case "westminster:m2":
-        case "westminster:m3":
-          break; // replaced by the generated milestones above
         default:
           panels.push(p);
       }
     }
     return { ...c, panels };
-  });
+  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0); // an empty section is skipped entirely
 }

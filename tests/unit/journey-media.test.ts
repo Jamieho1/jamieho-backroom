@@ -12,7 +12,7 @@ describe("journey media", () => {
 
   it("downloads clips in chapter order (the monitor push-in is the last chapter), once each", () => {
     const order = preloadOrder(HOME_CHAPTERS, "desktop").map((i) => i.src);
-    expect(order).toEqual(["c1", "c2", "c3a", "c3b", "c5a", "c5b", "c7a", "c7b"]);
+    expect(order).toEqual(["c1", "c7a", "c7b"]); // v1.1: video only at the two ends
     expect(preloadOrder(HOME_CHAPTERS, "mobile")[0].file).toBe("c1-mobile.mp4");
   });
 
@@ -20,14 +20,14 @@ describe("journey media", () => {
     const order = preloadOrder(HOME_CHAPTERS, "desktop", "c7b").map((i) => i.src);
     expect(order[0]).toBe("c7b");
     expect(order.filter((s) => s === "c7b")).toHaveLength(1);
-    expect(order).toHaveLength(8);
+    expect(order).toHaveLength(3);
   });
 
-  it("rings real bytes of the first two clips only", () => {
-    const items = [{ src: "a", file: "a-desktop.mp4", bytes: 100 }, { src: "b", file: "b-desktop.mp4", bytes: 300 }, { src: "c", file: "c", bytes: 999 }];
+  it("rings real bytes of the hero clip only", () => {
+    const items = [{ src: "a", file: "a-desktop.mp4", bytes: 100 }, { src: "b", file: "b-desktop.mp4", bytes: 300 }];
     expect(startProgress(items, {})).toBe(0);
-    expect(startProgress(items, { a: 100, b: 100 })).toBe(0.5);
-    expect(startProgress(items, { a: 500, b: 300, c: 999 })).toBe(1);
+    expect(startProgress(items, { a: 50, b: 300 })).toBe(0.5);
+    expect(startProgress(items, { a: 500 })).toBe(1);
     expect(startProgress([], {})).toBe(0);
   });
 
@@ -42,7 +42,7 @@ describe("journey media", () => {
       expect(MEDIA_MANIFEST[`${i.src}-first.jpg`], i.src).toBeTruthy();
       expect(MEDIA_MANIFEST[`${i.src}-last.jpg`], i.src).toBeTruthy();
     }
-    for (const f of ["lib-plate.jpg", "lib-props.png"]) {
+    for (const f of ["still-imperial.jpg"]) {
       expect(MEDIA_MANIFEST[f], f).toBeTruthy();
     }
   });

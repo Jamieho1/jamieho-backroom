@@ -745,3 +745,5 @@
 ### 2026-11-04 — Codex: entrance lettering occlusion correction
 - Jamie requested removal of the erroneous R drawn over the foreground pillar in his Refined entrace/Entrace 1.png. Built-in imagegen edited the source; visually reviewed output hides the R behind the clean pillar while other entrance letters remain spaced in place. Original preserved. Saved external workspace copy Imperial Entrance - pillar lettering corrected.png plus exact prompt; native source exec-5dcd9ab0-3ab9-45c1-b96b-6d8edb16a526.png. Generative edit, not a guaranteed pixel-identical restoration outside the target.
 - No website/code/video, database/migration/live-data, deployment, commit or push changes; prior migration status unchanged. App tests not rerun for image-only work; documentation diff check performed.
+
+- 2026-11-05: Home v1.1 grilled and specced (Resources/Home v1 - PRD.md, section "Home v1.1"): video only at the ends (C1, C7a+C7b); BMW-style sections Pivot/Projects/Experience/Toolkit/Creator; new projects table + /projects/<slug>; journey stays on /journey until content gate. Awaiting sign-off.

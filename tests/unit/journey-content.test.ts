@@ -31,28 +31,26 @@ describe("journey content (TKT-77)", () => {
     expect(spread(0, 0, 1)).toEqual([]);
   });
 
-  it("maps sections and experience onto the chapters, dropping empty ones", () => {
+  it("maps the hero and the pivot (About statement + education line)", () => {
     const experience = [
-      item({ kind: "education", title: "MEng", org: "Uni", dates: "2016–2020" }),
-      item({ title: "Intern", org: "A" }),
+      item({ kind: "education", title: "MEng Biomedical Engineering", org: "Imperial College London", dates: "2016–2020" }),
       item({ title: "Engineer", org: "B" }),
     ];
-    const out = withContent(HOME_CHAPTERS, { sections, experience, technologies: ["TypeScript", "Supabase"] });
+    const pivotSections = { ...sections, about: { key: "about" as const, title: "From labs to production", body: "First para.\n\nSecond." } };
+    const out = withContent(HOME_CHAPTERS, { sections: pivotSections, experience, technologies: [] });
     expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true, cta: { href: DESKTOP_HREF } });
-    expect(panelsOf(out, "imperial")[0]).toMatchObject({ title: "MEng", meta: "Uni · 2016–2020" });
-    const lib = panelsOf(out, "library");
-    expect(lib.map((p) => p.id)).toEqual(["about", "technology"]); // empty interests dropped
-    expect(lib[1].chips).toEqual(["TypeScript", "Supabase"]);
-    const w = panelsOf(out, "westminster");
-    expect(w.map((p) => p.title)).toEqual(["Intern", "Engineer"]);
-    expect(w.map((p) => p.id)).toEqual(["m1", "m2"]);
+    expect(panelsOf(out, "pivot")[0]).toMatchObject({
+      title: "From labs to production", body: "First para.", md: true, look: "statement",
+      meta: "MEng Biomedical Engineering · Imperial College London · 2016–2020",
+    });
   });
 
-  it("drops the Imperial and Westminster panels when there is no public experience", () => {
-    const out = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] });
-    expect(panelsOf(out, "imperial")).toEqual([]);
-    expect(panelsOf(out, "westminster")).toEqual([]);
-    expect(panelsOf(out, "library").map((p) => p.id)).toEqual(["about"]);
+  it("keeps the pivot without an education line, and drops it when About is empty", () => {
+    const withAbout = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] });
+    expect(panelsOf(withAbout, "pivot")[0]).toMatchObject({ title: "About", body: "About text.", meta: undefined });
+    const empty = { ...sections, about: { key: "about" as const, title: "", body: "" } };
+    const skipped = withContent(HOME_CHAPTERS, { sections: empty, experience: [], technologies: [] });
+    expect(skipped.some((c) => c.id === "pivot")).toBe(false); // the whole section is skipped, not left blank
   });
 
   it("fills the desk with Now and Latest, with a contact line from the Contact section", () => {

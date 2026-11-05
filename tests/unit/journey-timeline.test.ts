@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import {
-  type Chapter, alignAt, ctaOpacity, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
+  type Chapter, alignAt, ctaOpacity, landingOf, stillDrift, wipeOffset, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
 } from "@/lib/journey/timeline";
 
 const demo: Chapter[] = [
@@ -60,6 +60,32 @@ describe("journey timeline", () => {
     const twoSteps = approach(approach(0, 1, 45), 1, 45);
     expect(twoSteps).toBeCloseTo(a, 5);
     expect(approach(0.999999, 1, 16)).toBe(1);
+  });
+
+  it("wipes a solid section up over the previous chapter, then holds it flat", () => {
+    expect(wipeOffset(0)).toBe(1);
+    expect(wipeOffset(0.07)).toBeGreaterThan(0);
+    expect(wipeOffset(0.07)).toBeLessThan(1);
+    expect(wipeOffset(0.14)).toBe(0);
+    expect(wipeOffset(0.8)).toBe(0);
+    expect(stillDrift(0)).toBeCloseTo(0.06);
+    expect(stillDrift(0.5)).toBeCloseTo(0);
+    expect(stillDrift(1)).toBeCloseTo(-0.06);
+  });
+
+  it("lands menu jumps on a readable state: sections after their wipe, videos at their start", () => {
+    const ch: Chapter[] = [
+      { id: "v", label: "V", kind: "video", src: "v", scroll: 2 },
+      { id: "s", label: "S", kind: "section", tone: "light", scroll: 2, panels: [{ id: "p", from: 0.1, to: 1, title: "T" }] },
+    ];
+    expect(landingOf(ch, "v")).toBe(0);
+    expect(landingOf(ch, "s")).toBeCloseTo((2 + 2 * 0.2) / 4); // max(wipe 0.14, panel 0.1) + 0.06
+    expect(landingOf(ch, "nope")).toBe(0);
+  });
+
+  it("orders the v1.1 journey: video only at the two ends", () => {
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "pivot", "to-room", "c7a", "c7b"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Hello", "Pivot", "Desk"]);
   });
 
   it("fades the Switch on button in over the end of the push-in", () => {

@@ -29,6 +29,8 @@ export interface Panel {
   foot?: { label: string; href: string }[];
   /** One call-to-action button (e.g. the hero's "Go straight to my desktop"). */
   cta?: { label: string; href: string };
+  /** "statement": the title is set as a giant BMW-style line (section chapters). */
+  look?: "statement";
 }
 
 interface Base {
@@ -57,10 +59,18 @@ export interface VideoChapter extends Base {
    */
   align?: { scale: number; x: number; y: number; span: number };
 }
-export interface LayersChapter extends Base {
-  kind: "layers";
-  /** Which built-in layered scene (code-rendered from stills). */
-  scene: "library";
+/**
+ * Home v1.1: a BMW-style solid section (no video). It wipes up over the previous chapter, holds its text on a flat
+ * colour, and can show one framed still beside the text with a light parallax.
+ */
+export interface SectionChapter extends Base {
+  kind: "section";
+  /** light = warm off-white with dark ink, dark = warm near-black with light ink. */
+  tone: "light" | "dark";
+  /** Optional framed picture beside the text (a media file, e.g. "still-imperial.jpg"). */
+  still?: { file: string; side: "left" | "right" };
+  /** Fraction of the section's scroll used to wipe it in (default 0.14). */
+  wipe?: number;
 }
 export interface FadeChapter extends Base {
   kind: "fade";
@@ -69,7 +79,7 @@ export interface FadeChapter extends Base {
   /** Text colour scheme for panels shown over the colour. */
   tone?: "light" | "dark";
 }
-export type Chapter = VideoChapter | LayersChapter | FadeChapter;
+export type Chapter = VideoChapter | SectionChapter | FadeChapter;
 
 export const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 export const smoothstep = (a: number, b: number, x: number) => {
@@ -183,4 +193,27 @@ export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): nu
 export function ctaOpacity(local: number, at = 0.82): number {
   const t = (local - at) / (1 - at) * 2;
   return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+}
+
+export const SECTION_WIPE = 0.14;
+/** How far (0..1 of the screen height) a section still sits below its resting place while it wipes in. */
+export function wipeOffset(local: number, wipe = SECTION_WIPE): number {
+  return 1 - smoothstep(0, wipe, local);
+}
+
+/** Light parallax for a section's framed still: drifts from +amp to -amp (fraction of its height) over the section. */
+export function stillDrift(local: number, amp = 0.06): number {
+  return (0.5 - clamp01(local)) * 2 * amp;
+}
+
+/**
+ * Where the chapter menu lands for a chapter (global progress). Video chapters start at their first frame; a solid
+ * section lands just after its wipe, once its first panel is readable, so a menu jump never shows a blank screen.
+ */
+export function landingOf(chapters: readonly Chapter[], id: string, lay = layout(chapters)): number {
+  const i = chapters.findIndex((c) => c.id === id);
+  if (i < 0 || !lay.total) return 0;
+  const c = chapters[i];
+  const settle = c.kind === "section" ? Math.min(0.9, Math.max(c.wipe ?? SECTION_WIPE, c.panels?.[0]?.from ?? 0) + 0.06) : 0;
+  return (lay.starts[i] + c.scroll * settle) / lay.total;
 }

@@ -33,9 +33,9 @@ export function preloadOrder(chapters: Chapter[], variant: Variant, first?: stri
   });
 }
 
-/** The start ring: real bytes of the first two clips (what the visitor sees right after "Enter"). */
+/** The start ring: real bytes of the first clip, the hero the visitor scrubs right after "Enter" (v1.1). */
 export function startProgress(items: PreloadItem[], loaded: Record<string, number>): number {
-  const head = items.slice(0, 2);
+  const head = items.slice(0, 1);
   const total = head.reduce((s, i) => s + i.bytes, 0);
   if (!total) return 0;
   const got = head.reduce((s, i) => s + Math.min(loaded[i.src] ?? 0, i.bytes), 0);

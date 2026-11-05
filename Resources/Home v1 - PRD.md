@@ -159,3 +159,156 @@ Media work (Jamie) and code work run in parallel; the code uses placeholders unt
 - Supabase free-tier bandwidth is enough for the expected traffic (confirm before launch).
 - Lenis + GSAP smoothness on a real iPhone (checked in Ticket 7).
 - Domain purchase before the public launch (TKT-71 reminder).
+
+---
+
+## Home v1.1, shorter journey with BMW-style sections
+
+_Status: **signed off by Jamie (5 Nov 2026)**. Source: the grill-me session of 5 Nov 2026 in Claude (Cowork); its decisions are logged in the Claude project doc `claude/personal-website-grill-decisions.md` (section "Home v1.1"). Where this section conflicts with Home v1 above, this section wins._
+
+**Problem**
+
+The v1 journey is almost all video: Sky → Imperial → library → Westminster → room. Each long chapter carries only one short panel of text, so it reads as "a student showing AI clips" rather than a premium portfolio. The middle clips are also most of the weight (about 19 of 26 MB), and C3a still has a sign glitch. Jamie wants BMW's style instead:
+- solid colour backgrounds with large type;
+- static pictures beside the text;
+- one layered scroll scene;
+- a pinned project showcase with a progress line per project.
+
+Each section should deliver real information and a message.
+
+**Outcome and completion**
+
+Done means:
+
+1. **Shape.** `/journey` runs: **Hello (video C1) → Pivot → Projects → Experience → Toolkit → Creator → Desk (video C7a + C7b)**. Only the two ends are video. C2, C3a, C3b, C5a, C5b and the library layers are no longer loaded.
+2. **Hello.** The existing start screen (Enter the journey / Straight to my desktop) and the hero panel with "Go straight to my desktop". The progress ring tracks C1 only.
+3. **Pivot.** A solid section with a giant statement (the About section's title), its first paragraph, and the education meta line (title · org · dates from the first public education entry). A framed Imperial still sits on one side with light parallax.
+4. **Projects.** A pinned showcase of **featured projects only, at most 4**, about one screen of scroll each:
+   - Left: number, name, tagline, up to 3 tags, and "Read the case study →" linking to `/projects/<slug>`.
+   - Right: a browser-frame mockup of the project's screenshots, cross-fading through the project's scroll; full-page (tall) screenshots pan downwards.
+   - Bottom-left: one short line per project; the current one fills as you scroll.
+   - After the last project: "All projects →" to `/projects`.
+5. **Projects pages.** These read from a new owner-edited `projects` table, separate from `apps`:
+   - `/projects` lists every public project, featured first. It replaces today's app-card grid.
+   - `/projects/<slug>` shows the Markdown write-up, screenshots and tags, with "Visit website" when a URL exists and "Website coming soon" when it doesn't.
+   - The owner adds and edits projects in the existing Edit mode, including screenshot upload.
+6. **Experience.** Public CV roles, newest first, one role per screen:
+   - role · org · dates as a big line;
+   - up to 3 public bullets as proof points;
+   - a timeline dot for each role, and a framed Westminster still with light parallax.
+7. **Toolkit.** The one layered scene, built with CSS 3D and GSAP (no three.js):
+   - An exploded architecture stack whose layers separate one by one as you scroll. Each layer shows its tools and a one-line "how I use it".
+   - Layer data comes from the Technology section: each `## heading` is a layer, the first line under it is the "how", and the bullets are the tools. With no headings, it falls back to the technology tags from public projects.
+   - It ends with certification badges taken from public `certificate` CV entries, each linking to the first `https` URL in its summary (the Credly link).
+8. **Creator (YouTube & Instagram).**
+   - The Writing section's title and body as the channel pitch.
+   - Subscribe and Follow buttons built from the Contact section's YouTube and Instagram links.
+   - Cards for the latest published YouTube post, the latest Instagram post and the latest other article.
+9. **Desk.** C7a walks to the desk and shows the **Now** panel (the `now` section) and the contact line ("Say hello" + socials). The **Latest** panel moves to Creator. Scrolling continues through C7b into the monitor, where "Switch on" opens the desktop (`DESKTOP_HREF`).
+10. **Look.**
+    - Sections alternate warm off-white `#f6f3ee` and warm near-black `#0f0c09`, with the amber accent `#f2b45c`.
+    - Type: Unbounded for statements, Inter for body, JetBrains Mono for labels.
+    - Handovers between sections are a clean colour wipe.
+    - Chapter menu: 01 Hello · 02 Pivot · 03 Projects · 04 Experience · 05 Toolkit · 06 Creator · 07 Desk.
+11. **Phones and fallbacks.**
+    - On phones nothing pins: sections stack, the Toolkit layers lie flat, and videos use the phone encodes.
+    - With reduced motion or no JavaScript, every section is plain readable HTML and stills replace both videos.
+    - Empty sections are skipped automatically.
+12. **Content gate before `/`.** The journey stays on `/journey` and does **not** replace `/` (TKT-79) until every section has real content. Claude drafts all copy in a doc; Jamie edits it and enters it himself in the site editors.
+13. **Verified.** Unit, DB and e2e tests pass, plus the visual checks below. Jamie reviews and pushes himself.
+
+**Scope**
+
+- **In v1.1:**
+  - The section engine and all sections above.
+  - The `projects` table with its RLS, tests and editor, plus `/projects` and `/projects/<slug>`.
+  - Two graded web stills (Imperial and Westminster) made from Jamie's approved stills.
+  - Removal of the middle clips from the journey and preloader.
+  - The copy draft doc.
+- **Already built and kept:**
+  - Scroll engine (TKT-74).
+  - `home-media` bucket and versioned media (TKT-75/76).
+  - Start screen, preloader and media service worker (TKT-76).
+  - The room → monitor → "Switch on" ending.
+  - The `now` section (migration awaiting approval).
+  - Content mapping helpers (TKT-77).
+- **Out:**
+  - three.js / WebGL.
+  - Interests as a section.
+  - New videos.
+  - Running sites in iframes.
+  - Live links for FinAI and Cyterly (they start as "Website coming soon").
+  - Retiring the desktop: it is the destination of "Switch on".
+- **Superseded from v1:**
+  - The Imperial / library / Westminster video chapters and the library layer scene.
+  - TKT-77's library and Westminster mapping.
+  - TKT-78's clickable room objects (already removed).
+
+**Canonical locations/data**
+
+| What | Where |
+|---|---|
+| This PRD | repo `Resources/Home v1 - PRD.md`, this section |
+| Decision log | Claude project doc `claude/personal-website-grill-decisions.md` |
+| Code | `~/Documents/Developer/Personal Website/jamieho-backroom` (`lib/journey`, `components/journey`, `app/journey`, `app/projects`) |
+| Projects | new `public.projects` table (anyone reads public rows, only the owner writes); screenshots in Supabase Storage |
+| Page copy | `site_sections` (`hero`, `now`, `about`, `technology`, `writing`, `contact`), experience items and bullets, articles |
+| Media | `home-media` bucket: C1, C7a, C7b, the two new stills, and the manifest in `lib/journey/media-manifest.json` |
+| Copy draft | a Claude Doc Jamie edits; nothing personal in git |
+
+**Constraints**
+
+- **Content:** personal content lives only in the database, never in git, and only the owner writes it. Visibility is enforced by RLS with tests.
+- **Migrations:** the `projects` migration, its storage policies and the `now` section migration each need Jamie's explicit "apply it" before going live.
+- **Media and secrets:** Jamie makes media himself; agents spend no credits and use no Higgsfield. Jamie handles all secrets and pushes himself.
+- **Motion:** animate only transform and opacity, with one rAF loop and GSAP ScrollTrigger + Lenis (scroll-craft rules). Toolkit uses CSS 3D only.
+- **Cost:** free tiers only. The journey's video download stays at or under about 6 MB on desktop.
+- **Process:** ask before each ticket.
+
+**Build plan**
+
+1. **Section engine.**
+   - Extend the chapter model with a `section` kind: solid colour, layout, optional side still.
+   - Pinned segments, the colour-wipe handover, the new chapter menu.
+   - Remove the middle clips and the library scene from `HOME_CHAPTERS`.
+   - Preloader loads only C1, C7a and C7b; the ring tracks C1.
+2. **Pivot and Experience sections.**
+   - Content mapping (About + education → Pivot; public roles + ≤3 public bullets → Experience).
+   - The two graded web stills with parallax frames, and the timeline dots.
+3. **Projects data.** `projects` table migration, RLS and DB tests, and a screenshot storage path. _Gate:_ Jamie approves the migration before it's applied live.
+4. **Projects pages and editor.**
+   - `/projects` list and `/projects/<slug>` detail with Visit website / coming soon.
+   - Owner Edit mode with screenshot upload.
+   - The desktop's Projects app follows the new list.
+5. **Projects showcase.** Pinned, featured (max 4), cross-fading and panning browser frame, line indicators, "All projects"; stacked on phones.
+6. **Toolkit stack.**
+   - Technology heading parser and project-tag fallback.
+   - CSS 3D exploded layers and certification badges from public certificate entries; flat on phones.
+7. **Creator section.** Writing pitch, Subscribe/Follow, and latest YouTube, Instagram and article cards. Trim the Desk to Now + contact line.
+8. **Phones and fallbacks.** 390 px stacking, the reduced-motion / no-JS still version for every section, empty-section skipping.
+9. **Copy draft.** A doc with draft copy for every section and the first projects (FinAI, Cyterly). Jamie edits it and enters it himself.
+10. **Content gate → TKT-79.** When every section is filled, move the journey to `/` and the desktop to `/desktop`, set `DESKTOP_HREF`, and delete the unused clips from the bucket.
+
+**Verification and handoff**
+
+- Unit tests:
+  - content mapping, including empty sections;
+  - the Technology heading parser;
+  - featured cap and ordering;
+  - certificate link extraction.
+- DB tests for `projects`: public read, owner-only write, hidden rows invisible to anon.
+- e2e tests:
+  - start screen and Straight to my desktop;
+  - each section renders and skips when empty;
+  - showcase line indicators and links;
+  - `/projects` and `/projects/<slug>` (with and without a URL);
+  - Switch on;
+  - reduced motion.
+- Visual checks at 1440 px and 390 px for each section: pinned states at 0/50/100% and the Toolkit stack mid-separation.
+- Report what wasn't tested: real iPhone smoothness and Low Power Mode are checked by Jamie.
+- Rollback: everything stays on `/journey` until the content gate; `/` is unchanged.
+
+**Open questions**
+
+- Where project screenshots are stored: a new `project-media` bucket, or a folder in an existing bucket. Settle this in step 3 after checking how app screenshots are stored today.
+- Whether the old `apps.screenshots` cards stay anywhere once `/projects` switches to the new table.

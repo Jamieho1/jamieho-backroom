@@ -61,5 +61,22 @@ test("reduced motion gets the still version with no start screen", async ({ page
   await page.goto("/journey");
   await expect(page.getByRole("dialog", { name: "Welcome" })).toHaveCount(0);
   await expect(page.locator(".journey-stills")).toBeVisible();
+  // v1.1: the Pivot is a flat section in the still version too, with its statement and the Imperial still.
+  const pivot = page.locator(".journey-still-section").first();
+  await expect(pivot.locator(".journey-look-statement .journey-title")).toBeVisible();
+  await expect(pivot.locator("figure img")).toHaveAttribute("src", /still-imperial\.jpg\?v=/);
   await expect(page.getByRole("link", { name: /Switch on the computer/ })).toHaveAttribute("href", "/");
+});
+
+test("after the hero, the Pivot section wipes in with its statement, and no middle clips load", async ({ page }) => {
+  const clips: string[] = [];
+  page.on("request", (r) => { const m = r.url().match(/\/(c\w+)-(desktop|mobile)\.mp4/); if (m) clips.push(m[1]); });
+  await blockClips(page);
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Pivot/ }).click();
+  const statement = page.locator('[data-chapter="pivot"] .journey-look-statement');
+  await expect(statement).toBeVisible();
+  await expect(page.locator('[data-chapter="pivot"] figure img')).toHaveAttribute("src", /still-imperial\.jpg/);
+  expect([...new Set(clips)].sort()).toEqual(["c1", "c7a", "c7b"]);
 });
