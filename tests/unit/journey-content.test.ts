@@ -88,4 +88,25 @@ describe("journey content (TKT-77)", () => {
     const none = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [], projects: [proj("plain", { featured: false })] });
     expect(none.some((c) => c.id === "projects")).toBe(false);
   });
+
+  it("gives Experience one screen per public role with up to 3 public bullets; skips it with no roles", () => {
+    const experience = [
+      item({ kind: "education", title: "MEng" }),
+      item({ title: "Software Engineer", org: "Global Relay", dates: "2024 – now", bullets: [
+        { text: "One", public: true }, { text: "Hidden", public: false }, { text: "Two", public: true }, { text: "Three", public: true }, { text: "Four", public: true },
+      ] }),
+      item({ title: "ML Intern", org: "KOLN3D", dates: "2022", bullets: [] }),
+    ];
+    const ex = withContent(HOME_CHAPTERS, { sections, experience, technologies: [] }).find((c) => c.id === "experience")!;
+    expect(ex.scroll).toBeCloseTo(0.4 + 2);
+    const ps = ex.panels!;
+    expect(ps.map((p) => [p.id, p.title, p.meta, p.eyebrow, p.look])).toEqual([
+      ["r1", "Software Engineer", "Global Relay", "2024 – now", "role"], ["r2", "ML Intern", "KOLN3D", "2022", "role"],
+    ]);
+    expect(ps[0].points).toEqual(["One", "Two", "Three"]);
+    expect(ps[1].points).toEqual([]);
+    expect(ps[0].from).toBeCloseTo(0.4 / 2.4);
+    expect(ps[1].to).toBe(1);
+    expect(withContent(HOME_CHAPTERS, { sections, experience: [item({ kind: "education" })], technologies: [] }).some((c) => c.id === "experience")).toBe(false);
+  });
 });

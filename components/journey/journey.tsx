@@ -35,6 +35,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const panels = useRef<Map<string, HTMLElement>>(new Map());
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
+  const dots = useRef<(HTMLOListElement | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
   const cta = useRef<ScreenCtaHandle>(null);
@@ -151,6 +152,13 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if (opacity > 0) showcases.current[i]?.setProgress(at);
+          const ol = dots.current[i];
+          if (ol && opacity > 0) {
+            // Timeline: light the dot of the entry being read (the last one whose window has started).
+            let on = 0;
+            (c.panels ?? []).forEach((p, k) => { if (at >= p.from) on = k; });
+            ol.querySelectorAll("li").forEach((li, k) => { li.dataset.on = k === on ? "true" : k < on ? "past" : "false"; });
+          }
         }
         const d = displays.current[i];
         if (d) {
@@ -233,6 +241,11 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img ref={(el) => { stills.current[i] = el; }} src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
                   </figure>
+                ) : null}
+                {c.kind === "section" && c.timeline && (c.panels?.length ?? 0) > 1 ? (
+                  <ol ref={(el) => { dots.current[i] = el; }} className="journey-timeline" aria-hidden="true">
+                    {(c.panels ?? []).map((p) => <li key={p.id}><span>{p.eyebrow}</span></li>)}
+                  </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
@@ -348,6 +361,7 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
     <H className="journey-title">{split ? <Words text={p.title} /> : p.title}</H>
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
+    {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.links?.length ? (
       <ul className="journey-links">

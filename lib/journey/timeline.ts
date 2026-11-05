@@ -29,8 +29,10 @@ export interface Panel {
   foot?: { label: string; href: string }[];
   /** One call-to-action button (e.g. the hero's "Go straight to my desktop"). */
   cta?: { label: string; href: string };
-  /** "statement": the title is set as a giant BMW-style line (section chapters). */
-  look?: "statement";
+  /** "statement": the title is a giant BMW-style line; "role": one experience entry (section chapters). */
+  look?: "statement" | "role";
+  /** Short proof points under the body (an experience entry's public bullets). */
+  points?: string[];
 }
 
 interface Base {
@@ -71,6 +73,8 @@ export interface SectionChapter extends Base {
   still?: { file: string; side: "left" | "right" };
   /** Fraction of the section's scroll used to wipe it in (default 0.14). */
   wipe?: number;
+  /** TKT-85: show one timeline dot per panel (the current one lit), labelled with each panel's eyebrow. */
+  timeline?: boolean;
   /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
   showcase?: ShowcaseItem[];
 }

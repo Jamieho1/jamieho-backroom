@@ -4,6 +4,7 @@
  * - Sky: `hero` section (+ "Go straight to my desktop").
  * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
+ * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
  * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
  *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
@@ -51,12 +52,32 @@ export function spread(n: number, from: number, to: number, gap = 0.01): { from:
   return Array.from({ length: n }, (_, k) => ({ from: from + k * step, to: from + (k + 1) * step - (k < n - 1 ? gap : 0) }));
 }
 
+/** Scroll (screen heights) the Experience section gives each role, plus a short lead-in for its wipe. */
+export const EXPERIENCE_PER_ROLE = 1;
+export const EXPERIENCE_LEAD = 0.4;
+
 export function withContent(chapters: readonly Chapter[], content: JourneyContent): Chapter[] {
   const s = content.sections;
   const education = content.experience.find((i) => i.kind === "education");
 
   const featured = featuredProjects(content.projects ?? []);
+  const roles = content.experience.filter((i) => i.kind === "role" && i.public !== false);
   return chapters.map((c) => {
+    if (c.id === "experience" && c.kind === "section") {
+      // One screen per public role (in the owner's CV order), each with up to 3 public bullets as proof points.
+      const scroll = EXPERIENCE_LEAD + Math.max(1, roles.length) * EXPERIENCE_PER_ROLE;
+      const lead = EXPERIENCE_LEAD / scroll;
+      const tpl = c.panels?.[0];
+      const panels: Panel[] = tpl ? spread(roles.length, lead, 1).map((w, k) => {
+        const r = roles[k];
+        return {
+          ...tpl, id: `r${k + 1}`, ...w, eyebrow: r.dates.trim() || "Role", title: r.title, meta: r.org.trim() || undefined,
+          body: r.summary.trim() ? excerpt(r.summary, 220) : undefined, md: false,
+          points: r.bullets.filter((b) => b.public && b.text.trim()).slice(0, 3).map((b) => b.text.trim()),
+        };
+      }) : [];
+      return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), panels };
+    }
     if (c.kind === "section" && c.showcase) {
       // The showcase grows one screen of scroll per featured project; with none, the section is skipped below.
       const scroll = showcaseScroll(featured.length);

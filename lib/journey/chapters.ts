@@ -25,6 +25,12 @@ export const HOME_CHAPTERS: Chapter[] = [
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
   { id: "projects", label: "Projects", nav: "Projects", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
+  // Experience (TKT-85): public CV roles, one per screen, with a timeline dot each and Westminster framed beside them.
+  {
+    id: "experience", label: "Experience", nav: "Experience", kind: "section", tone: "light", scroll: 1.4, timeline: true,
+    still: { file: "still-westminster.jpg", side: "right" },
+    panels: [{ id: "r1", from: 0.1, to: 1, side: "left", look: "role", eyebrow: "Role", title: "Experience", body: PLACEHOLDER }],
+  },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   // The room (redesign 2026-11-05): walk to the desk, read "Now" and "Latest", then keep scrolling into the monitor.

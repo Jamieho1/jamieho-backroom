@@ -42,7 +42,7 @@ describe("journey media", () => {
       expect(MEDIA_MANIFEST[`${i.src}-first.jpg`], i.src).toBeTruthy();
       expect(MEDIA_MANIFEST[`${i.src}-last.jpg`], i.src).toBeTruthy();
     }
-    for (const f of ["still-imperial.jpg"]) {
+    for (const f of ["still-imperial.jpg", "still-westminster.jpg"]) {
       expect(MEDIA_MANIFEST[f], f).toBeTruthy();
     }
   });
