@@ -29,6 +29,8 @@ export interface Panel {
   foot?: { label: string; href: string }[];
   /** One call-to-action button (e.g. the hero's "Go straight to my desktop"). */
   cta?: { label: string; href: string };
+  /** A row of pill buttons (e.g. the Creator section's Subscribe / Follow); http(s) links open in a new tab. */
+  actions?: { label: string; href: string }[];
   /** "statement": the title is a giant BMW-style line; "role": one experience entry (section chapters). */
   look?: "statement" | "role";
   /** Short proof points under the body (an experience entry's public bullets). */

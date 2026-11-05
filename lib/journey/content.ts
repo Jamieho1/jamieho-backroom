@@ -5,6 +5,8 @@
  * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
+ * - Creator (v1.1): `writing` pitch + Subscribe/Follow from `contact` links; latest YouTube / Instagram / article.
+ * - Room: `now`, then the contact line (contact form + socials).
  * - Toolkit (v1.1): `technology` "## layer" blocks (fallback: project tags) + public certificate entries as badges.
  * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
  *   contact line built from the Contact section's social links.
@@ -12,7 +14,7 @@
  */
 import type { Item } from "@/lib/experience";
 import type { Section, SectionKey } from "@/lib/sections";
-import type { LatestItem } from "@/lib/articles-public";
+import type { LatestMedia } from "@/lib/articles-public";
 import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
 import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
 import { firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
@@ -29,7 +31,7 @@ export interface JourneyContent {
   sections: Record<SectionKey, Section>;
   experience: Item[];
   technologies: string[];
-  latest?: { video: LatestItem | null; article: LatestItem | null };
+  latest?: Partial<LatestMedia>;
   /** Public projects; the showcase keeps the featured ones (max 4). */
   projects?: Project[];
 }
@@ -109,13 +111,28 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
         case "room:now":
           if (plain(s.now.body)) panels.push(at({ title: s.now.title || p.title, body: excerpt(s.now.body), md: true }));
           break;
-        case "room:latest": {
+        case "room:contact": {
+          // The desk closes with one line: the contact form and every social link from the Contact section.
+          const foot = [{ label: "Send a message", href: CONTACT_HREF }, ...socialLinks(s.contact.body).map((l) => ({ label: SOCIAL_LABEL[l.kind], href: l.href }))];
+          panels.push(at({ foot }));
+          break;
+        }
+        case "creator:pitch": {
+          const socials = socialLinks(s.contact.body);
+          const actions = [
+            ...socials.filter((l) => l.kind === "youtube").map((l) => ({ label: "Subscribe on YouTube", href: l.href })),
+            ...socials.filter((l) => l.kind === "instagram").map((l) => ({ label: "Follow on Instagram", href: l.href })),
+          ];
+          if (plain(s.writing.body) || actions.length) panels.push(at({ title: s.writing.title.trim() || p.title, body: excerpt(s.writing.body), md: true, actions }));
+          break;
+        }
+        case "creator:latest": {
+          const { video, instagram, article } = { video: null, instagram: null, article: null, ...content.latest };
           const links: PanelLink[] = [];
-          const { video, article } = content.latest ?? { video: null, article: null };
           if (video) links.push({ kicker: "Latest video", title: video.title, href: video.source_url, image: video.cover_url || undefined, external: true });
+          if (instagram) links.push({ kicker: "Latest on Instagram", title: instagram.title, href: instagram.source_url, image: instagram.cover_url || undefined, external: true });
           if (article) links.push({ kicker: "Latest article", title: article.title, href: articleHref(article.slug), image: article.cover_url || undefined });
-          const foot = [{ label: "Say hello", href: CONTACT_HREF }, ...socialLinks(s.contact.body).map((l) => ({ label: SOCIAL_LABEL[l.kind], href: l.href }))];
-          panels.push(at({ links, foot }));
+          if (links.length) panels.push(at({ links }));
           break;
         }
         case "pivot:pivot":

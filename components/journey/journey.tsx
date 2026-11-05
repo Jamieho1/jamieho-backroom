@@ -402,6 +402,11 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
           className={k === 0 ? "is-primary" : undefined}>{f.label}</a>
       ))}</p>
     ) : null}
+    {p.actions?.length ? (
+      <p className="journey-actions">{p.actions.map((a) => (
+        <a key={a.href + a.label} className="journey-cta-link" href={a.href} target="_blank" rel="noopener noreferrer">{a.label} <span>↗</span></a>
+      ))}</p>
+    ) : null}
     {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}
   </>;
 }

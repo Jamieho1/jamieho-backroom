@@ -84,8 +84,8 @@ describe("journey timeline", () => {
   });
 
   it("orders the v1.1 journey: video only at the two ends", () => {
-    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "pivot", "projects", "experience", "toolkit", "to-room", "c7a", "c7b"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Hello", "Pivot", "Projects", "Experience", "Toolkit", "Desk"]);
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "pivot", "projects", "experience", "toolkit", "creator", "to-room", "c7a", "c7b"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Hello", "Pivot", "Projects", "Experience", "Toolkit", "Creator", "Desk"]);
   });
 
   it("fades the Switch on button in over the end of the push-in", () => {

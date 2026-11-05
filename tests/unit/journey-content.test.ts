@@ -53,28 +53,40 @@ describe("journey content (TKT-77)", () => {
     expect(skipped.some((c) => c.id === "pivot")).toBe(false); // the whole section is skipped, not left blank
   });
 
-  it("fills the desk with Now and Latest, with a contact line from the Contact section", () => {
+  it("puts the latest posts and Subscribe/Follow in Creator, and leaves the desk with Now + the contact line", () => {
     const latest = {
       video: { slug: "v", title: "My video", platform: "youtube" as const, source_url: "https://youtube.com/watch?v=x", cover_url: "https://img/v.jpg", created_at: "" },
+      instagram: { slug: "ig", title: "My reel", platform: "instagram" as const, source_url: "https://instagram.com/p/1", cover_url: "", created_at: "" },
       article: { slug: "a-post", title: "My post", platform: "other" as const, source_url: "", cover_url: "", created_at: "" },
     };
-    const withNow = { ...sections, now: { key: "now" as const, title: "Now", body: "Building things." },
+    const full = { ...sections, now: { key: "now" as const, title: "Now", body: "Building things." },
+      writing: { key: "writing" as const, title: "I teach production AI", body: "Ten-minute builds.\n\nMore." },
       contact: { key: "contact" as const, title: "Contact", body: "[YT](https://www.youtube.com/@me) [IG](https://instagram.com/me)" } };
-    const room = panelsOf(withContent(HOME_CHAPTERS, { sections: withNow, experience: [], technologies: [], latest }), "room");
-    expect(room.map((p) => p.id)).toEqual(["now", "latest"]);
-    expect(room[0]).toMatchObject({ title: "Now", body: "Building things." });
-    expect(room[1].links).toEqual([
+    const out = withContent(HOME_CHAPTERS, { sections: full, experience: [], technologies: [], latest });
+    const creator = panelsOf(out, "creator");
+    expect(creator.map((p) => p.id)).toEqual(["pitch", "latest"]);
+    expect(creator[0]).toMatchObject({ title: "I teach production AI", body: "Ten-minute builds.", look: "statement" });
+    expect(creator[0].actions).toEqual([
+      { label: "Subscribe on YouTube", href: "https://www.youtube.com/@me" }, { label: "Follow on Instagram", href: "https://instagram.com/me" },
+    ]);
+    expect(creator[1].links).toEqual([
       { kicker: "Latest video", title: "My video", href: "https://youtube.com/watch?v=x", image: "https://img/v.jpg", external: true },
+      { kicker: "Latest on Instagram", title: "My reel", href: "https://instagram.com/p/1", image: undefined, external: true },
       { kicker: "Latest article", title: "My post", href: "/articles/a-post", image: undefined },
     ]);
-    expect(room[1].foot?.map((f) => f.label)).toEqual(["Say hello", "YouTube", "Instagram"]);
+    const room = panelsOf(out, "room");
+    expect(room.map((p) => p.id)).toEqual(["now", "contact"]);
+    expect(room[0]).toMatchObject({ title: "Now", body: "Building things." });
+    expect(room[1].links).toBeUndefined();
+    expect(room[1].foot?.map((f) => f.label)).toEqual(["Send a message", "YouTube", "Instagram"]);
     expect(room[1].foot?.[0].href).toBe(CONTACT_HREF);
   });
 
-  it("hides Now when it is empty and still offers the contact line", () => {
-    const room = panelsOf(withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] }), "room");
-    expect(room.map((p) => p.id)).toEqual(["latest"]);
-    expect(room[0].links).toEqual([]);
+  it("skips Creator when there's no pitch, no links and no posts; the desk still offers the contact line", () => {
+    const quiet = { ...sections, writing: { key: "writing" as const, title: "Writing", body: "" } };
+    const out = withContent(HOME_CHAPTERS, { sections: quiet, experience: [], technologies: [] });
+    expect(out.some((c) => c.id === "creator")).toBe(false);
+    expect(panelsOf(out, "room").map((p) => p.id)).toEqual(["contact"]);
   });
 
   it("fills the showcase with featured public projects (max 4) and sizes its scroll; skips it with none", () => {

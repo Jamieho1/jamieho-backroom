@@ -176,6 +176,16 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-toolkit-grid { position: absolute; left: 16px; right: 16px; bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .journey-toolkit-grid i { font: normal 500 10px var(--j-mono); letter-spacing: 0.06em; padding: 6px 4px; text-align: center; border-radius: 6px; border: 1px solid rgb(246 241 232 / 0.18); color: rgb(246 241 232 / 0.75); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
+/* TKT-89 creator: pitch + Subscribe/Follow on the left, the latest posts as cards on the right. */
+.journey-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+.journey-actions .journey-cta-link { margin-top: 0; }
+.journey-section .journey-cta-link { color: var(--s-ink); border-color: var(--s-accent); background: transparent; }
+.journey-section-light .journey-cta-link:hover, .journey-section-light .journey-cta-link:focus-visible { background: rgb(154 106 44 / 0.12); }
+.journey-section [data-chapter] .journey-links a, .journey-section .journey-links a { color: var(--s-ink); border-color: var(--s-line); background: rgb(255 255 255 / 0.4); }
+.journey-section-dark .journey-links a { background: rgb(255 255 255 / 0.04); }
+.journey-section .journey-link-kicker { color: var(--s-accent); }
+.journey-section .journey-panel-right { width: min(460px, 36vw); }
+
 /* TKT-87 projects showcase: text left, a browser frame right, one line per project. Pinned with the stage. */
 .journey-showcase {
   position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr); align-items: center;
@@ -256,6 +266,10 @@ body:has(.journey-live) .site-header { display: none; }
   .journey-toolkit-label { top: 50%; translate: 0 -50%; }
   .journey-toolkit-items { min-height: 220px; align-self: start; }
   .journey-toolkit .journey-title { font-size: clamp(26px, 8vw, 38px); }
+  /* Creator on phones: the pitch on top, the cards straight after (no photo in this section). */
+  [data-chapter="creator"] .journey-panel-left { top: 64px; }
+  [data-chapter="creator"] .journey-panel-right { top: auto; bottom: 84px; width: auto; }
+  [data-chapter="creator"] .journey-look-statement .journey-title { font-size: clamp(26px, 8vw, 36px); }
   .journey-showcase { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 18px; padding: 60px 16px 84px; }
   .journey-showcase-frame { order: -1; max-height: 34vh; justify-self: stretch; }
   .journey-showcase-items { min-height: 200px; align-self: start; }

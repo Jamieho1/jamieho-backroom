@@ -33,16 +33,24 @@ export const HOME_CHAPTERS: Chapter[] = [
   },
   // Toolkit (TKT-88): the one layered scene. An exploded architecture stack, then the certification badges.
   { id: "toolkit", label: "Toolkit", nav: "Toolkit", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Toolkit", layers: [], certs: [] } },
+  // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
+  {
+    id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6,
+    panels: [
+      { id: "pitch", from: 0.12, to: 1, side: "left", look: "statement", eyebrow: "YouTube & Instagram", title: "I teach this", body: PLACEHOLDER },
+      { id: "latest", from: 0.2, to: 1, side: "right", eyebrow: "Latest", title: "Fresh off the desk" },
+    ],
+  },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
-  // The room (redesign 2026-11-05): walk to the desk, read "Now" and "Latest", then keep scrolling into the monitor.
+  // The room: walk to the desk, read "Now" and how to get in touch, then keep scrolling into the monitor.
   // Nothing in the room is clickable; the one action is switching the computer on at the very end.
   {
     id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 3, motes: 0.3,
     keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [0.5, 1], [1, 1]],
     panels: [
       { id: "now", from: 0.5, to: 0.73, side: "left", eyebrow: "At the desk", title: "Now", body: PLACEHOLDER },
-      { id: "latest", from: 0.74, to: 0.97, side: "right", eyebrow: "Fresh off the desk", title: "Latest" },
+      { id: "contact", from: 0.74, to: 0.97, side: "right", eyebrow: "Get in touch", title: "Say hello" },
     ],
   },
   // C7b scrubbed: the camera pushes into the monitor until it fills the screen, then "switch it on" (BMW-style).

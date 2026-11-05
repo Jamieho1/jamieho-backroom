@@ -48,12 +48,13 @@ test("the journey ends on the monitor: Switch on opens the desktop", async ({ pa
   await page.waitForURL((u) => u.pathname === "/");
 });
 
-test("the desk shows the Latest panel with a contact line", async ({ page }) => {
+test("the desk closes with a contact line", async ({ page }) => {
   await blockClips(page);
   await page.goto("/journey#desk");
-  const latest = page.locator('section.journey-panel[aria-label="Latest"]'); // faded out at the very end, still in the page
-  await expect(latest).toBeAttached();
-  await expect(latest.locator("a", { hasText: "Say hello" })).toHaveAttribute("href", "/about#home-contact");
+  const contact = page.locator('section.journey-panel[aria-label="Say hello"]'); // faded out at the very end, still in the page
+  await expect(contact).toBeAttached();
+  await expect(contact.locator("a", { hasText: "Send a message" })).toHaveAttribute("href", "/about#home-contact");
+  await expect(page.locator('section.journey-panel[aria-label="Latest"]')).toHaveCount(0);
 });
 
 test("reduced motion gets the still version with no start screen", async ({ page }) => {
