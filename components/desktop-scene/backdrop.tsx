@@ -2,10 +2,11 @@
 
 import {useEffect,useRef,useState} from 'react';
 import type {DesktopSceneController} from './runtime';
+import {DESKTOP_WIDE_FIT} from './assets';
 
 /** A still paints immediately. Graphics are deferred and never mount behind an app. */
 export function DesktopBackdrop({covered}:{covered:boolean}){
- const root=useRef<HTMLDivElement>(null),frame=useRef<HTMLDivElement>(null),host=useRef<HTMLDivElement>(null);
+ const root=useRef<HTMLDivElement>(null),frame=useRef<HTMLDivElement>(null),host=useRef<HTMLDivElement>(null),wide=useRef<HTMLDivElement>(null);
  const control=useRef<DesktopSceneController|null>(null),savedTime=useRef(0),nightRef=useRef(false);
  const [night,setNight]=useState(false),[reduced,setReduced]=useState(true),[enhanced,setEnhanced]=useState(false),[paused,setPaused]=useState(false),[unavailable,setUnavailable]=useState(false);
  const [phase,setPhase]=useState('still');
@@ -20,7 +21,9 @@ export function DesktopBackdrop({covered}:{covered:boolean}){
  useEffect(()=>{void control.current?.setNight(night)},[night]);
  useEffect(()=>{
   const el=root.current,art=frame.current;if(!el||!art)return;
-  const resize=()=>{const {width:w,height:h}=el.getBoundingClientRect();if(!w||!h)return;const ratio=1672/941,contain=true;const width=Math.min(w,h*ratio),height=width/ratio;art.style.width=width+'px';art.style.height=height+'px';art.style.left=(w-width)/2+'px';art.style.top=(h-height)/2+'px';el.dataset.composition=contain?'contain':'cover'};
+  const resize=()=>{const {width:w,height:h}=el.getBoundingClientRect();if(!w||!h)return;const ratio=1672/941,contain=true;const width=Math.min(w,h*ratio),height=width/ratio;art.style.width=width+'px';art.style.height=height+'px';art.style.left=(w-width)/2+'px';art.style.top=(h-height)/2+'px';el.dataset.composition=contain?'contain':'cover';
+   // The wide art continues the picture either side of the frame, lined up pixel for pixel (no blurred strips).
+   const side=wide.current;if(side){side.style.width=width*DESKTOP_WIDE_FIT.width+'px';side.style.height=height+'px';side.style.left=(w-width)/2-width*DESKTOP_WIDE_FIT.left+'px';side.style.top=(h-height)/2+'px'}};
   resize();if(typeof ResizeObserver==='undefined'){window.addEventListener('resize',resize);return()=>window.removeEventListener('resize',resize)}
   const observer=new ResizeObserver(resize);observer.observe(el);return()=>observer.disconnect();
  },[]);
@@ -41,6 +44,7 @@ export function DesktopBackdrop({covered}:{covered:boolean}){
  return <>
   <div className="desktop-backdrop" ref={root} data-scene={unavailable?'unavailable':phase} data-night={night} aria-hidden="true">
    <div className="desktop-ambient" />
+   <div className="desktop-wide" ref={wide} />
    <div className="desktop-art-frame" ref={frame}><div className="desktop-poster"/><div className="desktop-canvas" ref={host}/></div>
   </div>
   {!covered&&<div className="desktop-intro-tools">

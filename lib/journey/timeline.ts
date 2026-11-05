@@ -6,7 +6,12 @@
 /** [scroll fraction, media fraction] pairs, both 0..1, strictly increasing in scroll. Slow reading = shallow slope. */
 export type Keys = readonly (readonly [number, number])[];
 
-export interface PanelLink { kicker: string; title: string; href: string; image?: string; external?: boolean }
+export type MediaPlatform = "youtube" | "instagram" | "xiaohongshu" | "article";
+export interface PanelLink {
+  kicker: string; title: string; href: string; image?: string; external?: boolean;
+  /** Creator cards (TKT-89): which platform the card is for; `placeholder` = no post yet, links to the profile. */
+  platform?: MediaPlatform; placeholder?: boolean;
+}
 
 export interface Panel {
   id: string;
@@ -30,7 +35,7 @@ export interface Panel {
   /** One call-to-action button (e.g. the hero's "Go straight to my desktop"). */
   cta?: { label: string; href: string };
   /** A row of pill buttons (e.g. the Creator section's Subscribe / Follow); http(s) links open in a new tab. */
-  actions?: { label: string; href: string }[];
+  actions?: { label: string; href: string; platform?: MediaPlatform }[];
   /** "statement": the title is a giant BMW-style line; "role": one experience entry (section chapters). */
   look?: "statement" | "role";
   /** Short proof points under the body (an experience entry's public bullets). */

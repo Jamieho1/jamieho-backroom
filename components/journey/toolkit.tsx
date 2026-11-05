@@ -24,7 +24,7 @@ export const Toolkit = forwardRef<ToolkitHandle, { data: Data }>(function Toolki
       data.layers.forEach((_, k) => {
         const plane = planes.current[k];
         if (plane) {
-          plane.style.setProperty("--z", layerZ(k, s.lift).toFixed(1));
+          plane.style.setProperty("--z", layerZ(k, s.lift, 14, Math.min(96, 340 / Math.max(1, L - 1))).toFixed(1));
           plane.dataset.on = String(k === s.active && s.certs < 0.5);
         }
         const text = texts.current[k];

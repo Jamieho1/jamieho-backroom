@@ -15,14 +15,15 @@ export async function getPublicArticle(slug:string):Promise<Article|null>{
 }
 export type LatestItem=Pick<Article,'slug'|'title'|'platform'|'source_url'|'cover_url'|'created_at'>;
 /** The journey's Creator section (v1.1): newest YouTube post, newest Instagram post and newest other article. */
-export interface LatestMedia{video:LatestItem|null;instagram:LatestItem|null;article:LatestItem|null}
+export interface LatestMedia{video:LatestItem|null;instagram:LatestItem|null;rednote:LatestItem|null;article:LatestItem|null}
 export function pickLatest(rows:LatestItem[]):LatestMedia{
  const video=rows.find(r=>r.platform==='youtube'&&!!r.source_url)??null;
  const instagram=rows.find(r=>r.platform==='instagram'&&!!r.source_url)??null;
- return {video,instagram,article:rows.find(r=>r!==video&&r!==instagram)??null};
+ const rednote=rows.find(r=>r.platform==='xiaohongshu'&&!!r.source_url)??null;
+ return {video,instagram,rednote,article:rows.find(r=>r!==video&&r!==instagram&&r!==rednote)??null};
 }
 export async function getLatestMedia():Promise<LatestMedia>{
- const sb=publicClient();if(!sb)return {video:null,instagram:null,article:null};
+ const sb=publicClient();if(!sb)return {video:null,instagram:null,rednote:null,article:null};
  const {data,error}=await sb.from('articles').select('slug,title,platform,source_url,cover_url,created_at').eq('published',true).order('created_at',{ascending:false}).limit(30);
  if(error)throw new Error('Articles unavailable');
  return pickLatest((data??[]) as LatestItem[]);

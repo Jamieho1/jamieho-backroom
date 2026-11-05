@@ -6,12 +6,12 @@ const row = (slug: string, platform: LatestItem["platform"], source_url = "https
 
 describe("latest media for the Creator section (TKT-89)", () => {
   it("picks the newest YouTube, the newest Instagram and the newest remaining article", () => {
-    const rows = [row("ig2", "instagram"), row("note", "other", ""), row("yt2", "youtube"), row("ig1", "instagram"), row("yt1", "youtube")];
+    const rows = [row("ig2", "instagram"), row("note", "other", ""), row("xhs", "xiaohongshu"), row("yt2", "youtube"), row("ig1", "instagram"), row("yt1", "youtube")];
     const got = pickLatest(rows);
-    expect([got.video?.slug, got.instagram?.slug, got.article?.slug]).toEqual(["yt2", "ig2", "note"]);
+    expect([got.video?.slug, got.instagram?.slug, got.rednote?.slug, got.article?.slug]).toEqual(["yt2", "ig2", "xhs", "note"]);
   });
   it("ignores posts without a link for video/Instagram and copes with nothing", () => {
     expect(pickLatest([row("yt", "youtube", "")]).video).toBeNull();
-    expect(pickLatest([])).toEqual({ video: null, instagram: null, article: null });
+    expect(pickLatest([])).toEqual({ video: null, instagram: null, rednote: null, article: null });
   });
 });

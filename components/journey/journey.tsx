@@ -12,6 +12,7 @@ import { Motes, type MotesHandle } from "./motes";
 import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
+import { BrandIcon } from "./brand-icon";
 import { StartScreen } from "./start-screen";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
 import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
@@ -388,7 +389,25 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
     {p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
     {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
-    {p.links?.length ? (
+    {p.links?.some((l) => l.platform) ? (
+      <ul className="journey-media">
+        {p.links.map((l) => (
+          <li key={l.platform + l.href} className={`journey-media-${l.platform}${l.placeholder ? " is-placeholder" : ""}`}>
+            <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+              <span className="journey-media-thumb">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {l.image ? <img src={l.image} alt="" loading="lazy" /> : <BrandIcon platform={l.platform!} size={l.platform === "youtube" ? 40 : 28} />}
+                {l.platform === "youtube" && l.image ? <span className="journey-media-play" aria-hidden="true"><BrandIcon platform="youtube" size={44} /></span> : null}
+              </span>
+              <span className="journey-media-text">
+                <span className="journey-link-kicker"><BrandIcon platform={l.platform!} size={13} /> {l.kicker}</span>
+                <span className="journey-link-title">{l.title}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : p.links?.length ? (
       <ul className="journey-links">
         {p.links.map((l) => (
           <li key={l.href}>
@@ -410,7 +429,9 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
     ) : null}
     {p.actions?.length ? (
       <p className="journey-actions">{p.actions.map((a) => (
-        <a key={a.href + a.label} className="journey-cta-link" href={a.href} target="_blank" rel="noopener noreferrer">{a.label} <span>↗</span></a>
+        <a key={a.href + a.label} className={a.platform ? `journey-brand journey-brand-${a.platform}` : "journey-cta-link"} href={a.href} target="_blank" rel="noopener noreferrer">
+          {a.platform ? <BrandIcon platform={a.platform} size={20} /> : null}{a.label}{a.platform ? null : <span> ↗</span>}
+        </a>
       ))}</p>
     ) : null}
     {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}

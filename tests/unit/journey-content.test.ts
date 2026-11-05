@@ -67,13 +67,16 @@ describe("journey content (TKT-77)", () => {
     expect(creator.map((p) => p.id)).toEqual(["pitch", "latest"]);
     expect(creator[0]).toMatchObject({ title: "I teach production AI", body: "Ten-minute builds.", look: "statement" });
     expect(creator[0].actions).toEqual([
-      { label: "Subscribe on YouTube", href: "https://www.youtube.com/@me" }, { label: "Follow on Instagram", href: "https://instagram.com/me" },
+      { label: "YouTube", href: "https://www.youtube.com/@me", platform: "youtube" }, { label: "Instagram", href: "https://instagram.com/me", platform: "instagram" },
     ]);
     expect(creator[1].links).toEqual([
-      { kicker: "Latest video", title: "My video", href: "https://youtube.com/watch?v=x", image: "https://img/v.jpg", external: true },
-      { kicker: "Latest on Instagram", title: "My reel", href: "https://instagram.com/p/1", image: undefined, external: true },
-      { kicker: "Latest article", title: "My post", href: "/articles/a-post", image: undefined },
+      { platform: "youtube", kicker: "Latest video", title: "My video", href: "https://youtube.com/watch?v=x", image: "https://img/v.jpg", external: true },
+      { platform: "instagram", kicker: "Instagram", title: "My reel", href: "https://instagram.com/p/1", image: undefined, external: true },
+      { platform: "article", kicker: "Latest article", title: "My post", href: "/articles/a-post", image: undefined },
     ]);
+    // No post yet → a card that points at the profile (here YouTube from the Contact links), never an empty slot.
+    const noVideo = withContent(HOME_CHAPTERS, { sections: full, experience: [], technologies: [], latest: { ...latest, video: null } });
+    expect(panelsOf(noVideo, "creator")[1].links?.[0]).toMatchObject({ platform: "youtube", placeholder: true, href: "https://www.youtube.com/@me" });
     const room = panelsOf(out, "room");
     expect(room.map((p) => p.id)).toEqual(["now", "contact"]);
     expect(room[0]).toMatchObject({ title: "Now", body: "Building things." });
@@ -138,5 +141,18 @@ describe("journey content (TKT-77)", () => {
     const fallback = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: ["Next.js", "Supabase"] }).find((c) => c.id === "toolkit")!;
     expect(fallback.kind === "section" && fallback.toolkit?.layers).toEqual([{ name: "Stack", how: "", tools: ["Next.js", "Supabase"] }]);
     expect(withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] }).some((c) => c.id === "toolkit")).toBe(false);
+  });
+
+  it("turns a certificate entry's public bullets into one badge each (e.g. AWS)", () => {
+    const tech = { ...sections, technology: { key: "technology" as const, title: "Toolkit", body: "## AI\n- LLMs" } };
+    const aws = item({ kind: "certificate", title: "AWS", org: "", summary: "", bullets: [
+      { text: "AWS Machine Learning Specialty", public: true }, { text: "Hidden one", public: false },
+      { text: "AWS Solutions Architect Professional [Credly](https://www.credly.com/badges/2)", public: true },
+    ] });
+    const tk = withContent(HOME_CHAPTERS, { sections: tech, experience: [aws], technologies: [] }).find((c) => c.id === "toolkit")!;
+    expect(tk.kind === "section" && tk.toolkit?.certs).toEqual([
+      { title: "AWS Machine Learning Specialty", org: "AWS", href: undefined },
+      { title: "AWS Solutions Architect Professional", org: "AWS", href: "https://www.credly.com/badges/2" },
+    ]);
   });
 });

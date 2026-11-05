@@ -186,6 +186,41 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-section .journey-link-kicker { color: var(--s-accent); }
 .journey-section .journey-panel-right { width: min(460px, 36vw); }
 
+/* TKT-89 v2: brand buttons (icon + name) and one card per platform (YouTube large, then Instagram / RedNote / Articles). */
+.journey-brand {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px 12px 16px; border-radius: 999px; text-decoration: none;
+  font: 600 15px var(--j-body); color: #fff; transition: transform 0.2s ease, filter 0.2s ease;
+}
+.journey-brand:hover, .journey-brand:focus-visible { transform: translateY(-2px); filter: brightness(1.08); outline: none; }
+.journey-brand:focus-visible { box-shadow: 0 0 0 3px rgb(242 180 92 / 0.6); }
+.journey-brand-youtube { background: #ff0033; }
+.journey-brand-instagram { background: linear-gradient(45deg, #feda75, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5); }
+.journey-brand-xiaohongshu { background: #ff2442; }
+.journey-media { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.journey-media li:first-child { grid-column: 1 / -1; }
+.journey-media a { display: flex; flex-direction: column; gap: 8px; height: 100%; text-decoration: none; color: var(--s-ink, var(--j-ink)); }
+.journey-media-thumb {
+  position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+  background: rgb(21 17 12 / 0.06); border: 1px solid var(--s-line, rgb(255 255 255 / 0.16)); transition: transform 0.25s ease;
+}
+.journey-media li:first-child .journey-media-thumb { aspect-ratio: 16 / 9; }
+.journey-media-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.journey-media a:hover .journey-media-thumb, .journey-media a:focus-visible .journey-media-thumb { transform: translateY(-2px); }
+.journey-media a:focus-visible { outline: none; }
+.journey-media a:focus-visible .journey-media-thumb { box-shadow: 0 0 0 3px rgb(242 180 92 / 0.6); }
+.journey-media-play { position: absolute; color: #ff0033; filter: drop-shadow(0 4px 12px rgb(0 0 0 / 0.35)); }
+.journey-media-youtube .journey-media-thumb { color: #ff0033; }
+.journey-media-instagram .journey-media-thumb { color: #d62976; }
+.journey-media-xiaohongshu .journey-media-thumb { color: #ff2442; }
+.journey-media-article .journey-media-thumb { color: var(--s-accent, var(--j-accent)); }
+.journey-media-youtube.is-placeholder .journey-media-thumb { background: linear-gradient(135deg, rgb(255 0 51 / 0.12), rgb(255 0 51 / 0.03)); }
+.journey-media-instagram.is-placeholder .journey-media-thumb { background: linear-gradient(135deg, rgb(214 41 118 / 0.14), rgb(79 91 213 / 0.08)); }
+.journey-media-xiaohongshu.is-placeholder .journey-media-thumb { background: rgb(255 36 66 / 0.1); }
+.journey-media-text { display: grid; gap: 2px; }
+.journey-media .journey-link-kicker { display: inline-flex; align-items: center; gap: 5px; }
+.journey-media .journey-link-title { font-size: 13px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.journey-media li:first-child .journey-link-title { font-size: 15px; }
+
 /* TKT-87 projects showcase: text left, a browser frame right, one line per project. Pinned with the stage. */
 .journey-showcase {
   position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr); align-items: center;
@@ -270,6 +305,11 @@ body:has(.journey-live) .site-header { display: none; }
   [data-chapter="creator"] .journey-panel-left { top: 64px; }
   [data-chapter="creator"] .journey-panel-right { top: auto; bottom: 84px; width: auto; }
   [data-chapter="creator"] .journey-look-statement .journey-title { font-size: clamp(26px, 8vw, 36px); }
+  [data-chapter="creator"] .journey-panel-right .journey-title, [data-chapter="creator"] .journey-panel-right .journey-eyebrow { display: none; }
+  [data-chapter="creator"] .journey-panel-left .journey-md .md p, [data-chapter="creator"] .journey-panel-left .journey-body { -webkit-line-clamp: 2; }
+  .journey-media-thumb { aspect-ratio: 4 / 3; }
+  .journey-media li:first-child .journey-media-thumb { aspect-ratio: 2 / 1; }
+  .journey-brand { padding: 9px 14px 9px 12px; font-size: 13px; }
   /* Long copy never runs under the menu: clamp section text on phones (the full text lives on /about and project pages). */
   .journey-section .journey-body, .journey-section .journey-md .md p, .journey-showcase .journey-body, .journey-toolkit .journey-body {
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;
@@ -404,6 +444,9 @@ body:has(.journey-live) .site-header { display: none; }
   .journey-actions { gap: 6px; margin-top: 10px; }
   .journey-actions .journey-cta-link { padding: 8px 12px; font-size: 10px; }
   .journey-links { gap: 6px; }
+  .journey-media { gap: 6px; }
+  .journey-media li:first-child .journey-media-thumb { aspect-ratio: 21 / 9; }
+  .journey-media .journey-link-title { font-size: 12px; -webkit-line-clamp: 1; }
   .journey-links a { grid-template-columns: 56px 1fr auto; padding: 6px 10px 6px 6px; }
   .journey-links img, .journey-link-blank { width: 56px; }
   .journey-showcase, .journey-toolkit { padding-top: 52px; }

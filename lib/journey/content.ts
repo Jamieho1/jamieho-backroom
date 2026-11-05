@@ -18,7 +18,7 @@ import type { LatestMedia } from "@/lib/articles-public";
 import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
 import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
 import { firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
-import { articleHref } from "@/lib/articles";
+import { articleHref, youtubeId } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
 
@@ -87,8 +87,13 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       let layers = parseToolkit(s.technology.body);
       const tags = [...new Set([...content.technologies, ...(content.projects ?? []).filter((p) => p.public).flatMap((p) => p.tags)])];
       if (!layers.length && tags.length) layers = [{ name: "Stack", how: plain(excerpt(s.technology.body, 160)), tools: tags.slice(0, 12) }];
-      const certs = content.experience.filter((i) => i.kind === "certificate" && i.public !== false && i.title.trim())
-        .map((i) => ({ title: i.title.trim(), org: i.org.trim(), href: firstHttps(i.summary) }));
+      // Badges: one per public bullet of a certificate entry (e.g. "AWS" → its two certifications), else the entry itself.
+      const certs = content.experience.filter((i) => i.kind === "certificate" && i.public !== false && i.title.trim()).flatMap((i) => {
+        const shown = i.bullets.filter((b) => b.public && b.text.trim());
+        return shown.length
+          ? shown.map((b) => ({ title: b.text.replace(/\[[^\]]*\]\(https:[^)]*\)/g, "").replace(/https:\/\/\S+/g, "").replace(/\s+/g, " ").trim(), org: i.org.trim() || i.title.trim(), href: firstHttps(b.text) ?? firstHttps(i.summary) }))
+          : [{ title: i.title.trim(), org: i.org.trim(), href: firstHttps(i.summary) }];
+      });
       if (!layers.length) return { ...c, toolkit: { ...c.toolkit, layers: [], certs: [] } };
       const scroll = toolkitScroll(layers.length, certs.length);
       return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), toolkit: { title: s.technology.title.trim() || c.toolkit.title, layers, certs } };
@@ -118,20 +123,28 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           break;
         }
         case "creator:pitch": {
+          // Brand-coloured YouTube / Instagram buttons (icon + name), straight from the Contact section's links.
           const socials = socialLinks(s.contact.body);
-          const actions = [
-            ...socials.filter((l) => l.kind === "youtube").map((l) => ({ label: "Subscribe on YouTube", href: l.href })),
-            ...socials.filter((l) => l.kind === "instagram").map((l) => ({ label: "Follow on Instagram", href: l.href })),
-          ];
+          const actions = (["youtube", "instagram"] as const).flatMap((kind) =>
+            socials.filter((l) => l.kind === kind).map((l) => ({ label: kind === "youtube" ? "YouTube" : "Instagram", href: l.href, platform: kind })));
           if (plain(s.writing.body) || actions.length) panels.push(at({ title: s.writing.title.trim() || p.title, body: excerpt(s.writing.body), md: true, actions }));
           break;
         }
         case "creator:latest": {
-          const { video, instagram, article } = { video: null, instagram: null, article: null, ...content.latest };
+          // One card per platform: the newest post when there is one, otherwise a card pointing at the profile.
+          const { video, instagram, rednote, article } = { video: null, instagram: null, rednote: null, article: null, ...content.latest };
+          const profile = (kind: string) => socialLinks(s.contact.body).find((l) => l.kind === kind)?.href;
           const links: PanelLink[] = [];
-          if (video) links.push({ kicker: "Latest video", title: video.title, href: video.source_url, image: video.cover_url || undefined, external: true });
-          if (instagram) links.push({ kicker: "Latest on Instagram", title: instagram.title, href: instagram.source_url, image: instagram.cover_url || undefined, external: true });
-          if (article) links.push({ kicker: "Latest article", title: article.title, href: articleHref(article.slug), image: article.cover_url || undefined });
+          const yt = video ? youtubeId(video.source_url) : null;
+          if (video) links.push({ platform: "youtube", kicker: "Latest video", title: video.title, href: video.source_url, external: true,
+            image: video.cover_url || (yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : undefined) });
+          else if (profile("youtube")) links.push({ platform: "youtube", placeholder: true, kicker: "YouTube", title: "10-minute AI builds, production-grade", href: profile("youtube")!, external: true });
+          if (instagram) links.push({ platform: "instagram", kicker: "Instagram", title: instagram.title, href: instagram.source_url, image: instagram.cover_url || undefined, external: true });
+          else if (profile("instagram")) links.push({ platform: "instagram", placeholder: true, kicker: "Instagram", title: "Latest posts", href: profile("instagram")!, external: true });
+          if (rednote) links.push({ platform: "xiaohongshu", kicker: "RedNote", title: rednote.title, href: rednote.source_url, image: rednote.cover_url || undefined, external: true });
+          else if (profile("xiaohongshu")) links.push({ platform: "xiaohongshu", placeholder: true, kicker: "RedNote", title: "Latest posts", href: profile("xiaohongshu")!, external: true });
+          if (article) links.push({ platform: "article", kicker: "Latest article", title: article.title, href: articleHref(article.slug), image: article.cover_url || undefined });
+          else if (links.length) links.push({ platform: "article", placeholder: true, kicker: "Articles", title: "Notes and references", href: "/articles" });
           if (links.length) panels.push(at({ links }));
           break;
         }
