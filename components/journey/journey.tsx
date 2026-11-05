@@ -116,7 +116,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     let target = 0;
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
-    let shown = target, last = performance.now(), raf = 0;
+    let shown = target, last = performance.now(), raf = 0, lastNav = -1;
     // The computer is the very end of the track (where "Switch on" appears); other chapters jump to their start.
     const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
@@ -204,6 +204,12 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       let current = -1;
       navItems.forEach(({ i }, k) => { if (i <= index) current = k; });
       navRefs.current.forEach((b, k) => { if (b) b.ariaCurrent = k === current ? "step" : null; });
+      // Phones: the menu scrolls sideways, so keep the current chapter centred in it.
+      if (current !== lastNav) {
+        lastNav = current;
+        const btn = navRefs.current[current], nav = btn?.parentElement;
+        if (btn && nav && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: btn.offsetLeft - (nav.clientWidth - btn.offsetWidth) / 2, behavior: "smooth" });
+      }
       if (hud.current) hud.current.textContent = `${(shown * 100).toFixed(1)}% · ${active.id} ${(local * 100).toFixed(0)}%`;
       raf = requestAnimationFrame(draw);
     };

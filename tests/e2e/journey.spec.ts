@@ -100,3 +100,30 @@ test("the Toolkit stack lifts its layers as you scroll (falls back to project ta
   await expect(tk.locator(".journey-toolkit-item").first()).toBeVisible();
   await expect(tk.locator(".journey-toolkit-plane").first()).toHaveAttribute("data-on", "true");
 });
+
+test("on a phone the journey never scrolls sideways and the chapter menu keeps the current chapter in view", async ({ page }) => {
+  test.skip(test.info().project.name !== "phone", "phone layout");
+  await blockClips(page);
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  const H = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+  for (const f of [0.1, 0.3, 0.5, 0.7, 0.9, 1]) {
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(H * f));
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await expect.poll(() => page.evaluate(() => {
+    const b = document.querySelector<HTMLElement>('.journey-nav button[aria-current="step"]');
+    if (!b) return false;
+    const r = b.getBoundingClientRect();
+    return r.left >= 0 && r.right <= innerWidth;
+  })).toBe(true);
+});
+
+test("the still version (reduced motion) has no sideways scroll and keeps every link", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/journey");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.locator(".journey-stills a", { hasText: "Go straight to my desktop" })).toHaveAttribute("href", "/");
+  await expect(page.locator(".journey-stills a", { hasText: "Send a message" })).toHaveAttribute("href", "/about#home-contact");
+});
