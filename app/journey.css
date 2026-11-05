@@ -135,6 +135,47 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-timeline li[data-on="past"]::before { background: var(--s-accent); }
 .journey-timeline span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
 
+/* TKT-88 toolkit: CSS 3D exploded stack. Planes lift via --z (translateZ); the lit one glows amber. */
+.journey-toolkit {
+  position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center;
+  gap: clamp(24px, 4vw, 72px); padding: 12vh clamp(20px, 7vw, 120px) 15vh;
+}
+.journey-toolkit-text { position: relative; align-self: stretch; display: grid; grid-template-rows: auto 1fr; color: var(--s-ink); min-width: 0; }
+.journey-toolkit-items { position: relative; align-self: center; min-height: 280px; }
+.journey-toolkit-item, .journey-toolkit-certs { position: absolute; inset: 0 0 auto 0; will-change: transform, opacity; }
+.journey-toolkit-n { margin: 0 0 10px; font: 500 12px var(--j-mono); letter-spacing: 0.14em; color: var(--s-soft); }
+.journey-toolkit .journey-title { font-size: clamp(34px, 4vw, 68px); font-weight: 700; color: var(--s-ink); }
+.journey-toolkit .journey-body { color: var(--s-soft); font-size: clamp(16px, 1.2vw, 19px); }
+.journey-toolkit .journey-chips li { border-color: var(--s-line); color: var(--s-soft); }
+.journey-toolkit-certs ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.journey-toolkit-certs a { display: inline-flex; align-items: center; gap: 14px; color: inherit; text-decoration: none; }
+.journey-toolkit-badge { display: inline-flex; align-items: center; gap: 14px; }
+.journey-toolkit-badge strong { display: block; font-size: clamp(15px, 1.2vw, 18px); }
+.journey-toolkit-badge small { display: block; margin-top: 2px; font: 500 11px var(--j-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--s-soft); }
+.journey-toolkit-seal {
+  display: grid; place-items: center; width: 46px; height: 46px; flex: none; border-radius: 50%; color: #1a1208; font-weight: 700;
+  background: radial-gradient(circle at 35% 30%, #ffd796, #f2b45c 55%, #b9772a); box-shadow: 0 0 0 3px rgb(242 180 92 / 0.2);
+}
+.journey-toolkit-verify { font: 500 11px var(--j-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s-accent); }
+.journey-toolkit-certs a:hover strong, .journey-toolkit-certs a:focus-visible strong { text-decoration: underline; text-decoration-color: var(--s-accent); }
+.journey-toolkit-stage { position: relative; height: 70vh; perspective: 1600px; perspective-origin: 50% 30%; }
+.journey-toolkit-stack {
+  position: absolute; left: 50%; top: 62%; width: min(420px, 30vw); aspect-ratio: 16 / 10; transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(58deg) rotateZ(-36deg);
+}
+.journey-toolkit-plane {
+  position: absolute; inset: 0; border-radius: 14px; transform: translate3d(0, 0, calc(var(--z, 0) * 1px)); will-change: transform;
+  background: linear-gradient(135deg, rgb(246 241 232 / 0.09), rgb(246 241 232 / 0.03)); border: 1px solid rgb(246 241 232 / 0.22);
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.35); backdrop-filter: blur(2px); transition: border-color 0.3s ease, background 0.3s ease;
+}
+.journey-toolkit-plane[data-on="true"] {
+  border-color: var(--s-accent); background: linear-gradient(135deg, rgb(242 180 92 / 0.3), rgb(242 180 92 / 0.08));
+  box-shadow: 0 0 0 1px rgb(242 180 92 / 0.4), 0 0 60px rgb(242 180 92 / 0.25), 0 30px 60px rgb(0 0 0 / 0.35);
+}
+.journey-toolkit-label { position: absolute; left: 16px; top: 12px; font: 600 13px var(--j-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s-ink); }
+.journey-toolkit-grid { position: absolute; left: 16px; right: 16px; bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.journey-toolkit-grid i { font: normal 500 10px var(--j-mono); letter-spacing: 0.06em; padding: 6px 4px; text-align: center; border-radius: 6px; border: 1px solid rgb(246 241 232 / 0.18); color: rgb(246 241 232 / 0.75); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
 /* TKT-87 projects showcase: text left, a browser frame right, one line per project. Pinned with the stage. */
 .journey-showcase {
   position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr); align-items: center;
@@ -206,6 +247,15 @@ body:has(.journey-live) .site-header { display: none; }
   .journey-timeline { left: 16px; bottom: auto; top: calc(64px + 30vh + 8px); }
   .journey-timeline li { width: 64px; padding-top: 0; }
   .journey-timeline span { display: none; }
+  .journey-toolkit { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 12px; padding: 60px 16px 84px; }
+  .journey-toolkit-stage { order: -1; height: 30vh; perspective: none; }
+  /* Phones: the layers lie flat, stacked as bars; the lit one shows which layer the text describes. */
+  .journey-toolkit-stack { position: relative; left: auto; top: auto; width: 100%; aspect-ratio: auto; height: 100%; transform: none; transform-style: flat; display: flex; flex-direction: column-reverse; gap: 6px; justify-content: center; }
+  .journey-toolkit-plane { position: relative; inset: auto; transform: none; height: 40px; flex: none; }
+  .journey-toolkit-grid { display: none; }
+  .journey-toolkit-label { top: 50%; translate: 0 -50%; }
+  .journey-toolkit-items { min-height: 220px; align-self: start; }
+  .journey-toolkit .journey-title { font-size: clamp(26px, 8vw, 38px); }
   .journey-showcase { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 18px; padding: 60px 16px 84px; }
   .journey-showcase-frame { order: -1; max-height: 34vh; justify-self: stretch; }
   .journey-showcase-items { min-height: 200px; align-self: start; }
@@ -312,3 +362,5 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-still-showcase ul { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
 .journey-still-showcase img { position: static; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-radius: 8px; margin-bottom: 14px; }
 .journey-still-showcase .journey-title { font-size: clamp(24px, 3vw, 36px); }
+.journey-still-toolkit { max-width: 760px; display: grid; gap: 22px; }
+.journey-still-toolkit .journey-title { font-size: clamp(24px, 3vw, 36px); }

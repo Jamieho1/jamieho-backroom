@@ -11,6 +11,7 @@ import {
 import { Motes, type MotesHandle } from "./motes";
 import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
 import { Showcase, type ShowcaseHandle } from "./showcase";
+import { Toolkit, type ToolkitHandle } from "./toolkit";
 import { StartScreen } from "./start-screen";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
 import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
@@ -35,6 +36,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const panels = useRef<Map<string, HTMLElement>>(new Map());
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
+  const toolkits = useRef<(ToolkitHandle | null)[]>([]);
   const dots = useRef<(HTMLOListElement | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
@@ -151,7 +153,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
-          if (opacity > 0) showcases.current[i]?.setProgress(at);
+          if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
             // Timeline: light the dot of the entry being read (the last one whose window has started).
@@ -234,6 +236,8 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
+                ) : c.kind === "section" && c.toolkit?.layers.length ? (
+                  <Toolkit ref={(h) => { toolkits.current[i] = h; }} data={c.toolkit} />
                 ) : c.kind === "section" && c.showcase?.length ? (
                   <Showcase ref={(h) => { showcases.current[i] = h; }} items={c.showcase} />
                 ) : c.kind === "section" && c.still ? (
@@ -316,6 +320,21 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
             </figure>
+          ) : null}
+          {c.kind === "section" && c.toolkit?.layers.length ? (
+            <section className="journey-still-toolkit" aria-label={c.toolkit.title}>
+              <p className="journey-eyebrow">{c.toolkit.title}</p>
+              {c.toolkit.layers.map((l) => (
+                <div key={l.name}>
+                  <h2 className="journey-title">{l.name}</h2>
+                  {l.how ? <p className="journey-body">{l.how}</p> : null}
+                  {l.tools.length ? <ul className="journey-chips">{l.tools.map((t) => <li key={t}>{t}</li>)}</ul> : null}
+                </div>
+              ))}
+              {c.toolkit.certs.length ? <ul className="journey-points">{c.toolkit.certs.map((x) => (
+                <li key={x.title}>{x.href ? <a href={x.href} target="_blank" rel="noopener noreferrer">{x.title}</a> : x.title}{x.org ? ` · ${x.org}` : ""}</li>
+              ))}</ul> : null}
+            </section>
           ) : null}
           {c.kind === "section" && c.showcase?.length ? (
             <section className="journey-still-showcase" aria-label="Selected work">

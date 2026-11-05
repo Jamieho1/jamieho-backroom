@@ -5,6 +5,7 @@
  * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
+ * - Toolkit (v1.1): `technology` "## layer" blocks (fallback: project tags) + public certificate entries as badges.
  * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
  *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
@@ -14,6 +15,7 @@ import type { Section, SectionKey } from "@/lib/sections";
 import type { LatestItem } from "@/lib/articles-public";
 import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
 import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
+import { firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
 import { articleHref } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
@@ -78,6 +80,17 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       }) : [];
       return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), panels };
     }
+    if (c.kind === "section" && c.toolkit) {
+      // Layers from the Technology section's "## layer" blocks; without any, one layer of the projects' tags.
+      let layers = parseToolkit(s.technology.body);
+      const tags = [...new Set([...content.technologies, ...(content.projects ?? []).filter((p) => p.public).flatMap((p) => p.tags)])];
+      if (!layers.length && tags.length) layers = [{ name: "Stack", how: plain(excerpt(s.technology.body, 160)), tools: tags.slice(0, 12) }];
+      const certs = content.experience.filter((i) => i.kind === "certificate" && i.public !== false && i.title.trim())
+        .map((i) => ({ title: i.title.trim(), org: i.org.trim(), href: firstHttps(i.summary) }));
+      if (!layers.length) return { ...c, toolkit: { ...c.toolkit, layers: [], certs: [] } };
+      const scroll = toolkitScroll(layers.length, certs.length);
+      return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), toolkit: { title: s.technology.title.trim() || c.toolkit.title, layers, certs } };
+    }
     if (c.kind === "section" && c.showcase) {
       // The showcase grows one screen of scroll per featured project; with none, the section is skipped below.
       const scroll = showcaseScroll(featured.length);
@@ -116,5 +129,5 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       }
     }
     return { ...c, panels };
-  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || (c.showcase?.length ?? 0) > 0); // an empty section is skipped entirely
+  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || (c.showcase?.length ?? 0) > 0 || (c.toolkit?.layers.length ?? 0) > 0); // an empty section is skipped entirely
 }

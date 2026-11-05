@@ -75,6 +75,8 @@ export interface SectionChapter extends Base {
   wipe?: number;
   /** TKT-85: show one timeline dot per panel (the current one lit), labelled with each panel's eyebrow. */
   timeline?: boolean;
+  /** TKT-88: the exploded architecture stack (layers from the Technology section, badges from certificates). */
+  toolkit?: { title: string; layers: { name: string; how: string; tools: string[] }[]; certs: { title: string; org: string; href?: string }[] };
   /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
   showcase?: ShowcaseItem[];
 }

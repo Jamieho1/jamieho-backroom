@@ -109,4 +109,22 @@ describe("journey content (TKT-77)", () => {
     expect(ps[1].to).toBe(1);
     expect(withContent(HOME_CHAPTERS, { sections, experience: [item({ kind: "education" })], technologies: [] }).some((c) => c.id === "experience")).toBe(false);
   });
+
+  it("builds the Toolkit from '## layer' blocks plus public certificate badges, or falls back to project tags", () => {
+    const tech = { ...sections, technology: { key: "technology" as const, title: "Toolkit", body: "## Cloud\nAWS at work.\n- AWS, SQS\n## AI\n- LLMs" } };
+    const experience = [
+      item({ kind: "certificate", title: "AWS SA Pro", org: "AWS", summary: "[Credly](https://www.credly.com/badges/1)" }),
+      item({ kind: "certificate", title: "Hidden cert", public: false }),
+    ];
+    const tk = withContent(HOME_CHAPTERS, { sections: tech, experience, technologies: [] }).find((c) => c.id === "toolkit")!;
+    expect(tk.kind === "section" && tk.toolkit).toEqual({
+      title: "Toolkit",
+      layers: [{ name: "Cloud", how: "AWS at work.", tools: ["AWS", "SQS"] }, { name: "AI", how: "", tools: ["LLMs"] }],
+      certs: [{ title: "AWS SA Pro", org: "AWS", href: "https://www.credly.com/badges/1" }],
+    });
+    expect(tk.scroll).toBeCloseTo(0.5 + 2 * 0.7 + 0.6);
+    const fallback = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: ["Next.js", "Supabase"] }).find((c) => c.id === "toolkit")!;
+    expect(fallback.kind === "section" && fallback.toolkit?.layers).toEqual([{ name: "Stack", how: "", tools: ["Next.js", "Supabase"] }]);
+    expect(withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] }).some((c) => c.id === "toolkit")).toBe(false);
+  });
 });

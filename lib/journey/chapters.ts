@@ -31,6 +31,8 @@ export const HOME_CHAPTERS: Chapter[] = [
     still: { file: "still-westminster.jpg", side: "right" },
     panels: [{ id: "r1", from: 0.1, to: 1, side: "left", look: "role", eyebrow: "Role", title: "Experience", body: PLACEHOLDER }],
   },
+  // Toolkit (TKT-88): the one layered scene. An exploded architecture stack, then the certification badges.
+  { id: "toolkit", label: "Toolkit", nav: "Toolkit", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Toolkit", layers: [], certs: [] } },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   // The room (redesign 2026-11-05): walk to the desk, read "Now" and "Latest", then keep scrolling into the monitor.

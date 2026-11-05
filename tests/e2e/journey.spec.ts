@@ -90,3 +90,12 @@ test("with no featured projects or public roles, those sections are skipped, not
   await expect(nav.getByRole("button", { name: /Experience/ })).toHaveCount(0); // no public roles yet → skipped too
   await expect(page.locator('[data-chapter="projects"]')).toHaveCount(0);
 });
+
+test("the Toolkit stack lifts its layers as you scroll (falls back to project tags without '## layer' text)", async ({ page }) => {
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Toolkit/ }).click();
+  const tk = page.locator('[data-chapter="toolkit"]');
+  await expect(tk.locator(".journey-toolkit-item").first()).toBeVisible();
+  await expect(tk.locator(".journey-toolkit-plane").first()).toHaveAttribute("data-on", "true");
+});
