@@ -83,7 +83,7 @@ describe("journey timeline", () => {
       if (c.kind === "video" && c.keys) expect(() => validateKeys(c.keys!)).not.toThrow();
       for (const p of c.panels ?? []) expect(p.from).toBeLessThan(p.to);
     }
-    expect(ids.has("desk")).toBe(true);
+    expect(ids.has("room")).toBe(true);
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
 });

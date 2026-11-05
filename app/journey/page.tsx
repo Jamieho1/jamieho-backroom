@@ -6,6 +6,8 @@ import { getSections } from "@/lib/sections";
 import { getPublicExperience } from "@/lib/experience";
 import { getProjectApps } from "@/lib/projects";
 import { projectTechnologies } from "@/lib/home";
+import { socialLinks } from "@/lib/social";
+import { sendMessage } from "@/app/actions/contact";
 import "../journey.css";
 
 /** Home v1 preview (TKT-74): not linked or indexed until TKT-79 moves it onto `/`. */
@@ -25,6 +27,6 @@ export default async function JourneyPage() {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
     <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700&display=swap" />
-    <Journey chapters={chapters} base={MEDIA_BASE} />
+    <Journey chapters={chapters} base={MEDIA_BASE} socials={socialLinks(sections.contact.body)} send={sendMessage} />
   </main>;
 }

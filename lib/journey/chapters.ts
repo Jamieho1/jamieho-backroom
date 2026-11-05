@@ -55,12 +55,10 @@ export const HOME_CHAPTERS: Chapter[] = [
   { id: "arch", label: "Under the bridge", kind: "video", src: "c5b", scroll: 1.1, join: 0.05 },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
+  // The room: the camera settles at the desk and the journey stops there; the objects become clickable (TKT-78).
+  // c7b (desk → monitor) is no longer scrolled: it plays when the visitor clicks the monitor.
   {
-    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 1.6, motes: 0.3,
-    keys: [[0, 0], [0.42, 0.44], [0.46, 0.54], [1, 1]],
-  },
-  {
-    id: "desk", label: "Desk", kind: "video", src: "c7b", scroll: 1.6, join: 0.02,
-    panels: [{ id: "monitor", from: 0.9, to: 1.01, side: "left", eyebrow: "Desk", title: "Projects · Articles · Practice · Contact", body: "Placeholder: TKT-78 puts the launcher on the monitor." }],
+    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 2.2, motes: 0.3,
+    keys: [[0, 0], [0.36, 0.44], [0.4, 0.54], [0.84, 1], [1, 1]],
   },
 ];

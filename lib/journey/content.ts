@@ -49,7 +49,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           panels.push(at({ title: s.hero.title || "Jamie Ho", body: excerpt(s.hero.body), md: true }));
           break;
         case "imperial:imperial":
-          if (education) panels.push(at({ eyebrow: "Where it started", title: education.title, meta: meta(education), body: excerpt(education.summary, 220), md: false }));
+          if (education) panels.push(at({ eyebrow: "Where it started", title: education.title, meta: meta(education), body: excerpt(education.summary), md: false }));
           break;
         case "library:about":
         case "library:interests": {

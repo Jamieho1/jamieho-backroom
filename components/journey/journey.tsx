@@ -10,6 +10,10 @@ import {
 } from "@/lib/journey/timeline";
 import { LibraryScene, type LibrarySceneHandle } from "./library-scene";
 import { Motes, type MotesHandle } from "./motes";
+import { RoomHotspots, type RoomHandle } from "./room";
+import { ROOM_OBJECTS, roomOpacity } from "@/lib/journey/room";
+import type { ContactResult } from "@/lib/contact";
+import type { SocialLink } from "@/lib/social";
 import { Markdown } from "@/components/markdown";
 
 /**
@@ -19,7 +23,9 @@ import { Markdown } from "@/components/markdown";
  * bar and the chapter menu. Only transform/opacity animate (scroll-craft hard rules). All text is real HTML;
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
-export function Journey({ chapters, base }: { chapters: Chapter[]; base: string }) {
+type SendAction = (prev: ContactResult | null, form: FormData) => Promise<ContactResult>;
+
+export function Journey({ chapters, base, socials = [], send }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; send: SendAction }) {
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -29,6 +35,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const panels = useRef<Map<string, HTMLElement>>(new Map());
   const library = useRef<LibrarySceneHandle>(null);
   const motes = useRef<MotesHandle>(null);
+  const room = useRef<RoomHandle>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -61,12 +68,13 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0;
-    const yOf = (id: string) => st.start + (st.end - st.start) * progressOf(chapters, id, lay) + 1;
+    // The desk is the very end of the track (the room chapter holds its last frame there).
+    const yOf = (id: string) => id === "room" ? st.end : st.start + (st.end - st.start) * progressOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
     // Jump straight to the desk for /journey#desk (no forced tour).
     if (window.location.hash === "#desk") {
-      lenis.scrollTo(yOf("desk"), { immediate: true }); target = shown = progressOf(chapters, "desk", lay);
+      lenis.scrollTo(st.end, { immediate: true }); target = shown = 1;
     }
 
     // Word spans per panel, cached once.
@@ -116,6 +124,11 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           });
         }
       });
+      // Hotspots are cut from the clip's last frame, so only show them once the video has actually landed there
+      // (a seek can trail the scroll), otherwise the glow sits over the wrong picture.
+      const rv = active.id === "room" ? videos.current[index] : null;
+      const landed = !!rv && rv.duration > 0 && !rv.seeking && rv.currentTime >= rv.duration - 0.3;
+      room.current?.setOpacity(landed ? roomOpacity(local) : 0);
       motes.current?.setIntensity(active.kind === "fade" ? 0 : active.motes ?? 0);
       if (fadeEl.current) {
         fadeEl.current.style.opacity = active.kind === "fade" ? String(fadeCover(local)) : "0";
@@ -156,6 +169,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
               </div>
             ))}
             <div className="journey-vignette" aria-hidden="true" />
+            <RoomHotspots ref={room} base={base} zoomSrc="c7b" mobile={mobile} socials={socials} send={send} />
             <Motes ref={motes} />
             <div className="journey-grain" aria-hidden="true" />
             <div ref={fadeEl} className="journey-fade" />
@@ -194,7 +208,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} id={c.id === "desk" ? "desk" : undefined} className="journey-still">
+        <li key={c.id} id={c.id === "room" ? "desk" : undefined} className="journey-still">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={c.kind === "video" ? `${base}/${c.src}-${c.id === "sky" ? "first" : "last"}.jpg` : `${base}/lib-plate.jpg`} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
           {(c.panels ?? []).map((p) => (
@@ -202,6 +216,15 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
               <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
             </section>
           ))}
+          {c.id === "room" ? (
+            <nav className="journey-still-panel" aria-label="The desk">
+              <h2>The desk</h2>
+              <ul className="journey-sheet-links">
+                {ROOM_OBJECTS.flatMap((o) => o.action.kind === "zoom" || o.action.kind === "link" ? [{ label: o.label, href: o.action.href }]
+                  : o.action.kind === "menu" ? o.action.items : []).map((l) => <li key={l.href}><a href={l.href}>{l.label} <span>→</span></a></li>)}
+              </ul>
+            </nav>
+          ) : null}
         </li>
       ))}
     </ol>
