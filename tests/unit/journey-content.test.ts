@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
-import { excerpt, spread, withContent } from "@/lib/journey/content";
+import { CONTACT_HREF, DESKTOP_HREF, excerpt, spread, withContent } from "@/lib/journey/content";
 import { FALLBACK_SECTIONS } from "@/lib/sections";
 import type { Item } from "@/lib/experience";
 
@@ -38,7 +38,7 @@ describe("journey content (TKT-77)", () => {
       item({ title: "Engineer", org: "B" }),
     ];
     const out = withContent(HOME_CHAPTERS, { sections, experience, technologies: ["TypeScript", "Supabase"] });
-    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true });
+    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true, cta: { href: DESKTOP_HREF } });
     expect(panelsOf(out, "imperial")[0]).toMatchObject({ title: "MEng", meta: "Uni · 2016–2020" });
     const lib = panelsOf(out, "library");
     expect(lib.map((p) => p.id)).toEqual(["about", "technology"]); // empty interests dropped
@@ -53,5 +53,29 @@ describe("journey content (TKT-77)", () => {
     expect(panelsOf(out, "imperial")).toEqual([]);
     expect(panelsOf(out, "westminster")).toEqual([]);
     expect(panelsOf(out, "library").map((p) => p.id)).toEqual(["about"]);
+  });
+
+  it("fills the desk with Now and Latest, with a contact line from the Contact section", () => {
+    const latest = {
+      video: { slug: "v", title: "My video", platform: "youtube" as const, source_url: "https://youtube.com/watch?v=x", cover_url: "https://img/v.jpg", created_at: "" },
+      article: { slug: "a-post", title: "My post", platform: "other" as const, source_url: "", cover_url: "", created_at: "" },
+    };
+    const withNow = { ...sections, now: { key: "now" as const, title: "Now", body: "Building things." },
+      contact: { key: "contact" as const, title: "Contact", body: "[YT](https://www.youtube.com/@me) [IG](https://instagram.com/me)" } };
+    const room = panelsOf(withContent(HOME_CHAPTERS, { sections: withNow, experience: [], technologies: [], latest }), "room");
+    expect(room.map((p) => p.id)).toEqual(["now", "latest"]);
+    expect(room[0]).toMatchObject({ title: "Now", body: "Building things." });
+    expect(room[1].links).toEqual([
+      { kicker: "Latest video", title: "My video", href: "https://youtube.com/watch?v=x", image: "https://img/v.jpg", external: true },
+      { kicker: "Latest article", title: "My post", href: "/articles/a-post", image: undefined },
+    ]);
+    expect(room[1].foot?.map((f) => f.label)).toEqual(["Say hello", "YouTube", "Instagram"]);
+    expect(room[1].foot?.[0].href).toBe(CONTACT_HREF);
+  });
+
+  it("hides Now when it is empty and still offers the contact line", () => {
+    const room = panelsOf(withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] }), "room");
+    expect(room.map((p) => p.id)).toEqual(["latest"]);
+    expect(room[0].links).toEqual([]);
   });
 });

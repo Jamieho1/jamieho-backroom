@@ -55,10 +55,16 @@ export const HOME_CHAPTERS: Chapter[] = [
   { id: "arch", label: "Under the bridge", kind: "video", src: "c5b", scroll: 1.1, join: 0.05 },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
-  // The room: the camera settles at the desk and the journey stops there; the objects become clickable (TKT-78).
-  // c7b (desk → monitor) is no longer scrolled: it plays when the visitor clicks the monitor.
+  // The room (redesign 2026-11-05): walk to the desk, read "Now" and "Latest", then keep scrolling into the monitor.
+  // Nothing in the room is clickable; the one action is switching the computer on at the very end.
   {
-    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 2.2, motes: 0.3,
-    keys: [[0, 0], [0.36, 0.44], [0.4, 0.54], [0.84, 1], [1, 1]],
+    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 3, motes: 0.3,
+    keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [0.5, 1], [1, 1]],
+    panels: [
+      { id: "now", from: 0.5, to: 0.73, side: "left", eyebrow: "At the desk", title: "Now", body: PLACEHOLDER },
+      { id: "latest", from: 0.74, to: 0.97, side: "right", eyebrow: "Fresh off the desk", title: "Latest" },
+    ],
   },
+  // C7b scrubbed: the camera pushes into the monitor until it fills the screen, then "switch it on" (BMW-style).
+  { id: "screen", label: "Computer", nav: "Computer", kind: "video", src: "c7b", scroll: 1.4, join: 0.08 },
 ];

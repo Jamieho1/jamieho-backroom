@@ -5,16 +5,27 @@
  * - Imperial: the first public education entry (title · org · dates).
  * - Library: `about`, `interests`, `technology` (+ technologies used by public projects).
  * - Westminster: every other public experience entry, in order, stepping in one after another.
+ * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
+ *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
  */
 import type { Item } from "@/lib/experience";
 import type { Section, SectionKey } from "@/lib/sections";
-import type { Chapter, Panel } from "./timeline";
+import type { LatestItem } from "@/lib/articles-public";
+import { articleHref } from "@/lib/articles";
+import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
+import type { Chapter, Panel, PanelLink } from "./timeline";
+
+/** Where "switch on the computer" leads. The desktop moves to /desktop when the journey takes over / (TKT-79). */
+export const DESKTOP_HREF = "/";
+/** The contact form on the existing site. */
+export const CONTACT_HREF = "/about#home-contact";
 
 export interface JourneyContent {
   sections: Record<SectionKey, Section>;
   experience: Item[];
   technologies: string[];
+  latest?: { video: LatestItem | null; article: LatestItem | null };
 }
 
 /** Keep panels short: the first paragraph, cut at a word boundary. Markdown is kept (rendered safely). */
@@ -46,8 +57,20 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       const at = (patch: Partial<Panel>): Panel => ({ ...p, ...patch });
       switch (`${c.id}:${p.id}`) {
         case "sky:hero":
-          panels.push(at({ title: s.hero.title || "Jamie Ho", body: excerpt(s.hero.body), md: true }));
+          panels.push(at({ title: s.hero.title || "Jamie Ho", body: excerpt(s.hero.body), md: true, cta: { label: "Go straight to my desktop", href: DESKTOP_HREF } }));
           break;
+        case "room:now":
+          if (plain(s.now.body)) panels.push(at({ title: s.now.title || p.title, body: excerpt(s.now.body), md: true }));
+          break;
+        case "room:latest": {
+          const links: PanelLink[] = [];
+          const { video, article } = content.latest ?? { video: null, article: null };
+          if (video) links.push({ kicker: "Latest video", title: video.title, href: video.source_url, image: video.cover_url || undefined, external: true });
+          if (article) links.push({ kicker: "Latest article", title: article.title, href: articleHref(article.slug), image: article.cover_url || undefined });
+          const foot = [{ label: "Say hello", href: CONTACT_HREF }, ...socialLinks(s.contact.body).map((l) => ({ label: SOCIAL_LABEL[l.kind], href: l.href }))];
+          panels.push(at({ links, foot }));
+          break;
+        }
         case "imperial:imperial":
           if (education) panels.push(at({ eyebrow: "Where it started", title: education.title, meta: meta(education), body: excerpt(education.summary), md: false }));
           break;

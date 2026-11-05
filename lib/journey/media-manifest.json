@@ -1,0 +1,158 @@
+{
+  "c1-desktop.mp4": {
+    "v": "5aec486d",
+    "bytes": 1586848
+  },
+  "c1-first.jpg": {
+    "v": "315cc97d",
+    "bytes": 172197
+  },
+  "c1-last.jpg": {
+    "v": "b8057664",
+    "bytes": 21539
+  },
+  "c1-mobile.mp4": {
+    "v": "6b9e5de7",
+    "bytes": 1015238
+  },
+  "c2-desktop.mp4": {
+    "v": "9eb9d6c0",
+    "bytes": 3344915
+  },
+  "c2-first.jpg": {
+    "v": "445c5766",
+    "bytes": 20776
+  },
+  "c2-last.jpg": {
+    "v": "cd2e896c",
+    "bytes": 255511
+  },
+  "c2-mobile.mp4": {
+    "v": "bb040fcc",
+    "bytes": 1854055
+  },
+  "c3a-desktop.mp4": {
+    "v": "ee489169",
+    "bytes": 5678084
+  },
+  "c3a-first.jpg": {
+    "v": "f2062cd7",
+    "bytes": 252317
+  },
+  "c3a-last.jpg": {
+    "v": "81f635ed",
+    "bytes": 190739
+  },
+  "c3a-mobile.mp4": {
+    "v": "5ff6b833",
+    "bytes": 2667880
+  },
+  "c3b-desktop.mp4": {
+    "v": "83661dee",
+    "bytes": 3767786
+  },
+  "c3b-first.jpg": {
+    "v": "fb4291b0",
+    "bytes": 199207
+  },
+  "c3b-last.jpg": {
+    "v": "e06be871",
+    "bytes": 237501
+  },
+  "c3b-mobile.mp4": {
+    "v": "9e3d82eb",
+    "bytes": 2042918
+  },
+  "c5a-desktop.mp4": {
+    "v": "8d1e3514",
+    "bytes": 5507032
+  },
+  "c5a-first.jpg": {
+    "v": "479fbc94",
+    "bytes": 228193
+  },
+  "c5a-last.jpg": {
+    "v": "b51dca3b",
+    "bytes": 244581
+  },
+  "c5a-mobile.mp4": {
+    "v": "9260997e",
+    "bytes": 2890462
+  },
+  "c5b-desktop.mp4": {
+    "v": "286fa6ea",
+    "bytes": 2380028
+  },
+  "c5b-first.jpg": {
+    "v": "b5ad434b",
+    "bytes": 241435
+  },
+  "c5b-last.jpg": {
+    "v": "7db58095",
+    "bytes": 168714
+  },
+  "c5b-mobile.mp4": {
+    "v": "6700953a",
+    "bytes": 1284441
+  },
+  "c7a-desktop.mp4": {
+    "v": "27257f27",
+    "bytes": 2053196
+  },
+  "c7a-first.jpg": {
+    "v": "d89016fb",
+    "bytes": 134747
+  },
+  "c7a-last.jpg": {
+    "v": "cc1fd617",
+    "bytes": 123730
+  },
+  "c7a-mobile.mp4": {
+    "v": "b4b99d83",
+    "bytes": 1200610
+  },
+  "c7b-desktop.mp4": {
+    "v": "ba863363",
+    "bytes": 1337542
+  },
+  "c7b-first.jpg": {
+    "v": "58a5ee88",
+    "bytes": 132355
+  },
+  "c7b-last.jpg": {
+    "v": "64380441",
+    "bytes": 35065
+  },
+  "c7b-mobile.mp4": {
+    "v": "95d62680",
+    "bytes": 761481
+  },
+  "lib-plate.jpg": {
+    "v": "4d36ce48",
+    "bytes": 772793
+  },
+  "lib-props.png": {
+    "v": "4d5b6828",
+    "bytes": 96010
+  },
+  "room-keyboard.png": {
+    "v": "3cc0a43d",
+    "bytes": 32495
+  },
+  "room-mic.png": {
+    "v": "97d34398",
+    "bytes": 12624
+  },
+  "room-monitor.png": {
+    "v": "420d8f18",
+    "bytes": 52742
+  },
+  "room-shelf.png": {
+    "v": "c878c698",
+    "bytes": 5792
+  },
+  "room-tablet.png": {
+    "v": "df256de1",
+    "bytes": 12801
+  }
+}

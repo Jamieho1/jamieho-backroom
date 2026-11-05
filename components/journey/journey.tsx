@@ -6,14 +6,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
   type Chapter, type Panel, type VideoChapter, alignAt, approach, displayOpacity, fadeCover, joinOpacity, layout, locate,
-  mapKeys, panelOpacity, progressOf, wordReveal,
+  ctaOpacity, mapKeys, panelOpacity, progressOf, wordReveal,
 } from "@/lib/journey/timeline";
 import { LibraryScene, type LibrarySceneHandle } from "./library-scene";
 import { Motes, type MotesHandle } from "./motes";
-import { RoomHotspots, type RoomHandle } from "./room";
-import { ROOM_OBJECTS, roomOpacity } from "@/lib/journey/room";
-import type { ContactResult } from "@/lib/contact";
-import type { SocialLink } from "@/lib/social";
+import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
+import { StartScreen } from "./start-screen";
+import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
+import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
+import { DESKTOP_HREF } from "@/lib/journey/content";
 import { Markdown } from "@/components/markdown";
 
 /**
@@ -23,9 +24,8 @@ import { Markdown } from "@/components/markdown";
  * bar and the chapter menu. Only transform/opacity animate (scroll-craft hard rules). All text is real HTML;
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
-type SendAction = (prev: ContactResult | null, form: FormData) => Promise<ContactResult>;
 
-export function Journey({ chapters, base, socials = [], send }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; send: SendAction }) {
+export function Journey({ chapters, base }: { chapters: Chapter[]; base: string }) {
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -35,13 +35,20 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
   const panels = useRef<Map<string, HTMLElement>>(new Map());
   const library = useRef<LibrarySceneHandle>(null);
   const motes = useRef<MotesHandle>(null);
-  const room = useRef<RoomHandle>(null);
+  const cta = useRef<ScreenCtaHandle>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const hud = useRef<HTMLDivElement>(null);
   const jump = useRef<(id: string) => void>(() => {});
+  const skip = useRef<() => void>(() => {});
+  const lenisRef = useRef<Lenis | null>(null);
+  const ready = useRef<boolean[]>([]);
+  const preloader = useRef<Preloader | null>(null);
   const [live, setLive] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [startShown, setStartShown] = useState(true);
+  const [ring, setRing] = useState(0);
   const [mobile, setMobile] = useState(false);
   const [debug, setDebug] = useState(false);
 
@@ -50,15 +57,52 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
     setMobile(window.matchMedia("(max-width: 768px)").matches);
     setDebug(new URLSearchParams(window.location.search).has("debug"));
     setLive(!reduce.matches);
+    if (window.location.hash === "#desk") { setEntered(true); setStartShown(false); } // deep link: straight to the desk
     const onChange = () => setLive(!reduce.matches);
     reduce.addEventListener("change", onChange);
     return () => reduce.removeEventListener("change", onChange);
   }, []);
 
+  // TKT-76: download the clips whole, in chapter order, and swap each chapter from its still to its video as it lands.
+  useEffect(() => {
+    if (!live) return;
+    registerMediaCache();
+    const variant = mobile ? "mobile" : "desktop";
+    const items = preloadOrder(chapters, variant, window.location.hash === "#desk" ? "c7b" : undefined);
+    if (shouldSkipVideo()) { setRing(1); return; }
+    const loaded: Record<string, number> = {};
+    let shownRing = 0;
+    preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
+      progress(src, bytes) {
+        loaded[src] = bytes;
+        const r = Math.floor(startProgress(items, loaded) * 100) / 100;
+        if (r !== shownRing) { shownRing = r; setRing(r); }
+      },
+      ready(src, blobUrl) {
+        chapters.forEach((c, i) => {
+          const v = videos.current[i];
+          if (c.kind !== "video" || c.src !== src || !v) return;
+          v.addEventListener("loadeddata", () => { ready.current[i] = true; }, { once: true });
+          v.src = blobUrl;
+          // iOS only lets a video seek smoothly once it has played; it's muted and inline, so this is allowed.
+          void v.play().then(() => v.pause()).catch(() => {});
+        });
+      },
+    });
+    return () => { preloader.current?.dispose(); preloader.current = null; ready.current = []; };
+  }, [live, mobile, chapters, base]);
+
+  const enter = () => {
+    // Inside the tap: let every clip that has already arrived play once, so iOS lets it scrub.
+    videos.current.forEach((v) => { if (v?.src) void v.play().then(() => v.pause()).catch(() => {}); });
+    setEntered(true);
+  };
+
   useEffect(() => {
     if (!live || !track.current) return;
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9 });
+    lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (t: number) => lenis.raf(t * 1000);
     gsap.ticker.add(tick);
@@ -68,14 +112,13 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0;
-    // The desk is the very end of the track (the room chapter holds its last frame there).
-    const yOf = (id: string) => id === "room" ? st.end : st.start + (st.end - st.start) * progressOf(chapters, id, lay) + 1;
+    // The computer is the very end of the track (where "Switch on" appears); other chapters jump to their start.
+    const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * progressOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
-    // Jump straight to the desk for /journey#desk (no forced tour).
-    if (window.location.hash === "#desk") {
-      lenis.scrollTo(st.end, { immediate: true }); target = shown = 1;
-    }
+    // Straight to the switched-off computer for /journey#desk links (no forced tour).
+    skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
+    if (window.location.hash === "#desk") skip.current();
 
     // Word spans per panel, cached once.
     const words = new Map<string, HTMLElement[]>();
@@ -98,7 +141,7 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
-        if (c.kind === "video") drawVideo(c, videos.current[i], el, at);
+        if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base);
         if (c.kind === "layers" && opacity > 0) library.current?.setProgress(at);
         const d = displays.current[i];
         if (d) {
@@ -126,9 +169,10 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
       });
       // Hotspots are cut from the clip's last frame, so only show them once the video has actually landed there
       // (a seek can trail the scroll), otherwise the glow sits over the wrong picture.
-      const rv = active.id === "room" ? videos.current[index] : null;
-      const landed = !!rv && rv.duration > 0 && !rv.seeking && rv.currentTime >= rv.duration - 0.3;
-      room.current?.setOpacity(landed ? roomOpacity(local) : 0);
+      // "Switch on" appears once the push-in has (nearly) filled the frame with the monitor.
+      const cv = active.id === "screen" ? videos.current[index] : null;
+      const filled = !!cv && (!ready.current[index] || (cv.duration > 0 && !cv.seeking && cv.currentTime >= cv.duration * 0.8));
+      cta.current?.setOpacity(filled ? ctaOpacity(local) : 0);
       motes.current?.setIntensity(active.kind === "fade" ? 0 : active.motes ?? 0);
       if (fadeEl.current) {
         fadeEl.current.style.opacity = active.kind === "fade" ? String(fadeCover(local)) : "0";
@@ -143,8 +187,20 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy(); jump.current = () => {}; };
-  }, [live, chapters, lay, navItems]);
+    return () => {
+      cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
+      lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
+    };
+  }, [live, chapters, lay, navItems, base]);
+
+  // Declared after the engine so Lenis exists. The start screen holds the page still until the visitor enters (or skips to the desk).
+  useEffect(() => {
+    if (!live || entered) return;
+    const html = document.documentElement;
+    html.style.overflow = "hidden";
+    lenisRef.current?.stop();
+    return () => { html.style.overflow = ""; lenisRef.current?.start(); };
+  }, [live, entered]);
 
   return (
     <div className={`journey${live ? " journey-live" : ""}`}>
@@ -155,8 +211,9 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
               <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : ""}`} data-chapter={c.id}>
                 {c.kind === "video" ? (
                   <div className="journey-frame">
-                    <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="auto"
-                      poster={`${base}/${c.src}-first.jpg`} src={`${base}/${c.src}-${mobile ? "mobile" : "desktop"}.mp4`} />
+                    {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
+                    <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
+                      poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
                 ) : c.kind === "layers" ? <LibraryScene ref={library} base={base} /> : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
@@ -169,7 +226,7 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
               </div>
             ))}
             <div className="journey-vignette" aria-hidden="true" />
-            <RoomHotspots ref={room} base={base} zoomSrc="c7b" mobile={mobile} socials={socials} send={send} />
+            <ScreenCta ref={cta} href={DESKTOP_HREF} />
             <Motes ref={motes} />
             <div className="journey-grain" aria-hidden="true" />
             <div ref={fadeEl} className="journey-fade" />
@@ -184,6 +241,10 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
               </nav>
             ) : null}
             {debug ? <div ref={hud} className="journey-hud" /> : null}
+            {startShown ? (
+              <StartScreen still={mediaUrl(base, "c1-first.jpg")} hero={chapters[0]?.panels?.[0]} progress={ring}
+                desktopHref={DESKTOP_HREF} onEnter={enter} onGone={() => setStartShown(false)} />
+            ) : null}
           </div>
         </div>
       ) : (
@@ -193,11 +254,17 @@ export function Journey({ chapters, base, socials = [], send }: { chapters: Chap
   );
 }
 
-function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: HTMLElement, local: number) {
+function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: HTMLElement, local: number, ready: boolean, base: string) {
   if (!v) return;
   const a = alignAt(c, local);
   const frame = el.firstElementChild as HTMLElement | null;
   if (frame) frame.style.transform = a.scale === 1 && !a.x && !a.y ? "" : `translate3d(${a.x * 100}%, ${a.y * 100}%, 0) scale(${a.scale})`;
+  if (!ready) {
+    // Clip still downloading: show the approved still for this part of the chapter, never a frozen half-loaded frame.
+    const still = stillFor(c.src, local);
+    if (v.dataset.still !== still) { v.dataset.still = still; v.poster = mediaUrl(base, still); }
+    return;
+  }
   if (!v.duration || v.seeking) return;
   const t = mapKeys(c.keys, local) * Math.max(0, v.duration - 0.05);
   if (Math.abs(v.currentTime - t) > 1 / 60) v.currentTime = t;
@@ -210,19 +277,15 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
         <li key={c.id} id={c.id === "room" ? "desk" : undefined} className="journey-still">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={c.kind === "video" ? `${base}/${c.src}-${c.id === "sky" ? "first" : "last"}.jpg` : `${base}/lib-plate.jpg`} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
+          <img src={mediaUrl(base, c.kind === "video" ? `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg` : "lib-plate.jpg")} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
           {(c.panels ?? []).map((p) => (
             <section key={p.id} className="journey-still-panel" aria-label={p.title}>
               <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
             </section>
           ))}
-          {c.id === "room" ? (
-            <nav className="journey-still-panel" aria-label="The desk">
-              <h2>The desk</h2>
-              <ul className="journey-sheet-links">
-                {ROOM_OBJECTS.flatMap((o) => o.action.kind === "zoom" || o.action.kind === "link" ? [{ label: o.label, href: o.action.href }]
-                  : o.action.kind === "menu" ? o.action.items : []).map((l) => <li key={l.href}><a href={l.href}>{l.label} <span>→</span></a></li>)}
-              </ul>
+          {c.id === "screen" ? (
+            <nav className="journey-still-panel" aria-label="The computer">
+              <a className="journey-cta-link" href={DESKTOP_HREF}>Switch on the computer <span>→</span></a>
             </nav>
           ) : null}
         </li>
@@ -243,5 +306,26 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
+    {p.links?.length ? (
+      <ul className="journey-links">
+        {p.links.map((l) => (
+          <li key={l.href}>
+            <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {l.image ? <img src={l.image} alt="" loading="lazy" /> : <span className="journey-link-blank" aria-hidden="true" />}
+              <span><span className="journey-link-kicker">{l.kicker}</span><span className="journey-link-title">{l.title}</span></span>
+              <span className="journey-link-go" aria-hidden="true">{l.external ? "↗" : "→"}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : null}
+    {p.foot?.length ? (
+      <p className="journey-foot">{p.foot.map((f, k) => (
+        <a key={f.href} href={f.href} {...(/^https?:/.test(f.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className={k === 0 ? "is-primary" : undefined}>{f.label}</a>
+      ))}</p>
+    ) : null}
+    {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}
   </>;
 }

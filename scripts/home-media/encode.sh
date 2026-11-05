@@ -18,4 +18,5 @@ ffmpeg -v error -y -i "$src" -an -vf "${vf}scale=1280:720:flags=lanczos,format=y
 ffmpeg -v error -y -i "$src" -an -vf "${vf}scale=960:540:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -crf 28 -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart "$out/$id-mobile.mp4"
 ffmpeg -v error -y -i "$out/$id-desktop.mp4" -frames:v 1 -q:v 3 "$out/$id-first.jpg"
 ffmpeg -v error -y -sseof -0.08 -i "$out/$id-desktop.mp4" -frames:v 1 -update 1 -q:v 3 "$out/$id-last.jpg"
+echo "(next: node scripts/home-media/manifest.mjs, upload, commit the manifest)"
 echo "$id: $(du -h "$out/$id-desktop.mp4" | cut -f1) desktop, $(du -h "$out/$id-mobile.mp4" | cut -f1) phone"

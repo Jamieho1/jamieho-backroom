@@ -21,3 +21,10 @@ The library scene uses `lib-plate.jpg` (wide plate from S3a/S3b/S3c, props and w
 
 Live site: upload every file in `public/home-media/` to the bucket root, then set the Vercel env var
 `NEXT_PUBLIC_HOME_MEDIA_URL=https://<project-ref>.supabase.co/storage/v1/object/public/home-media` and redeploy.
+
+## After encoding or replacing any file (TKT-76)
+
+1. `node scripts/home-media/manifest.mjs` — re-hashes everything in `public/home-media/` into `lib/journey/media-manifest.json`.
+2. Upload the changed files to the `home-media` bucket (same names, replace).
+3. Commit the manifest. Pages request `<file>?v=<hash>`, so browsers and the media service worker (`public/media-sw.js`)
+   fetch the new file immediately and keep it cached for good.

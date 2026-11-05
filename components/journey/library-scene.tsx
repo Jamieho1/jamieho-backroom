@@ -2,6 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { mediaUrl } from "@/lib/journey/media";
 
 /**
  * Library pass in code (Jamie 2026-11-04: the generated clip was poor). Layers built offline from the three library
@@ -44,12 +45,12 @@ export const LibraryScene = forwardRef<LibrarySceneHandle, { base: string }>(fun
   return (
     <div className="journey-frame journey-library" aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img ref={plate} className="journey-layer" src={`${base}/lib-plate.jpg`} alt="" draggable={false}
+      <img ref={plate} className="journey-layer" src={mediaUrl(base, "lib-plate.jpg")} alt="" draggable={false}
         style={{ left: pctX(-PLATE.pad), top: 0, width: pctX(PLATE.w), height: "100%" }} />
       <div ref={m1} className="journey-mullion" style={{ left: pctX(1390), top: 0, width: pctX(MULLION.w), height: pctY(MULLION.h) }} />
       <div ref={m2} className="journey-mullion" style={{ left: pctX(1390 - 1630), top: 0, width: pctX(MULLION.w), height: pctY(MULLION.h) }} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img ref={props} className="journey-layer journey-props" src={`${base}/lib-props.png`} alt="" draggable={false}
+      <img ref={props} className="journey-layer journey-props" src={mediaUrl(base, "lib-props.png")} alt="" draggable={false}
         style={{ left: pctX(PROPS.x), top: pctY(PROPS.y), width: pctX(PROPS.w), height: pctY(PROPS.h) }} />
     </div>
   );

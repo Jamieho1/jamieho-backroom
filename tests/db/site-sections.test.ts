@@ -19,12 +19,12 @@ beforeAll(async () => {
 describe("site_sections", () => {
   it("keeps the original placeholders and seeds optional sections without personal copy", async () => {
     const r = await db.query<{ key: string; body: string }>("select key, body from public.site_sections order by sort");
-    expect(r.rows.map((x) => x.key)).toEqual(["hero", "about", "interests", "technology", "writing", "contact"]);
+    expect(r.rows.map((x) => x.key)).toEqual(["hero", "now", "about", "interests", "technology", "writing", "contact"]);
     for (const row of r.rows.filter(row => ["about", "writing", "contact"].includes(row.key))) expect(row.body).toMatch(/^\*.*\*$/);
-    for (const row of r.rows.filter(row => ["interests", "technology"].includes(row.key))) expect(row.body).toBe("");
+    for (const row of r.rows.filter(row => ["now", "interests", "technology"].includes(row.key))) expect(row.body).toBe("");
   });
   it("anyone can read it, without signing in", async () => {
-    expect(await as(db, anon, (q) => q("select key from public.site_sections"))).toHaveLength(6);
+    expect(await as(db, anon, (q) => q("select key from public.site_sections"))).toHaveLength(7);
   });
   it("visitors and members can't change it", async () => {
     await expect(as(db, anon, (q) => q("update public.site_sections set body = 'x'"))).rejects.toThrow(/permission denied/);
@@ -44,7 +44,7 @@ describe("site_sections", () => {
   it("only known section keys exist", async () => {
     await expect(db.query("insert into public.site_sections (key) values ('cv')")).rejects.toThrow(/check/);
   });
-  for (const key of ["interests", "technology"]) it(`${key} is publicly readable and only the owner can edit or clear it`, async () => {
+  for (const key of ["now", "interests", "technology"]) it(`${key} is publicly readable and only the owner can edit or clear it`, async () => {
     expect(await as(db, anon, q => q("select body from public.site_sections where key=$1", [key]))).toEqual([{ body: "" }]);
     expect(await as(db, member, q => q("update public.site_sections set body='not allowed' where key=$1 returning key", [key]))).toEqual([]);
     await expect(as(db, anon, q => q("update public.site_sections set body='not allowed' where key=$1", [key]))).rejects.toThrow(/permission denied/);

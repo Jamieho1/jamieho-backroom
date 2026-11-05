@@ -20,7 +20,9 @@ export function HomeEditableStop({ section, fallback }: { section: Section; fall
       <EditableSection sectionKey={section.key} title={section.title} body={section.body} className="block" emptyContent={fallback}>
         {section.body.trim() ? <Markdown text={section.body} /> : fallback}
       </EditableSection>
-      {editing ? <p className="home-edit-hint">{fallback ? "Leave the text blank to use the technologies from your project tags." : "Add your interests here. Leave the text blank to hide this section from visitors."}</p> : null}
+      {editing ? <p className="home-edit-hint">{fallback ? "Leave the text blank to use the technologies from your project tags."
+        : section.key === "now" ? "What you're doing right now, in two or three lines. It also shows at the desk in the journey. Leave it blank to hide it."
+        : "Add your interests here. Leave the text blank to hide this section from visitors."}</p> : null}
     </HomeStop>
   );
 }

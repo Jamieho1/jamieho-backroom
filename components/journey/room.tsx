@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ROOM_OBJECTS, boxStyle, type RoomObject } from "@/lib/journey/room";
+import { mediaUrl } from "@/lib/journey/media";
 import { ContactForm } from "@/components/contact-form";
 import type { ContactResult } from "@/lib/contact";
 import { SOCIAL_LABEL, type SocialLink } from "@/lib/social";
@@ -15,8 +16,8 @@ export interface RoomHandle { setOpacity(o: number): void }
  * place in the final frame; its cut-out glows along the outline on hover/focus with a label. The monitor plays the
  * push-in clip (c7b) and then opens Projects; the shelf and mic open small menus; the keyboard opens the contact form.
  */
-export const RoomHotspots = forwardRef<RoomHandle, { base: string; zoomSrc: string; mobile: boolean; socials: SocialLink[]; send: SendAction }>(
-  function RoomHotspots({ base, zoomSrc, mobile, socials, send }, ref) {
+export const RoomHotspots = forwardRef<RoomHandle, { base: string; zoomUrl: string; socials: SocialLink[]; send: SendAction }>(
+  function RoomHotspots({ base, zoomUrl, socials, send }, ref) {
     const root = useRef<HTMLDivElement>(null);
     const zoom = useRef<HTMLVideoElement>(null);
     const [open, setOpen] = useState<RoomObject["id"] | null>(null);
@@ -76,14 +77,14 @@ export const RoomHotspots = forwardRef<RoomHandle, { base: string; zoomSrc: stri
               aria-label={`${o.label}: ${o.hint}`} aria-expanded={o.action.kind === "menu" || o.action.kind === "socials" || o.action.kind === "contact" ? open === o.id : undefined}
               onClick={() => activate(o)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${base}/room-${o.id}.png`} alt="" draggable={false} style={{
+              <img src={mediaUrl(base, `room-${o.id}.png`)} alt="" draggable={false} style={{
                 left: `${(6 / (o.box.w + 12)) * 100}%`, width: `${(o.box.w / (o.box.w + 12)) * 100}%`,
                 top: `${(6 / (o.box.h + 12)) * 100}%`, height: `${(o.box.h / (o.box.h + 12)) * 100}%` }} />
               <span className="journey-hot-label" aria-hidden="true">{o.label} <span>→</span></span>
             </button>
           ))}
-          <video ref={zoom} className={`journey-zoom${zooming ? " is-on" : ""}`} muted playsInline preload="auto"
-            src={`${base}/${zoomSrc}-${mobile ? "mobile" : "desktop"}.mp4`} aria-hidden="true" />
+          <video ref={zoom} className={`journey-zoom${zooming ? " is-on" : ""}`} muted playsInline preload="none"
+            src={zoomUrl} aria-hidden="true" />
         </div>
 
         {open === "shelf" ? (

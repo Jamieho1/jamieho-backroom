@@ -6,6 +6,8 @@
 /** [scroll fraction, media fraction] pairs, both 0..1, strictly increasing in scroll. Slow reading = shallow slope. */
 export type Keys = readonly (readonly [number, number])[];
 
+export interface PanelLink { kicker: string; title: string; href: string; image?: string; external?: boolean }
+
 export interface Panel {
   id: string;
   /** Visible between these local scroll fractions (fades in/out over `fade`). */
@@ -21,6 +23,12 @@ export interface Panel {
   md?: boolean;
   /** Short tags shown under the body (e.g. technologies). */
   chips?: string[];
+  /** Link cards (the desk's "Latest" panel): kicker, title, where it goes, optional cover image. */
+  links?: PanelLink[];
+  /** A row of small inline links under everything else (e.g. "Say hello" + socials). */
+  foot?: { label: string; href: string }[];
+  /** One call-to-action button (e.g. the hero's "Go straight to my desktop"). */
+  cta?: { label: string; href: string };
 }
 
 interface Base {
@@ -169,4 +177,10 @@ export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): nu
   if (n <= 1) return o;
   const start = (i / (n - 1)) * spreadAmt;
   return clamp01((o - start) / (1 - spreadAmt));
+}
+
+/** The end-of-journey "Switch on" button: fades in over the last stretch of the push-in (smoothstep). */
+export function ctaOpacity(local: number, at = 0.82): number {
+  const t = (local - at) / (1 - at) * 2;
+  return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
 }

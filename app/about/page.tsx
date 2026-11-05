@@ -41,6 +41,7 @@ export default async function AboutMe() {
         <Markdown text={s.about.body} />
       </EditableSection>
       }>
+      <HomeEditableStop section={s.now} />
       <HomeEditableStop section={s.interests} />
       <HomeEditableStop section={s.technology} fallback={toolkit} />
       <HomeStop id="work" className="home-stop-wide">

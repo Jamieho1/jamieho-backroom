@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import {
-  type Chapter, alignAt, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
+  type Chapter, alignAt, ctaOpacity, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
 } from "@/lib/journey/timeline";
 
 const demo: Chapter[] = [
@@ -62,6 +62,13 @@ describe("journey timeline", () => {
     expect(approach(0.999999, 1, 16)).toBe(1);
   });
 
+  it("fades the Switch on button in over the end of the push-in", () => {
+    expect(ctaOpacity(0.5)).toBe(0);
+    expect(ctaOpacity(0.82)).toBe(0);
+    expect(ctaOpacity(1)).toBe(1);
+    expect(ctaOpacity(0.88)).toBeGreaterThan(0);
+  });
+
   it("shows the giant chapter word only as the chapter begins", () => {
     expect(displayOpacity(0)).toBe(1);
     expect(displayOpacity(0.05)).toBe(1);
@@ -84,6 +91,7 @@ describe("journey timeline", () => {
       for (const p of c.panels ?? []) expect(p.from).toBeLessThan(p.to);
     }
     expect(ids.has("room")).toBe(true);
+    expect(HOME_CHAPTERS.at(-1)?.id).toBe("screen"); // the journey ends on the monitor's "Switch on"
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
 });

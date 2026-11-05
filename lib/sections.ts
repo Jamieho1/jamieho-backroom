@@ -5,7 +5,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readSupabaseEnv } from "@/lib/env";
 
-export const SECTION_KEYS = ["hero", "about", "interests", "technology", "writing", "contact"] as const;
+export const SECTION_KEYS = ["hero", "now", "about", "interests", "technology", "writing", "contact"] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
 export interface Section {
   key: SectionKey;
@@ -19,6 +19,7 @@ export const MAX_TITLE = 120;
 /** Used only when Supabase isn't configured (local dev without keys, CI). Placeholders, no personal text. */
 export const FALLBACK_SECTIONS: Record<SectionKey, Section> = {
   hero: { key: "hero", title: "Jamie Ho", body: "Software engineer in London." },
+  now: { key: "now", title: "Now", body: "" },
   about: { key: "about", title: "About", body: "*Write a short paragraph about yourself here.*" },
   interests: { key: "interests", title: "Interests", body: "" },
   technology: { key: "technology", title: "Technology", body: "" },
