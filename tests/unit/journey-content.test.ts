@@ -76,4 +76,16 @@ describe("journey content (TKT-77)", () => {
     expect(room.map((p) => p.id)).toEqual(["latest"]);
     expect(room[0].links).toEqual([]);
   });
+
+  it("fills the showcase with featured public projects (max 4) and sizes its scroll; skips it with none", () => {
+    const proj = (slug: string, over: Record<string, unknown> = {}) => ({ id: slug, slug, name: slug.toUpperCase(), tagline: "t", body: "", tags: ["a", "b", "c", "d"], screenshots: ["https://x/1.png"], url: "", featured: true, public: true, sort: 1, created_at: "", ...over });
+    const projects = [proj("one"), proj("two"), proj("plain", { featured: false }), proj("hidden", { public: false }), proj("three"), proj("four"), proj("five")];
+    const out = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [], projects });
+    const sc = out.find((c) => c.id === "projects");
+    expect(sc?.kind === "section" && sc.showcase?.map((i) => i.slug)).toEqual(["one", "two", "three", "four"]);
+    expect(sc?.kind === "section" && sc.showcase?.[0]).toEqual({ slug: "one", name: "ONE", tagline: "t", tags: ["a", "b", "c"], href: "/projects/one", shots: ["https://x/1.png"] });
+    expect(sc?.scroll).toBeCloseTo(0.6 + 4);
+    const none = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [], projects: [proj("plain", { featured: false })] });
+    expect(none.some((c) => c.id === "projects")).toBe(false);
+  });
 });

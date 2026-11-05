@@ -71,6 +71,18 @@ export interface SectionChapter extends Base {
   still?: { file: string; side: "left" | "right" };
   /** Fraction of the section's scroll used to wipe it in (default 0.14). */
   wipe?: number;
+  /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
+  showcase?: ShowcaseItem[];
+}
+
+export interface ShowcaseItem {
+  slug: string;
+  name: string;
+  tagline: string;
+  tags: string[];
+  /** The project's own page (the case study), never the website directly. */
+  href: string;
+  shots: string[];
 }
 export interface FadeChapter extends Base {
   kind: "fade";

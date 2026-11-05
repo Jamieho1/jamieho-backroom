@@ -23,6 +23,8 @@ export const HOME_CHAPTERS: Chapter[] = [
     still: { file: "still-imperial.jpg", side: "right" },
     panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "The pivot", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
   },
+  // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
+  { id: "projects", label: "Projects", nav: "Projects", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   // The room (redesign 2026-11-05): walk to the desk, read "Now" and "Latest", then keep scrolling into the monitor.

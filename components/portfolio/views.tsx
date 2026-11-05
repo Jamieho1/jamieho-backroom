@@ -4,7 +4,7 @@
  */
 import Link from "next/link";
 import { Markdown } from "@/components/markdown";
-import { projectHref, siteHost, type Project } from "@/lib/portfolio";
+import { projectHref, siteHost, type Project } from "@/lib/portfolio-core";
 
 export function ProjectList({ projects }: { projects: Project[] }) {
   if (!projects.length) return <p className="muted">Projects are on their way.</p>;

@@ -10,6 +10,7 @@ import {
 } from "@/lib/journey/timeline";
 import { Motes, type MotesHandle } from "./motes";
 import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
+import { Showcase, type ShowcaseHandle } from "./showcase";
 import { StartScreen } from "./start-screen";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
 import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
@@ -33,6 +34,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
   const stills = useRef<(HTMLImageElement | null)[]>([]);
+  const showcases = useRef<(ShowcaseHandle | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
   const cta = useRef<ScreenCtaHandle>(null);
@@ -148,6 +150,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
+          if (opacity > 0) showcases.current[i]?.setProgress(at);
         }
         const d = displays.current[i];
         if (d) {
@@ -223,6 +226,8 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
+                ) : c.kind === "section" && c.showcase?.length ? (
+                  <Showcase ref={(h) => { showcases.current[i] = h; }} items={c.showcase} />
                 ) : c.kind === "section" && c.still ? (
                   <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -298,6 +303,23 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
             </figure>
+          ) : null}
+          {c.kind === "section" && c.showcase?.length ? (
+            <section className="journey-still-showcase" aria-label="Selected work">
+              <p className="journey-eyebrow">Selected work</p>
+              <ul>
+                {c.showcase.map((it) => (
+                  <li key={it.slug}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {it.shots[0] ? <img src={it.shots[0]} alt="" loading="lazy" /> : null}
+                    <h2 className="journey-title">{it.name}</h2>
+                    {it.tagline ? <p className="journey-body">{it.tagline}</p> : null}
+                    <a className="journey-cta-link" href={it.href}>Read the case study <span>→</span></a>
+                  </li>
+                ))}
+              </ul>
+              <a className="journey-cta-link" href="/projects">All projects <span>→</span></a>
+            </section>
           ) : null}
           {(c.panels ?? []).map((p) => (
             <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={p.title}>

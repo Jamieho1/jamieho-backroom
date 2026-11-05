@@ -80,3 +80,12 @@ test("after the hero, the Pivot section wipes in with its statement, and no midd
   await expect(page.locator('[data-chapter="pivot"] figure img')).toHaveAttribute("src", /still-imperial\.jpg/);
   expect([...new Set(clips)].sort()).toEqual(["c1", "c7a", "c7b"]);
 });
+
+test("with no featured projects the showcase is skipped, not left blank", async ({ page }) => {
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  const nav = page.getByRole("navigation", { name: "Journey chapters" });
+  await expect(nav.getByRole("button", { name: /Pivot/ })).toBeVisible();
+  await expect(nav.getByRole("button", { name: /Projects/ })).toHaveCount(0);
+  await expect(page.locator('[data-chapter="projects"]')).toHaveCount(0);
+});

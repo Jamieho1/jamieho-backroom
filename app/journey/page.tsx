@@ -7,6 +7,7 @@ import { getPublicExperience } from "@/lib/experience";
 import { getProjectApps } from "@/lib/projects";
 import { projectTechnologies } from "@/lib/home";
 import { getLatestMedia } from "@/lib/articles-public";
+import { getPublicProjects } from "@/lib/portfolio";
 import "../journey.css";
 
 /** Home v1 preview (TKT-74): not linked or indexed until TKT-79 moves it onto `/`. */
@@ -19,8 +20,8 @@ export const revalidate = 86400;
 const MEDIA_BASE = (process.env.NEXT_PUBLIC_HOME_MEDIA_URL ?? "/home-media").replace(/\/$/, "");
 
 export default async function JourneyPage() {
-  const [sections, experience, apps, latest] = await Promise.all([getSections(), getPublicExperience(), getProjectApps(), getLatestMedia()]);
-  const chapters = withContent(HOME_CHAPTERS, { sections, experience, latest, technologies: projectTechnologies(apps).map((t) => t.name) });
+  const [sections, experience, apps, latest, projects] = await Promise.all([getSections(), getPublicExperience(), getProjectApps(), getLatestMedia(), getPublicProjects()]);
+  const chapters = withContent(HOME_CHAPTERS, { sections, experience, latest, projects, technologies: projectTechnologies(apps).map((t) => t.name) });
   return <main className="journey-page">
     {/* Journey typefaces (polish pass): wide display, mono labels, clean body. React hoists these into <head>. */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />

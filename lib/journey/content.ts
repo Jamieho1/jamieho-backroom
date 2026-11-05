@@ -3,6 +3,7 @@
  * personal in git). Mapping agreed 2026-11-04:
  * - Sky: `hero` section (+ "Go straight to my desktop").
  * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
+ * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
  *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
@@ -10,6 +11,8 @@
 import type { Item } from "@/lib/experience";
 import type { Section, SectionKey } from "@/lib/sections";
 import type { LatestItem } from "@/lib/articles-public";
+import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
+import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
 import { articleHref } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
@@ -24,6 +27,8 @@ export interface JourneyContent {
   experience: Item[];
   technologies: string[];
   latest?: { video: LatestItem | null; article: LatestItem | null };
+  /** Public projects; the showcase keeps the featured ones (max 4). */
+  projects?: Project[];
 }
 
 /** Keep panels short: the first paragraph, cut at a word boundary. Markdown is kept (rendered safely). */
@@ -50,7 +55,16 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
   const s = content.sections;
   const education = content.experience.find((i) => i.kind === "education");
 
+  const featured = featuredProjects(content.projects ?? []);
   return chapters.map((c) => {
+    if (c.kind === "section" && c.showcase) {
+      // The showcase grows one screen of scroll per featured project; with none, the section is skipped below.
+      const scroll = showcaseScroll(featured.length);
+      return {
+        ...c, scroll, wipe: SHOWCASE_WIPE / scroll,
+        showcase: featured.map((p) => ({ slug: p.slug, name: p.name, tagline: p.tagline, tags: p.tags.slice(0, 3), href: projectHref(p.slug), shots: p.screenshots })),
+      };
+    }
     const panels: Panel[] = [];
     for (const p of c.panels ?? []) {
       const at = (patch: Partial<Panel>): Panel => ({ ...p, ...patch });
@@ -81,5 +95,5 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       }
     }
     return { ...c, panels };
-  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0); // an empty section is skipped entirely
+  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || (c.showcase?.length ?? 0) > 0); // an empty section is skipped entirely
 }
