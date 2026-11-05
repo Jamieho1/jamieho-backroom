@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import {
-  type Chapter, alignAt, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
+  type Chapter, alignAt, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
 } from "@/lib/journey/timeline";
 
 const demo: Chapter[] = [
@@ -60,6 +60,19 @@ describe("journey timeline", () => {
     const twoSteps = approach(approach(0, 1, 45), 1, 45);
     expect(twoSteps).toBeCloseTo(a, 5);
     expect(approach(0.999999, 1, 16)).toBe(1);
+  });
+
+  it("shows the giant chapter word only as the chapter begins", () => {
+    expect(displayOpacity(0)).toBe(1);
+    expect(displayOpacity(0.05)).toBe(1);
+    expect(displayOpacity(0.25)).toBe(0);
+  });
+
+  it("reveals words one after another, all visible at full opacity", () => {
+    expect(wordReveal(0.2, 0, 4)).toBeGreaterThan(wordReveal(0.2, 3, 4));
+    expect(wordReveal(1, 3, 4)).toBe(1);
+    expect(wordReveal(0, 0, 4)).toBe(0);
+    expect(wordReveal(0.5, 0, 1)).toBe(0.5);
   });
 
   it("ships valid chapter data", () => {

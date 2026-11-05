@@ -8,6 +8,11 @@
 #   Posters: first and last frame of the encoded desktop clip.
 set -euo pipefail
 src="$1"; id="$2"; vf="${3:-}"; out="$(dirname "$0")/../../public/home-media"
+# One warm "golden hour" grade for every clip (polish pass, 2026-11-05), so the illustrated art, stills and AI video
+# read as one film. Vignette and grain are drawn in CSS, not baked in. Set GRADE=none to skip.
+GRADE_DEFAULT="eq=contrast=1.08:brightness=-0.02:saturation=1.06,colorbalance=rs=-0.04:gs=-0.01:bs=0.05:rm=0.03:bm=-0.02:rh=0.08:gh=0.03:bh=-0.07,curves=all='0/0 0.25/0.21 0.75/0.80 1/0.97',"
+grade="${GRADE:-$GRADE_DEFAULT}"; [ "$grade" = "none" ] && grade=""
+vf="${vf}${grade}"
 mkdir -p "$out"
 ffmpeg -v error -y -i "$src" -an -vf "${vf}scale=1280:720:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -crf 26 -g 12 -keyint_min 12 -sc_threshold 0 -movflags +faststart "$out/$id-desktop.mp4"
 ffmpeg -v error -y -i "$src" -an -vf "${vf}scale=960:540:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -crf 28 -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart "$out/$id-mobile.mp4"

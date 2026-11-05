@@ -11,7 +11,7 @@ export interface Panel {
   /** Visible between these local scroll fractions (fades in/out over `fade`). */
   from: number;
   to: number;
-  side?: "left" | "right";
+  side?: "left" | "right" | "center";
   eyebrow?: string;
   title: string;
   /** Small line under the title (e.g. organisation · dates). */
@@ -31,6 +31,12 @@ interface Base {
   panels?: Panel[];
   /** Fraction of this chapter's scroll used to cross-fade in from the previous chapter's last frame. */
   join?: number;
+  /** Giant chapter word shown as the chapter begins (BMW-style), e.g. "IMPERIAL". */
+  display?: string;
+  /** Short label in the bottom chapter menu; chapters without one are not listed. */
+  nav?: string;
+  /** Floating light motes over the scene (0 = none, 1 = full). */
+  motes?: number;
 }
 export interface VideoChapter extends Base {
   kind: "video";
@@ -151,4 +157,16 @@ export function approach(current: number, target: number, dtMs: number, halfLife
 /** Fade-chapter cover opacity: rises over the first `edge`, holds (panel reads on the colour), clears over the last. */
 export function fadeCover(local: number, edge = 0.25): number {
   return Math.min(smoothstep(0, edge, local), 1 - smoothstep(1 - edge, 1, local));
+}
+
+/** Giant chapter word: in fully at the start, holds briefly, gone by ~18% of the chapter. */
+export function displayOpacity(local: number): number {
+  return 1 - smoothstep(0.06, 0.18, local);
+}
+
+/** Per-word reveal (0..1) for word `i` of `n`, given the panel's overall opacity `o`. */
+export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): number {
+  if (n <= 1) return o;
+  const start = (i / (n - 1)) * spreadAmt;
+  return clamp01((o - start) / (1 - spreadAmt));
 }

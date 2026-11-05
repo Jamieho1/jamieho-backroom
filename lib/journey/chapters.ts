@@ -14,22 +14,22 @@ const PLACEHOLDER = "Placeholder: TKT-77 fills this panel from the existing site
 
 export const HOME_CHAPTERS: Chapter[] = [
   {
-    id: "sky", label: "Hello", kind: "video", src: "c1", scroll: 1.6,
+    id: "sky", label: "Hello", nav: "Hello", kind: "video", src: "c1", scroll: 1.6, motes: 0.6,
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
-    panels: [{ id: "hero", from: 0, to: 0.32, side: "left", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
+    panels: [{ id: "hero", from: 0, to: 0.32, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
-  { id: "descent", label: "Descent", kind: "video", src: "c2", scroll: 1.3, join: 0.03 },
+  { id: "descent", label: "Descent", kind: "video", src: "c2", scroll: 1.3, join: 0.03, motes: 0.4 },
   {
-    id: "imperial", label: "Imperial", kind: "video", src: "c3a", scroll: 2.2,
+    id: "imperial", label: "Imperial", nav: "Imperial", display: "Imperial", kind: "video", src: "c3a", scroll: 2.2, motes: 0.5,
     keys: [[0, 0], [0.4, 0.3], [0.7, 0.65], [0.74, 0.81], [1, 1]],
-    panels: [{ id: "imperial", from: 0.04, to: 0.4, side: "left", eyebrow: "Chapter 1", title: "Imperial College London", body: PLACEHOLDER }],
+    panels: [{ id: "imperial", from: 0.04, to: 0.4, side: "left", eyebrow: "01 / Imperial", title: "Imperial College London", body: PLACEHOLDER }],
   },
   {
     id: "atrium", label: "Atrium", kind: "video", src: "c3b", scroll: 1.4, join: 0.05,
     align: { scale: 1.069, x: -0.041, y: -0.038, span: 0.3 },
   },
   {
-    id: "library", label: "Library", kind: "layers", scene: "library", scroll: 3, join: 0.06,
+    id: "library", label: "Library", nav: "Library", kind: "layers", scene: "library", scroll: 3, join: 0.06, motes: 0.8,
     panels: [
       { id: "about", from: 0.06, to: 0.36, side: "left", eyebrow: "About", title: "Background", body: PLACEHOLDER },
       { id: "interests", from: 0.38, to: 0.66, side: "right", eyebrow: "Interests", title: "What I care about", body: PLACEHOLDER },
@@ -39,12 +39,12 @@ export const HOME_CHAPTERS: Chapter[] = [
   // C4 in code (Jamie 2026-11-04, BMW-style): the window light blooms to white, chapter text rises, then clears.
   {
     id: "to-westminster", label: "Westminster", kind: "fade", color: "#f6f3ee", tone: "dark", scroll: 1.2,
-    panels: [{ id: "experience", from: 0.25, to: 0.75, side: "left", eyebrow: "Chapter 2", title: "Experience", body: PLACEHOLDER }],
+    panels: [{ id: "experience", from: 0.25, to: 0.75, side: "left", eyebrow: "02 / Experience", title: "From university to production" }],
   },
   // Westminster walk: the experience timeline steps in while the camera walks slowly along the railing (TKT-77
   // replaces these with one panel per public experience entry).
   {
-    id: "westminster", label: "Westminster", kind: "video", src: "c5a", scroll: 2.8,
+    id: "westminster", label: "Westminster", nav: "Experience", display: "Westminster", kind: "video", src: "c5a", scroll: 2.8, motes: 0.5,
     keys: [[0, 0], [0.7, 0.5], [1, 1]],
     panels: [
       { id: "m1", from: 0.04, to: 0.26, side: "left", eyebrow: "Milestone", title: "University", body: PLACEHOLDER },
@@ -56,7 +56,7 @@ export const HOME_CHAPTERS: Chapter[] = [
   // C6 in code: through black into the room.
   { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   {
-    id: "room", label: "Room", kind: "video", src: "c7a", scroll: 1.6,
+    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 1.6, motes: 0.3,
     keys: [[0, 0], [0.42, 0.44], [0.46, 0.54], [1, 1]],
   },
   {
