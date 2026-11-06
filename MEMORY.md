@@ -23,3 +23,9 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Moved hero Welcome/name below the hands above introduction; removed displayed trailing period. Full-screen art retained, phone social spacing tightened. Typecheck/build passed; no database changes.
 
 2026-11-06: Hero socials now use platform colours; fixed shared YouTube glyph white-on-white play triangle. Typecheck/build passed; no database/migration change.
+
+2026-11-06: Raised hero heading halfway between fingertips and glass panel using responsive anchors. Build passed; no database/migration change.
+
+2026-11-06: About grade hidden only in journey, text contrast strengthened and heading reduced; phone paragraph unclamped. 12 content tests/typecheck passed. Role wording live SQL rejected by automatic approval review; await explicit approval. Shorter heading choice pending; no database change.
+
+2026-11-06: Jamie chose original About heading at reduced size and explicitly approved live role wording. Applied/verified slash removal in site_sections.about. No migration; cached page refresh/deploy needed.

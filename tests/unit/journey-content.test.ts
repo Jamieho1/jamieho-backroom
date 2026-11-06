@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
-import { CONTACT_HREF, DESKTOP_HREF, excerpt, spread, withContent } from "@/lib/journey/content";
+import { CONTACT_HREF, DESKTOP_HREF, educationLine, excerpt, spread, withContent } from "@/lib/journey/content";
 import { FALLBACK_SECTIONS } from "@/lib/sections";
 import type { Item } from "@/lib/experience";
 
@@ -15,6 +15,13 @@ const sections = {
 const panelsOf = (chapters: ReturnType<typeof withContent>, id: string) => chapters.find((c) => c.id === id)?.panels ?? [];
 
 describe("journey content (TKT-77)", () => {
+  it("omits the classification from the About education line without changing the source item", () => {
+    const education = item({ kind: "education", title: "MEng Engineering – 2:1 Upper Second Class", org: "University", dates: "2020–2024" });
+    expect(educationLine(education)).toBe("MEng Engineering · University · 2020–2024");
+    expect(education.title).toContain("Upper Second Class");
+    expect(educationLine(item({ title: "MSc Engineering", org: "University", dates: "" }))).toBe("MSc Engineering · University");
+  });
+
   it("separates the hero role from its description and reuses Creator social destinations", () => {
     const custom = { ...sections,
       hero: { key: "hero" as const, title: "Test Name", body: "Engineering role.\n\nA concise description." },

@@ -18,3 +18,9 @@ Glass redesign: npm run check passed (520 unit/database tests, typecheck, produc
 2026-11-06: Welcome/name moved below the pointing hands, above the introduction. Display strips trailing full stop without changing stored content. Phone social spacing tightened to fit the three links. Typecheck and final production build passed; local desktop/phone previews reviewed. No database/migration change.
 
 2026-11-06: Restored platform colours to hero social buttons. YouTube glyph now has a red body and white play triangle, correcting white-on-white rendering wherever reused. Typecheck and production build passed; no database/migration change.
+
+2026-11-06: Raised Welcome/name to the midpoint between fingertips and introduction; panel/art stay fixed. Production build passed; desktop/phone previews reviewed. No database/migration change.
+
+2026-11-06 About: classification hidden in journey display, stronger paragraph contrast, smaller heading and untruncated phone paragraph. Typecheck and 12 journey-content tests passed; final production build passed. Desktop/phone previews checked. Jamie approved and the live About role wording update was applied and verified: slash removed. Original heading retained at reduced size, as requested. No schema/migration change.
+
+2026-11-06: About wording live update applied with explicit approval and verified by query. Existing heading text retained. Deployment/ISR refresh is needed for cached public copy; no migration.

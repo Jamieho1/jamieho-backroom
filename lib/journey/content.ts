@@ -47,7 +47,7 @@ export function excerpt(markdown: string, max = 320): string {
 
 const meta = (i: Item) => [i.org, i.dates].map((s) => s.trim()).filter(Boolean).join(" · ");
 /** "MEng Biomedical Engineering · Imperial College London · 2016–2020" from the education entry. */
-export const educationLine = (i: Item) => [i.title, meta(i)].map((s) => s.trim()).filter(Boolean).join(" · ");
+export const educationLine = (i: Item) => [i.title.replace(/\s*[–—-]\s*2:1\s+Upper Second Class\s*$/i, ""), meta(i)].map((s) => s.trim()).filter(Boolean).join(" · ");
 const plain = (s: string) => s.replace(/[*_`#>]/g, "").trim();
 
 /** Spread `n` panels evenly over [from, to] with a small gap between them. */
