@@ -6,7 +6,7 @@
 /** [scroll fraction, media fraction] pairs, both 0..1, strictly increasing in scroll. Slow reading = shallow slope. */
 export type Keys = readonly (readonly [number, number])[];
 
-export type MediaPlatform = "youtube" | "instagram" | "xiaohongshu" | "article";
+export type MediaPlatform = "youtube" | "instagram" | "xiaohongshu" | "article" | "linkedin";
 export interface PanelLink {
   kicker: string; title: string; href: string; image?: string; external?: boolean;
   /** Creator cards (TKT-89): which platform the card is for; `placeholder` = no post yet, links to the profile. */

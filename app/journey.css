@@ -283,7 +283,7 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-nav {
   position: absolute; left: 50%; bottom: 22px; z-index: 5; translate: -50% 0; display: flex; gap: 2px; padding: 5px;
   border-radius: 999px; background: rgb(12 9 6 / 0.55); border: 1px solid rgb(255 255 255 / 0.12);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
 }
 .journey-nav button {
   appearance: none; border: 0; background: transparent; color: rgb(246 241 232 / 0.72); cursor: pointer;
@@ -563,45 +563,71 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 
 .journey-logo svg { width: 24px; height: 24px; --heading: #f3c86b; --bg: #152337; }
 @media (max-width: 768px) { .journey-navigation .journey-account > a[href="/privacy"] { display: inline; font-size: 10px; } }
-/* On narrower desktops retain every character; continue the matching sky above the wide art. */
-@media (min-width: 769px) and (max-aspect-ratio: 2/1) {
-  .journey-hero-art img { position: absolute; bottom: 0; width: 100%; height: auto; }
-  .journey-hero-art picture { background: #2d65b0; }
-  .journey-hero-art .journey-hero-night { background: #102336; }
-  .journey-hero-art img { mask-image: linear-gradient(to bottom, transparent, #000 7%); }
-  [data-chapter="sky"] .journey-panel-center { top: 100px; bottom: auto; }
-  [data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(44px, 6.5vw, 100px); }
-}
 
-/* Reserved sky copy: readable glass rather than text over faces or landmarks. */
-[data-chapter="sky"] .journey-panel-center { top: 96px; bottom: auto; width: min(680px, calc(100vw - 40px)); }
-[data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(34px, 3.5vw, 56px); line-height: 1.12; margin-bottom: 14px; }
-[data-chapter="sky"] .journey-welcome { font-size: clamp(16px, 1.3vw, 22px); margin-bottom: 10px; }
-.journey-hero-glass { padding: 16px 22px; border: 1px solid rgb(255 255 255 / .28); border-radius: 20px; background: rgb(13 28 48 / .72); box-shadow: 0 10px 35px rgb(0 0 0 / .16), inset 0 1px rgb(255 255 255 / .1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.journey-hero-glass .journey-meta { font: 600 clamp(15px, 1.2vw, 18px)/1.4 var(--j-body); color: #fff; margin: 0 0 8px; }
-.journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 16px; line-height: 1.45; color: #eef3fa; max-width: 62ch; }
-.journey-hero-glass .journey-actions { justify-content: center; margin: 12px 0 0; gap: 10px; }
-.journey-hero-glass .journey-brand { padding: 8px 14px; font-size: 13px; }
-.journey-cue { display: flex; align-items: center; justify-content: center; gap: 12px; bottom: 24px; padding: 13px 19px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .45); background: rgb(13 28 48 / .8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: 600 12px var(--j-body); letter-spacing: .08em; text-decoration: none; pointer-events: auto; box-shadow: 0 6px 24px rgb(0 0 0 / .2); }
-.journey-cue:focus-visible { outline: 2px solid #ffd36d; outline-offset: 4px; }
-.journey-cue span:last-child { font-size: 20px; color: #ffd36d; }
-.journey-stills > li:first-child { align-items: flex-start; padding-top: 96px; box-sizing: border-box; }
-.journey-stills > li:first-child .journey-still-panel { width: min(680px, calc(100vw - 40px)); margin: 0; }
-.journey-stills > li:first-child .journey-title { font-size: clamp(34px, 3.5vw, 56px); }
-@media (min-width: 769px) {
-  .journey-hero-art picture { background: #2d65b0; }
-  .journey-hero-art .journey-hero-night { background: #102336; }
-  .journey-hero-art img { position: absolute; bottom: 0; width: 100%; height: auto; max-height: calc(100% - 310px); object-fit: contain; object-position: center bottom; mask-image: linear-gradient(to bottom, transparent, #000 7%); }
+/* Full-bleed art: heading in the sky, lighter glass copy over the city below the characters. */
+.journey-hero-art, .journey-hero-art picture { position: absolute; inset: 0; background: #2d65b0; }
+.journey-hero-art .journey-hero-night { background: #102336; }
+.journey-hero-art img { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; mask-image: none; }
+.journey [data-chapter="sky"] .journey-panel-center { inset: 0; width: 100%; height: 100%; translate: none; padding: 0; pointer-events: none; }
+[data-chapter="sky"] .journey-panel::before { display: none; }
+.journey-hero-heading { position: absolute; top: 88px; left: 50%; translate: -50% 0; width: min(900px, calc(100% - 32px)); text-align: center; text-shadow: 0 2px 20px rgb(0 0 0 / .32); }
+.journey-hero-heading .journey-welcome { margin-bottom: 6px; font-size: clamp(14px, 1.2vw, 20px); }
+.journey [data-chapter="sky"] .journey-hero-heading .journey-title { font-size: clamp(34px, 3.2vw, 56px); line-height: 1.12; margin: 0; }
+.journey-hero-glass {
+  --hero-ink: 13 29 47;
+  position: absolute; bottom: 92px; left: 50%; translate: -50% 0; box-sizing: border-box;
+  width: min(700px, calc(100% - 40px)); padding: 22px 28px 16px;
+  border: 1px solid rgb(210 225 241 / .22); border-radius: 12px;
+  background: linear-gradient(115deg, rgb(var(--hero-ink) / .76), rgb(var(--hero-ink) / .6));
+  box-shadow: 0 8px 28px rgb(5 15 28 / .14), inset 0 1px rgb(255 255 255 / .08);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  text-align: left; pointer-events: auto; text-shadow: none;
 }
+.journey-hero-glass::before { content: ""; position: absolute; top: -1px; left: 28px; width: 32px; height: 2px; background: #e9c47c; }
+.journey-hero-glass .journey-meta { font: 600 clamp(15px, 1.2vw, 18px)/1.4 var(--j-body); color: #fff; margin: 0 0 8px; }
+.journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 16px; line-height: 1.5; color: #fff; max-width: 64ch; margin: 0; }
+.journey-hero-glass .journey-actions { justify-content: flex-start; margin: 16px 0 0; padding-top: 12px; border-top: 1px solid rgb(210 225 241 / .16); gap: 10px; }
+.journey-hero-glass .journey-brand {
+  padding: 9px 12px; font-size: 13px; min-height: 44px; box-sizing: border-box;
+  border: 1px solid rgb(210 225 241 / .2); border-radius: 6px; background: rgb(255 255 255 / .04); color: #fff;
+  transition: background .2s ease, border-color .2s ease;
+}
+.journey-hero-glass .journey-brand:hover { transform: none; filter: none; background: rgb(255 255 255 / .1); border-color: rgb(233 196 124 / .65); }
+.journey-hero-glass .journey-brand:focus-visible { transform: none; outline: 2px solid #e9c47c; outline-offset: 3px; box-shadow: none; }
+.journey-cue {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  bottom: max(20px, env(safe-area-inset-bottom)); min-height: 44px; box-sizing: border-box;
+  padding: 0 8px 0 16px; border-radius: 8px; border: 1px solid rgb(210 225 241 / .24);
+  background: linear-gradient(115deg, rgb(13 29 47 / .76), rgb(13 29 47 / .6));
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  color: #fff; font: 500 12px var(--j-body); letter-spacing: .06em; text-decoration: none;
+  pointer-events: auto; box-shadow: 0 4px 16px rgb(5 15 28 / .12); width: max-content; max-width: calc(100% - 32px); white-space: nowrap;
+  transition: border-color .2s ease, background .2s ease;
+}
+.journey-cue:hover { border-color: rgb(233 196 124 / .65); background: rgb(13 29 47 / .85); }
+.journey-cue:focus-visible { outline: 2px solid #e9c47c; outline-offset: 4px; }
+.journey-cue span:last-child { display: grid; place-items: center; width: 30px; height: 28px; border-left: 1px solid rgb(210 225 241 / .2); font-size: 20px; color: #e9c47c; }
+.journey-stills > li:first-child { position: relative; min-height: 100svh; padding: 0; }
+.journey-stills > li:first-child .journey-still-panel { position: absolute; inset: 0; margin: 0; width: 100%; max-width: none; padding: 0; }
+.journey-stills > li:first-child .journey-title { color: #fff; }
 @media (max-width: 768px) {
-  .journey-phone [data-chapter="sky"] .journey-panel-center { top: 80px; width: calc(100vw - 28px); left: 14px; right: 14px; }
-  [data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(28px, 7.5vw, 38px); margin-bottom: 10px; }
-  [data-chapter="sky"] .journey-welcome { font-size: 15px; margin-bottom: 7px; }
-  .journey-hero-glass { padding: 10px 12px; border-radius: 16px; }
+  .journey-hero-art img { object-position: center bottom; }
+  .journey-hero-heading { top: 80px; }
+  .journey-hero-heading .journey-welcome { font-size: 14px; }
+  .journey [data-chapter="sky"] .journey-hero-heading .journey-title { font-size: clamp(26px, 7.5vw, 38px); }
+  .journey-hero-glass { bottom: 82px; width: calc(100% - 28px); padding: 16px 18px 12px; border-radius: 10px; }
   .journey-hero-glass .journey-meta { font-size: 14px; margin-bottom: 6px; }
-  .journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 13px; line-height: 1.4; }
-  .journey-hero-glass .journey-actions { margin-top: 8px; }
-  .journey-hero-glass .journey-brand { padding: 7px 10px; font-size: 12px; }
-  .journey-cue { bottom: 20px; font-size: 12px; padding: 11px 16px; white-space: nowrap; }
-  .journey-stills > li:first-child { padding-top: 80px; }
+  .journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 14px; line-height: 1.45; }
+  .journey-hero-glass::before { left: 18px; }
+  .journey-hero-glass .journey-actions { margin-top: 12px; padding-top: 10px; gap: 10px; }
+  .journey-hero-glass .journey-brand { padding: 8px 12px; font-size: 12px; }
+}
+@supports not (backdrop-filter: blur(1px)) { .journey-hero-glass, .journey-cue { background: rgb(13 28 48 / .8); } }
+@media (max-height: 600px) and (min-width: 769px) {
+  .journey-hero-heading { top: 76px; }
+  .journey [data-chapter="sky"] .journey-hero-heading .journey-title { font-size: 30px; }
+  .journey-hero-glass { bottom: 74px; padding: 10px 18px; }
+  .journey-hero-glass .journey-meta { font-size: 14px; margin-bottom: 4px; }
+  .journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 13px; }
+  .journey-hero-glass .journey-actions { margin-top: 6px; }
 }

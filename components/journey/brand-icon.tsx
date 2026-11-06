@@ -2,6 +2,9 @@ import type { MediaPlatform } from "@/lib/journey/timeline";
 
 /** Small brand marks for the Creator section (simple, recognisable glyphs; not the official logo files). */
 export function BrandIcon({ platform, size = 18 }: { platform: MediaPlatform; size?: number }) {
+  if (platform === "linkedin") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="2" /><path d="M3 9h4v12H3zM10 9h4v1.6c.8-1.2 2-1.9 3.5-1.9 3 0 4.5 1.9 4.5 5.2V21h-4v-6.3c0-1.7-.6-2.5-1.9-2.5-1.4 0-2.1 1-2.1 2.5V21h-4z" /></svg>
+  );
   if (platform === "youtube") return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="5" width="21" height="14" rx="4" fill="currentColor" /><path d="M10 9l5 3-5 3z" fill="#fff" /></svg>
   );

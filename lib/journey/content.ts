@@ -119,7 +119,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           const role = paragraphs.length > 1 ? plain(paragraphs.shift()!) : undefined;
           const intro = excerpt(paragraphs.join("\n\n"));
           const rotator = parseRotator(intro) ?? undefined;
-          panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, meta: role, actions: (["youtube", "instagram"] as const).flatMap(kind => socialLinks(s.contact.body).filter(l => l.kind === kind).map(l => ({ label: SOCIAL_LABEL[kind], href: l.href, platform: kind }))), cta: undefined }));
+          panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, meta: role, actions: (["youtube", "instagram", "linkedin"] as const).flatMap(kind => socialLinks(s.contact.body).filter(l => l.kind === kind).map(l => ({ label: SOCIAL_LABEL[kind], href: l.href, platform: kind }))), cta: undefined }));
         }
           break;
         case "room:now":
