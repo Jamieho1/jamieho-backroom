@@ -5,6 +5,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { readSupabaseEnv } from "@/lib/env";
+import { projectScreenshots } from "./project-art";
 import { PROJECT_SELECT, sortProjects, type Project } from "./portfolio-core";
 export * from "./portfolio-core";
 
@@ -19,7 +20,7 @@ export async function getPublicProjects(): Promise<Project[]> {
   if (!sb) return [];
   const { data, error } = await sb.from("projects").select(PROJECT_SELECT).eq("public", true);
   if (error) throw new Error("Projects unavailable");
-  return sortProjects((data ?? []) as Project[]);
+  return sortProjects((data ?? []) as Project[]).map(p => ({ ...p, screenshots: projectScreenshots(p.slug, p.screenshots) }));
 }
 
 export async function getPublicProject(slug: string): Promise<Project | null> {
@@ -27,5 +28,5 @@ export async function getPublicProject(slug: string): Promise<Project | null> {
   if (!sb) return null;
   const { data, error } = await sb.from("projects").select(PROJECT_SELECT).eq("slug", slug).eq("public", true).maybeSingle();
   if (error) throw new Error("Projects unavailable");
-  return (data as Project | null) ?? null;
+  return data ? { ...data as Project, screenshots: projectScreenshots(data.slug, data.screenshots) } : null;
 }

@@ -25,3 +25,5 @@ Articles and portfolio projects have public slug pages and owner management. Pub
 Update this map when routes, data ownership or module boundaries change.
 
 Homepage navigation/hero are isolated in components/journey/navigation.tsx and hero-artwork.tsx. The desktop remains at /desktop; public /about and existing apps remain available.
+
+lib/project-art.ts provides the supplied public Cyterly image only when that public project has no database screenshots. Owner-selected screenshots override it; the editor still reads and writes the database record.

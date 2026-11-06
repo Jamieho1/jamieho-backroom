@@ -13,3 +13,5 @@ Media is external to Git: local public/home-media/ is ignored; live home-media S
 Day art keeps warm sky/cloud tones; night uses softer muted contrast. Preserve character identity; portrait editions are recompositions. Generated image sources/prompts are outside Git in the chat visualization folder.
 
 Legacy room modules and Resources plans may describe unused hotspots; they are not evidence of current UI. Read the active renderer before modifying navigation.
+
+Hero readability (2026-11-06): approved top-sky placement, smaller name, compact glass role/description/social panel, with reserved artwork clearance. Hero body uses first paragraph as bold role and following paragraph as description; a one-paragraph body remains supported. Copy stays in site_sections.hero; YouTube/Instagram actions reuse Contact links. The larger glass scroll pill is a keyboard-accessible link that jumps to About.

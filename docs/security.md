@@ -13,3 +13,5 @@ Approved illustrated public wallpaper in public/desktop-art/ and editable public
 Migrations are append-only. Test locally, obtain Jamie's approval before live application, record local filename/remote version/result. SQL presence does not prove application. Historical applied records through resume_sections are in archived MEMORY; newer categories/images/home_media/now/projects migration application must be verified before relying on it.
 
 Storage reads/writes require appropriate bucket/policy checks. Keep schema and export coverage consistent. Never inspect .env values or private.settings owner seed; Jamie handles keys. NEXT_PUBLIC variables are public Config; real secrets are unprefixed Sensitive. Never place service-role/Google secrets in Vercel.
+
+The supplied public Cyterly screenshot is delivered under public/project-art for the requested project display. This contains no private CV/notes/import data. Other project screenshots remain database/Storage managed.

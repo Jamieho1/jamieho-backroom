@@ -14,6 +14,16 @@ test("homepage enters directly, keeps hero text and scrolls without an entry gat
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
 });
 
+test("glass introduction remains readable and the scroll pill opens About", async ({ page }) => {
+  await page.goto("/");
+  const glass = page.locator('[data-chapter="sky"] .journey-hero-glass');
+  await expect(glass).toBeVisible();
+  expect(await glass.evaluate(el => getComputedStyle(el).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+  await page.getByRole("link", { name: "Scroll to discover" }).click();
+  await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
+  await expect(page.locator(".journey-navigation")).toHaveAttribute("data-floating", "true");
+});
+
 test("legacy journey address redirects to the homepage", async ({ page }) => {
   await page.goto("/journey");
   await expect(page).toHaveURL(/\/$/);

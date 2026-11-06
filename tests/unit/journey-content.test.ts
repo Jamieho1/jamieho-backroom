@@ -15,6 +15,18 @@ const sections = {
 const panelsOf = (chapters: ReturnType<typeof withContent>, id: string) => chapters.find((c) => c.id === id)?.panels ?? [];
 
 describe("journey content (TKT-77)", () => {
+  it("separates the hero role from its description and reuses Creator social destinations", () => {
+    const custom = { ...sections,
+      hero: { key: "hero" as const, title: "Test Name", body: "Engineering role.\n\nA concise description." },
+      contact: { key: "contact" as const, title: "Contact", body: "[YouTube](https://youtube.com/@test) [Instagram](https://instagram.com/test)" },
+    };
+    const hero = panelsOf(withContent(HOME_CHAPTERS, { sections: custom, experience: [], technologies: [] }), "sky")[0];
+    expect(hero.meta).toBe("Engineering role.");
+    expect(hero.body).toBe("A concise description.");
+    expect(hero.actions?.map(a => a.platform)).toEqual(["youtube", "instagram"]);
+    expect(hero.cta).toBeUndefined();
+  });
+
   it("keeps panels short", () => {
     expect(excerpt("One.\n\nTwo.")).toBe("One.");
     const long = excerpt("word ".repeat(200), 50);
@@ -38,7 +50,7 @@ describe("journey content (TKT-77)", () => {
     ];
     const pivotSections = { ...sections, about: { key: "about" as const, title: "From labs to production", body: "First para.\n\nSecond." } };
     const out = withContent(HOME_CHAPTERS, { sections: pivotSections, experience, technologies: [] });
-    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true, cta: undefined });
+    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "Second paragraph.", meta: "First line.", md: true, cta: undefined });
     expect(panelsOf(out, "pivot")[0]).toMatchObject({
       title: "From labs to production", body: "First para.", md: true, look: "statement",
       meta: "MEng Biomedical Engineering · Imperial College London · 2016–2020",

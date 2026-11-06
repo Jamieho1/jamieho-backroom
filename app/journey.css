@@ -572,3 +572,36 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
   [data-chapter="sky"] .journey-panel-center { top: 100px; bottom: auto; }
   [data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(44px, 6.5vw, 100px); }
 }
+
+/* Reserved sky copy: readable glass rather than text over faces or landmarks. */
+[data-chapter="sky"] .journey-panel-center { top: 96px; bottom: auto; width: min(680px, calc(100vw - 40px)); }
+[data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(34px, 3.5vw, 56px); line-height: 1.12; margin-bottom: 14px; }
+[data-chapter="sky"] .journey-welcome { font-size: clamp(16px, 1.3vw, 22px); margin-bottom: 10px; }
+.journey-hero-glass { padding: 16px 22px; border: 1px solid rgb(255 255 255 / .28); border-radius: 20px; background: rgb(13 28 48 / .72); box-shadow: 0 10px 35px rgb(0 0 0 / .16), inset 0 1px rgb(255 255 255 / .1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.journey-hero-glass .journey-meta { font: 600 clamp(15px, 1.2vw, 18px)/1.4 var(--j-body); color: #fff; margin: 0 0 8px; }
+.journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 16px; line-height: 1.45; color: #eef3fa; max-width: 62ch; }
+.journey-hero-glass .journey-actions { justify-content: center; margin: 12px 0 0; gap: 10px; }
+.journey-hero-glass .journey-brand { padding: 8px 14px; font-size: 13px; }
+.journey-cue { display: flex; align-items: center; justify-content: center; gap: 12px; bottom: 24px; padding: 13px 19px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .45); background: rgb(13 28 48 / .8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: 600 12px var(--j-body); letter-spacing: .08em; text-decoration: none; pointer-events: auto; box-shadow: 0 6px 24px rgb(0 0 0 / .2); }
+.journey-cue:focus-visible { outline: 2px solid #ffd36d; outline-offset: 4px; }
+.journey-cue span:last-child { font-size: 20px; color: #ffd36d; }
+.journey-stills > li:first-child { align-items: flex-start; padding-top: 96px; box-sizing: border-box; }
+.journey-stills > li:first-child .journey-still-panel { width: min(680px, calc(100vw - 40px)); margin: 0; }
+.journey-stills > li:first-child .journey-title { font-size: clamp(34px, 3.5vw, 56px); }
+@media (min-width: 769px) {
+  .journey-hero-art picture { background: #2d65b0; }
+  .journey-hero-art .journey-hero-night { background: #102336; }
+  .journey-hero-art img { position: absolute; bottom: 0; width: 100%; height: auto; max-height: calc(100% - 310px); object-fit: contain; object-position: center bottom; mask-image: linear-gradient(to bottom, transparent, #000 7%); }
+}
+@media (max-width: 768px) {
+  .journey-phone [data-chapter="sky"] .journey-panel-center { top: 80px; width: calc(100vw - 28px); left: 14px; right: 14px; }
+  [data-chapter="sky"] .journey-panel-center .journey-title { font-size: clamp(28px, 7.5vw, 38px); margin-bottom: 10px; }
+  [data-chapter="sky"] .journey-welcome { font-size: 15px; margin-bottom: 7px; }
+  .journey-hero-glass { padding: 10px 12px; border-radius: 16px; }
+  .journey-hero-glass .journey-meta { font-size: 14px; margin-bottom: 6px; }
+  .journey-hero-glass .journey-body, .journey-hero-glass .journey-md .md p { font-size: 13px; line-height: 1.4; }
+  .journey-hero-glass .journey-actions { margin-top: 8px; }
+  .journey-hero-glass .journey-brand { padding: 7px 10px; font-size: 12px; }
+  .journey-cue { bottom: 20px; font-size: 12px; padding: 11px 16px; white-space: nowrap; }
+  .journey-stills > li:first-child { padding-top: 80px; }
+}

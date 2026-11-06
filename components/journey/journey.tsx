@@ -57,7 +57,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const hud = useRef<HTMLDivElement>(null);
-  const cue = useRef<HTMLDivElement>(null);
+  const cue = useRef<HTMLAnchorElement>(null);
   const jump = useRef<(id: string) => void>(() => {});
   const skip = useRef<() => void>(() => {});
   const lenisRef = useRef<Lenis | null>(null);
@@ -285,13 +285,13 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
                     className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
-                    <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} split />
+                    {c.id === "sky" ? <HeroCopy p={p} split /> : <PanelBody p={p} heading="h2" split />}
                   </section>
                 ))}
               </div>
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
-            <div ref={cue} className="journey-cue" aria-hidden="true"><span>Scroll to discover</span><i /></div>
+            <a ref={cue} className="journey-cue" href="#pivot" onClick={event => { event.preventDefault(); jump.current("pivot"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
             <ScreenCta ref={cta} href={DESKTOP_HREF} />
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
@@ -389,7 +389,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
           ) : null}
           {(c.panels ?? []).map((p) => (
             <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
-              <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
+              {c.id === "sky" ? <HeroCopy p={p} /> : <PanelBody p={p} heading="h2" />}
             </section>
           ))}
           {c.id === "screen" ? (
@@ -424,11 +424,21 @@ function RotatorLine({ r }: { r: NonNullable<Panel["rotator"]> }) {
   );
 }
 
+function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
+  return <>
+    {p.eyebrow ? <p className="journey-eyebrow journey-welcome">{p.eyebrow}</p> : null}
+    <h1 className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</h1>
+    <div className="journey-hero-glass">
+      <PanelBody p={{ ...p, eyebrow: undefined, title: "" }} heading="h2" />
+    </div>
+  </>;
+}
+
 function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean }) {
   const H = heading;
   return <>
     {p.eyebrow ? <p className={`journey-eyebrow${heading === "h1" ? " journey-welcome" : ""}`}>{p.eyebrow}</p> : null}
-    <H className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</H>
+    {p.title ? <H className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</H> : null}
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {split && p.rotator ? <RotatorLine r={p.rotator} />
       : p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
