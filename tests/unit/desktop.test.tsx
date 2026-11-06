@@ -14,7 +14,7 @@ it("opens and records deep-linked internal apps, with maximise and close control
   expect(log).toHaveBeenCalledWith("notes");
   fireEvent.click(screen.getByRole("button", { name: "Maximise window" }));
   expect(screen.getByRole("button", { name: "Restore window" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Close window" }).getAttribute("href")).toBe("/");
+  expect(screen.getByRole("link", { name: "Close window" }).getAttribute("href")).toBe("/desktop");
 });
 it("never renders or records an inaccessible deep link", () => {
   render(<Desktop apps={FALLBACK_APPS.slice(0, 2)} initialApp="behavioral" />);

@@ -12,8 +12,8 @@ export const DESKTOP_ASSETS={
   "eyeDay": "/desktop-art/eyeDay-70db3fb1f7d3.webp",
   "eyeNight": "/desktop-art/eyeNight-cbd3487049fe.webp",
   "eyeMatte": "/desktop-art/eyeMatte-7f9bd22ed9f6.webp",
-  "dayWide": "/desktop-art/dayWide-ed04cac02d51.webp",
-  "nightWide": "/desktop-art/nightWide-bead99c59c48.webp",
+  "dayWide": "/desktop-art/dayWide-6a3597cb6b21.webp",
+  "nightWide": "/desktop-art/nightWide-c3fdf0a627b4.webp",
   "dayPortrait": "/desktop-art/dayPortrait-58d1effa814a.webp",
   "nightPortrait": "/desktop-art/nightPortrait-9aed77b783cf.webp"
 } as const;

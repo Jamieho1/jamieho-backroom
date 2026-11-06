@@ -17,7 +17,7 @@ test("/api/health answers with the app name and a Supabase status", async ({ req
 
 test("the header offers Google sign-in when signed out", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("banner").getByRole("link", { name: "Jamie Ho" })).toBeVisible();
+  await expect(page.getByRole("banner").getByRole("link", { name: "Jamie Ho — back to the top" })).toBeVisible();
   // Without Supabase settings (CI) the button is hidden rather than broken.
   const configured = process.env.NEXT_PUBLIC_SUPABASE_URL ? 1 : 0;
   await expect(page.getByRole("button", { name: "Sign in with Google" })).toHaveCount(configured);
@@ -31,7 +31,7 @@ test("a callback without a code comes back with a clear message", async ({ page 
 
 test("the privacy policy is public and linked from About Me without a global footer", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Privacy", exact: true })).toHaveCount(0); // the desktop itself stays clean (2026-11-06)
+  await expect(page.getByRole("link", { name: "Privacy", exact: true })).toHaveCount(1); // Privacy stays available from the homepage bar
   await page.goto("/about");
   await page.locator(".landing-footer").getByRole("link", { name: "Privacy", exact: true }).click();
   await expect(page).toHaveURL(/\/privacy$/);

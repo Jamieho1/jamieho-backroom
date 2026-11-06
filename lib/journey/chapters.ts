@@ -13,15 +13,15 @@ const PLACEHOLDER = "Placeholder: filled from the existing site content.";
 
 export const HOME_CHAPTERS: Chapter[] = [
   {
-    id: "sky", label: "Hello", nav: "Hello", kind: "video", src: "c1", scroll: 1.6, motes: 0.6,
+    id: "sky", label: "Hello", kind: "video", src: "c1", scroll: 1.6, motes: 0.6,
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
     panels: [{ id: "hero", from: 0, to: 0.32, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
   // The pivot: one giant statement on off-white, the education line, and the Imperial entrance framed beside it.
   {
-    id: "pivot", label: "Pivot", nav: "Pivot", kind: "section", tone: "light", scroll: 1.5,
+    id: "pivot", label: "About", nav: "About", kind: "section", tone: "light", scroll: 1.5,
     still: { file: "still-imperial.jpg", side: "right" },
-    panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "The pivot", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
+    panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
   { id: "projects", label: "Projects", nav: "Projects", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
@@ -32,7 +32,7 @@ export const HOME_CHAPTERS: Chapter[] = [
     panels: [{ id: "r1", from: 0.1, to: 1, side: "left", look: "role", eyebrow: "Role", title: "Experience", body: PLACEHOLDER }],
   },
   // Toolkit (TKT-88): the one layered scene. An exploded architecture stack, then the certification badges.
-  { id: "toolkit", label: "Toolkit", nav: "Toolkit", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Toolkit", layers: [], certs: [] } },
+  { id: "toolkit", label: "Techstack", nav: "Techstack", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Techstack", layers: [], certs: [] } },
   // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
   {
     id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6,

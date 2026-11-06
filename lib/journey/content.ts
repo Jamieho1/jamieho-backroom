@@ -1,7 +1,7 @@
 /**
  * TKT-77: fill the journey's placeholder panels with the site's existing content (no new content store, nothing
  * personal in git). Mapping agreed 2026-11-04:
- * - Sky: `hero` section (+ "Go straight to my desktop").
+ * - Sky: `hero` section, with no desktop shortcut.
  * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
@@ -23,8 +23,8 @@ import { articleHref, youtubeId } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
 
-/** Where "switch on the computer" leads. The desktop moves to /desktop when the journey takes over / (TKT-79). */
-export const DESKTOP_HREF = "/";
+/** Where "switch on the computer" leads. The homepage journey ends at the signed-in desktop. */
+export const DESKTOP_HREF = "/desktop";
 /** The contact form on the existing site. */
 export const CONTACT_HREF = "/about#home-contact";
 
@@ -117,7 +117,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           // "I {build|ship|teach} …" in the Hero body cycles in the live journey; the still version reads the first option.
           const intro = excerpt(s.hero.body);
           const rotator = parseRotator(intro) ?? undefined;
-          panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, cta: { label: "Go straight to my desktop", href: DESKTOP_HREF } }));
+          panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, cta: undefined }));
         }
           break;
         case "room:now":

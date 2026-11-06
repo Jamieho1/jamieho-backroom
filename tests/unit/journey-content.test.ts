@@ -38,7 +38,7 @@ describe("journey content (TKT-77)", () => {
     ];
     const pivotSections = { ...sections, about: { key: "about" as const, title: "From labs to production", body: "First para.\n\nSecond." } };
     const out = withContent(HOME_CHAPTERS, { sections: pivotSections, experience, technologies: [] });
-    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true, cta: { href: DESKTOP_HREF } });
+    expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "First line.", md: true, cta: undefined });
     expect(panelsOf(out, "pivot")[0]).toMatchObject({
       title: "From labs to production", body: "First para.", md: true, look: "statement",
       meta: "MEng Biomedical Engineering · Imperial College London · 2016–2020",

@@ -1,11 +1,13 @@
 # jamieho-backroom
 
+Agent context: see `AGENTS.md`, `docs/README.md` and `docs/status.md`. Older feature notes below may be superseded by `docs/`.
+
 Jamie Ho's personal website. It has three parts:
 - a public portfolio;
 - a Google-sign-in desktop of apps (Notes, practice arena, Behavioral);
 - a hub for later projects on subdomains.
 
-The plan is in `PRD.md`, working rules in `CLAUDE.md`, status in `MEMORY.md`, and the ticket order in `Resources/Tickets - Dependency Map.md`. Tickets live in Notion (TKT-51 to TKT-71).
+Current implementation summaries and task-specific reading paths are in `docs/`. Historical scope remains in `PRD.md` and `Resources/`; ticket dependencies are in `Resources/Tickets - Dependency Map.md`. Live ticket status is tracked in Notion.
 
 **This folder is the repo root.** Run every git command here, never in the parent `Personal Website` folder.
 

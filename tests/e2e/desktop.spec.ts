@@ -53,7 +53,7 @@ test('clean app routes stay gated and legacy desktop links redirect to them',asy
  }
 });
 test('Home and Projects use client navigation without replacing the document',async({page})=>{
- await page.goto('/');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
+ await page.goto('/about');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
  await page.getByRole('navigation',{name:'Desktop apps'}).getByRole('link',{name:'Projects',exact:true}).click();
  await expect(page).toHaveURL(/\/projects$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');

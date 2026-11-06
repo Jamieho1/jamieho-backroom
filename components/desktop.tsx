@@ -94,7 +94,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
               <h2 id={windowTitle}>{active.name}</h2>
               <div className="desktop-controls">
                 <button type="button" onClick={() => setMaximised(!maximised)} aria-label={maximised ? "Restore window" : "Maximise window"}>{maximised ? "⧉" : "□"}</button>
-                <Link href="/" aria-label="Close window">×</Link>
+                <Link href="/desktop" aria-label="Close window">×</Link>
               </div>
             </div>
             {content ? <div className="desktop-app-content">{content}</div> : PLACEHOLDERS[active.id] ? <div className="desktop-placeholder"><h2>{active.name}</h2><p>{PLACEHOLDERS[active.id]}</p></div> : (

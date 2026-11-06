@@ -97,6 +97,22 @@
       "width": 1672,
       "height": 941,
       "sha256": "7f9bd22ed9f6da5cb9cd2261f7b3fe45cc69c953c54bfbf66bef53db08e8cbe6"
+    },
+    {
+      "key": "dayWide",
+      "file": "/desktop-art/dayWide-6a3597cb6b21.webp",
+      "bytes": 385868,
+      "width": 1942,
+      "height": 809,
+      "sha256": "6a3597cb6b218b51041ed6e9f2a2ce941961c8f8f99606dd31ee6ae9f6c609c2"
+    },
+    {
+      "key": "nightWide",
+      "file": "/desktop-art/nightWide-c3fdf0a627b4.webp",
+      "bytes": 301932,
+      "width": 1942,
+      "height": 809,
+      "sha256": "c3fdf0a627b494c68bda799b51fd8c13c39ca1e26d060fe34cadfaa4f2b03951"
     }
   ]
 }

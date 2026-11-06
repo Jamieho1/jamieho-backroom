@@ -15,12 +15,13 @@ import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
 import { BrandIcon } from "./brand-icon";
-import { StartScreen } from "./start-screen";
+import { HeroArtwork } from "./hero-artwork";
+import { JourneyNavigation } from "./navigation";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
-import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
+import { mediaUrl, preloadOrder, stillFor } from "@/lib/journey/media";
 import { DESKTOP_HREF } from "@/lib/journey/content";
 import { Markdown } from "@/components/markdown";
-import { keyTokens, stripKeys, growAt, growTransform } from "@/lib/journey/motion";
+import { keyTokens, stripKeys } from "@/lib/journey/motion";
 import { PHONE_QUERY, PHONE_STILLS, phoneChapters } from "@/lib/journey/phone";
 import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/assets";
 
@@ -60,24 +61,28 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
   const jump = useRef<(id: string) => void>(() => {});
   const skip = useRef<() => void>(() => {});
   const lenisRef = useRef<Lenis | null>(null);
+  const navigation = useRef<HTMLDivElement>(null);
   const ready = useRef<boolean[]>([]);
   const preloader = useRef<Preloader | null>(null);
   const [live, setLive] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const [startShown, setStartShown] = useState(true);
-  const [ring, setRing] = useState(0);
   const [debug, setDebug] = useState(false);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setMobile(window.matchMedia(PHONE_QUERY).matches);
-    setDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const phone = window.matchMedia(PHONE_QUERY);
+    const syncPhone = () => setMobile(phone.matches);
+    syncPhone(); phone.addEventListener("change", syncPhone);
+    const scheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncTheme = () => setDark(document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && scheme.matches));
+    syncTheme();
+    scheme.addEventListener("change", syncTheme);
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     setDebug(new URLSearchParams(window.location.search).has("debug"));
     setLive(!reduce.matches);
-    if (window.location.hash === "#desk") { setEntered(true); setStartShown(false); } // deep link: straight to the desk
     const onChange = () => setLive(!reduce.matches);
     reduce.addEventListener("change", onChange);
-    return () => reduce.removeEventListener("change", onChange);
+    return () => { reduce.removeEventListener("change", onChange); scheme.removeEventListener("change", syncTheme); observer.disconnect(); phone.removeEventListener("change", syncPhone); };
   }, []);
 
   // TKT-76: download the clips whole, in chapter order, and swap each chapter from its still to its video as it lands.
@@ -85,16 +90,10 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
     if (!live) return;
     registerMediaCache();
     const variant = mobile ? "mobile" : "desktop";
-    const items = preloadOrder(chapters, variant, window.location.hash === "#desk" ? "c7b" : undefined);
-    if (mobile || shouldSkipVideo()) { setRing(1); return; } // phones: stills only, nothing to download
-    const loaded: Record<string, number> = {};
-    let shownRing = 0;
+    const items = preloadOrder(chapters.filter(c => c.id !== "sky"), variant, window.location.hash === "#desk" ? "c7b" : undefined);
+    if (mobile || shouldSkipVideo()) return; // phones: stills only, nothing to download
     preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
-      progress(src, bytes) {
-        loaded[src] = bytes;
-        const r = Math.floor(startProgress(items, loaded) * 100) / 100;
-        if (r !== shownRing) { shownRing = r; setRing(r); }
-      },
+      progress() {},
       ready(src, blobUrl) {
         chapters.forEach((c, i) => {
           const v = videos.current[i];
@@ -118,12 +117,6 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
       ? { url: wallpaper, fit: "portrait", fill: dark ? DESKTOP_PORTRAIT.nightTop : DESKTOP_PORTRAIT.dayTop }
       : { url: mediaUrl(base, f), fit: "cover" };
   }, [mobile, dark, wallpaper, base]);
-
-  const enter = () => {
-    // Inside the tap: let every clip that has already arrived play once, so iOS lets it scrub.
-    videos.current.forEach((v) => { if (v?.src) void v.play().then(() => v.pause()).catch(() => {}); });
-    setEntered(true);
-  };
 
   useEffect(() => {
     if (!live || !track.current) return;
@@ -154,25 +147,6 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
     const keys = new Map<string, HTMLElement[]>();
     panels.current.forEach((node, key) => keys.set(key, [...node.querySelectorAll<HTMLElement>(".journey-key, .journey-md strong, .journey-points strong")]));
 
-    // TKT-93: each section's framed image (still or showcase browser) grows to fill the screen as the section ends.
-    // Layout boxes (offset*, unaffected by transforms) are measured once and re-measured after a resize.
-    const boxes = new Map<number, { el: HTMLElement; x: number; y: number; w: number; h: number } | null>();
-    const growBox = (i: number) => {
-      if (boxes.has(i)) return boxes.get(i)!;
-      const layer = layers.current[i];
-      const el = layer?.querySelector<HTMLElement>(".journey-section-still, .journey-showcase-frame") ?? null;
-      let box = null;
-      if (layer && el && el.offsetWidth > 0) {
-        let x = 0, y = 0, n: HTMLElement | null = el;
-        while (n && n !== layer) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent as HTMLElement | null; }
-        box = { el, x, y, w: el.offsetWidth, h: el.offsetHeight };
-      }
-      boxes.set(i, box);
-      return box;
-    };
-    const remeasure = () => boxes.clear();
-    window.addEventListener("resize", remeasure);
-
     let prevNow = performance.now();
     const draw = () => {
       const now = performance.now();
@@ -182,7 +156,8 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
       const active = chapters[index];
       // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
       const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe) : 0;
-      let activeGrow = 0;
+      const activeGrow = 0;
+      if (navigation.current) navigation.current.dataset.floating = index > 0 ? "true" : "false";
       chapters.forEach((c, i) => {
         const el = layers.current[i];
         if (!el) return;
@@ -200,20 +175,6 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
-          const grows = !c.toolkit?.layers.length && (!!c.showcase?.length || !!c.still);
-          const box = grows && (opacity > 0 || el.dataset.grow) ? growBox(i) : null;
-          const g = box && opacity > 0 ? growAt(at) : 0;
-          if (box) {
-            if (g > 0) {
-              // A touch past "cover" so the frame's rounded corners leave the screen.
-              const t = growTransform(box, el.clientWidth, el.clientHeight, g);
-              const sc = t.scale * (1 + 0.06 * g);
-              box.el.style.transform = `translate3d(${t.dx.toFixed(1)}px, ${t.dy.toFixed(1)}px, 0) scale(${sc.toFixed(4)})`;
-              el.dataset.grow = "1";
-            } else { box.el.style.transform = ""; delete el.dataset.grow; }
-          }
-          el.style.setProperty("--grow", g.toFixed(3));
-          if (i === index) activeGrow = g;
           const ol = dots.current[i];
           if (ol && opacity > 0) {
             // Timeline: light the dot of the entry being read (the last one whose window has started).
@@ -235,7 +196,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
           if (!node) continue;
           const o = i === index ? panelOpacity(p, local, 0.08) : 0;
           const leaving = local > (p.from + p.to) / 2;
-          const fade = c.kind === "section" && o > 0 ? 1 - Number(el.style.getPropertyValue("--grow") || 0) : 1;
+          const fade = 1;
           node.style.opacity = o > 0 ? fade.toFixed(3) : "0";
           node.style.visibility = o > 0 ? "visible" : "hidden";
           node.style.setProperty("--o", o.toFixed(3));
@@ -286,29 +247,20 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
     };
     raf = requestAnimationFrame(draw);
     return () => {
-      window.removeEventListener("resize", remeasure);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
   }, [live, chapters, lay, navItems, base, phoneStill]);
 
-  // Declared after the engine so Lenis exists. The start screen holds the page still until the visitor enters (or skips to the desk).
-  useEffect(() => {
-    if (!live || entered) return;
-    const html = document.documentElement;
-    html.style.overflow = "hidden";
-    lenisRef.current?.stop();
-    return () => { html.style.overflow = ""; lenisRef.current?.start(); };
-  }, [live, entered]);
-
   return (
     <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`}>
+      <JourneyNavigation ref={navigation} items={navItems} navRefs={navRefs} live={live} onJump={(id) => jump.current(id)} />
       {live ? (
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
               <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id}>
-                {c.kind === "video" ? (
+                {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
@@ -346,20 +298,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
             <div className="journey-grain" aria-hidden="true" />
             <div ref={fadeEl} className="journey-fade" />
             <div className="journey-progress" aria-hidden="true"><div ref={bar} /></div>
-            {navItems.length ? (
-              <nav className="journey-nav" aria-label="Journey chapters">
-                {navItems.map(({ c }, k) => (
-                  <button key={c.id} type="button" ref={(el) => { navRefs.current[k] = el; }} onClick={() => jump.current(c.id)}>
-                    <span className="journey-nav-n">{String(k + 1).padStart(2, "0")}</span>{c.nav}
-                  </button>
-                ))}
-              </nav>
-            ) : null}
             {debug ? <div ref={hud} className="journey-hud" /> : null}
-            {startShown ? (
-              <StartScreen still={mobile ? wallpaper : mediaUrl(base, "c1-first.jpg")} hero={chapters[0]?.panels?.[0]} progress={ring}
-                desktopHref={DESKTOP_HREF} onEnter={enter} onGone={() => setStartShown(false)} />
-            ) : null}
           </div>
         </div>
       ) : (
@@ -405,9 +344,9 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} id={c.id === "room" ? "desk" : undefined}
+        <li key={c.id} id={c.id === "room" ? "desk" : c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
-          {c.kind === "video" ? (
+          {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mediaUrl(base, `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg`)} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
           ) : c.kind === "section" && c.still ? (
@@ -488,7 +427,7 @@ function RotatorLine({ r }: { r: NonNullable<Panel["rotator"]> }) {
 function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean }) {
   const H = heading;
   return <>
-    {p.eyebrow ? <p className="journey-eyebrow">{p.eyebrow}</p> : null}
+    {p.eyebrow ? <p className={`journey-eyebrow${heading === "h1" ? " journey-welcome" : ""}`}>{p.eyebrow}</p> : null}
     <H className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</H>
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {split && p.rotator ? <RotatorLine r={p.rotator} />
