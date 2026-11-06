@@ -19,3 +19,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Refined homepage introduction and scroll cue into coordinated navy glass with fine borders, muted gold and outline socials; full-background art/placement retained. Check passed (520 tests); focused browser checks 23 passed/1 existing skip. Local day/night desktop/phone previews reviewed. No database/migration changes; uncommitted, Jamie deploys/verifies.
 
 2026-11-06: Added existing Contact LinkedIn link to homepage introduction with matching icon. Typecheck, content tests and build passed; no database/migration changes.
+
+2026-11-06: Moved hero Welcome/name below the hands above introduction; removed displayed trailing period. Full-screen art retained, phone social spacing tightened. Typecheck/build passed; no database changes.

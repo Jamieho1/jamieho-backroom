@@ -425,15 +425,16 @@ function RotatorLine({ r }: { r: NonNullable<Panel["rotator"]> }) {
 }
 
 function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
-  return <>
+  const title = p.title.replace(/\.(?=\s*$)/, "");
+  return <div className="journey-hero-intro">
     <div className="journey-hero-heading">
       {p.eyebrow ? <p className="journey-eyebrow journey-welcome">{p.eyebrow}</p> : null}
-      <h1 className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</h1>
+      <h1 className="journey-title">{split ? <Words text={title} /> : stripKeys(title)}</h1>
     </div>
     <div className="journey-hero-glass">
       <PanelBody p={{ ...p, eyebrow: undefined, title: "" }} heading="h2" />
     </div>
-  </>;
+  </div>;
 }
 
 function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean }) {

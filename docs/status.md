@@ -14,3 +14,5 @@ Updated 2026-11-06; baseline 4e69257. Implementation below is local unless expli
 Glass redesign: npm run check passed (520 unit/database tests, typecheck, production build and static assertions). Local configured desktop/day and phone/day/night previews reviewed; sampled description contrast: 6.77:1, 6.66:1 and 10.37:1 respectively. Focused desktop/phone browser checks: 23 passed, 1 existing skip. Prior complete browser run had one unrelated /about WebGL re-enable timeout. No new database, migration, dependency, commit, push or deployment changes. Jamie verifies production.
 
 2026-11-06: Homepage introduction now includes LinkedIn beside YouTube/Instagram, using the existing Contact URL and matching outline icon button. Typecheck, journey-content tests and production build passed. No database change.
+
+2026-11-06: Welcome/name moved below the pointing hands, above the introduction. Display strips trailing full stop without changing stored content. Phone social spacing tightened to fit the three links. Typecheck and final production build passed; local desktop/phone previews reviewed. No database/migration change.
