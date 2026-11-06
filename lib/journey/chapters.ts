@@ -13,9 +13,9 @@ const PLACEHOLDER = "Placeholder: filled from the existing site content.";
 
 export const HOME_CHAPTERS: Chapter[] = [
   {
-    id: "sky", label: "Hello", kind: "video", src: "c1", scroll: 1.6, motes: 0.6,
+    id: "sky", label: "Hello", kind: "video", src: "c1", scroll: 0.65, motes: 0.6,
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
-    panels: [{ id: "hero", from: 0, to: 0.32, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
+    panels: [{ id: "hero", from: 0, to: 0.85, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
   // The pivot: one giant statement on off-white, the education line, and the Imperial entrance framed beside it.
   {

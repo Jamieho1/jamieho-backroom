@@ -1,6 +1,6 @@
 # Home journey
 
-Current route: /. Jamie authorized the cutover on 2026-11-06; /journey redirects to /. Arrival opens directly with no entry gate. Active sources: lib/journey/chapters.ts and content.ts; renderer components/journey/journey.tsx. Later Home v1.1/v1.2 decisions supersede the original all-landmarks journey and clickable-room plan.
+Current route: /. Jamie authorized the cutover on 2026-11-06; /journey redirects to /. Arrival opens directly with no entry gate. Hero scroll is 0.65 viewport heights (previously 1.6); its text stays until 85% of that chapter, avoiding an empty pause before About. Active sources: lib/journey/chapters.ts and content.ts; renderer components/journey/journey.tsx. Later Home v1.1/v1.2 decisions supersede the original all-landmarks journey and clickable-room plan.
 
 Sequence: sky → About/Imperial → Projects showcase → Experience/Westminster → Techstack/certifications → Creator → black join → desk Now/contact → monitor “Switch on”. Copy and featured records bind from public database content; empty sections are handled by content binding. Do not invent personal claims or clients.
 
