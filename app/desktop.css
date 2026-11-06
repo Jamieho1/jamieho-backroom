@@ -55,9 +55,6 @@ body:has(.desktop-os) .site-header{display:none}
 .desktop-introduction-cue{position:absolute;z-index:2;left:6%;top:14px;display:flex;align-items:center;gap:3px;padding:3px 6px;color:#fff0d4!important;font:italic clamp(12px,1.25vw,22px)/1.25 Georgia,serif;text-shadow:0 1px 5px #18334480;max-width:160px;white-space:nowrap;text-decoration:none}
 .desktop-introduction-cue svg{width:34px;height:35px;flex:none;filter:drop-shadow(0 1px 3px #18334460)}
 .desktop-introduction-cue:hover{text-decoration:underline;text-underline-offset:4px}
-.desktop-intro-tools{position:absolute;z-index:2;left:16px;right:16px;bottom:10px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
-.desktop-motion,.desktop-motion-label,.desktop-intro-privacy{pointer-events:auto;border:1px solid #e8e4d866;border-radius:6px;background:#102735b8;color:#fff0d4;padding:5px 9px;font:500 12px/18px var(--f-body);backdrop-filter:blur(8px);text-decoration:none}
-.desktop-motion{cursor:pointer}
 @media(max-width:1100px){.desktop-clock{display:none}.desktop-menubar{flex-wrap:wrap}.desktop-session{margin-left:auto}}
 @media(max-width:700px){
  .desktop-menubar{gap:5px;padding:6px 10px}.desktop-brand{font-size:13px}.desktop-session{order:1}.desktop-menubar .desktop-launchers{order:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;flex-basis:100%;gap:2px;max-height:25dvh;overflow:auto}
@@ -65,8 +62,7 @@ body:has(.desktop-os) .site-header{display:none}
  .desktop-session .desktop-menu-link{display:block;white-space:nowrap;font-size:11px;padding:4px 5px}.desktop-apps-loading{grid-column:1/-1}
  .desktop-workspace,.desktop-os.is-maximised .desktop-workspace{padding:8px 8px 0}.desktop-titlebar{display:flex;justify-content:space-between}.desktop-titlebar>span,.desktop-controls button{display:none}.desktop-placeholder{padding:20px}
  .desktop-introduction{top:64px;left:20px;right:20px}.desktop-introduction h1{font-size:36px}.desktop-introduction-copy{pointer-events:auto;font:400 14px/1.4 var(--f-body)}
- .desktop-introduction-cue{top:8px;font-size:14px}.desktop-introduction-cue svg{width:27px;height:30px}.desktop-intro-tools{left:10px;right:10px;bottom:10px}.desktop-motion,.desktop-motion-label,.desktop-intro-privacy{font-size:11px;padding:4px 7px}
-}
+ .desktop-introduction-cue{top:8px;font-size:14px}.desktop-introduction-cue svg{width:27px;height:30px}}
 @media(prefers-reduced-motion:reduce){.desktop-canvas{transition:none}}
 
 .desktop-noscript-nav{display:flex;gap:10px;font-size:12px;padding:4px}

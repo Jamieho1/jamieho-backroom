@@ -492,3 +492,14 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-toolkit-badge-img { width: clamp(72px, 7vw, 108px); height: auto; flex: none; filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.35)); }
 .journey-still-toolkit .journey-toolkit-badge-img { width: 44px; vertical-align: middle; margin-right: 10px; filter: none; }
 @media (max-width: 700px) { .journey-toolkit-badge-img { width: 64px; } }
+
+/* TKT-96 phone mode: the wallpaper's characters fill the middle, so the name sits in the sky and the buttons below. */
+.journey-phone [data-chapter="sky"] .journey-panel-center { top: max(48px, 6vh); bottom: auto; }
+.journey-phone .journey-start { place-items: stretch; }
+.journey-phone .journey-start-copy { display: flex; flex-direction: column; align-items: center; height: 100%; box-sizing: border-box; padding: max(56px, 8vh) 16px 40px; }
+.journey-phone .journey-start-actions { margin-top: auto; }
+.journey-phone .journey-start::after { background: linear-gradient(to bottom, rgb(8 6 4 / 0.35), transparent 30%, transparent 62%, rgb(8 6 4 / 0.7)); }
+/* No footage on phones, so each still fills the screen itself rather than a 16:9 box. */
+.journey-phone .journey-frame { width: 100%; height: 100%; }
+.journey-phone .journey-video[data-fit="portrait"] { object-fit: contain; object-position: 50% 100%; }
+@media (min-aspect-ratio: 941/1672) { .journey-phone .journey-video[data-fit="portrait"] { object-fit: cover; } }

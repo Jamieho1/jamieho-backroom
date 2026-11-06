@@ -29,6 +29,7 @@ test("visitors who want the apps can go straight to the desktop", async ({ page 
 });
 
 test("a clip that has not arrived shows its approved still, never a blank or frozen frame", async ({ page }) => {
+  test.skip(test.info().project.name === "phone", "phones show stills only (TKT-96)");
   await blockClips(page);
   await page.goto("/journey");
   await page.getByRole("button", { name: "Enter the journey" }).click();
@@ -79,7 +80,7 @@ test("after the hero, the Pivot section wipes in with its statement, and no midd
   const statement = page.locator('[data-chapter="pivot"] .journey-look-statement');
   await expect(statement).toBeVisible();
   await expect(page.locator('[data-chapter="pivot"] figure img')).toHaveAttribute("src", /still-imperial\.jpg/);
-  expect([...new Set(clips)].sort()).toEqual(["c1", "c7a", "c7b"]);
+  expect([...new Set(clips)].sort()).toEqual(test.info().project.name === "phone" ? [] : ["c1", "c7a", "c7b"]);
 });
 
 test("with no featured projects or public roles, those sections are skipped, not left blank", async ({ page }) => {
@@ -195,4 +196,25 @@ test("TKT-95: on a desktop the journey scrolls through every section without err
   const nav = page.getByRole("navigation", { name: "Journey chapters" });
   for (const name of [/Pivot/, /Toolkit/, /Creator/]) { await nav.getByRole("button", { name }).click(); await page.waitForTimeout(700); }
   expect(errors).toEqual([]);
+});
+
+test("TKT-96: a phone runs the journey on stills only — the wallpaper, the desk, then the monitor with Switch on", async ({ page }) => {
+  test.skip(test.info().project.name !== "phone", "phone mode");
+  const mp4: string[] = [];
+  page.on("request", (r) => { if (/\.mp4/.test(r.url())) mp4.push(r.url()); });
+  await page.goto("/journey");
+  await expect(page.locator(".journey-start-art")).toHaveAttribute("src", /(day|night)Portrait-/);
+  await expect(page.locator(".journey-start-pct")).toHaveText("Ready");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  await expect(page.locator('[data-chapter="sky"] video')).toHaveAttribute("poster", /(day|night)Portrait-/);
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Desk/ }).click();
+  await expect(page.locator('[data-chapter="room"] video')).toHaveAttribute("poster", /c7a-last\.jpg/);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator('[data-chapter="screen"] video')).toHaveAttribute("poster", /c7b-last\.jpg/);
+  const on = page.getByRole("button", { name: /Switch on the computer/ });
+  await expect(on).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(mp4).toEqual([]);
+  await on.click();
+  await page.waitForURL((u) => u.pathname === "/");
 });

@@ -23,7 +23,7 @@ test('arrival stays on the introduction until About Me is opened, and all apps u
 test('reduced motion and JavaScript-free visitors keep the complete still and working About Me link',async({page,browser,baseURL})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
  await expect(page.locator('.desktop-canvas canvas')).toHaveCount(0);
- await expect(page.getByText('Still view',{exact:true})).toBeVisible();
+ await expect(page.getByText('Still view',{exact:true})).toHaveCount(0); // no motion controls on the page (2026-11-06)
  await page.getByRole('link',{name:'Check Here: open About Me'}).click();await expect(page).toHaveURL(/\/about$/);
  const context=await browser.newContext({javaScriptEnabled:false});const plain=await context.newPage();await plain.goto(baseURL!);
  await expect(plain.getByRole('heading',{name:'Jamie Ho',level:1})).toBeVisible();
@@ -34,7 +34,7 @@ test('reduced motion and JavaScript-free visitors keep the complete still and wo
  await context.close();
 });
 
-test('desktop motion pauses, releases on navigation and loads night layers only when needed',async({page},info)=>{
+test('desktop motion is always on, releases on navigation and loads night layers only when needed',async({page},info)=>{
  test.skip(info.project.name==='phone','Phone layout and reduced-motion paths run separately.');
  await page.emulateMedia({colorScheme:'light',reducedMotion:'no-preference'});
  const errors:string[]=[],nightFiles:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&/THREE|Shader|WebGLProgram/.test(m.text()))errors.push(m.text())});
@@ -46,8 +46,7 @@ test('desktop motion pauses, releases on navigation and loads night layers only 
  await expect(backdrop).toHaveAttribute('data-scene','ready',{timeout:25000});
  const start=await canvas.getAttribute('data-scene-frame');await expect(canvas).not.toHaveAttribute('data-scene-frame',start!);
  expect(nightFiles).toEqual([]);
- await page.getByRole('button',{name:'Pause desktop motion',exact:true}).click();await expect(canvas.locator('canvas')).toHaveCount(0);
- await page.getByRole('button',{name:'Enable desktop motion',exact:true}).click();await expect(backdrop).toHaveAttribute('data-scene','ready',{timeout:25000});
+ await expect(page.getByRole('button',{name:/desktop motion/})).toHaveCount(0);
  await page.getByRole('button',{name:'Switch to dark mode'}).click();
  await expect(backdrop).toHaveAttribute('data-night','true');await expect(backdrop).toHaveAttribute('data-scene','ready',{timeout:25000});
  await expect(canvas).toHaveAttribute('data-scene-theme','night',{timeout:25000});expect(nightFiles.length).toBeGreaterThan(0);
@@ -62,7 +61,7 @@ test('desktop motion pauses, releases on navigation and loads night layers only 
 
 test('unavailable graphics leave the still, theme switch and navigation usable',async({page})=>{
  await page.addInitScript(`(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(kind,...args){return String(kind).includes('webgl')?null:original.call(this,kind,...args)}})()`);
- await page.goto('/');await expect(page.locator('.desktop-backdrop')).toHaveAttribute('data-scene','unavailable',{timeout:15000});await expect(page.getByText('Still view',{exact:true})).toBeVisible();
+ await page.goto('/');await expect(page.locator('.desktop-backdrop')).toHaveAttribute('data-scene','unavailable',{timeout:15000});
  await expect(page.locator('.desktop-canvas canvas')).toHaveCount(0);
  await page.getByRole('link',{name:'Check Here: open About Me'}).click();await expect(page).toHaveURL(/\/about$/);
  await expect(page.getByRole('heading',{level:1,name:'Jamie Ho'})).toBeVisible();

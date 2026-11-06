@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -21,6 +21,8 @@ import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/m
 import { DESKTOP_HREF } from "@/lib/journey/content";
 import { Markdown } from "@/components/markdown";
 import { keyTokens, stripKeys, growAt, growTransform } from "@/lib/journey/motion";
+import { PHONE_QUERY, PHONE_STILLS, phoneChapters } from "@/lib/journey/phone";
+import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/assets";
 
 /**
  * Home v1 scroll engine (TKT-74, polish pass 2026-11-05). One scroll owner: Lenis smooths native scroll,
@@ -30,7 +32,11 @@ import { keyTokens, stripKeys, growAt, growTransform } from "@/lib/journey/motio
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
 
-export function Journey({ chapters, base }: { chapters: Chapter[]; base: string }) {
+export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: string }) {
+  const [mobile, setMobile] = useState(false);
+  const [dark, setDark] = useState(false);
+  // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
+  const chapters = useMemo(() => (mobile ? phoneChapters(all) : all), [all, mobile]);
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -60,12 +66,12 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const [entered, setEntered] = useState(false);
   const [startShown, setStartShown] = useState(true);
   const [ring, setRing] = useState(0);
-  const [mobile, setMobile] = useState(false);
   const [debug, setDebug] = useState(false);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setMobile(window.matchMedia("(max-width: 768px)").matches);
+    setMobile(window.matchMedia(PHONE_QUERY).matches);
+    setDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
     setDebug(new URLSearchParams(window.location.search).has("debug"));
     setLive(!reduce.matches);
     if (window.location.hash === "#desk") { setEntered(true); setStartShown(false); } // deep link: straight to the desk
@@ -80,7 +86,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     registerMediaCache();
     const variant = mobile ? "mobile" : "desktop";
     const items = preloadOrder(chapters, variant, window.location.hash === "#desk" ? "c7b" : undefined);
-    if (shouldSkipVideo()) { setRing(1); return; }
+    if (mobile || shouldSkipVideo()) { setRing(1); return; } // phones: stills only, nothing to download
     const loaded: Record<string, number> = {};
     let shownRing = 0;
     preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
@@ -102,6 +108,16 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     });
     return () => { preloader.current?.dispose(); preloader.current = null; ready.current = []; };
   }, [live, mobile, chapters, base]);
+
+  const wallpaper = dark ? DESKTOP_ASSETS.nightPortrait : DESKTOP_ASSETS.dayPortrait;
+  const phoneStill = useCallback((src: string): PhoneStill | undefined => {
+    if (!mobile) return undefined;
+    const f = PHONE_STILLS[src];
+    if (!f) return undefined;
+    return f === "wallpaper"
+      ? { url: wallpaper, fit: "portrait", fill: dark ? DESKTOP_PORTRAIT.nightTop : DESKTOP_PORTRAIT.dayTop }
+      : { url: mediaUrl(base, f), fit: "cover" };
+  }, [mobile, dark, wallpaper, base]);
 
   const enter = () => {
     // Inside the tap: let every clip that has already arrived play once, so iOS lets it scrub.
@@ -178,7 +194,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
-        if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base);
+        if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base, phoneStill(c.src));
         if (c.kind === "section") {
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
@@ -274,7 +290,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
-  }, [live, chapters, lay, navItems, base]);
+  }, [live, chapters, lay, navItems, base, phoneStill]);
 
   // Declared after the engine so Lenis exists. The start screen holds the page still until the visitor enters (or skips to the desk).
   useEffect(() => {
@@ -286,7 +302,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   }, [live, entered]);
 
   return (
-    <div className={`journey${live ? " journey-live" : ""}`}>
+    <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`}>
       {live ? (
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
@@ -341,7 +357,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
             ) : null}
             {debug ? <div ref={hud} className="journey-hud" /> : null}
             {startShown ? (
-              <StartScreen still={mediaUrl(base, "c1-first.jpg")} hero={chapters[0]?.panels?.[0]} progress={ring}
+              <StartScreen still={mobile ? wallpaper : mediaUrl(base, "c1-first.jpg")} hero={chapters[0]?.panels?.[0]} progress={ring}
                 desktopHref={DESKTOP_HREF} onEnter={enter} onGone={() => setStartShown(false)} />
             ) : null}
           </div>
@@ -353,8 +369,23 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   );
 }
 
-function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: HTMLElement, local: number, ready: boolean, base: string) {
+interface PhoneStill { url: string; fit: "cover" | "portrait"; fill?: string }
+
+function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: HTMLElement, local: number, ready: boolean, base: string, fixed?: PhoneStill) {
   if (!v) return;
+  if (fixed) {
+    // Phone mode: one still for the whole chapter, no camera moves. On screens taller than 9:16 the wallpaper sits on
+    // the bottom edge and its sky colour fills the space above, so nothing is cropped off the sides (see journey.css).
+    if (v.dataset.still !== fixed.url) {
+      v.dataset.still = fixed.url;
+      v.poster = fixed.url;
+      v.dataset.fit = fixed.fit;
+      v.style.background = fixed.fill ?? "";
+      const frame = el.firstElementChild as HTMLElement | null;
+      if (frame) frame.style.transform = "";
+    }
+    return;
+  }
   const a = alignAt(c, local);
   const frame = el.firstElementChild as HTMLElement | null;
   if (frame) frame.style.transform = a.scale === 1 && !a.x && !a.y ? "" : `translate3d(${a.x * 100}%, ${a.y * 100}%, 0) scale(${a.scale})`;
