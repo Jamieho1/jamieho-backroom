@@ -29,3 +29,11 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: About grade hidden only in journey, text contrast strengthened and heading reduced; phone paragraph unclamped. 12 content tests/typecheck passed. Role wording live SQL rejected by automatic approval review; await explicit approval. Shorter heading choice pending; no database change.
 
 2026-11-06: Jamie chose original About heading at reduced size and explicitly approved live role wording. Applied/verified slash removal in site_sections.about. No migration; cached page refresh/deploy needed.
+
+2026-11-06: Enlarged hero Welcome/name and added local feathered navy contrast backdrop. Cyterly screenshot contains full dashboard with pan disabled, including still fallback. Typecheck/16 focused tests/build passed. No database changes.
+
+2026-11-06: Softened daytime hero via reversible CSS colour grade; day heading navy/teal with pale halo, night light/gold on navy. Build passed; local responsive previews reviewed. Original media and database unchanged.
+
+2026-11-06: Corrected overly pale day treatment: restored colour/depth with mild CSS grade and reduced heading halo. Night unchanged. Production build passed.
+
+2026-11-06: Installed approved softer 1920×1080 landscape day hero as hashed WebP; removed CSS image grade. Portrait/night assets retained. Check passed (521 tests/build/static assertions); local previews reviewed. No database changes; uncommitted.

@@ -40,7 +40,7 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
           img.style.opacity = j === shot ? String(1 - mix) : j === shot + 1 ? String(mix) : "0";
           // A full-page screenshot (much taller than the frame) slides up as if someone scrolls the site.
           const box = img.parentElement;
-          const tall = box && img.naturalWidth ? img.naturalHeight / img.naturalWidth - box.clientHeight / box.clientWidth : 0;
+          const tall = img.dataset.fit !== "contain" && box && img.naturalWidth ? img.naturalHeight / img.naturalWidth - box.clientHeight / box.clientWidth : 0;
           img.style.transform = tall > 0.15 && j === shot ? `translate3d(0, ${(-pan * 100 * (1 - (box!.clientHeight / box!.clientWidth) / (img.naturalHeight / img.naturalWidth))).toFixed(2)}%, 0)` : "";
         });
       });
@@ -77,7 +77,7 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
             <div key={it.slug} ref={(el) => { frames.current[k] = el; }} className="journey-showcase-shots" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
               {it.shots.length ? it.shots.map((src, j) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} ref={(el) => { (shots.current[k] ??= [])[j] = el; }} src={src} alt="" loading="lazy" style={{ opacity: j ? 0 : 1 }} />
+                <img key={src} data-fit={it.slug === "cyterly" ? "contain" : undefined} ref={(el) => { (shots.current[k] ??= [])[j] = el; }} src={src} alt="" loading="lazy" style={{ opacity: j ? 0 : 1 }} />
               )) : <div className="journey-showcase-blank"><span>{it.name}</span></div>}
             </div>
           ))}

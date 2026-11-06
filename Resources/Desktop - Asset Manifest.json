@@ -113,6 +113,14 @@
       "width": 1942,
       "height": 809,
       "sha256": "c3fdf0a627b494c68bda799b51fd8c13c39ca1e26d060fe34cadfaa4f2b03951"
+    },
+    {
+      "key": "dayHero",
+      "file": "/desktop-art/dayHero-6fb2c4bcd1b1.webp",
+      "bytes": 532400,
+      "width": 1920,
+      "height": 1080,
+      "sha256": "6fb2c4bcd1b1489822e9de048fcab9514967f2f1c7f0c7595527f8cd6c6389ff"
     }
   ]
 }

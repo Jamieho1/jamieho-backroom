@@ -377,7 +377,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
                 {c.showcase.map((it) => (
                   <li key={it.slug}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {it.shots[0] ? <img src={it.shots[0]} alt="" loading="lazy" /> : null}
+                    {it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt="" loading="lazy" /> : null}
                     <h2 className="journey-title">{it.name}</h2>
                     {it.tagline ? <p className="journey-body">{it.tagline}</p> : null}
                     <a className="journey-cta-link" href={it.href}>Read the case study <span>→</span></a>

@@ -24,3 +24,9 @@ Glass redesign: npm run check passed (520 unit/database tests, typecheck, produc
 2026-11-06 About: classification hidden in journey display, stronger paragraph contrast, smaller heading and untruncated phone paragraph. Typecheck and 12 journey-content tests passed; final production build passed. Desktop/phone previews checked. Jamie approved and the live About role wording update was applied and verified: slash removed. Original heading retained at reduced size, as requested. No schema/migration change.
 
 2026-11-06: About wording live update applied with explicit approval and verified by query. Existing heading text retained. Deployment/ISR refresh is needed for cached public copy; no migration.
+
+2026-11-06: Enlarged Welcome/name with feathered contrast scrim. Cyterly dashboard preview fits all edges and does not pan; fallback matches. Typecheck, 16 focused tests and build passed; local desktop/phone hero and fit behaviour checked. No database/migration changes in this revision.
+
+2026-11-06: Landscape day hero now uses the approved softer 1920×1080 artwork, navy/teal heading and reduced pale halo; CSS image filter removed. Night image unchanged; light/gold heading retained. Original assets untouched. Production build passed; local day/night previews checked. No database/migration changes.
+
+2026-11-06: Replaced landscape day hero with approved softer 1080p image, WebP delivery and manifest recorded. Existing phone portraits/night image retained. npm run check passed: typecheck, 521 tests, production build and static assertions. Local responsive hero previews reviewed. No database/migration/deployment changes.
