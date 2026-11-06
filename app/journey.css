@@ -593,7 +593,11 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
   border: 1px solid rgb(210 225 241 / .2); border-radius: 6px; background: rgb(255 255 255 / .04); color: #fff;
   transition: background .2s ease, border-color .2s ease;
 }
-.journey-hero-glass .journey-brand:hover { transform: none; filter: none; background: rgb(255 255 255 / .1); border-color: rgb(233 196 124 / .65); }
+.journey-hero-glass .journey-brand-youtube { background: #c9002b; }
+.journey-hero-glass .journey-brand-instagram { background: linear-gradient(120deg, #a52a72, #9035aa 55%, #5347ad); }
+.journey-hero-glass .journey-brand-linkedin { background: #0967a7; }
+.journey-hero-glass .journey-brand-youtube svg { padding: 2px; box-sizing: border-box; border-radius: 4px; background: #fff; }
+.journey-hero-glass .journey-brand:hover { transform: none; filter: brightness(1.12); border-color: rgb(255 255 255 / .6); }
 .journey-hero-glass .journey-brand:focus-visible { transform: none; outline: 2px solid #e9c47c; outline-offset: 3px; box-shadow: none; }
 .journey-cue {
   display: flex; align-items: center; justify-content: center; gap: 18px;

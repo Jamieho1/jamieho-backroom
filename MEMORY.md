@@ -21,3 +21,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Added existing Contact LinkedIn link to homepage introduction with matching icon. Typecheck, content tests and build passed; no database/migration changes.
 
 2026-11-06: Moved hero Welcome/name below the hands above introduction; removed displayed trailing period. Full-screen art retained, phone social spacing tightened. Typecheck/build passed; no database changes.
+
+2026-11-06: Hero socials now use platform colours; fixed shared YouTube glyph white-on-white play triangle. Typecheck/build passed; no database/migration change.
