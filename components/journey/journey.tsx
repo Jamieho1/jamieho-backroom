@@ -9,6 +9,8 @@ import {
   ctaOpacity, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
 } from "@/lib/journey/timeline";
 import { Motes, type MotesHandle } from "./motes";
+import { LineShape, type LineShapeHandle } from "./line-shape";
+import { lineState } from "@/lib/journey/lines";
 import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
@@ -18,6 +20,7 @@ import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } f
 import { mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
 import { DESKTOP_HREF } from "@/lib/journey/content";
 import { Markdown } from "@/components/markdown";
+import { keyTokens, stripKeys, growAt, growTransform } from "@/lib/journey/motion";
 
 /**
  * Home v1 scroll engine (TKT-74, polish pass 2026-11-05). One scroll owner: Lenis smooths native scroll,
@@ -41,11 +44,13 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
   const dots = useRef<(HTMLOListElement | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
+  const lineShape = useRef<LineShapeHandle>(null);
   const cta = useRef<ScreenCtaHandle>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const hud = useRef<HTMLDivElement>(null);
+  const cue = useRef<HTMLDivElement>(null);
   const jump = useRef<(id: string) => void>(() => {});
   const skip = useRef<() => void>(() => {});
   const lenisRef = useRef<Lenis | null>(null);
@@ -129,7 +134,30 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     // Word spans per panel, cached once.
     const words = new Map<string, HTMLElement[]>();
     panels.current.forEach((node, key) => words.set(key, [...node.querySelectorAll<HTMLElement>(".journey-w")]));
+    // Keywords (TKT-92): title **keys** and bold words in the copy light up one after another while the panel reads.
+    const keys = new Map<string, HTMLElement[]>();
+    panels.current.forEach((node, key) => keys.set(key, [...node.querySelectorAll<HTMLElement>(".journey-key, .journey-md strong, .journey-points strong")]));
 
+    // TKT-93: each section's framed image (still or showcase browser) grows to fill the screen as the section ends.
+    // Layout boxes (offset*, unaffected by transforms) are measured once and re-measured after a resize.
+    const boxes = new Map<number, { el: HTMLElement; x: number; y: number; w: number; h: number } | null>();
+    const growBox = (i: number) => {
+      if (boxes.has(i)) return boxes.get(i)!;
+      const layer = layers.current[i];
+      const el = layer?.querySelector<HTMLElement>(".journey-section-still, .journey-showcase-frame") ?? null;
+      let box = null;
+      if (layer && el && el.offsetWidth > 0) {
+        let x = 0, y = 0, n: HTMLElement | null = el;
+        while (n && n !== layer) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent as HTMLElement | null; }
+        box = { el, x, y, w: el.offsetWidth, h: el.offsetHeight };
+      }
+      boxes.set(i, box);
+      return box;
+    };
+    const remeasure = () => boxes.clear();
+    window.addEventListener("resize", remeasure);
+
+    let prevNow = performance.now();
     const draw = () => {
       const now = performance.now();
       shown = approach(shown, target, now - last);
@@ -138,6 +166,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       const active = chapters[index];
       // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
       const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe) : 0;
+      let activeGrow = 0;
       chapters.forEach((c, i) => {
         const el = layers.current[i];
         if (!el) return;
@@ -155,6 +184,20 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
+          const grows = !c.toolkit?.layers.length && (!!c.showcase?.length || !!c.still);
+          const box = grows && (opacity > 0 || el.dataset.grow) ? growBox(i) : null;
+          const g = box && opacity > 0 ? growAt(at) : 0;
+          if (box) {
+            if (g > 0) {
+              // A touch past "cover" so the frame's rounded corners leave the screen.
+              const t = growTransform(box, el.clientWidth, el.clientHeight, g);
+              const sc = t.scale * (1 + 0.06 * g);
+              box.el.style.transform = `translate3d(${t.dx.toFixed(1)}px, ${t.dy.toFixed(1)}px, 0) scale(${sc.toFixed(4)})`;
+              el.dataset.grow = "1";
+            } else { box.el.style.transform = ""; delete el.dataset.grow; }
+          }
+          el.style.setProperty("--grow", g.toFixed(3));
+          if (i === index) activeGrow = g;
           const ol = dots.current[i];
           if (ol && opacity > 0) {
             // Timeline: light the dot of the entry being read (the last one whose window has started).
@@ -176,9 +219,15 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
           if (!node) continue;
           const o = i === index ? panelOpacity(p, local, 0.08) : 0;
           const leaving = local > (p.from + p.to) / 2;
-          node.style.opacity = o > 0 ? "1" : "0";
+          const fade = c.kind === "section" && o > 0 ? 1 - Number(el.style.getPropertyValue("--grow") || 0) : 1;
+          node.style.opacity = o > 0 ? fade.toFixed(3) : "0";
           node.style.visibility = o > 0 ? "visible" : "hidden";
           node.style.setProperty("--o", o.toFixed(3));
+          const ks = keys.get(key) ?? [];
+          if (ks.length) {
+            const q = o > 0 ? (local - p.from) / Math.max(0.01, p.to - p.from) : -1;
+            ks.forEach((k, n) => { const on = q >= 0.12 + n * 0.06 ? "1" : "0"; if (k.dataset.on !== on) k.dataset.on = on; });
+          }
           const ws = words.get(key) ?? [];
           ws.forEach((w, k) => {
             const r = leaving ? o : wordReveal(o, k, ws.length);
@@ -193,6 +242,9 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
       const cv = active.id === "screen" ? videos.current[index] : null;
       const filled = !!cv && (!ready.current[index] || (cv.duration > 0 && !cv.seeking && cv.currentTime >= cv.duration * 0.8));
       cta.current?.setOpacity(filled ? ctaOpacity(local) : 0);
+      // TKT-95: the wireframe behind the titles (desktop only; a no-op until three.js has loaded).
+      lineShape.current?.frame(layers.current[index], lineState(chapters, index, local, activeGrow), active.kind === "section" ? active.tone : "dark", now - prevNow);
+      prevNow = now;
       motes.current?.setIntensity(active.kind === "video" ? active.motes ?? 0 : 0);
       // The film vignette belongs to the footage; it lifts off as a flat section covers the screen.
       if (vignette.current) vignette.current.style.opacity = active.kind === "section" ? wipeIn.toFixed(3) : "1";
@@ -201,6 +253,8 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
         if (active.kind === "fade") fadeEl.current.style.background = active.color;
       }
       if (bar.current) bar.current.style.transform = `scaleX(${shown.toFixed(4)})`;
+      // "Scroll to discover" (TKT-92): only on the opening screen, gone as soon as the journey moves.
+      if (cue.current) { const o = Math.max(0, 1 - shown * 60); cue.current.style.opacity = o.toFixed(3); cue.current.style.visibility = o > 0 ? "visible" : "hidden"; }
       // Chapter menu: the current item is the last listed chapter at or before the active one.
       let current = -1;
       navItems.forEach(({ i }, k) => { if (i <= index) current = k; });
@@ -216,6 +270,7 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
     };
     raf = requestAnimationFrame(draw);
     return () => {
+      window.removeEventListener("resize", remeasure);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
@@ -261,15 +316,17 @@ export function Journey({ chapters, base }: { chapters: Chapter[]; base: string 
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={p.title}>
+                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
                     <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} split />
                   </section>
                 ))}
               </div>
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
+            <div ref={cue} className="journey-cue" aria-hidden="true"><span>Scroll to discover</span><i /></div>
             <ScreenCta ref={cta} href={DESKTOP_HREF} />
             <Motes ref={motes} />
+            <LineShape ref={lineShape} />
             <div className="journey-grain" aria-hidden="true" />
             <div ref={fadeEl} className="journey-fade" />
             <div className="journey-progress" aria-hidden="true"><div ref={bar} /></div>
@@ -339,7 +396,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
                 </div>
               ))}
               {c.toolkit.certs.length ? <ul className="journey-points">{c.toolkit.certs.map((x) => (
-                <li key={x.title}>{x.href ? <a href={x.href} target="_blank" rel="noopener noreferrer">{x.title}</a> : x.title}{x.org ? ` · ${x.org}` : ""}</li>
+                <li key={x.title}>{/* eslint-disable-next-line @next/next/no-img-element */}{x.badge ? <img className="journey-toolkit-badge-img" src={x.badge} alt="" width={56} height={56} /> : null}{x.href ? <a href={x.href} target="_blank" rel="noopener noreferrer">{x.title}</a> : x.title}{x.org ? ` · ${x.org}` : ""}</li>
               ))}</ul> : null}
             </section>
           ) : null}
@@ -361,7 +418,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
             </section>
           ) : null}
           {(c.panels ?? []).map((p) => (
-            <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={p.title}>
+            <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
               <PanelBody p={p} heading={c.id === "sky" ? "h1" : "h2"} />
             </section>
           ))}
@@ -377,17 +434,35 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
 }
 
 function Words({ text }: { text: string }) {
-  return <>{text.split(/(\s+)/).map((w, k) => (/^\s+$/.test(w) ? w : <span key={k} className="journey-w">{w}</span>))}</>;
+  return <>{keyTokens(text).map((t, k) => (/^\s+$/.test(t.text) ? t.text : <span key={k} className={t.key ? "journey-w journey-key" : "journey-w"}>{t.text}</span>))}</>;
+}
+
+/** `**word**` inside short text (proof points) → <strong>, which lights up like the title keywords. */
+function Inline({ text }: { text: string }) {
+  return <>{text.split(/(\*\*[^*]+\*\*)/).map((part, k) => /^\*\*[^*]+\*\*$/.test(part) ? <strong key={k}>{part.slice(2, -2)}</strong> : part)}</>;
+}
+
+/** TKT-92: "I {build|ship|teach} …": the options sit in one grid cell (width of the longest) and take turns (CSS only). */
+function RotatorLine({ r }: { r: NonNullable<Panel["rotator"]> }) {
+  const n = r.words.length;
+  return (
+    <p className="journey-body journey-rotator" aria-label={`${r.before}${r.words.join(", ")}${r.after}`}>
+      <span aria-hidden="true">{r.before}<span className="journey-rotate" style={{ ["--n" as string]: n }}>
+        {r.words.map((w, k) => <span key={w} style={{ ["--i" as string]: k }}>{w}</span>)}
+      </span>{r.after}</span>
+    </p>
+  );
 }
 
 function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean }) {
   const H = heading;
   return <>
     {p.eyebrow ? <p className="journey-eyebrow">{p.eyebrow}</p> : null}
-    <H className="journey-title">{split ? <Words text={p.title} /> : p.title}</H>
+    <H className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</H>
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
-    {p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
-    {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}>{t}</li>)}</ul> : null}
+    {split && p.rotator ? <RotatorLine r={p.rotator} />
+      : p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
+    {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}><Inline text={t} /></li>)}</ul> : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.links?.some((l) => l.platform) ? (
       <ul className="journey-media">

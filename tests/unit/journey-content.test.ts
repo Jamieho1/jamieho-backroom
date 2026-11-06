@@ -151,8 +151,8 @@ describe("journey content (TKT-77)", () => {
     ] });
     const tk = withContent(HOME_CHAPTERS, { sections: tech, experience: [aws], technologies: [] }).find((c) => c.id === "toolkit")!;
     expect(tk.kind === "section" && tk.toolkit?.certs).toEqual([
-      { title: "AWS Machine Learning Specialty", org: "AWS", href: undefined },
-      { title: "AWS Solutions Architect Professional", org: "AWS", href: "https://www.credly.com/badges/2" },
+      { title: "AWS Machine Learning Specialty", org: "AWS", href: undefined, badge: expect.stringMatching(/aws-ml-specialty/) },
+      { title: "AWS Solutions Architect Professional", org: "AWS", href: "https://www.credly.com/badges/2", badge: expect.stringMatching(/aws-sa-pro/) },
     ]);
   });
 });

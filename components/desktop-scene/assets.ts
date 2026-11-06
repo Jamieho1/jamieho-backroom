@@ -13,7 +13,9 @@ export const DESKTOP_ASSETS={
   "eyeNight": "/desktop-art/eyeNight-cbd3487049fe.webp",
   "eyeMatte": "/desktop-art/eyeMatte-7f9bd22ed9f6.webp",
   "dayWide": "/desktop-art/dayWide-ed04cac02d51.webp",
-  "nightWide": "/desktop-art/nightWide-bead99c59c48.webp"
+  "nightWide": "/desktop-art/nightWide-bead99c59c48.webp",
+  "dayPortrait": "/desktop-art/dayPortrait-58d1effa814a.webp",
+  "nightPortrait": "/desktop-art/nightPortrait-9aed77b783cf.webp"
 } as const;
 
 /**
@@ -22,3 +24,10 @@ export const DESKTOP_ASSETS={
  * width 1437.8 (same scale both themes, no rotation). So, relative to the art frame's width:
  */
 export const DESKTOP_WIDE_FIT = { left: 252.1 / 1437.8, width: 1942 / 1437.8 } as const;
+
+/**
+ * 9:16 portrait versions of the day/night art, made by Jamie (2026-11-06) for phones. They fill the screen's width,
+ * sit on the bottom edge, and on taller screens the sky continues above them in its own top colour.
+ * Below this width-to-height ratio the backdrop uses them instead of the landscape frame.
+ */
+export const DESKTOP_PORTRAIT = { below: 0.75, dayTop: "#2d65b0", nightTop: "#102336" } as const;

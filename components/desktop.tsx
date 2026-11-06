@@ -62,7 +62,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
   }
 
   return (
-    <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`,"--desktop-day-wide":`url("${DESKTOP_ASSETS.dayWide}")`,"--desktop-night-wide":`url("${DESKTOP_ASSETS.nightWide}")`} as CSSProperties}>
+    <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`,"--desktop-day-wide":`url("${DESKTOP_ASSETS.dayWide}")`,"--desktop-night-wide":`url("${DESKTOP_ASSETS.nightWide}")`,"--desktop-day-portrait":`url("${DESKTOP_ASSETS.dayPortrait}")`,"--desktop-night-portrait":`url("${DESKTOP_ASSETS.nightPortrait}")`} as CSSProperties}>
       <header className="desktop-menubar">
         <Link href="/" className="desktop-brand"><AppMark /> Jamie Ho</Link>
         <nav className="desktop-launchers" aria-label="Desktop apps" aria-busy={loadingApps}>

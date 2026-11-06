@@ -17,7 +17,8 @@ import type { Section, SectionKey } from "@/lib/sections";
 import type { LatestMedia } from "@/lib/articles-public";
 import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
 import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
-import { firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
+import { certBadge, firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
+import { parseRotator, rotatorText } from "./motion";
 import { articleHref, youtubeId } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
@@ -94,6 +95,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           ? shown.map((b) => ({ title: b.text.replace(/\[[^\]]*\]\(https:[^)]*\)/g, "").replace(/https:\/\/\S+/g, "").replace(/\s+/g, " ").trim(), org: i.org.trim() || i.title.trim(), href: firstHttps(b.text) ?? firstHttps(i.summary) }))
           : [{ title: i.title.trim(), org: i.org.trim(), href: firstHttps(i.summary) }];
       });
+      for (const cert of certs) { const badge = certBadge(cert.title, cert.org); if (badge) Object.assign(cert, { badge }); }
       if (!layers.length) return { ...c, toolkit: { ...c.toolkit, layers: [], certs: [] } };
       const scroll = toolkitScroll(layers.length, certs.length);
       return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), toolkit: { title: s.technology.title.trim() || c.toolkit.title, layers, certs } };
@@ -111,7 +113,12 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       const at = (patch: Partial<Panel>): Panel => ({ ...p, ...patch });
       switch (`${c.id}:${p.id}`) {
         case "sky:hero":
-          panels.push(at({ title: s.hero.title || "Jamie Ho", body: excerpt(s.hero.body), md: true, cta: { label: "Go straight to my desktop", href: DESKTOP_HREF } }));
+        {
+          // "I {build|ship|teach} …" in the Hero body cycles in the live journey; the still version reads the first option.
+          const intro = excerpt(s.hero.body);
+          const rotator = parseRotator(intro) ?? undefined;
+          panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, cta: { label: "Go straight to my desktop", href: DESKTOP_HREF } }));
+        }
           break;
         case "room:now":
           if (plain(s.now.body)) panels.push(at({ title: s.now.title || p.title, body: excerpt(s.now.body), md: true }));

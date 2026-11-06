@@ -36,6 +36,8 @@ export interface Panel {
   cta?: { label: string; href: string };
   /** A row of pill buttons (e.g. the Creator section's Subscribe / Follow); http(s) links open in a new tab. */
   actions?: { label: string; href: string; platform?: MediaPlatform }[];
+  /** A cycling phrase shown instead of the body in the live journey (TKT-92); `body` keeps its still-version text. */
+  rotator?: { before: string; words: string[]; after: string };
   /** "statement": the title is a giant BMW-style line; "role": one experience entry (section chapters). */
   look?: "statement" | "role";
   /** Short proof points under the body (an experience entry's public bullets). */
@@ -83,7 +85,7 @@ export interface SectionChapter extends Base {
   /** TKT-85: show one timeline dot per panel (the current one lit), labelled with each panel's eyebrow. */
   timeline?: boolean;
   /** TKT-88: the exploded architecture stack (layers from the Technology section, badges from certificates). */
-  toolkit?: { title: string; layers: { name: string; how: string; tools: string[] }[]; certs: { title: string; org: string; href?: string }[] };
+  toolkit?: { title: string; layers: { name: string; how: string; tools: string[] }[]; certs: { title: string; org: string; href?: string; badge?: string }[] };
   /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
   showcase?: ShowcaseItem[];
 }

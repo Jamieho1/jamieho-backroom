@@ -11,7 +11,7 @@
 import { clamp01, smoothstep } from "./timeline";
 
 export interface Layer { name: string; how: string; tools: string[] }
-export interface Cert { title: string; org: string; href?: string }
+export interface Cert { title: string; org: string; href?: string; badge?: string }
 
 export const TOOLKIT_LIMITS = { layers: 6, tools: 12 } as const;
 
@@ -71,4 +71,14 @@ export function layerZ(k: number, lift: number[], tight = 14, open = 96): number
   let z = 0;
   for (let j = 1; j <= k; j++) z += tight + (open - tight) * clamp01(lift[j] ?? 0);
   return z;
+}
+
+/** Official badge art (public/badges) for certifications Jamie holds, matched loosely on the title. */
+export const CERT_BADGES: readonly { match: RegExp; src: string }[] = [
+  { match: /machine learning/i, src: "/badges/aws-ml-specialty-d33720a3e719.webp" },
+  { match: /solutions? architect/i, src: "/badges/aws-sa-pro-eae67aa33207.webp" },
+];
+export function certBadge(title: string, org = ""): string | undefined {
+  if (!/aws|amazon/i.test(`${title} ${org}`)) return undefined;
+  return CERT_BADGES.find((b) => b.match.test(title))?.src;
 }

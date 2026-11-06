@@ -312,3 +312,95 @@ Done means:
 
 - Where project screenshots are stored: a new `project-media` bucket, or a folder in an existing bucket. Settle this in step 3 after checking how app screenshots are stored today.
 - Whether the old `apps.screenshots` cards stay anywhere once `/projects` switches to the new table.
+
+---
+
+## Home v1.2, motion and polish
+
+_Status: **signed off by Jamie (5 Nov 2026)**. Source: the planning round of 5 Nov 2026 in Claude (Cowork). Builds on Home v1.1 above; where they conflict, this section wins._
+
+**Problem**
+
+v1.1 gave the journey real content, but it still moves mostly as fades. Next to BMW's site it lacks motion that carries meaning: words that change, keywords that light up, geometry, images that grow. Phones also crop the 16:9 hero and desk videos badly. The page also has no strong closing action for clients, and no fast path for viewers who arrive from a video or post looking for the extra materials.
+
+**Outcome and completion**
+
+Done means:
+
+1. **Text motion.**
+   - The hero cycles a short set of words with a fade, e.g. "I build · I ship · I teach". The words come from the Hero section.
+   - Keywords in the Pivot and Experience statements change to the amber accent as you scroll past them. The owner marks them with `**bold**` in the copy.
+   - A "Scroll to discover" cue sits at the bottom of the first screen and nudges every few seconds until the visitor scrolls.
+2. **Image grows to full screen.** The project showcase frame and the section stills scale up as you scroll, filling the screen at the hand-over to the next section. Only transform changes.
+3. **3D line sphere.** A wireframe sphere drawn with three.js (already a dependency) sits behind the section titles. It morphs between shapes from section to section (sphere, torus, wave grid or similar) and rotates slowly. It's off on phones and with reduced motion, and has no effect on content or layout.
+4. **Viewer path.** The start screen gets a third option, "I came from a video →", which opens /articles. Recruiters and clients share the main journey; there is no copy-swap toggle.
+5. **"Make the next move".** A new dark section before the room. A huge "Make the next move" statement sits over a large "Book a 30-min call ↗" button, with a smaller "or send a message" link to the contact form.
+   - The call link comes from a Cal.com or Calendly link in the Contact section, which Jamie creates for free.
+   - With no booking link, the section offers only the contact form.
+6. **Phones.**
+   - The hero and desk use two 9:16 portrait stills, which Jamie generates, instead of video. They have a slow zoom (Ken Burns) and the light motes.
+   - This cuts the phone download by about 2 MB and fixes the crop.
+   - Push-in to the monitor: either a portrait still, or "Switch on" over the desk still.
+7. **Verified.**
+   - Unit and e2e tests pass.
+   - Visual checks at 1440, 390 and 360 px.
+   - Reduced motion keeps everything readable, with no sphere, cycling or zoom.
+   - Jamie reviews and pushes.
+
+**Scope**
+
+- **In:** items 1–6 above; the booking-link detection in the Contact section; the portrait still slots in the media pipeline and manifest.
+- **Out:**
+  - A copy-swap toggle for different audiences.
+  - New videos.
+  - Embedding live YouTube or Instagram feeds (they stay article-driven).
+  - Any paid booking tool.
+- **Reused:**
+  - The v1.1 section engine and its single rAF loop.
+  - GSAP and Lenis.
+  - three.js (already used by the desktop scene).
+  - The start screen, the media manifest and service worker, and the Contact section's social-link parsing.
+
+**Canonical locations/data**
+
+| What | Where |
+|---|---|
+| This PRD | repo `Resources/Home v1 - PRD.md`, this section |
+| Code | `~/Documents/Developer/Personal Website/jamieho-backroom` (`lib/journey`, `components/journey`, `app/journey.css`) |
+| Copy (cycling words, bold keywords, booking link) | `site_sections` (`hero`, `about`, `contact`) and experience bullets, edited on the site |
+| Portrait stills | made by Jamie → `Personal Website/Media/Stills/` → graded web copies in `public/home-media/` + the `home-media` bucket |
+
+**Constraints**
+
+- Animate transform and opacity only, from one rAF loop (scroll-craft rules). The sphere renders in its own canvas, paused when off-screen or with reduced motion.
+- Free tiers only. The sphere adds no new dependency. The phone payload drops instead of growing.
+- Jamie makes the portrait stills and the booking page himself. Agents generate no media and spend no credits.
+- Personal content stays in the database. Ask before each ticket. Jamie pushes himself.
+
+**Build plan**
+
+1. **Text motion:** word cycler from the Hero section, keyword highlight from `**bold**`, and the Scroll to discover cue.
+2. **Image grows to full screen:** the scale-up and hand-over on the showcase frame and stills.
+3. **3D line sphere:** a three.js wireframe that morphs per section; skipped on phones and with reduced motion; a fallback when WebGL is missing.
+4. **Viewer path:** the "I came from a video →" start-screen option to /articles.
+5. **Make the next move:** the section, booking-link detection (Cal.com / Calendly), and the contact-form fallback.
+6. **Phone portrait mode:** portrait stills with slow zoom and motes for the hero and desk on phones, plus the push-in treatment. _Gate:_ Jamie supplies the two 9:16 stills.
+7. **Verification pass:** all sections on desktop, phone and reduced motion.
+
+**Verification and handoff**
+
+- **Unit:** word list parsing, bold-keyword extraction, booking-link detection, scale and morph maths.
+- **e2e:**
+  - the start-screen viewer link;
+  - Make the next move, with and without a booking link;
+  - phones get no video requests;
+  - reduced motion has no canvas, no cycling and keeps all text.
+- **Visual:** each new effect at 0, 50 and 100% of its range.
+- **Not tested here:** a real iPhone and Low Power Mode. Jamie checks those.
+- **Rollback:** everything stays on /journey until the content gate (TKT-79).
+
+**Open questions**
+
+- Pivot community line ("Tech Lead, Google Developer Student Club · Head of Systematic Trading, Investment Society · talks"): recommended, but Jamie hasn't confirmed it.
+- Morph shapes for the sphere per section: to settle during build with a visual check.
+- Desk on phones: portrait push-in still, or Switch on over the desk still.

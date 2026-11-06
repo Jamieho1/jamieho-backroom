@@ -82,5 +82,7 @@ export const Toolkit = forwardRef<ToolkitHandle, { data: Data }>(function Toolki
 });
 
 function Badge({ c }: { c: Data["certs"][number] }) {
-  return <span className="journey-toolkit-badge"><span className="journey-toolkit-seal" aria-hidden="true">✓</span><span><strong>{c.title}</strong>{c.org ? <small>{c.org}</small> : null}</span></span>;
+  // eslint-disable-next-line @next/next/no-img-element
+  const seal = c.badge ? <img className="journey-toolkit-badge-img" src={c.badge} alt="" width={120} height={120} /> : <span className="journey-toolkit-seal" aria-hidden="true">✓</span>;
+  return <span className="journey-toolkit-badge">{seal}<span><strong>{c.title}</strong>{c.org ? <small>{c.org}</small> : null}</span></span>;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { firstHttps, layerZ, parseToolkit, toolkitScroll, toolkitState } from "@/lib/journey/toolkit";
+import { certBadge, firstHttps, layerZ, parseToolkit, toolkitScroll, toolkitState } from "@/lib/journey/toolkit";
 
 describe("toolkit stack (TKT-88)", () => {
   it("parses '## layer', the how line and bullet tools", () => {
@@ -56,5 +56,14 @@ Ship it.`;
     expect(layerZ(0, [0, 0, 0])).toBe(0);
     expect(layerZ(2, [0, 0, 0])).toBe(28);
     expect(layerZ(2, [1, 1, 1])).toBe(192);
+  });
+});
+
+describe("certificate badges", () => {
+  it("uses the official AWS art for the two certifications, and the seal otherwise", () => {
+    expect(certBadge("AWS Machine Learning Specialty", "AWS")).toMatch(/aws-ml-specialty/);
+    expect(certBadge("AWS Certified Solutions Architect – Professional", "Amazon Web Services")).toMatch(/aws-sa-pro/);
+    expect(certBadge("Machine Learning", "Coursera")).toBeUndefined();
+    expect(certBadge("CKA", "Linux Foundation")).toBeUndefined();
   });
 });

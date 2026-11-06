@@ -137,3 +137,30 @@ TKT-76 Start screen + preloader (in review) ────────────
 - TKT-80 Done as superseded by TKT-90.
 - TKT-79 re-scoped as the content gate.
 - TKT-81 re-scoped to the final media check.
+
+---
+
+## Home v1.2, motion and polish (added 2026-11-05)
+
+PRD: `Resources/Home v1 - PRD.md`, section "Home v1.2" (signed off 5 Nov 2026). Notion: Tickets database.
+
+**Startable now (no blockers, can run in parallel):**
+- **TKT-91** Make the next move: booking CTA section (P0)
+- **TKT-92** Text motion: word cycler, keyword highlight, Scroll to discover (P1)
+- **TKT-93** Images grow to full screen at hand-over (P1)
+- **TKT-94** Viewer path: "I came from a video" → /articles (P1)
+- **TKT-95** 3D line sphere morphing behind section titles (P2)
+
+**Gated:**
+- **TKT-96** Phone portrait mode (P1). Blocked until Jamie supplies two 9:16 stills (hero, desk) in `Media/Stills`.
+
+**Blocking chain:**
+
+```
+TKT-91 ─┐
+TKT-92 ─┤
+TKT-93 ─┼─> TKT-97 Verification pass (also re-checks TKT-96 when it lands)
+TKT-94 ─┤
+TKT-95 ─┘
+Jamie's 9:16 stills ─> TKT-96 Phone portrait mode
+```

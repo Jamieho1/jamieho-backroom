@@ -127,3 +127,72 @@ test("the still version (reduced motion) has no sideways scroll and keeps every 
   await expect(page.locator(".journey-stills a", { hasText: "Go straight to my desktop" })).toHaveAttribute("href", "/");
   await expect(page.locator(".journey-stills a", { hasText: "Send a message" })).toHaveAttribute("href", "/about#home-contact");
 });
+
+test("TKT-92: 'Scroll to discover' nudges until the visitor scrolls, then goes", async ({ page }) => {
+  await blockClips(page);
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  const cue = page.locator(".journey-cue");
+  await expect(cue).toBeVisible();
+  await page.mouse.wheel(0, 1200);
+  await expect(cue).toBeHidden();
+});
+
+test("TKT-92: reduced motion has no cue and no cycling words", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/journey");
+  await expect(page.locator(".journey-cue")).toHaveCount(0);
+  expect(await page.locator(".journey-rotate").evaluateAll((els) => els.every((e) => getComputedStyle(e).animationName === "none"))).toBe(true);
+});
+
+test("TKT-93: at the end of the Pivot its photo grows to fill the screen and the text fades", async ({ page }) => {
+  await blockClips(page);
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  const pivot = page.locator('[data-chapter="pivot"]');
+  const H = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+  let y = 0;
+  // Scroll until the photo starts growing, then a little further so it covers the screen.
+  while (y < H && !(await pivot.getAttribute("data-grow"))) { y += 40; await page.evaluate((v) => scrollTo(0, v), y); await page.waitForTimeout(40); }
+  expect(y).toBeLessThan(H);
+  // Step on until it has fully grown (Lenis eases the scroll, so give each step a moment to settle).
+  const grow = () => pivot.evaluate((el) => Number((el as HTMLElement).style.getPropertyValue("--grow") || 0));
+  let g = await grow();
+  for (let k = 0; k < 120 && g < 0.98; k++) {
+    y += 12;
+    await page.evaluate((v) => scrollTo(0, v), y);
+    await page.waitForTimeout(120);
+    g = await grow();
+  }
+  expect(g).toBeGreaterThanOrEqual(0.98);
+  const covers = await pivot.locator("figure").evaluate((f) => { const r = f.getBoundingClientRect(); return r.left <= 1 && r.top <= 1 && r.right >= innerWidth - 1 && r.bottom >= innerHeight - 1; });
+  expect(covers).toBe(true);
+  expect(Number(await pivot.locator(".journey-panel").first().evaluate((n) => getComputedStyle(n).opacity))).toBeLessThan(0.05);
+});
+
+test("TKT-95: the wireframe never loads on a phone or with reduced motion, and never throws", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  if (test.info().project.name !== "phone") await page.emulateMedia({ reducedMotion: "reduce" });
+  const three: string[] = [];
+  page.on("request", (r) => { if (/three/i.test(r.url())) three.push(r.url()); });
+  await page.goto("/journey");
+  const enter = page.getByRole("button", { name: "Enter the journey" });
+  if (await enter.count()) await enter.click();
+  await page.mouse.wheel(0, 2500);
+  await page.waitForTimeout(800);
+  await expect(page.locator(".journey-lines")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("TKT-95: on a desktop the journey scrolls through every section without errors (wireframe or not)", async ({ page }) => {
+  test.skip(test.info().project.name === "phone", "desktop only");
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await blockClips(page);
+  await page.goto("/journey");
+  await page.getByRole("button", { name: "Enter the journey" }).click();
+  const nav = page.getByRole("navigation", { name: "Journey chapters" });
+  for (const name of [/Pivot/, /Toolkit/, /Creator/]) { await nav.getByRole("button", { name }).click(); await page.waitForTimeout(700); }
+  expect(errors).toEqual([]);
+});
