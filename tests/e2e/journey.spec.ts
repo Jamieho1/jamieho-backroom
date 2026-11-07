@@ -24,9 +24,9 @@ test("glass introduction keeps full-background framing and the scroll cue opens 
     const img = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-day img')!.getBoundingClientRect();
     const description = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-glass')!.getBoundingClientRect();
     const heading = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-heading')!.getBoundingClientRect();
-    return { fullBackground: Math.abs(img.height - innerHeight) < 2 && Math.abs(img.width - innerWidth) < 2, descriptionBelowCharacters: description.top > innerHeight * .5, headingAboveDescription: heading.bottom < description.top };
+    return { fullBackground: Math.abs(img.height - innerHeight) < 2 && Math.abs(img.width - innerWidth) < 2, descriptionBelowCharacters: description.top > innerHeight * .5, headingAboveDescription: heading.bottom < description.top, headingInSky: heading.bottom < innerHeight * .28 };
   });
-  expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true });
+  expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();
   await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
   await expect(page.locator(".journey-navigation")).toHaveAttribute("data-floating", "true");

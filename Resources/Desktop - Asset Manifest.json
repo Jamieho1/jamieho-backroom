@@ -116,11 +116,19 @@
     },
     {
       "key": "dayHero",
-      "file": "/desktop-art/dayHero-6fb2c4bcd1b1.webp",
-      "bytes": 532400,
+      "file": "/desktop-art/dayHero-b67d4e8834d8.webp",
+      "bytes": 537358,
       "width": 1920,
       "height": 1080,
-      "sha256": "6fb2c4bcd1b1489822e9de048fcab9514967f2f1c7f0c7595527f8cd6c6389ff"
+      "sha256": "b67d4e8834d8f40ce80acdf342f1974efc38da481f3060281f47526385b60635"
+    },
+    {
+      "key": "nightHero",
+      "file": "/desktop-art/nightHero-d2e13cc4bbaf.webp",
+      "bytes": 460942,
+      "width": 1920,
+      "height": 1080,
+      "sha256": "d2e13cc4bbafcd3f67b02a3198a615ad69f2b27d956e00611a93fb346a50b493"
     }
   ]
 }

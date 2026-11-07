@@ -37,3 +37,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Corrected overly pale day treatment: restored colour/depth with mild CSS grade and reduced heading halo. Night unchanged. Production build passed.
 
 2026-11-06: Installed approved softer 1920×1080 landscape day hero as hashed WebP; removed CSS image grade. Portrait/night assets retained. Check passed (521 tests/build/static assertions); local previews reviewed. No database changes; uncommitted.
+
+2026-11-06: Generated/installed matching 1920×1080 day/night landscape hero pair with extended detailed sky and larger aligned characters. Yellow/white editable heading restored above characters; lower intro unchanged. Existing phone portraits retained. Check passed (521 tests/build/static); focused browser checks 23 passed/1 existing skip, including updated artwork-selection check. No database/migration change.
