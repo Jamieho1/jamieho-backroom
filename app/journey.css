@@ -651,3 +651,6 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 /* Dashboard previews preserve all edges instead of cropping or panning. */
 .journey-showcase-shots img[data-fit="contain"] { height: 100%; min-height: 0; object-fit: contain; object-position: center; background: #142234; }
 .journey-still-showcase img[data-fit="contain"] { object-fit: contain; background: #142234; }
+
+.journey-hero-glass .journey-schedule:disabled { background: #e9c47c; color: #142334; border-color: #e9c47c; opacity: 1; cursor: default; font-family: var(--j-body); }
+.journey-hero-glass .journey-schedule:disabled:hover { filter: none; transform: none; }

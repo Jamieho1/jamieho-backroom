@@ -433,13 +433,13 @@ function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
     </div>
     <div className="journey-hero-intro">
       <div className="journey-hero-glass">
-        <PanelBody p={{ ...p, eyebrow: undefined, title: "" }} heading="h2" />
+        <PanelBody p={{ ...p, eyebrow: undefined, title: "" }} heading="h2" scheduleCall />
       </div>
     </div>
   </>;
 }
 
-function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean }) {
+function PanelBody({ p, heading, split = false, scheduleCall = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean; scheduleCall?: boolean }) {
   const H = heading;
   return <>
     {p.eyebrow ? <p className={`journey-eyebrow${heading === "h1" ? " journey-welcome" : ""}`}>{p.eyebrow}</p> : null}
@@ -487,12 +487,15 @@ function PanelBody({ p, heading, split = false }: { p: Panel; heading: "h1" | "h
           className={k === 0 ? "is-primary" : undefined}>{f.label}</a>
       ))}</p>
     ) : null}
-    {p.actions?.length ? (
-      <p className="journey-actions">{p.actions.map((a) => (
+    {p.actions?.length || scheduleCall ? (
+      <p className="journey-actions">{p.actions?.map((a) => (
         <a key={a.href + a.label} className={a.platform ? `journey-brand journey-brand-${a.platform}` : "journey-cta-link"} href={a.href} target="_blank" rel="noopener noreferrer">
           {a.platform ? <BrandIcon platform={a.platform} size={20} /> : null}{a.label}{a.platform ? null : <span> ↗</span>}
         </a>
-      ))}</p>
+      ))}{scheduleCall ? <button type="button" className="journey-brand journey-schedule" disabled title="Scheduling will be available soon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m3 0h2" /></svg>
+        Schedule a call
+      </button> : null}</p>
     ) : null}
     {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}
   </>;

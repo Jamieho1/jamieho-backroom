@@ -39,3 +39,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Installed approved softer 1920×1080 landscape day hero as hashed WebP; removed CSS image grade. Portrait/night assets retained. Check passed (521 tests/build/static assertions); local previews reviewed. No database changes; uncommitted.
 
 2026-11-06: Generated/installed matching 1920×1080 day/night landscape hero pair with extended detailed sky and larger aligned characters. Yellow/white editable heading restored above characters; lower intro unchanged. Existing phone portraits retained. Check passed (521 tests/build/static); focused browser checks 23 passed/1 existing skip, including updated artwork-selection check. No database/migration change.
+
+2026-11-07: Added gold Schedule a call placeholder immediately after LinkedIn in hero (disabled; functionality deferred). Typecheck/build passed. No database change; uncommitted.
