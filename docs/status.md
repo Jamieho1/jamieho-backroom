@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-08. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
+Updated 2026-11-09. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
 
 - Home journey is /. /journey redirects home; retired /about redirects to /#pivot, /desktop to /resources. Legacy desktop app queries redirect to canonical app routes.
 - Shared arrival/floating/app navigation: Journey dropdown, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. App windows close to Resources. Owner Settings/edit controls are available there.
@@ -12,6 +12,10 @@ Updated 2026-11-08. Changes remain local/uncommitted unless stated as live. Jami
 - Live content previously verified: approved hero copy, About slash removal and supplied Contact social URLs. Direct database edits need ISR refresh/rebuild for cached public copy.
 - Canonical apps/auth/RLS/editors retained. Phones download no journey clips; desktop keeps room/monitor clips. No schema/migration/dependency/deployment change. Historical migration status and outstanding domain/subdomain SSO sign-offs remain unverified.
 
+- Creator pitch heading reduced to 28–44px desktop / 22–28px phone, including static fallback. Approved Creator title “AI engineering, explained” saved live and verified on 2026-11-09; title-only content update, no schema migration. Cached public copy needs ISR refresh/rebuild; smaller typography still requires deployment.
+
 ## Validation
 
-Latest npm run check passed: typecheck, 517 unit/database tests, production build and static assertions for /, /resources, /privacy, /projects and /articles. Full updated browser run: 115 passed, 3 existing skips. Final theme/resource/cross-page Journey checks: 10 passed. Local configured desktop/390px arrival, floating controls and Resources previews reviewed without horizontal overflow. Contact submission was previously exercised through the no-write/no-email honeypot path.
+Creator heading adjustment (2026-11-09): production build and whitespace checks passed; no new browser-suite run.
+
+Prior navigation implementation npm run check passed: typecheck, 517 unit/database tests, production build and static assertions for /, /resources, /privacy, /projects and /articles. Full updated browser run: 115 passed, 3 existing skips. Final theme/resource/cross-page Journey checks: 10 passed. Local configured desktop/390px arrival, floating controls and Resources previews reviewed without horizontal overflow. Contact submission was previously exercised through the no-write/no-email honeypot path.

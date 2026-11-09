@@ -47,3 +47,7 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-08: Replaced final Switch on CTA and desk copy with Contact Us monitor, social logos and existing contact form/action. Contact Us nav/direct anchors go to form; static fallback included. Check passed (521 tests/build/static), monitor previews fit desktop/phone; focused browser checks 23 passed/1 existing skip, including honeypot submission without inbox/email writes. No database/migration change.
 
 2026-11-08: Retired /about and /desktop via redirects; shared Journey dropdown/Articles/Resources/Privacy navigation, visible Auto/Day/Night and gold auth buttons. Resources has generic blurred previews and existing-permission unlocks for Notes/Practice/Behavioral; app windows close there. No billing/DB change. Final check passed (517 tests/build/static); full E2E 115 passed/3 skips plus 10 final cross-page/theme/resource checks.
+
+2026-11-09: Reduced Creator pitch heading across desktop/phone and static fallback; proposed “AI engineering, explained” awaits wording/live-content approval. No database/migration change. Production build and whitespace checks passed; no new browser-suite run.
+
+2026-11-09: With explicit approval, saved Creator title “AI engineering, explained” live in site_sections.writing; database readback verified. Title only; no schema migration. Public cache refresh/rebuild needed; compact typography remains a local change.
