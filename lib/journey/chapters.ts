@@ -41,18 +41,11 @@ export const HOME_CHAPTERS: Chapter[] = [
       { id: "latest", from: 0.2, to: 1, side: "right", eyebrow: "Latest", title: "Fresh off the desk" },
     ],
   },
-  // C6 in code: through black into the room.
-  { id: "to-room", label: "Home", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
-  // The room: walk to the desk, read "Now" and how to get in touch, then keep scrolling into the monitor.
-  // Nothing in the room is clickable; the one action is switching the computer on at the very end.
+  // The final journey arrives in the room and pushes into the contact screen.
+  { id: "to-room", label: "Contact Us", kind: "fade", color: "#050403", tone: "light", scroll: 0.8 },
   {
-    id: "room", label: "Room", nav: "Desk", display: "Home", kind: "video", src: "c7a", scroll: 3, motes: 0.3,
+    id: "room", label: "Room", display: "Contact Us", kind: "video", src: "c7a", scroll: 3, motes: 0.3,
     keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [0.5, 1], [1, 1]],
-    panels: [
-      { id: "now", from: 0.5, to: 0.73, side: "left", eyebrow: "At the desk", title: "Now", body: PLACEHOLDER },
-      { id: "contact", from: 0.74, to: 0.97, side: "right", eyebrow: "Get in touch", title: "Say hello" },
-    ],
   },
-  // C7b scrubbed: the camera pushes into the monitor until it fills the screen, then "switch it on" (BMW-style).
-  { id: "screen", label: "Computer", kind: "video", src: "c7b", scroll: 1.4, join: 0.08 },
+  { id: "screen", label: "Contact Us", nav: "Contact Us", kind: "video", src: "c7b", scroll: 1.4, join: 0.08 },
 ];

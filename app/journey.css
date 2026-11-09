@@ -380,26 +380,41 @@ body:has(.journey-live) .site-header { display: none; }
 .journey-cta-link span { color: var(--j-accent); }
 .journey-cta-link:hover, .journey-cta-link:focus-visible { background: rgb(242 180 92 / 0.18); outline: none; }
 
-/* The last beat: the monitor fills the frame and becomes one "Switch on" button (BMW-style). */
-.journey-cta { position: absolute; inset: 0; z-index: 3; transition: opacity 0.4s ease; }
-.journey-cta-screen {
-  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; border: 0; padding: 16px;
-  background: radial-gradient(ellipse at center, rgb(242 180 92 / 0.08), transparent 60%); color: var(--j-ink); cursor: pointer;
+/* Contact content is contained within the monitor after the final push-in. */
+.journey-contact-screen { position: absolute; inset: 12% 4% 7%; z-index: 6; display: grid; place-items: center; transition: opacity .3s ease; }
+.journey-contact-window {
+  width: min(740px, 100%); max-height: 100%; overflow-y: auto; overscroll-behavior: contain;
+  box-sizing: border-box; padding: clamp(16px, 2vw, 26px); border-radius: 12px;
+  border: 1px solid rgb(210 225 241 / .2); background: linear-gradient(135deg, #101e2e, #0c1521);
+  color: #f3f6fa; font-family: var(--j-body); scrollbar-width: thin; text-align: left;
 }
-.journey-cta-power {
-  display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; border: 1.5px solid rgb(242 180 92 / 0.75);
-  background: rgb(12 9 6 / 0.35); animation: journey-pulse 2.4s ease-in-out infinite;
+.journey-contact-window h2 { font: 700 clamp(24px, 3vw, 36px)/1.15 var(--j-display); color: #fff; margin: 0 0 14px; }
+.journey-contact-window h3 { font: 600 16px/1.4 var(--j-body); margin: 18px 0 12px; color: #f3d28f; }
+.journey-contact-socials { display: flex; flex-wrap: wrap; gap: 8px; }
+.journey-contact-socials .journey-brand { border-radius: 6px; padding: 8px 12px; font-size: 12px; min-height: 40px; box-sizing: border-box; gap: 7px; }
+.journey-contact-socials .journey-brand-instagram { background: linear-gradient(120deg, #a52a72, #9035aa 55%, #5347ad); }
+.journey-contact-socials .journey-brand-linkedin { background: #0967a7; }
+.journey-contact-socials .journey-brand-youtube svg { padding: 2px; box-sizing: border-box; border-radius: 4px; background: #fff; }
+.journey-contact-window .contact-form { gap: 10px; }
+.journey-contact-window .contact-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.journey-contact-window .field { color: #dae3ee; margin-bottom: 0; font-size: 13px; min-width: 0; }
+.journey-contact-window .field input, .journey-contact-window .field textarea, .journey-contact-window .field select { box-sizing: border-box; width: 100%; color: #fff; background: #142437; border: 1px solid #405269; border-radius: 6px; font: 14px/1.4 var(--j-body); padding: 9px 10px; }
+.journey-contact-window .field textarea { height: 80px; min-height: 64px; resize: vertical; }
+.journey-contact-window .edit-bar { margin: 0; }
+.journey-contact-window .btn { background: #e9c47c; color: #132438; border-color: #e9c47c; min-height: 42px; }
+.journey-contact-window .muted { color: #bdcad9; margin: 0; font-size: 12px; line-height: 1.45; }
+.journey-contact-window a:not(.journey-brand) { color: #f3d28f; }
+.journey-contact-window input:focus-visible, .journey-contact-window textarea:focus-visible, .journey-contact-window select:focus-visible, .journey-contact-window button:focus-visible { outline: 2px solid #f3d28f; outline-offset: 3px; }
+.journey-contact-window .contact-done { color: #edf5fc; }
+.journey-contact-static { position: relative; z-index: 3; width: min(740px, calc(100% - 32px)); margin: 0 auto; padding: 100px 0 60px; }
+.journey-contact-static .journey-contact-window { max-height: none; }
+[data-chapter="room"] .journey-display { font-size: clamp(40px, 9vw, 144px); }
+@media (max-width: 768px) {
+  .journey-contact-screen { inset: 90px 12px 42px; }
+  .journey-contact-window { padding: 16px; }
+  .journey-contact-socials { gap: 6px; }
+  .journey-contact-socials .journey-brand { padding: 8px; gap: 6px; }
 }
-.journey-cta-power svg { width: 34px; height: 34px; fill: none; stroke: var(--j-accent); stroke-width: 1.8; stroke-linecap: round; }
-.journey-cta-label { font-family: var(--j-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(28px, 5vw, 56px); line-height: 1; }
-.journey-cta-sub { font: 500 11px var(--j-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(246 241 232 / 0.7); text-align: center; }
-.journey-cta-screen:hover .journey-cta-power, .journey-cta-screen:focus-visible .journey-cta-power { background: rgb(242 180 92 / 0.2); }
-.journey-cta-screen:focus-visible { outline: none; }
-.journey-cta-screen:focus-visible .journey-cta-label { text-decoration: underline; text-decoration-color: var(--j-accent); text-underline-offset: 8px; }
-.journey-cta.is-on .journey-cta-screen { animation: journey-power-on 0.4s ease-out forwards; }
-@keyframes journey-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgb(242 180 92 / 0.35); } 50% { box-shadow: 0 0 0 16px rgb(242 180 92 / 0); } }
-@keyframes journey-power-on { to { background: rgb(246 241 232 / 0.92); } }
-@media (prefers-reduced-motion: reduce) { .journey-cta-power { animation: none; } }
 
 /* TKT-76 start screen: one instant image, the name, Enter ringed by real download progress, Straight to my desktop. */
 .journey-start {
@@ -654,3 +669,34 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 
 .journey-hero-glass .journey-schedule:disabled { background: #e9c47c; color: #142334; border-color: #e9c47c; opacity: 1; cursor: default; font-family: var(--j-body); }
 .journey-hero-glass .journey-schedule:disabled:hover { filter: none; transform: none; }
+
+/* Reading surfaces mute the wireframe only behind copy; the geometry remains in the scene. */
+.journey-section-light { --reading-surface: 250 249 246; --reading-border: 40 54 70; --reading-shadow: 30 38 48; }
+.journey-section-dark { --reading-surface: 19 26 36; --reading-border: 210 225 241; --reading-shadow: 0 0 0; }
+.journey-showcase { z-index: 3; }
+.journey-reading-card { isolation: isolate; }
+.journey-reading-card > :not(.journey-title) { opacity: 1; }
+.journey-reading-card::after {
+  content: ""; position: absolute; inset: -20px -24px; z-index: -1; pointer-events: none;
+  border-radius: 12px; border: 1px solid rgb(var(--reading-border) / .13);
+  background: rgb(var(--reading-surface) / .94);
+  box-shadow: 0 8px 28px rgb(var(--reading-shadow) / .07), inset 0 1px rgb(255 255 255 / .06);
+}
+.journey-reading-card .journey-body, .journey-reading-card .journey-md .md p,
+.journey-reading-card .journey-points li { color: var(--s-ink); }
+@media (max-width: 768px) {
+  .journey-reading-card::after { inset: -12px -10px; border-radius: 10px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .journey-reading-card::after { background: rgb(var(--reading-surface)); }
+}
+
+@media (max-width: 760px) {
+ .journey-hero-heading { top: 132px; }
+ .journey-section-still, .journey-section-still.is-left, .journey-section-still.is-right { top: 112px; height: calc(30vh - 32px); }
+ .journey-section .journey-panel { top: calc(112px + 30vh - 32px + 28px); }
+ .journey-timeline { top: calc(112px + 30vh - 32px + 8px); }
+ .journey-showcase { padding-top: 112px; }
+ [data-chapter="creator"] .journey-panel-left { top: 112px; }
+ .journey-contact-screen { top: 124px; }
+}

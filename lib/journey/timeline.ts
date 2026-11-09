@@ -216,7 +216,7 @@ export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): nu
   return clamp01((o - start) / (1 - spreadAmt));
 }
 
-/** The end-of-journey "Switch on" button: fades in over the last stretch of the push-in (smoothstep). */
+/** The end-of-journey contact screen: fades in over the last stretch of the push-in (smoothstep). */
 export function ctaOpacity(local: number, at = 0.82): number {
   const t = (local - at) / (1 - at) * 2;
   return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);

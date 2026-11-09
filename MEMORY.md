@@ -41,3 +41,9 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-06: Generated/installed matching 1920×1080 day/night landscape hero pair with extended detailed sky and larger aligned characters. Yellow/white editable heading restored above characters; lower intro unchanged. Existing phone portraits retained. Check passed (521 tests/build/static); focused browser checks 23 passed/1 existing skip, including updated artwork-selection check. No database/migration change.
 
 2026-11-07: Added gold Schedule a call placeholder immediately after LinkedIn in hero (disabled; functionality deferred). Typecheck/build passed. No database change; uncommitted.
+
+2026-11-08: Added subtle reading surfaces behind About/Projects/Experience/Creator pitch text, retaining geometry. Strong paragraph colour and no extra copy fade; responsive inset and reduced-transparency fallback. Local section previews checked; typecheck and final production build passed. No database changes.
+
+2026-11-08: Replaced final Switch on CTA and desk copy with Contact Us monitor, social logos and existing contact form/action. Contact Us nav/direct anchors go to form; static fallback included. Check passed (521 tests/build/static), monitor previews fit desktop/phone; focused browser checks 23 passed/1 existing skip, including honeypot submission without inbox/email writes. No database/migration change.
+
+2026-11-08: Retired /about and /desktop via redirects; shared Journey dropdown/Articles/Resources/Privacy navigation, visible Auto/Day/Night and gold auth buttons. Resources has generic blurred previews and existing-permission unlocks for Notes/Practice/Behavioral; app windows close there. No billing/DB change. Final check passed (517 tests/build/static); full E2E 115 passed/3 skips plus 10 final cross-page/theme/resource checks.

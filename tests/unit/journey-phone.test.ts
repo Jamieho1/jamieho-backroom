@@ -7,12 +7,9 @@ describe("phone mode (TKT-96)", () => {
   it("gives every video chapter a still to hold", () => {
     for (const c of HOME_CHAPTERS) if (c.kind === "video") expect(PHONE_STILLS[c.src], c.id).toBeTruthy();
   });
-  it("shows the desk panels from early in the chapter, in order, and ends on a short monitor beat", () => {
+  it("holds the room without text panels and ends on the contact monitor", () => {
     const room = phone.find((c) => c.id === "room")!;
-    const [now, contact] = room.panels!;
-    expect(now.from).toBeLessThan(0.2);
-    expect(now.to).toBeLessThan(contact.from);
-    expect(contact.to).toBeLessThanOrEqual(1);
+    expect(room.panels ?? []).toEqual([]);
     expect(room.scroll).toBeLessThan(HOME_CHAPTERS.find((c) => c.id === "room")!.scroll);
     const screen = phone.find((c) => c.id === "screen")!;
     expect(screen.scroll).toBeLessThan(1);

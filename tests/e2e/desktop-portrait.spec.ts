@@ -4,7 +4,7 @@ test('homepage selects portrait artwork for phones and matching landscape art fo
   await page.goto('/');
   const img = page.locator('.journey-hero-day img');
   await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(test.info().project.name === 'phone' ? /dayPortrait-/ : /dayHero-/);
-  await page.getByRole('button', { name: /Switch to dark mode/ }).click();
+  await page.getByRole('combobox', { name: 'Colour mode' }).selectOption('dark');
   await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
   await expect.poll(() => page.locator('.journey-hero-night img').evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(test.info().project.name === 'phone' ? /nightPortrait-/ : /nightHero-/);
   if (test.info().project.name === 'desktop') {

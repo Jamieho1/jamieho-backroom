@@ -85,10 +85,10 @@ describe("journey timeline", () => {
 
   it("orders the v1.1 journey: video only at the two ends", () => {
     expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "pivot", "projects", "experience", "toolkit", "creator", "to-room", "c7a", "c7b"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["About", "Projects", "Experience", "Techstack", "Creator", "Desk"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["About", "Projects", "Experience", "Techstack", "Creator", "Contact Us"]);
   });
 
-  it("fades the Switch on button in over the end of the push-in", () => {
+  it("fades the contact screen in over the end of the push-in", () => {
     expect(ctaOpacity(0.5)).toBe(0);
     expect(ctaOpacity(0.82)).toBe(0);
     expect(ctaOpacity(1)).toBe(1);
@@ -117,7 +117,7 @@ describe("journey timeline", () => {
       for (const p of c.panels ?? []) expect(p.from).toBeLessThan(p.to);
     }
     expect(ids.has("room")).toBe(true);
-    expect(HOME_CHAPTERS.at(-1)?.id).toBe("screen"); // the journey ends on the monitor's "Switch on"
+    expect(HOME_CHAPTERS.at(-1)?.id).toBe("screen"); // the journey ends on the contact monitor
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
 });

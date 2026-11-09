@@ -6,10 +6,8 @@
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
  * - Creator (v1.1): `writing` pitch + Subscribe/Follow from `contact` links; latest YouTube / Instagram / article.
- * - Room: `now`, then the contact line (contact form + socials).
+ * - Room/monitor: no text panels; the shared contact form uses Contact social links.
  * - Toolkit (v1.1): `technology` "## layer" blocks (fallback: project tags) + public certificate entries as badges.
- * - Room (redesign 2026-11-05): `now` section, then "Latest" (newest YouTube post + newest other post) with a
- *   contact line built from the Contact section's social links.
  * Empty sections and missing entries simply drop their panel.
  */
 import type { Item } from "@/lib/experience";
@@ -23,10 +21,8 @@ import { articleHref, youtubeId } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
 
-/** Where "switch on the computer" leads. The homepage journey ends at the signed-in desktop. */
-export const DESKTOP_HREF = "/desktop";
 /** The contact form on the existing site. */
-export const CONTACT_HREF = "/about#home-contact";
+export const CONTACT_HREF = "/#home-contact";
 
 export interface JourneyContent {
   sections: Record<SectionKey, Section>;
@@ -122,15 +118,6 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           panels.push(at({ title: s.hero.title || "Jamie Ho", body: rotator ? rotatorText(rotator) : intro, md: !rotator, rotator, meta: role, actions: (["youtube", "instagram", "linkedin"] as const).flatMap(kind => socialLinks(s.contact.body).filter(l => l.kind === kind).map(l => ({ label: SOCIAL_LABEL[kind], href: l.href, platform: kind }))), cta: undefined }));
         }
           break;
-        case "room:now":
-          if (plain(s.now.body)) panels.push(at({ title: s.now.title || p.title, body: excerpt(s.now.body), md: true }));
-          break;
-        case "room:contact": {
-          // The desk closes with one line: the contact form and every social link from the Contact section.
-          const foot = [{ label: "Send a message", href: CONTACT_HREF }, ...socialLinks(s.contact.body).map((l) => ({ label: SOCIAL_LABEL[l.kind], href: l.href }))];
-          panels.push(at({ foot }));
-          break;
-        }
         case "creator:pitch": {
           // Brand-coloured YouTube / Instagram buttons (icon + name), straight from the Contact section's links.
           const socials = socialLinks(s.contact.body);

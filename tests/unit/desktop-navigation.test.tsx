@@ -1,92 +1,48 @@
 // @vitest-environment jsdom
 import { afterEach,beforeEach,it,expect,vi } from 'vitest';
 import { render as baseRender,screen,cleanup,waitFor } from '@testing-library/react';
-const m=vi.hoisted(()=>({getApps:vi.fn(),log:vi.fn(),viewer:{status:'anonymous',name:undefined as string|undefined,id:undefined as string|undefined},configured:false,pathname:'/'}));
-vi.mock('@/app/actions/desktop',()=>({getDesktopApps:m.getApps,logDesktopOpen:m.log}));
+const m=vi.hoisted(()=>({getApps:vi.fn(),viewer:{status:'anonymous',name:undefined as string|undefined,id:undefined as string|undefined},configured:false,pathname:'/resources'}));
+vi.mock('@/app/actions/desktop',()=>({getDesktopApps:m.getApps}));
 vi.mock('@/components/viewer-provider',()=>({useViewer:()=>({viewer:m.viewer,configured:m.configured,editing:false,setEditing:vi.fn()})}));
 vi.mock('next/link',()=>({default:({children,prefetch:_p,...props}:React.ComponentProps<'a'>&{prefetch?:boolean})=><a {...props}>{children}</a>}));
-vi.mock('@/components/theme-toggle',()=>({ThemeToggle:()=>null}));
-import { DesktopAppsProvider } from '@/components/desktop-apps-provider';
 vi.mock('next/navigation',()=>({usePathname:()=>m.pathname}));
-const render=(ui:React.ReactElement)=>baseRender(ui,{wrapper:DesktopAppsProvider});
-import { Desktop } from '@/components/desktop';
+import { DesktopAppsProvider } from '@/components/desktop-apps-provider';
+import { ResourceCatalog } from '@/components/resource-catalog';
 import { FALLBACK_APPS } from '@/lib/projects';
-beforeEach(()=>{vi.clearAllMocks();m.viewer={status:'anonymous',name:undefined,id:undefined};m.configured=false;m.pathname='/';m.getApps.mockResolvedValue([]);});afterEach(cleanup);
-it('public Home opens without sign-in and is not recorded as a registry app launch',()=>{
- render(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
- expect(screen.getByRole('region',{name:'About Me'})).toBeTruthy();expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();expect(screen.getAllByRole('link',{name:'Projects'}).every(a=>a.getAttribute('href')==='/projects')).toBe(true);expect(m.getApps).not.toHaveBeenCalled();expect(m.log).not.toHaveBeenCalled();
+const render=(ui:React.ReactElement)=>baseRender(ui,{wrapper:DesktopAppsProvider});
+beforeEach(()=>{vi.clearAllMocks();m.viewer={status:'anonymous',name:undefined,id:undefined};m.getApps.mockResolvedValue([]);});
+afterEach(cleanup);
+it('shows only generic blurred resource previews before sign-in',()=>{
+ render(<ResourceCatalog/>);
+ expect(screen.getAllByText('Sign in to unlock')).toHaveLength(3);
+ expect(screen.queryByRole('link',{name:'Open Notes'})).toBeNull();
+ expect(document.querySelectorAll('.resource-card.is-locked')).toHaveLength(3);
+ expect(m.getApps).not.toHaveBeenCalled();
 });
-it('signed-in public navigation displays only the server-filtered registry apps',async()=>{
+it('opens only the resources returned by the server permission filter',async()=>{
  m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
- render(<Desktop apps={[]} initialApp="projects" discoverApps content={<h1>Public projects</h1>} />);
- await screen.findAllByRole('link',{name:FALLBACK_APPS[0].name});
- expect(m.getApps).toHaveBeenCalledTimes(1);expect(screen.queryAllByRole('link',{name:'Behavioral'})).toHaveLength(0);expect(m.log).not.toHaveBeenCalled();
+ render(<ResourceCatalog/>);
+ expect((await screen.findByRole('link',{name:'Open Notes'})).getAttribute('href')).toBe('/notes');
+ expect(screen.queryByRole('link',{name:'Open Practice'})).toBeNull();
+ expect(screen.queryByRole('link',{name:'Open Resume & Stories'})).toBeNull();
+ expect(screen.getAllByText('Membership access required')).toHaveLength(2);
 });
-it('logout clears discovered app icons',async()=>{
+it('locks resources immediately after logout',async()=>{
  m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
- const {rerender}=render(<Desktop apps={[]} initialApp="home" discoverApps />);
- await waitFor(()=>expect(screen.getAllByRole('link',{name:FALLBACK_APPS[0].name}).length).toBe(1));
- m.viewer={status:'anonymous',name:undefined,id:undefined};rerender(<Desktop apps={[]} initialApp="home" discoverApps />);
- await waitFor(()=>expect(screen.queryAllByRole('link',{name:FALLBACK_APPS[0].name})).toHaveLength(0));
+ const {rerender}=render(<ResourceCatalog/>);await screen.findByRole('link',{name:'Open Notes'});
+ m.viewer={status:'anonymous',name:undefined,id:undefined};rerender(<ResourceCatalog/>);
+ expect(screen.queryByRole('link',{name:'Open Notes'})).toBeNull();expect(screen.getAllByText('Sign in to unlock')).toHaveLength(3);
 });
-it('failed app discovery leaves the public window available and never guesses private icons',async()=>{
- m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockRejectedValue(new Error('offline'));
- render(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
- await screen.findByRole('status');expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();expect(screen.queryAllByRole('link',{name:'Behavioral'})).toHaveLength(0);
+it('does not expose the previous account’s unlocks while the next account loads',async()=>{
+ m.viewer={status:'member',name:'First',id:'first'};m.getApps.mockResolvedValueOnce([FALLBACK_APPS[0]]);
+ const {rerender}=render(<ResourceCatalog/>);await screen.findByRole('link',{name:'Open Notes'});
+ let finish!:(apps:unknown[])=>void;m.getApps.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve}));
+ m.viewer={status:'member',name:'Second',id:'second'};rerender(<ResourceCatalog/>);
+ expect(screen.queryByRole('link',{name:'Open Notes'})).toBeNull();
+ await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(2));finish([FALLBACK_APPS[1]]);
+ await screen.findByRole('link',{name:'Open Practice'});expect(screen.queryByRole('link',{name:'Open Notes'})).toBeNull();
 });
-
-it('same-name account switches reload the allowed icons for the new user ID',async()=>{
- m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
- const {rerender}=render(<Desktop apps={[]} initialApp="home" discoverApps />);
- await screen.findAllByRole('link',{name:FALLBACK_APPS[0].name});
- m.viewer={status:'member',name:'Example',id:'second'};m.getApps.mockResolvedValue([FALLBACK_APPS[1]]);
- rerender(<Desktop apps={[]} initialApp="home" discoverApps />);
- await screen.findAllByRole('link',{name:FALLBACK_APPS[1].name});
- expect(screen.queryAllByRole('link',{name:FALLBACK_APPS[0].name})).toHaveLength(0);expect(m.getApps).toHaveBeenCalledTimes(2);
-});
-
-it('page remounts keep permitted icons visible while the new route revalidates them',async()=>{
- m.viewer={status:'member',name:'Example',id:'first'};m.getApps.mockResolvedValue([FALLBACK_APPS[0]]);
- const {rerender}=render(<Desktop key="home" apps={[]} initialApp="home" discoverApps content={<h1>Home content</h1>} />);
- await screen.findAllByRole('link',{name:'Notes'});
- let finish!:(apps:unknown[])=>void;m.getApps.mockReturnValue(new Promise(resolve=>{finish=resolve;}));m.pathname='/projects';
- rerender(<Desktop key="projects" apps={[]} initialApp="projects" discoverApps content={<h1>Project content</h1>} />);
- expect(screen.getAllByRole('link',{name:'Notes'})).toHaveLength(1);expect(screen.getByRole('heading',{name:'Project content'})).toBeTruthy();
- await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(2));
- finish([]);await waitFor(()=>expect(screen.queryAllByRole('link',{name:'Notes'})).toHaveLength(0));
-});
-
-it('reveals all permitted icons together after discovery, including during initial viewer loading',async()=>{
- m.viewer={status:'loading',name:undefined,id:'first'};
- let finish!:(apps:unknown[])=>void; m.getApps.mockReturnValue(new Promise(resolve=>{finish=resolve;}));
- const {rerender}=render(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
- expect(screen.getByRole('heading',{name:'Public landing'})).toBeTruthy();
- expect(screen.queryAllByRole('link',{name:'Projects'})).toHaveLength(0);
- expect(screen.queryAllByRole('link',{name:'Notes'})).toHaveLength(0);
- expect(screen.getByRole('navigation',{name:'Desktop apps'}).getAttribute('aria-busy')).toBe('true');
- await waitFor(()=>expect(m.getApps).toHaveBeenCalledTimes(1));
- m.viewer={status:'member',name:'Example',id:'first'};
- rerender(<Desktop apps={[]} initialApp="home" discoverApps content={<h1>Public landing</h1>} />);
- expect(m.getApps).toHaveBeenCalledTimes(1);
- finish([FALLBACK_APPS[0]]);
- await screen.findAllByRole('link',{name:'Notes'});
- expect(screen.getAllByRole('link',{name:'Projects'})).toHaveLength(1);
- expect(screen.getByRole('navigation',{name:'Desktop apps'}).getAttribute('aria-busy')).toBe('false');
-});
-it('places Settings once at the right of the top app navigation',async()=>{
- m.viewer={status:'owner',name:'Example',id:'first'};
- m.getApps.mockResolvedValue([{...FALLBACK_APPS[0],id:'settings',name:'Settings',icon:'gear',url:'/settings'}]);
- render(<Desktop apps={[]} initialApp="home" discoverApps />);
- const links=await screen.findAllByRole('link',{name:'Settings'});
- expect(links).toHaveLength(1);
- expect(links.some(link=>link.closest('.desktop-launcher-right'))).toBe(true);
- expect(links.every(link=>link.closest('nav[aria-label="Desktop apps"]'))).toBe(true);
-});
-
-it('closed windows reveal the introduction and its independent About Me link',()=>{
- render(<Desktop apps={[]} />);
- expect(screen.queryByText('Your desktop')).toBeNull();
- expect(screen.queryByText('Choose an app to get started.')).toBeNull();
- expect(document.querySelector('.desktop-welcome')).toBeNull();expect(screen.getByRole('heading',{name:'Jamie Ho'})).toBeTruthy();expect(screen.getByRole('link',{name:'Check Here: open About Me'}).getAttribute('href')).toBe('/about');
- expect(screen.getAllByRole('link',{name:'About Me'})).toHaveLength(1);
+it('keeps owner administration accessible from Resources',async()=>{
+ m.viewer={status:'owner',name:'Owner',id:'owner'};render(<ResourceCatalog/>);
+ await screen.findByRole('link',{name:'Settings'});expect(screen.getByRole('button',{name:'Edit site'})).toBeTruthy();
 });

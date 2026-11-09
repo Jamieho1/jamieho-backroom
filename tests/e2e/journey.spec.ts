@@ -9,7 +9,7 @@ test("homepage enters directly, keeps hero text and scrolls without an entry gat
   await expect(page.getByRole("button", { name: "Enter the journey" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /straight to my desktop/i })).toHaveCount(0);
   await expect(page.locator(".journey-cue")).toBeVisible();
-  await expect(page.locator('.journey-navigation')).toHaveAttribute('data-floating', 'false');
+  await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating', 'false');
   await page.mouse.wheel(0, 1200);
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
 });
@@ -29,7 +29,7 @@ test("glass introduction keeps full-background framing and the scroll cue opens 
   expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();
   await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
-  await expect(page.locator(".journey-navigation")).toHaveAttribute("data-floating", "true");
+  await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
 });
 
 test("legacy journey address redirects to the homepage", async ({ page }) => {
@@ -38,18 +38,19 @@ test("legacy journey address redirects to the homepage", async ({ page }) => {
   await expect(page.locator(".journey-hero-art")).toHaveCount(1);
 });
 
-test("About floats the bar, numbering starts at 01, logo returns to hero", async ({ page }) => {
+test("Journey dropdown navigates, keeps the floating controls and returns to the hero", async ({ page }) => {
   await page.goto("/");
+  await page.locator(".is-journey summary").click();
   const nav = page.getByRole("navigation", { name: "Journey chapters" });
   await expect(nav.getByRole("button", { name: /Hello/ })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: /About/ })).toBeVisible();
-  await expect(nav.getByRole("button", { name: /About/ }).locator(".journey-nav-n")).toHaveText("01");
-  await expect(nav.getByRole("button", { name: /Techstack/ })).toBeAttached();
+
+  await expect(nav.getByRole("button", { name: /TechStack/ })).toBeAttached();
   await nav.getByRole("button", { name: /About/ }).click();
-  await expect(page.locator(".journey-navigation")).toHaveAttribute("data-floating", "true");
+  await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
   await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
   await page.getByRole("link", { name: "Jamie Ho — back to the top" }).click();
-  await expect(page.locator(".journey-navigation")).toHaveAttribute("data-floating", "false");
+  await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "false");
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(4);
 });
 
@@ -66,6 +67,7 @@ test("opening uses artwork and never downloads the opening video", async ({ page
 test("section photos stay framed through hand-over instead of growing fullscreen", async ({ page }) => {
   await page.goto("/");
   const about = page.locator('[data-chapter="pivot"]');
+  await page.locator(".is-journey summary").click();
   await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /About/ }).click();
   await expect(about.locator(".journey-panel")).toBeVisible();
   await page.mouse.wheel(0, 600);
@@ -74,22 +76,34 @@ test("section photos stay framed through hand-over instead of growing fullscreen
   expect(await about.locator("figure").evaluate(el => el.style.transform)).toBe("");
 });
 
-test("journey ends at monitor and Switch on opens the protected desktop", async ({ page }) => {
-  await page.goto("/#desk");
-  const on = page.getByRole("button", { name: /Switch on the computer/ });
-  await expect(on).toBeVisible();
-  await on.click();
-  await expect(page).toHaveURL(/\/desktop$/);
-  await expect(page.getByText("Sign in with Google to open your apps.")).toBeVisible();
+test("journey ends with the contact form on the monitor instead of a desktop link", async ({ page }) => {
+  await page.goto("/#home-contact");
+  const contact = page.getByRole("region", { name: "Contact Us", exact: true });
+  await expect(contact).toBeVisible();
+  await expect(contact.getByLabel("Name", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Switch on the computer/ })).toHaveCount(0);
+  await expect(page.getByText("At the desk", { exact: true })).toHaveCount(0);
+  await page.locator(".is-journey summary").click();
+  await expect(page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Contact Us/ })).toBeVisible();
+  await page.locator(".is-journey summary").click();
+  await contact.getByLabel("Name", { exact: true }).fill("Local form test");
+  await contact.getByLabel("Email", { exact: true }).fill("visitor@example.test");
+  await contact.getByLabel("What do you need?", { exact: true }).fill("Testing the contact form UI.");
+  await contact.getByRole("combobox", { name: "Budget", exact: true }).selectOption({ index: 1 });
+  // The existing honeypot success path exercises the real server action without writing or emailing.
+  await contact.locator('input[name="website"]').evaluate((el: HTMLInputElement) => { el.value = "bot.example"; });
+  await contact.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(contact.getByRole("status")).toContainText("Thanks, your message is in.");
+  await expect(page).toHaveURL(/\/#home-contact$/);
 });
 
-test("reduced motion keeps readable stills, text and the desktop destination", async ({ page }) => {
+test("reduced motion keeps readable stills and the contact form", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator(".journey-stills")).toBeVisible();
   await expect(page.locator(".journey-start")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /Switch on the computer/ })).toHaveAttribute("href", "/desktop");
-  await expect(page.locator(".journey-stills a", { hasText: "Send a message" })).toHaveAttribute("href", "/about#home-contact");
+  await expect(page.getByRole("region", { name: "Contact Us", exact: true }).getByLabel("Name", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Send a message", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -107,5 +121,5 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   expect(clips).toEqual([]);
-  await expect(page.getByRole("button", { name: /Switch on the computer/ })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Contact Us", exact: true })).toBeVisible();
 });

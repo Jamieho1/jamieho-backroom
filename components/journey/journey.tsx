@@ -11,7 +11,8 @@ import {
 import { Motes, type MotesHandle } from "./motes";
 import { LineShape, type LineShapeHandle } from "./line-shape";
 import { lineState } from "@/lib/journey/lines";
-import { ScreenCta, type ScreenCtaHandle } from "./screen-cta";
+import { ScreenContact, ContactContent, type ScreenContactHandle } from "./screen-contact";
+import type { SocialLink } from "@/lib/social";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
 import { BrandIcon } from "./brand-icon";
@@ -19,7 +20,6 @@ import { HeroArtwork } from "./hero-artwork";
 import { JourneyNavigation } from "./navigation";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
 import { mediaUrl, preloadOrder, stillFor } from "@/lib/journey/media";
-import { DESKTOP_HREF } from "@/lib/journey/content";
 import { Markdown } from "@/components/markdown";
 import { keyTokens, stripKeys } from "@/lib/journey/motion";
 import { PHONE_QUERY, PHONE_STILLS, phoneChapters } from "@/lib/journey/phone";
@@ -33,7 +33,7 @@ import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/ass
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
 
-export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: string }) {
+export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[] }) {
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
@@ -52,7 +52,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
   const lineShape = useRef<LineShapeHandle>(null);
-  const cta = useRef<ScreenCtaHandle>(null);
+  const cta = useRef<ScreenContactHandle>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -61,7 +61,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
   const jump = useRef<(id: string) => void>(() => {});
   const skip = useRef<() => void>(() => {});
   const lenisRef = useRef<Lenis | null>(null);
-  const navigation = useRef<HTMLDivElement>(null);
+  const navigation = useRef<HTMLElement>(null);
   const ready = useRef<boolean[]>([]);
   const preloader = useRef<Preloader | null>(null);
   const [live, setLive] = useState(false);
@@ -90,7 +90,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
     if (!live) return;
     registerMediaCache();
     const variant = mobile ? "mobile" : "desktop";
-    const items = preloadOrder(chapters.filter(c => c.id !== "sky"), variant, window.location.hash === "#desk" ? "c7b" : undefined);
+    const items = preloadOrder(chapters.filter(c => c.id !== "sky"), variant, ["#desk", "#screen", "#home-contact"].includes(window.location.hash) ? "c7b" : undefined);
     if (mobile || shouldSkipVideo()) return; // phones: stills only, nothing to download
     preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
       progress() {},
@@ -132,13 +132,14 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0, lastNav = -1;
-    // The computer is the very end of the track (where "Switch on" appears); other chapters jump to their start.
+    // Contact Us jumps to the end of the monitor push-in; other chapters jump to their start.
     const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
     skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
-    if (window.location.hash === "#desk") skip.current();
+    if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
+    else if (window.location.hash) { const id = window.location.hash.slice(1); if (chapters.some(c => c.id === id)) jump.current(id); }
 
     // Word spans per panel, cached once.
     const words = new Map<string, HTMLElement[]>();
@@ -213,9 +214,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
           });
         }
       });
-      // Hotspots are cut from the clip's last frame, so only show them once the video has actually landed there
-      // (a seek can trail the scroll), otherwise the glow sits over the wrong picture.
-      // "Switch on" appears once the push-in has (nearly) filled the frame with the monitor.
+      // Reveal the form after the camera reaches the monitor, accounting for delayed video seeks.
       const cv = active.id === "screen" ? videos.current[index] : null;
       const filled = !!cv && (!ready.current[index] || (cv.duration > 0 && !cv.seeking && cv.currentTime >= cv.duration * 0.8));
       cta.current?.setOpacity(filled ? ctaOpacity(local) : 0);
@@ -284,7 +283,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
+                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
                     {c.id === "sky" ? <HeroCopy p={p} split /> : <PanelBody p={p} heading="h2" split />}
                   </section>
                 ))}
@@ -292,7 +291,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
             <a ref={cue} className="journey-cue" href="#pivot" onClick={event => { event.preventDefault(); jump.current("pivot"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
-            <ScreenCta ref={cta} href={DESKTOP_HREF} />
+            <ScreenContact ref={cta} socials={socials} />
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
             <div className="journey-grain" aria-hidden="true" />
@@ -302,7 +301,7 @@ export function Journey({ chapters: all, base }: { chapters: Chapter[]; base: st
           </div>
         </div>
       ) : (
-        <StillJourney chapters={chapters} base={base} />
+        <StillJourney chapters={chapters} base={base} socials={socials} />
       )}
     </div>
   );
@@ -340,7 +339,7 @@ function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: 
 }
 
 /** No JavaScript, reduced motion or before hydration: every chapter as a sharp still with its text, in order. */
-export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: string }) {
+export function StillJourney({ chapters, base, socials = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[] }) {
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
@@ -393,9 +392,7 @@ export function StillJourney({ chapters, base }: { chapters: Chapter[]; base: st
             </section>
           ))}
           {c.id === "screen" ? (
-            <nav className="journey-still-panel" aria-label="The computer">
-              <a className="journey-cta-link" href={DESKTOP_HREF}>Switch on the computer <span>→</span></a>
-            </nav>
+            <div className="journey-contact-static"><ContactContent socials={socials} /></div>
           ) : null}
         </li>
       ))}

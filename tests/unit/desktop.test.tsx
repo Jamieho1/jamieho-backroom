@@ -14,7 +14,7 @@ it("opens and records deep-linked internal apps, with maximise and close control
   expect(log).toHaveBeenCalledWith("notes");
   fireEvent.click(screen.getByRole("button", { name: "Maximise window" }));
   expect(screen.getByRole("button", { name: "Restore window" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Close window" }).getAttribute("href")).toBe("/desktop");
+  expect(screen.getByRole("link", { name: "Close window" }).getAttribute("href")).toBe("/resources");
 });
 it("never renders or records an inaccessible deep link", () => {
   render(<Desktop apps={FALLBACK_APPS.slice(0, 2)} initialApp="behavioral" />);
@@ -22,14 +22,10 @@ it("never renders or records an inaccessible deep link", () => {
   expect(screen.getByRole("status").textContent).toMatch(/don't have access/);
   expect(log).not.toHaveBeenCalled();
 });
-it("external apps open a new tab and record the click", () => {
-  const external = { ...FALLBACK_APPS[0], id: "external", name: "Outside", kind: "external" as const, url: "https://example.com" };
-  render(<Desktop apps={[external]} />);
-  const link = screen.getAllByRole("link", { name: "Outside ↗" })[0];
-  expect(link.getAttribute("target")).toBe("_blank");
-  expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-  fireEvent.click(link);
-  expect(log).toHaveBeenCalledWith("external");
+it("keeps the retired desktop launchers out of app windows", () => {
+  render(<Desktop apps={[]} initialApp="projects" content={<h1>Projects content</h1>} />);
+  expect(screen.queryByRole("navigation", { name: "Desktop apps" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Resources" }).getAttribute("href")).toBe("/resources");
 });
 
 it("renders built-in server content in its window without an iframe", () => {

@@ -1,4 +1,5 @@
 import { AuthErrorNotice } from "@/components/auth-error-notice";
+import { socialLinks } from "@/lib/social";
 import { Journey } from "@/components/journey/journey";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import { withContent } from "@/lib/journey/content";
@@ -25,6 +26,6 @@ export default async function Home() {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
     <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700&display=swap" />
     <AuthErrorNotice />
-    <Journey chapters={chapters} base={MEDIA_BASE} />
+    <Journey chapters={chapters} base={MEDIA_BASE} socials={socialLinks(sections.contact.body)} />
   </main>;
 }

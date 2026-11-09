@@ -4,7 +4,7 @@ Next.js App Router, React, TypeScript; Supabase Postgres/Google Auth/RLS; Vercel
 
 | Area | Source |
 | --- | --- |
-| Homepage/profile | app/page.tsx, app/about/, components/journey/ |
+| Homepage/profile | app/page.tsx, components/journey/ |
 | Journey | app/page.tsx, components/journey/, lib/journey/, app/journey.css; app/journey/ redirects home |
 | App registry/access discovery | lib/apps.ts, lib/viewer.ts, lib/desktop-pages.ts, components/desktop-apps-provider.tsx |
 | Notes | app/notes/, app/desktop/notes-content.tsx, components/notes/, lib/notes/ |
@@ -24,6 +24,10 @@ Articles and portfolio projects have public slug pages and owner management. Pub
 
 Update this map when routes, data ownership or module boundaries change.
 
-Homepage navigation/hero are isolated in components/journey/navigation.tsx and hero-artwork.tsx. The desktop remains at /desktop; public /about and existing apps remain available.
+Homepage navigation/hero are isolated in components/journey/navigation.tsx and hero-artwork.tsx. Resources is /resources. Retired /about redirects to /#pivot; /desktop redirects to /resources while legacy app queries go to canonical routes. Existing app content stays in its window shell, with shared site navigation and Close returning to Resources.
 
 lib/project-art.ts provides the supplied public Cyterly image only when that public project has no database screenshots. Owner-selected screenshots override it; the editor still reads and writes the database record.
+
+Homepage ending: components/journey/screen-contact.tsx embeds the existing ContactForm/sendMessage action on the monitor and in static fallbacks. app/page.tsx supplies social links from Contact content. Final navigation targets Contact Us, not /desktop.
+
+Shared navigation: components/site-navigation.tsx, with Journey dropdown, Articles, Resources, Privacy, theme and auth controls; JourneyNavigation supplies local scroll actions. ResourceCatalog/ResourceGate and lib/resources.ts provide three generic locked previews and permission-filtered opening. ThemeToggle persists Auto/Day/Night in the existing jb.theme key; Auto removes the explicit theme override so system preference remains live.
