@@ -141,3 +141,13 @@
 .notes-track:disabled { cursor:default; opacity:.6; }
 .notes-columns.notes-single { grid-template-columns:minmax(0,1fr); }
 .notes-extra { color: var(--secondary); font-size: .85em; }
+
+/* Keep visual controls alongside the text as the app content scrolls. */
+.notes-reader { min-height: 100%; }
+.notes-visuals { position: sticky; top: 0; align-self: start; max-height: 100dvh; max-height: var(--notes-visual-height, calc(100dvh - 170px)); overflow: auto; overscroll-behavior: contain; }
+.notes-main, .notes-visuals { padding: 16px; }
+.notes-heading h2, .notes-visuals > h2 { font-size: 20px; }
+.notes-reader .cc-toggle { font-size: 16px; }
+.notes-reader .cc:not([data-numbered]) .cc-toggle { font-size: 14px; }
+@container notes (max-width:850px) { .notes-visuals { position: static; max-height: none; overflow: visible; } }
+@media(max-width:800px) { .notes-visuals { position: static; max-height: none; overflow: visible; } }

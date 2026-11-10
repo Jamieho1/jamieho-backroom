@@ -51,3 +51,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-09: Reduced Creator pitch heading across desktop/phone and static fallback; proposed “AI engineering, explained” awaits wording/live-content approval. No database/migration change. Production build and whitespace checks passed; no new browser-suite run.
 
 2026-11-09: With explicit approval, saved Creator title “AI engineering, explained” live in site_sections.writing; database readback verified. Title only; no schema migration. Public cache refresh/rebuild needed; compact typography remains a local change.
+
+2026-11-10: Left-aligned full top-bar links; centred floating bar retained, Journey hover/click and SVG chevron. Hero glass replaced with compact approved tagline/local scrim, buttons retained. Articles cover links/full-height sidebar, Cloud & Ink app palette, compact Notes/Practice/Resume sizing and sticky desktop Notes visuals. No database/migration change. Check passed (518 tests/build/static); final build and 38 affected desktop/phone browser checks passed. Docs updated; uncommitted, Jamie deploys/verifies.

@@ -1,11 +1,11 @@
 # Current state
 
-Updated 2026-11-09. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
+Updated 2026-11-10. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
 
 - Home journey is /. /journey redirects home; retired /about redirects to /#pivot, /desktop to /resources. Legacy desktop app queries redirect to canonical app routes.
 - Shared arrival/floating/app navigation: Journey dropdown, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. App windows close to Resources. Owner Settings/edit controls are available there.
 - Resources lists Notes (/notes), Practice (/practices) and Resume & Stories (/behavioral). Locked previews contain generic blurred placeholders only. Existing server-filtered discovery and server/RLS checks determine unlocks; missing access gets a membership gate. Payment integration is not implemented.
-- Hero uses matching generated 1920×1080 day/night landscapes with extended sky and aligned larger characters. Yellow/white editable heading sits above them; existing phone portraits remain. No CSS colour grading/pale halo. Lower navy panel holds social links and disabled Schedule a call placeholder.
+- Hero uses matching generated 1920×1080 day/night landscapes with extended sky and aligned larger characters. Yellow/white editable heading sits above them; existing phone portraits remain. No CSS colour grading/pale halo. Compact tagline and social buttons sit over a soft local scrim; the large glass card is removed. Schedule a call remains disabled.
 - Reading cards behind About/Projects/Experience/Creator copy retain geometry. About keeps its original smaller heading, full-opacity paragraph and untruncated phone text; grade omitted only from journey display.
 - Contact Us ending removes desk copy/page-opening CTA. Monitor holds social logos and the existing contact form/action; static fallback included. Contact anchors navigate to the form.
 - Cyterly uses the approved bundled image only when database screenshots are empty; preview contains the full screenshot without pan. Owner screenshots take precedence.
@@ -14,8 +14,8 @@ Updated 2026-11-09. Changes remain local/uncommitted unless stated as live. Jami
 
 - Creator pitch heading reduced to 28–44px desktop / 22–28px phone, including static fallback. Approved Creator title “AI engineering, explained” saved live and verified on 2026-11-09; title-only content update, no schema migration. Cached public copy needs ISR refresh/rebuild; smaller typography still requires deployment.
 
+- Top-bar links now group left; floating bar remains centred. Journey supports hover/click with an SVG chevron. App surfaces match Resources in light/dark/Auto. Articles sidebar stretches full height and covers open slug pages. Notes visuals stay sticky on desktop; compact Notes/Practice/Resume typography and spacing applied. No database/schema/dependency changes.
+
 ## Validation
 
-Creator heading adjustment (2026-11-09): production build and whitespace checks passed; no new browser-suite run.
-
-Prior navigation implementation npm run check passed: typecheck, 517 unit/database tests, production build and static assertions for /, /resources, /privacy, /projects and /articles. Full updated browser run: 115 passed, 3 existing skips. Final theme/resource/cross-page Journey checks: 10 passed. Local configured desktop/390px arrival, floating controls and Resources previews reviewed without horizontal overflow. Contact submission was previously exercised through the no-write/no-email honeypot path.
+2026-11-10: npm run check passed (typecheck, 518 unit/database tests, production build and static assertions). Final palette correction rebuilt successfully. Affected home/Articles/Practice/Notes browser suites: 38 passed across desktop and 390px phone, including hover/click dropdown, centred floating navigation, article cover links/full-height sidebar, sticky visuals, resizers and Python runner. Local day/night phone and desktop hero previews fit without horizontal overflow. No production browser verification, database update, migration, deployment, commit or push in this change.

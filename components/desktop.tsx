@@ -34,7 +34,7 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
   }, [active?.id,tracked]); // A deep link counts as opening an app, too.
 
   return (
-    <div className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`,"--desktop-day-wide":`url("${DESKTOP_ASSETS.dayWide}")`,"--desktop-night-wide":`url("${DESKTOP_ASSETS.nightWide}")`,"--desktop-day-portrait":`url("${DESKTOP_ASSETS.dayPortrait}")`,"--desktop-night-portrait":`url("${DESKTOP_ASSETS.nightPortrait}")`} as CSSProperties}>
+    <div data-app={initialApp} className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`,"--desktop-day-wide":`url("${DESKTOP_ASSETS.dayWide}")`,"--desktop-night-wide":`url("${DESKTOP_ASSETS.nightWide}")`,"--desktop-day-portrait":`url("${DESKTOP_ASSETS.dayPortrait}")`,"--desktop-night-portrait":`url("${DESKTOP_ASSETS.nightPortrait}")`} as CSSProperties}>
       <SiteNavigation embedded />
       <main className="desktop-workspace">
         <DesktopBackdrop covered={!!active}/>

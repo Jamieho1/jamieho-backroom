@@ -46,3 +46,26 @@ test("Journey dropdown returns from Resources to the requested homepage section"
   await expect(page).toHaveURL(/\/#pivot$/);
   await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
 });
+
+test('Journey opens on hover and click, and the floating bar remains centred', async ({page}, info) => {
+ await page.goto('/');
+ const menu=page.locator('.site-navigation.is-journey .journey-menu');
+ const summary=menu.locator('summary');
+ if(info.project.name==='desktop') {
+  const logo=await page.locator('.is-journey .site-navigation-logo').boundingBox();
+  const links=await page.locator('.is-journey .site-navigation-links').boundingBox();
+  expect(links!.x-(logo!.x+logo!.width)).toBeLessThan(30);
+  await summary.hover(); await expect(menu).toHaveAttribute('open','');
+  await page.locator('.is-journey .site-navigation-logo').hover(); await expect(menu).not.toHaveAttribute('open','');
+ }
+ await summary.click(); await expect(menu).toHaveAttribute('open','');
+ await summary.click(); await expect(menu).not.toHaveAttribute('open','');
+ await summary.click(); await page.keyboard.press('Escape'); await expect(menu).not.toHaveAttribute('open','');
+ await summary.click();
+ await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
+ await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
+ if(info.project.name==='desktop') {
+  const bar=await page.locator('.site-navigation.is-journey').boundingBox();
+  expect(Math.abs(bar!.x+bar!.width/2-page.viewportSize()!.width/2)).toBeLessThan(2);
+ }
+});

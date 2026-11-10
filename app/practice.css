@@ -67,3 +67,7 @@
 .practice-timer { display:inline-flex; align-items:center; gap:6px; }
 .practice-timer-time { font-variant-numeric:tabular-nums; font-family:var(--font-mono, ui-monospace, monospace); color:var(--secondary); min-width:5ch; }
 .practice-timer-time.running { color:inherit; font-weight:600; }
+
+.practice-workspace, .practice-sidebar { padding: 12px; }
+.practice-heading h2, .practice-sidebar-heading h2 { font-size: 20px; }
+.practice-columns { margin-top: 12px; }

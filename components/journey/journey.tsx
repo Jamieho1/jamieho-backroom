@@ -430,7 +430,7 @@ function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
     </div>
     <div className="journey-hero-intro">
       <div className="journey-hero-glass">
-        <PanelBody p={{ ...p, eyebrow: undefined, title: "" }} heading="h2" scheduleCall />
+        <PanelBody p={{ ...p, eyebrow: undefined, title: "", meta: undefined, body: "Building systems. Exploring AI. Sharing what works.", md: false, rotator: undefined }} heading="h2" scheduleCall />
       </div>
     </div>
   </>;

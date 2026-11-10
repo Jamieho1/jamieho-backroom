@@ -44,3 +44,12 @@
 .behavioral-story-library { margin:24px 0; padding:16px; border:1px solid var(--border); border-radius:8px; background:var(--bg-accent); }
 .behavioral-story-library summary { cursor:pointer; font-weight:800; }
 .behavioral-story-library nav { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+
+.behavioral { padding-top: 18px; padding-bottom: 18px; }
+.resume-section { padding: 16px; margin-bottom: 16px; }
+.resume-section-head { padding-bottom: 10px; margin-bottom: 12px; }
+.resume-section-head h3 { font-size: 17px; }
+.resume-entry-head h4 { font-size: 15px; }
+.behavioral-role { padding: 12px; }
+.behavioral-role li { margin-bottom: 10px; }
+.behavioral-resume-layout { margin-top: 18px; gap: 18px; }

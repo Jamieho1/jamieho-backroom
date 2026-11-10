@@ -176,3 +176,18 @@ test('Notes shows text and visuals together with resizable panels and fits phone
  await expect(page.getByRole('navigation',{name:'Coding topics'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('Notes visuals remain beside scrolling text on desktop and stack on phone',async({page},info)=>{
+ await mount(page,'notesFixture');
+ await expect(page.locator('.notes-visuals')).toBeVisible();
+ if(info.project.name==='desktop') {
+  await page.locator('.notes-main').evaluate(el=>{for(let i=0;i<60;i++){const p=document.createElement('p');p.textContent='Long note reading section '+i;el.append(p);}});
+  const before=await page.locator('.notes-visuals').boundingBox();
+  await page.locator('#practice-test-root .desktop-app-content').evaluate(el=>{el.scrollTop=450;});
+  expect(await page.locator('#practice-test-root .desktop-app-content').evaluate(el=>el.scrollTop)).toBeGreaterThan(400);
+  await expect.poll(()=>page.locator('.notes-visuals').evaluate(el=>Math.round(el.getBoundingClientRect().top))).toBe(Math.round(before!.y));
+ } else {
+  expect(await page.locator('.notes-visuals').evaluate(el=>getComputedStyle(el).position)).toBe('static');
+ }
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

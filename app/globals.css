@@ -280,3 +280,36 @@ html[data-theme="dark"] body:has(.resources-page) { --resources-background: #0d1
 .resources-page .resource-preview span { background: var(--resources-line); }
 .resources-page .resource-access { border-color: var(--resources-line); }
 body:has(.resources-page) .site-header { background: transparent; backdrop-filter: none; }
+
+/* Full top bar groups links beside the logo; floating navigation stays centred. */
+.site-navigation { justify-content: flex-start; }
+.site-navigation-account { margin-left: auto; }
+.journey-menu-chevron { display: block; flex: none; transition: transform .15s; }
+.journey-menu[open] .journey-menu-chevron { transform: rotate(180deg); }
+.journey-chapter-list::before { content: ""; position: absolute; bottom: 100%; left: 0; right: 0; height: 14px; }
+
+/* App workspaces share the Resources Cloud & Ink surfaces in every theme. */
+body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+  --bg: #edf2f7; --bg-accent: #f8fafc; --desktop: #f8fafc; --input: #e6edf5;
+  --ink: #182b42; --heading: #182b42; --secondary: #4f6278; --muted: #63768b;
+  --border: #c8d4e2; --border-light: #d9e2ec; --blue: #245cb0;
+  background: var(--bg); color: var(--ink);
+}
+html[data-theme="dark"] body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+  --bg: #0d1725; --bg-accent: #142235; --desktop: #142235; --input: #192b42;
+  --ink: #eef4fa; --heading: #eef4fa; --secondary: #bac9da; --muted: #9aadc3;
+  --border: #344961; --border-light: #293c53; --blue: #8dbbff;
+}
+@media (prefers-color-scheme: dark) {
+ html:not([data-theme="light"]) body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+  --bg: #0d1725; --bg-accent: #142235; --desktop: #142235; --input: #192b42;
+  --ink: #eef4fa; --heading: #eef4fa; --secondary: #bac9da; --muted: #9aadc3;
+  --border: #344961; --border-light: #293c53; --blue: #8dbbff;
+ }
+}
+/* Compact content sizing without scaling the UI or reducing touch targets. */
+:is(.notes-reader, .practice-arena, .behavioral) { font-size: 14px; line-height: 1.55; }
+:is(.notes-reader, .practice-arena, .behavioral) h2 { font-size: 20px; }
+:is(.notes-reader, .practice-arena, .behavioral) h3 { font-size: 17px; }
+:is(.notes-reader, .practice-arena, .behavioral) .md { font-size: 14px; }
+:is(.notes-reader, .practice-arena, .behavioral) .btn { font-size: 13px; padding: 7px 11px; }
