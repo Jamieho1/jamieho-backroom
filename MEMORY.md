@@ -53,3 +53,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-09: With explicit approval, saved Creator title “AI engineering, explained” live in site_sections.writing; database readback verified. Title only; no schema migration. Public cache refresh/rebuild needed; compact typography remains a local change.
 
 2026-11-10: Left-aligned full top-bar links; centred floating bar retained, Journey hover/click and SVG chevron. Hero glass replaced with compact approved tagline/local scrim, buttons retained. Articles cover links/full-height sidebar, Cloud & Ink app palette, compact Notes/Practice/Resume sizing and sticky desktop Notes visuals. No database/migration change. Check passed (518 tests/build/static); final build and 38 affected desktop/phone browser checks passed. Docs updated; uncommitted, Jamie deploys/verifies.
+
+2026-11-10: Raised hero tagline/buttons into the cloud bank and lowered Welcome/name toward the characters, with smaller phone offsets. Artwork unchanged. Production build/whitespace and local desktop/390px previews passed; no database/migration change or new full-suite run. Docs updated; Jamie deploys/verifies.
