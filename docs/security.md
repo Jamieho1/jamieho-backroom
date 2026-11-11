@@ -1,6 +1,6 @@
 # Data and security contract
 
-Access is enforced in database RLS with PGlite policy tests, never just hidden UI. Only the owner edits managed site/app content; contact submissions and permitted self app-open records have their existing constrained visitor writes. New app data uses rls.can_view_app. Settings remains owner-only; Behavioral access is registry-controlled and initially invite-only.
+Access is enforced in database RLS with PGlite policy tests, never just hidden UI. Only the owner edits managed site/app content. Readers manage only their own article_pins, separate from article content. Contact submissions and permitted self app-open records have their existing constrained visitor writes. New app data uses rls.can_view_app. Settings remains owner-only; Behavioral access is registry-controlled and initially invite-only.
 
 Anon/authenticated may execute only public.record_signin over the API. ops_usage is service-role-only. RLS helpers belong in rls; trigger functions in private. Preserve grants, security-invoker discovery and tests/db coverage.
 
@@ -17,3 +17,5 @@ Storage reads/writes require appropriate bucket/policy checks. Keep schema and e
 The supplied public Cyterly screenshot is delivered under public/project-art for the requested project display. This contains no private CV/notes/import data. Other project screenshots remain database/Storage managed.
 
 Resources previews contain generic placeholders only. Unlock state uses existing server-filtered app discovery; /notes, /practices and /behavioral still enforce server/RLS access. Missing permission shows a membership gate; payment integration is not implemented. Retired /about and /desktop only redirect.
+
+Article pins: 20261111180819_article_pins.sql (applied live 2026-11-11 as remote 20261111181807) grants authenticated SELECT/INSERT/DELETE only. RLS isolates every user, including owner; inserts require an accessible published article. No UPDATE, anonymous grants or new callable functions. Account/article deletion cascades; export-tables.json includes pins. Privacy discloses account/article IDs and pin dates. Approved application and live RLS/grant/policy/cascade checks succeeded; no article-pins security advisory.

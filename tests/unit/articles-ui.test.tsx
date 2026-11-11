@@ -3,6 +3,7 @@ import {beforeEach,afterEach,it,expect,vi} from 'vitest';
 import {render,screen,fireEvent,cleanup,within} from '@testing-library/react';
 const m=vi.hoisted(()=>({save:vi.fn(),role:'anonymous'}));
 vi.mock('@/app/actions/articles',()=>({saveArticle:m.save}));vi.mock('@/components/viewer-provider',()=>({useViewer:()=>({viewer:{status:m.role}})}));vi.mock('next/link',()=>({default:({prefetch:_p,children,...props}:React.ComponentProps<'a'>&{prefetch?:boolean})=><a {...props}>{children}</a>}));
+vi.mock('@/app/actions/article-pins',()=>({loadArticlePins:vi.fn(async()=>({ok:true,ids:[]})),saveArticlePin:vi.fn(async()=>({ok:true}))}));
 import {ArticleEditor} from '@/components/articles/editor';
 import {ArticlesShell} from '@/components/articles/library';
 import {relatedArticles,youtubeId} from '@/lib/articles';
@@ -85,9 +86,13 @@ it('"On this page" lists Overview then each section and follows clicks',async()=
  expect(within(nav).getAllByRole('link').map(a=>a.textContent)).toEqual(['Overview','Setup','Prompts']);
  fireEvent.click(within(nav).getByRole('link',{name:'Setup'}));expect(scrolled).toHaveBeenCalled();expect(within(nav).getByRole('link',{name:'Setup'}).getAttribute('aria-current')).toBe('location');
 });
-it('article covers and placeholders open the matching article',()=>{
+it('article cards are one complete link with no nested links',()=>{
  render(<ArticlesShell articles={[{...article,cover_url:'https://cdn.example/cover.png'},{...article,id:'two',slug:'second',title:'Second post'}]} />);
- expect(screen.getByRole('link',{name:'Read Example reference'}).getAttribute('href')).toBe('/articles/example');
- expect(screen.getByRole('link',{name:'Read Example reference'}).querySelector('img')).toBeTruthy();
- expect(screen.getByRole('link',{name:'Read Second post'}).getAttribute('href')).toBe('/articles/second');
+ expect(screen.getByRole('link',{name:'Example reference'}).getAttribute('href')).toBe('/articles/example');
+ const card=screen.getByRole('link',{name:'Example reference'});
+ expect(card.querySelector('img')).toBeTruthy();
+ expect(card.querySelector('.article-card-body')?.textContent).toContain('Summary');
+ expect(card.querySelector('.catalog-card-footer')?.textContent).toContain('Read article');
+ expect(card.querySelector('a,button')).toBeNull();
+ expect(screen.getByRole('link',{name:'Second post'}).getAttribute('href')).toBe('/articles/second');
 });

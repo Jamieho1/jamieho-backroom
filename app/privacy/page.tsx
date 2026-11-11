@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "What this site collects, why, and how to have it deleted.",
 };
 
-const UPDATED = "1 November 2026";
+const UPDATED = "11 November 2026";
 
 /**
  * Privacy policy (needed for Google sign-in to be published). Keep it true to what the code does:
@@ -47,7 +47,7 @@ export default function Privacy() {
           are covered by the retention and encrypted-backup periods below.
         </li>
         <li>
-          <strong>Articles</strong> are stored in Supabase. The owner can save private drafts and publish articles and reference links for everyone to read. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
+          <strong>Articles</strong> are stored in Supabase. Signed-in readers can pin published articles; the article ID, account ID and pin date are stored privately to sync their list across devices. Readers can unpin them; deleting an account or article removes its pins. These records follow the retention and backup periods below. The owner can save private drafts and publish articles and reference links for everyone to read. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>
           <strong>Resume, Behavioral stories and answers</strong> are stored in Supabase, including experience, projects, education, certificates, skills, CV bullets, story links, question-to-story mappings, answer outlines and follow-ups. Only the owner edits them; people allowed to open Behavioral can read them. Resume entries and bullets appear publicly on About Me only when the owner marks them Public. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.

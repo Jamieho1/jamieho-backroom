@@ -24,10 +24,8 @@ Updated 2026-11-11. Changes remain local/uncommitted unless stated as live. Jami
 
 - Projects/Articles cards now share Resources surfaces, rounded border, body spacing and gold action-footer treatment. Project card window decoration removed; images, Featured/tags and detail-page links retained.
 
+- Articles scroll follow-up: sidebar remains stationary while the right reading pane scrolls. Only sidebar/list scroll near the end auto-loads more latest posts; Show more remains. Personal pins are implemented for account sync with private RLS, error/retry handling and a Pinned posts sidebar. Migration 20261111180819_article_pins.sql applied live with approval on 2026-11-11; remote version 20261111181807 (article_pins). Catalogue verification confirmed RLS, own-only policies, denied anonymous/UPDATE access, backup reads and cascading foreign keys. Frontend deployment remains Jamie’s step.
+
 ## Validation
 
-Catalogue card follow-up: typecheck, 13 Articles UI tests, production build and all 20 Articles/Projects desktop/phone browser checks passed. Local light-desktop/dark-phone previews reviewed with no horizontal overflow. No database/migration change.
-
-Previous Articles sidebar follow-up: typecheck, 13 article UI unit tests, production build and all 8 Articles desktop/phone browser checks passed. Earlier broader counts below are from the Projects change.
-
-2026-11-11 Projects follow-up: typecheck, 518 unit/database tests, production build and required static assertions passed. Local database setup hooks timed out under overlapping test load; rerun with maxWorkers=2 passed all tests. Full isolated desktop/390px browser suite: 125 passed, 3 existing skips, including Projects/Work navigation, plain project pages, article links and Notes resizing/sticky visuals. Existing app access/logging remains unchanged. No database/migration/dependency/deployment change; Jamie commits, pushes and verifies live.
+Account pins (2026-11-11): typecheck, 530 unit/database tests (maxWorkers=2), production build/static assertions passed. Full desktop/390px browser run: 129 passed, 4 skips; one previously intermittent desktop contact honeypot submission failed, then passed on a focused desktop/phone rerun (2 passed). Pin/unpin, failed-save retry, independent sidebar pagination, app access and account-switch isolation checks passed. Approved migration 20261111180819_article_pins.sql is applied live as remote 20261111181807; RLS/grants/policies/constraints verified through MCP. Security advisors reported no article-pins finding. Privacy updated and article_pins added to encrypted exports. Final explicit grant tightening passed the 5 pin database tests. No dependencies changed, no commit/push/deployment.

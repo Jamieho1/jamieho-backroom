@@ -43,7 +43,6 @@
 .articles-intro p { color:var(--secondary); margin:0 0 22px; max-width:42rem; }
 .articles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr)); gap:16px; margin-bottom:20px; }
 .article-card h2 { font-size:22px; margin:0; line-height:1.25; }
-.article-card h2 a { color:var(--heading); text-decoration:none; }
 .article-card-body p { margin:0; color:var(--secondary); line-height:1.6; }
 .article-card-body .article-meta { font-size:12.5px; }
 .article-card-cover { display:block; width:100%; aspect-ratio:16/9; object-fit:cover; background:var(--bg); margin-bottom:0; }
@@ -126,8 +125,27 @@
 /* Stretch the browse surface to the window bottom even with a short article list. */
 .articles-wrap { min-height: 100%; }
 .articles-app { min-height: 100%; }
-.article-card > .article-card-image-link { display: block; margin: 0; }
-.article-card-image-link:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
-.article-card-image-link:hover img { filter: brightness(.96); }
+.article-card { text-decoration: none; transition: border-color .2s ease; }
+.article-card:hover { border-color: var(--blue); }
+.article-card:hover .article-card-cover { filter: brightness(.96); }
 
 .articles-list-heading { margin: 0 8px 6px; font: 700 12px/1.4 var(--f-body); color: var(--secondary); letter-spacing: .06em; text-transform: uppercase; }
+
+/* Desktop browse and reading panes scroll independently beneath the shared top bar. */
+.articles-wrap { height: 100%; }
+@container articles (min-width:721px) {
+ .articles-app { height: 100%; min-height: 0; grid-template-rows: minmax(0,1fr); overflow: hidden; }
+ .articles-side, .articles-main { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+ .articles-side { scrollbar-gutter: stable; }
+}
+
+.article-sidebar-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.article-sidebar-row > a { flex: 1; min-width: 0; }
+.article-pin { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--secondary); cursor: pointer; }
+.article-pin[aria-pressed="true"] { background: var(--heading); color: var(--bg); }
+.article-pin:disabled { opacity: .5; cursor: default; }
+.article-pin:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.articles-pinned { padding-top: 12px; border-top: 1px solid var(--border-light); }
+.articles-pinned > p, .articles-pin-signin p { margin: 0 8px; color: var(--secondary); font-size: 12px; }
+.articles-pinned .articles-list { border-top: 0; padding-top: 0; }
+.articles-pin-signin .btn { margin-top: 8px; font-size: 12px; }
