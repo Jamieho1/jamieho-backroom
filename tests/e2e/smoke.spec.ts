@@ -48,11 +48,12 @@ test("Settings is a plain 404 for anyone who isn't the owner", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Settings" })).toHaveCount(0);
 });
 
-test("the project page remains a public app window", async ({ page }) => {
+test("the project page is public with the plain Resources layout", async ({ page }) => {
   await page.goto("/projects");
   await expect(page.getByRole("heading", { name: "Projects", level: 1 })).toBeVisible();
   await expect(page.getByText("Projects are on their way.")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Close window" })).toHaveAttribute("href", "/resources");
+  await expect(page.getByRole("link", { name: "Close window" })).toHaveCount(0);
+  await expect(page.locator(".app-page[data-app=projects]")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 

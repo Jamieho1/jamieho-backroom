@@ -34,7 +34,7 @@ test("navigation controls remain available in the floating bar", async ({ page }
   await page.goto('/'); await page.locator('.is-journey summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
-  for(const name of ['Articles','Resources','Privacy']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
+  for(const name of ['Projects','Articles','Resources','Privacy']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
   await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
@@ -68,4 +68,18 @@ test('Journey opens on hover and click, and the floating bar remains centred', a
   const bar=await page.locator('.site-navigation.is-journey').boundingBox();
   expect(Math.abs(bar!.x+bar!.width/2-page.viewportSize()!.width/2)).toBeLessThan(2);
  }
+});
+
+test('Projects opens the catalogue while Journey Work links to the showcase',async({page})=>{
+ await page.goto('/resources');
+ const nav=page.getByRole('navigation',{name:'Site',exact:true});
+ await expect(nav.getByRole('link',{name:'Projects',exact:true})).toHaveAttribute('href','/projects');
+ await nav.locator('summary').click();
+ const chapters=page.getByRole('navigation',{name:'Journey chapters'});
+ await expect(chapters.getByRole('link',{name:'Work',exact:true})).toHaveAttribute('href','/#projects');
+ await expect(chapters.getByRole('link',{name:'Projects',exact:true})).toHaveCount(0);
+ await page.keyboard.press('Escape');
+ await nav.getByRole('link',{name:'Projects',exact:true}).click();
+ await expect(page).toHaveURL(/\/projects$/);
+ await expect(page.locator('.app-page[data-app="projects"]')).toBeVisible();
 });

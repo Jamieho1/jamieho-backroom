@@ -33,6 +33,18 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
     if (active&&tracked) void logDesktopOpen(active.id);
   }, [active?.id,tracked]); // A deep link counts as opening an app, too.
 
+  // These routes are full pages beneath the shared site header, rather than desktop windows.
+  if (initialApp && ["privacy", "projects", "articles", "notes", "practice", "behavioral", "signin"].includes(initialApp)) {
+    return <main className="app-page" data-app={initialApp} aria-label={active?.name}>
+      <div className="desktop-app-content app-page-content">
+        {notice}
+        {loadError ? <p className="desktop-notice" role="status">Can&apos;t load your apps. <a href="/resources">Try again</a></p> : null}
+        {!active ? <p className="desktop-notice" role="status">This app is unavailable or you don&apos;t have access to it.</p>
+          : content ?? <div className="desktop-placeholder"><h1>{active.name}</h1><p>{PLACEHOLDERS[active.id] ?? "This app’s content is not available yet."}</p></div>}
+      </div>
+    </main>;
+  }
+
   return (
     <div data-app={initialApp} className={`desktop-os${maximised && active ? " is-maximised" : ""}`} style={{"--desktop-day":`url("${DESKTOP_ASSETS.day}")`,"--desktop-night":`url("${DESKTOP_ASSETS.night}")`,"--desktop-day-wide":`url("${DESKTOP_ASSETS.dayWide}")`,"--desktop-night-wide":`url("${DESKTOP_ASSETS.nightWide}")`,"--desktop-day-portrait":`url("${DESKTOP_ASSETS.dayPortrait}")`,"--desktop-night-portrait":`url("${DESKTOP_ASSETS.nightPortrait}")`} as CSSProperties}>
       <SiteNavigation embedded />

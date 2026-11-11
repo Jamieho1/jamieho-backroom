@@ -1,9 +1,9 @@
 # Current state
 
-Updated 2026-11-10. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
+Updated 2026-11-11. Changes remain local/uncommitted unless stated as live. Jamie pushes and verifies production.
 
 - Home journey is /. /journey redirects home; retired /about redirects to /#pivot, /desktop to /resources. Legacy desktop app queries redirect to canonical app routes.
-- Shared arrival/floating/app navigation: Journey dropdown, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. App windows close to Resources. Owner Settings/edit controls are available there.
+- Shared arrival/floating/app navigation: Journey dropdown, Projects, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. Privacy/Projects/Articles/Notes/Practice/Resume & Stories use plain pages; only Settings retains window controls. Owner Settings/edit controls are available there.
 - Resources lists Notes (/notes), Practice (/practices) and Resume & Stories (/behavioral). Locked previews contain generic blurred placeholders only. Existing server-filtered discovery and server/RLS checks determine unlocks; missing access gets a membership gate. Payment integration is not implemented.
 - Hero uses matching generated 1920×1080 day/night landscapes with extended sky and aligned larger characters. Yellow/white editable heading sits above them; existing phone portraits remain. No CSS colour grading/pale halo. Welcome/name sit closer to the characters; compact tagline and social buttons are raised toward the lower cloud bank over a soft local scrim; the large glass card is removed. Schedule a call remains disabled.
 - Reading cards behind About/Projects/Experience/Creator copy retain geometry. About keeps its original smaller heading, full-opacity paragraph and untruncated phone text; grade omitted only from journey display.
@@ -16,8 +16,10 @@ Updated 2026-11-10. Changes remain local/uncommitted unless stated as live. Jami
 
 - Top-bar links now group left; floating bar remains centred. Journey supports hover/click with an SVG chevron. App surfaces match Resources in light/dark/Auto. Articles sidebar stretches full height and covers open slug pages. Notes visuals stay sticky on desktop; compact Notes/Practice/Resume typography and spacing applied. No database/schema/dependency changes.
 
+- Plain app layout (2026-11-11): removed window chrome/backdrop from Privacy, Articles, Notes, Practice, Resume & Stories and locked resource screens. One shared root top bar, Resources Cloud & Ink palette including Privacy. Existing protected server content/access checks, app-open logging, scrolling and resizers retained. No policy copy, data/schema or dependency change.
+
+- Projects follow-up: catalogue, case studies and management use the plain shared app shell and Cloud & Ink palette. Direct Projects link in top/floating navigation; Journey showcase renamed Work with existing #projects anchor preserved. Typecheck, all 518 unit/database tests (local maxWorkers=2), production build/static assertions and full browser suite (125 passed, 3 existing skips) passed.
+
 ## Validation
 
-Hero placement follow-up: responsive CSS only; production build and whitespace checks passed. Local desktop/390px day/night phone previews reviewed without horizontal overflow. Earlier test counts below belong to the preceding layout change; no new full-suite run.
-
-2026-11-10: npm run check passed (typecheck, 518 unit/database tests, production build and static assertions). Final palette correction rebuilt successfully. Affected home/Articles/Practice/Notes browser suites: 38 passed across desktop and 390px phone, including hover/click dropdown, centred floating navigation, article cover links/full-height sidebar, sticky visuals, resizers and Python runner. Local day/night phone and desktop hero previews fit without horizontal overflow. No production browser verification, database update, migration, deployment, commit or push in this change.
+2026-11-11 Projects follow-up: typecheck, 518 unit/database tests, production build and required static assertions passed. Local database setup hooks timed out under overlapping test load; rerun with maxWorkers=2 passed all tests. Full isolated desktop/390px browser suite: 125 passed, 3 existing skips, including Projects/Work navigation, plain project pages, article links and Notes resizing/sticky visuals. Existing app access/logging remains unchanged. No database/migration/dependency/deployment change; Jamie commits, pushes and verifies live.

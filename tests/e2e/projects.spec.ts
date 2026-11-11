@@ -13,7 +13,7 @@ const fin={...base,id:'1',slug:'fin-example',name:'Fin example',tagline:'Budgeti
 const site={...base,id:'2',slug:'site-example',name:'Site example',tagline:'Has a live website',featured:false,url:'https://www.example.com/app',screenshots:['data:image/gif;base64,R0lGODlhAQABAAAAACw=']};
 const q=new URLSearchParams(location.search).get('view');
 const upload=async(files)=>files.map(f=>({name:f.name,url:'https://example.com/shots/'+f.name}));
-createRoot(document.getElementById('projects-fixture')).render(<main className="desktop-os"><div className="desktop-app-content">{q==='editor'?<ProjectEditor initial={[fin,site]} upload={upload}/>:q==='fin'?<ProjectDetail p={fin}/>:q==='site'?<ProjectDetail p={site}/>:q==='empty'?<ProjectList projects={[]}/>:<ProjectList projects={[fin,site]}/>}</div></main>);`,
+createRoot(document.getElementById('projects-fixture')).render(<><div className="site-header" /><main className="app-page" data-app="projects"><div className="desktop-app-content app-page-content">{q==='editor'?<ProjectEditor initial={[fin,site]} upload={upload}/>:q==='fin'?<ProjectDetail p={fin}/>:q==='site'?<ProjectDetail p={site}/>:q==='empty'?<ProjectList projects={[]}/>:<ProjectList projects={[fin,site]}/>}</div></main></>);`,
       resolveDir: process.cwd(), loader: "tsx",
     },
     bundle: true, write: false, format: "iife", platform: "browser", jsx: "automatic", define: { "process.env.NODE_ENV": '"production"' },

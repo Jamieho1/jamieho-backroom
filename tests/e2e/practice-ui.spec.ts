@@ -12,11 +12,11 @@ test.beforeAll(async()=>{
    import {NotesReader} from './components/notes/reader';
    const params=new URLSearchParams(location.search);
    createRoot(document.getElementById('practice-test-root')).render(
-     <main className="desktop-os"><div className="desktop-workspace">
-       <section className="desktop-window"><div className="desktop-app-content">
+     <><div className="site-header" /><main className="app-page">
+       <div className="desktop-app-content app-page-content">
          {params.has('notesFixture') ? <NotesReader notes={[{id:'arrays-hashing',title:'Arrays',body:'# Arrays\\n\\n### 1. Walk\\nExample explanation. Contains Duplicate',free:'',visual:[{kind:'array',title:'Walk a list',concept:'Walk',values:[2,4],frames:[{caption:'Start',pointers:[{name:'i',index:0}]},{caption:'Move',pointers:[{name:'i',index:1}]}]}],sort:1,updated_at:'2026-11-01T00:00:00Z'}]} /> : <PracticeArena viewerKey="fixture" initialProblem={217} canEdit={params.has('ownerFixture')} />}
-       </div></section>
-     </div></main>
+       </div>
+     </main></>
    );
  `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'mock-practice-service',setup(b){b.onResolve({filter:/app\/actions\/practice-stars$/},()=>({path:'stars',namespace:'stars-fixture'}));b.onLoad({filter:/.*/,namespace:'stars-fixture'},()=>({contents:`let stars=new Set([217]);let fail=true;export async function loadPracticeStars(){return {ok:true,problems:[...stars]}};export async function savePracticeStar(problem,starred){if(fail){fail=false;return {ok:false,message:'Could not save star'}};starred?stars.add(problem):stars.delete(problem);return {ok:true};}`}));b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'link-fixture'}));b.onLoad({filter:/.*/,namespace:'link-fixture'},()=>({resolveDir:process.cwd(),contents:'import React from "react";export default function Link({prefetch,children,...props}){return React.createElement("a",props,children)}'}));b.onResolve({filter:/app\/actions\/practice$/},()=>({path:'practice',namespace:'fixture'}));b.onResolve({filter:/app\/actions\/notes$/},()=>({path:'notes',namespace:'notes-fixture'}));b.onLoad({filter:/.*/,namespace:'notes-fixture'},()=>({contents:'export async function saveNote(){return {ok:false,message:"Not part of this fixture"};}'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:`
  let codeFailures=1; let noteFailures=1;let loadFailures=location.search.includes('loadFailure')?1:0;

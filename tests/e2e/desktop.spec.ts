@@ -13,17 +13,6 @@ test("legacy resource deep links stay behind sign-in", async ({ page }) => {
  await expect(page.getByRole('region',{name:'Question bank'})).toHaveCount(0);
 });
 
-test('Projects and Privacy keep full-height app windows with the shared navigation',async({page},info)=>{
- if(info.project.name==='desktop')await page.setViewportSize({width:1920,height:900});
- for(const [path,title] of [['/projects','Projects'],['/privacy','Privacy']] as const){
-  await page.goto(path);const win=page.getByRole('region',{name:title,exact:true});await expect(win).toBeVisible();
-  const box=await win.boundingBox();expect(Math.abs(box!.y+box!.height-page.viewportSize()!.height)).toBeLessThanOrEqual(2);
-  expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1)).toBe(true);
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await expect(page.getByRole('link',{name:'Close window'})).toHaveAttribute('href','/resources');
- }
-});
-
 test('clean resource routes stay gated and legacy desktop links redirect to them',async({page})=>{
  for(const [old,path] of [['/desktop?app=notes','/notes'],['/desktop?app=practice','/practices'],['/desktop?app=practice&problem=217','/practices/217'],['/desktop?app=behavioral','/behavioral']]){
   await page.goto(old);expect(new URL(page.url()).pathname).toBe(path);
@@ -41,4 +30,25 @@ test('Resources and Articles use client navigation without replacing the documen
  await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Resources',exact:true}).click();
  await expect(page).toHaveURL(/\/resources$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
+});
+
+test('Privacy, Articles and protected resources use plain pages with one shared header',async({page})=>{
+ for(const path of ['/privacy','/projects','/articles','/notes','/practices','/behavioral']) {
+  await page.goto(path);
+  await expect(page.locator('.app-page')).toBeVisible();
+  await expect(page.locator('.desktop-window, .desktop-titlebar, .desktop-backdrop')).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Maximise window'})).toHaveCount(0);
+  await expect(page.getByRole('link',{name:'Close window'})).toHaveCount(0);
+  await expect(page.getByRole('banner')).toHaveCount(1);
+  await expect(page.getByRole('navigation',{name:'Site'})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+ await page.goto('/resources');
+ const resources=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
+ await page.goto('/privacy');
+ expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(resources);
+ await page.getByRole('combobox',{name:'Colour mode'}).selectOption('dark');
+ const privacyDark=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
+ await page.goto('/resources');
+ expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(privacyDark);
 });

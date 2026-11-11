@@ -24,7 +24,7 @@ export const HOME_CHAPTERS: Chapter[] = [
     panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
-  { id: "projects", label: "Projects", nav: "Projects", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
+  { id: "projects", label: "Work", nav: "Work", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
   // Experience (TKT-85): public CV roles, one per screen, with a timeline dot each and Westminster framed beside them.
   {
     id: "experience", label: "Experience", nav: "Experience", kind: "section", tone: "light", scroll: 1.4, timeline: true,

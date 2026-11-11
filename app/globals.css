@@ -289,19 +289,19 @@ body:has(.resources-page) .site-header { background: transparent; backdrop-filte
 .journey-chapter-list::before { content: ""; position: absolute; bottom: 100%; left: 0; right: 0; height: 14px; }
 
 /* App workspaces share the Resources Cloud & Ink surfaces in every theme. */
-body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .app-page, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
   --bg: #edf2f7; --bg-accent: #f8fafc; --desktop: #f8fafc; --input: #e6edf5;
   --ink: #182b42; --heading: #182b42; --secondary: #4f6278; --muted: #63768b;
   --border: #c8d4e2; --border-light: #d9e2ec; --blue: #245cb0;
   background: var(--bg); color: var(--ink);
 }
-html[data-theme="dark"] body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+html[data-theme="dark"] body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .app-page, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
   --bg: #0d1725; --bg-accent: #142235; --desktop: #142235; --input: #192b42;
   --ink: #eef4fa; --heading: #eef4fa; --secondary: #bac9da; --muted: #9aadc3;
   --border: #344961; --border-light: #293c53; --blue: #8dbbff;
 }
 @media (prefers-color-scheme: dark) {
- html:not([data-theme="light"]) body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
+ html:not([data-theme="light"]) body:has(:is(.resources-page, .articles-wrap, .notes-reader, .practice-arena, .behavioral, .resource-gate, .app-page, .desktop-os:is([data-app="articles"], [data-app="notes"], [data-app="practice"], [data-app="behavioral"]))) {
   --bg: #0d1725; --bg-accent: #142235; --desktop: #142235; --input: #192b42;
   --ink: #eef4fa; --heading: #eef4fa; --secondary: #bac9da; --muted: #9aadc3;
   --border: #344961; --border-light: #293c53; --blue: #8dbbff;
@@ -313,3 +313,12 @@ html[data-theme="dark"] body:has(:is(.resources-page, .articles-wrap, .notes-rea
 :is(.notes-reader, .practice-arena, .behavioral) h3 { font-size: 17px; }
 :is(.notes-reader, .practice-arena, .behavioral) .md { font-size: 14px; }
 :is(.notes-reader, .practice-arena, .behavioral) .btn { font-size: 13px; padding: 7px 11px; }
+
+/* Resource-style app pages: plain surfaces below the shared top bar, without window chrome. */
+.app-page { height: calc(100dvh - 88px); min-height: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--ink); }
+.app-page-content { min-width: 0; }
+.app-page .articles-wrap, .app-page .notes-reader, .app-page .practice-arena { min-height: 100%; }
+.app-page:is([data-app="privacy"], [data-app="projects"]) .page { max-width: 72rem; margin: 0 auto; padding: 24px 16px 72px; }
+.app-page .resource-gate { width: calc(100% - 32px); max-width: 72rem; margin: 24px auto; }
+body:has(.app-page) .site-header { background: transparent; backdrop-filter: none; }
+@media (max-width: 760px) { .app-page { height: calc(100dvh - 118px); } }

@@ -14,17 +14,18 @@ test("homepage enters directly, keeps hero text and scrolls without an entry gat
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
 });
 
-test("glass introduction keeps full-background framing and the scroll cue opens About", async ({ page }) => {
+test("editorial introduction keeps full-background framing and the scroll cue opens About", async ({ page }) => {
   await page.goto("/");
   const glass = page.locator('[data-chapter="sky"] .journey-hero-glass');
   await expect(glass).toBeVisible();
-  expect(await glass.evaluate(el => getComputedStyle(el).backgroundImage)).not.toBe("none");
-  expect(await glass.evaluate(el => getComputedStyle(el).backdropFilter)).toContain("blur(");
+  expect(await glass.evaluate(el => getComputedStyle(el).backgroundImage)).toBe("none");
+  expect(await glass.evaluate(el => getComputedStyle(el, "::before").backgroundImage)).toContain("radial-gradient");
+  expect(await glass.evaluate(el => getComputedStyle(el).backdropFilter)).toBe("none");
   const placement = await page.evaluate(() => {
     const img = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-day img')!.getBoundingClientRect();
     const description = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-glass')!.getBoundingClientRect();
     const heading = document.querySelector<HTMLElement>('[data-chapter="sky"] .journey-hero-heading')!.getBoundingClientRect();
-    return { fullBackground: Math.abs(img.height - innerHeight) < 2 && Math.abs(img.width - innerWidth) < 2, descriptionBelowCharacters: description.top > innerHeight * .5, headingAboveDescription: heading.bottom < description.top, headingInSky: heading.bottom < innerHeight * .28 };
+    return { fullBackground: Math.abs(img.height - innerHeight) < 2 && Math.abs(img.width - innerWidth) < 2, descriptionBelowCharacters: description.top > innerHeight * .5, headingAboveDescription: heading.bottom < description.top, headingInSky: heading.bottom < innerHeight * (innerWidth <= 768 ? .32 : .28) };
   });
   expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();

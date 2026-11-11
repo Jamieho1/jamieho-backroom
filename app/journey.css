@@ -742,3 +742,6 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
   .journey-hero-heading { top: 88px; }
   .journey-hero-intro { bottom: 112px; }
 }
+
+/* Contain the editorial scrim in the static hero on narrow screens. */
+.journey-stills > li:first-child { overflow: clip; }

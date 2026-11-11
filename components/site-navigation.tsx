@@ -7,7 +7,7 @@ import { SignInButton } from "./sign-in-button";
 import { useViewer } from "./viewer-provider";
 
 export const JOURNEY_LINKS = [
-  { id: "pivot", label: "About" }, { id: "projects", label: "Projects" },
+  { id: "pivot", label: "About" }, { id: "projects", label: "Work" },
   { id: "experience", label: "Experience" }, { id: "toolkit", label: "TechStack" },
   { id: "creator", label: "Creator" }, { id: "screen", label: "Contact Us" },
 ];
@@ -41,7 +41,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
           {items.map((item, k) => onJump ? <button type="button" key={item.id} ref={node => { if (navRefs) navRefs.current[k] = node; }} onClick={() => { onJump(item.id); closeMenu(); }}>{item.label}</button> : <Link key={item.id} prefetch={false} href={`${journey ? "" : "/"}#${item.id}`} onClick={closeMenu}>{item.label}</Link>)}
         </nav>
       </details>
-      <Link href="/articles">Articles</Link><Link href="/resources">Resources</Link><Link href="/privacy">Privacy</Link>
+      <Link href="/projects">Projects</Link><Link href="/articles">Articles</Link><Link href="/resources">Resources</Link><Link href="/privacy">Privacy</Link>
     </nav>
     <div className="site-navigation-account">
       <ThemeToggle />
