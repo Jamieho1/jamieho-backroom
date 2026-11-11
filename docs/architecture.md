@@ -11,6 +11,7 @@ Next.js App Router, React, TypeScript; Supabase Postgres/Google Auth/RLS; Vercel
 | Practice | app/practices/, components/practice/, lib/practice/, public/runner/ |
 | Behavioral/resume | app/behavioral/, components/behavioral/, lib/behavioral/, lib/experience.ts |
 | Articles | app/articles/, components/articles/, lib/articles*, lib/article-images.ts |
+| Guides | app/guides/, components/guides/, lib/guides*, app/actions/guides.ts |
 | Project portfolio | app/projects/, components/portfolio/, lib/portfolio*, app/actions/portfolio.ts |
 | Owner admin | app/settings/, app/actions/ |
 | Shared content/contact | lib/sections.ts, lib/social.ts, lib/contact.ts, app/actions/contact.ts |
@@ -41,3 +42,5 @@ Articles sidebar (2026-11-11): Latest posts renders on both /articles and slug p
 Catalogue card styling (2026-11-11): Resources and .catalog-card share border, 14px radius and theme surface tokens in globals.css. Projects/Articles use common 24px body padding, 22px titles and a separated gold-action footer; project cards no longer imitate window chrome. Images, project tags/Featured badges and public detail-page links remain.
 
 Articles scrolling (2026-11-11): desktop .articles-app constrains left/right panes to the shared content viewport; sidebar and reading pane scroll independently. Near-bottom sidebar scroll reveals eight more latest posts, with Show more retained. Narrow layouts retain their stacked article list scroll. Personal pins use authenticated server actions and account-keyed client state. Pinned posts lives above Latest posts; pin buttons remain outside full-card links. Account changes/logout clear displayed pins and stale async results are ignored. Migration 20261111180819_article_pins.sql applied live with approval on 2026-11-11 as remote 20261111181807; frontend requires deployment.
+
+Guides (2026-11-11): public evergreen resource pages, separate from articles. An article is the long version of one social post; a guide is the reusable reference several posts link to, with optional Notion toolkit and Google Doc links. Table public.guides (migration 20261111220000_guides.sql): published rows readable by anyone (no app gate), owner-only writes. /resources (ISR 1h, still pre-rendered) shows a Guides shelf above the member app catalogue; /guides lists them; /guides/[slug] renders Markdown with the article renderer and toolkit buttons; /guides/manage is the owner editor (pictures in the article-images bucket under guides-<slug>/). Owner Resources bar links Manage guides.

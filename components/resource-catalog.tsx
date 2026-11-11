@@ -12,7 +12,7 @@ export function ResourceCatalog() {
   const signedIn = viewer.status === "member" || viewer.status === "owner";
   return <>
     {loadError ? <p role="alert">Access couldn’t be checked. <a href="/resources">Try again</a></p> : null}
-    {viewer.status === "owner" ? <div className="resource-owner"><Link href="/settings">Settings</Link><button type="button" className="btn ghost" aria-pressed={editing} onClick={() => setEditing(!editing)}>{editing ? "Done editing" : "Edit site"}</button></div> : null}
+    {viewer.status === "owner" ? <div className="resource-owner"><Link href="/settings">Settings</Link><Link href="/guides/manage" prefetch={false}>Manage guides</Link><button type="button" className="btn ghost" aria-pressed={editing} onClick={() => setEditing(!editing)}>{editing ? "Done editing" : "Edit site"}</button></div> : null}
     <ul className="resource-grid">{RESOURCE_PAGES.map(resource => {
       const allowed = signedIn && apps.some(app => app.id === resource.id);
       return <li className={`resource-card${allowed ? "" : " is-locked"}`} key={resource.id}>
