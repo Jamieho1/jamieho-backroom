@@ -257,7 +257,7 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
  .site-navigation-links > a, .journey-menu > summary { padding: 5px 0; }
 }
 
-.resource-card { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-accent); }
+.resource-card, .catalog-card { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-accent); color: var(--ink); }
 .resource-card header { padding: 24px 24px 0; }
 .resource-card h2 { margin: 12px 0 8px; font-size: 22px; }
 .resource-card p { color: var(--secondary); line-height: 1.6; }
@@ -322,3 +322,11 @@ html[data-theme="dark"] body:has(:is(.resources-page, .articles-wrap, .notes-rea
 .app-page .resource-gate { width: calc(100% - 32px); max-width: 72rem; margin: 24px auto; }
 body:has(.app-page) .site-header { background: transparent; backdrop-filter: none; }
 @media (max-width: 760px) { .app-page { height: calc(100dvh - 118px); } }
+
+/* Catalogue cards reuse the Resources surface, spacing and separated action row. */
+.catalog-card { display: flex; flex-direction: column; min-width: 0; }
+.catalog-card-body { display: flex; flex-direction: column; gap: 8px; padding: 24px; flex: 1; min-width: 0; }
+.catalog-card-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 20px 24px; min-height: 72px; border-top: 1px solid var(--border); }
+.catalog-card-title { font: 700 22px/1.25 var(--f-head); color: var(--heading); }
+.catalog-card-footer .site-auth-button { display: inline-flex; align-items: center; text-decoration: none; }
+.catalog-card:focus-visible, .catalog-card:has(a:focus-visible) { outline: 2px solid var(--blue); outline-offset: 3px; }

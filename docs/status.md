@@ -22,8 +22,12 @@ Updated 2026-11-11. Changes remain local/uncommitted unless stated as live. Jami
 
 - Articles sidebar follow-up: Latest posts now appears on index and detail views; filters, newest-first published data and pagination retained. No database change.
 
+- Projects/Articles cards now share Resources surfaces, rounded border, body spacing and gold action-footer treatment. Project card window decoration removed; images, Featured/tags and detail-page links retained.
+
 ## Validation
 
-Latest Articles sidebar follow-up: typecheck, 13 article UI unit tests, production build and all 8 Articles desktop/phone browser checks passed. Earlier broader counts below are from the Projects change.
+Catalogue card follow-up: typecheck, 13 Articles UI tests, production build and all 20 Articles/Projects desktop/phone browser checks passed. Local light-desktop/dark-phone previews reviewed with no horizontal overflow. No database/migration change.
+
+Previous Articles sidebar follow-up: typecheck, 13 article UI unit tests, production build and all 8 Articles desktop/phone browser checks passed. Earlier broader counts below are from the Projects change.
 
 2026-11-11 Projects follow-up: typecheck, 518 unit/database tests, production build and required static assertions passed. Local database setup hooks timed out under overlapping test load; rerun with maxWorkers=2 passed all tests. Full isolated desktop/390px browser suite: 125 passed, 3 existing skips, including Projects/Work navigation, plain project pages, article links and Notes resizing/sticky visuals. Existing app access/logging remains unchanged. No database/migration/dependency/deployment change; Jamie commits, pushes and verifies live.

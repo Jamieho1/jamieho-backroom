@@ -49,12 +49,15 @@ export function ArticlesShell({articles,currentId,children,footer}:{articles:Art
 }
 
 export function ArticleCardView({a}:{a:ArticleCard}){
- return <article className="article-card">
+ return <article className="catalog-card article-card">
   <Link className="article-card-image-link" href={articleHref(a.slug)} prefetch={false} aria-label={`Read ${a.title}`}>
    {a.cover_url?/* eslint-disable-next-line @next/next/no-img-element */<img className="article-card-cover" src={a.cover_url} alt="" loading="lazy" referrerPolicy="no-referrer" />:<div className="article-card-cover placeholder" aria-hidden="true">{CATEGORY_LABEL[a.category]}</div>}
   </Link>
+  <div className="catalog-card-body article-card-body">
   <p className="article-meta">{articleDate(a.created_at)} · {CATEGORY_LABEL[a.category]}</p>
   <h2><Link href={articleHref(a.slug)} prefetch={false}>{a.title}</Link></h2>
   {a.summary?<p>{a.summary}</p>:null}
+  </div>
+  <div className="catalog-card-footer"><Link className="site-auth-button" href={articleHref(a.slug)} prefetch={false}>Read article <span aria-hidden="true">→</span></Link></div>
  </article>;
 }

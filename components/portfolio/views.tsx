@@ -9,24 +9,24 @@ import { ProjectManageLink } from "./manage-link";
 
 export function ProjectList({ projects }: { projects: Project[] }) {
   if (!projects.length) return <p className="muted">Projects are on their way.</p>;
-  return <ul className="win-grid project-list">{projects.map((p) => <li key={p.id}><ProjectTile p={p} /></li>)}</ul>;
+  return <ul className="project-list">{projects.map((p) => <li key={p.id}><ProjectTile p={p} /></li>)}</ul>;
 }
 
 export function ProjectTile({ p }: { p: Project }) {
   const shot = p.screenshots[0];
   return (
-    <Link className="win project-tile" href={projectHref(p.slug)} prefetch={false} aria-label={`${p.name}${p.tagline ? `: ${p.tagline}` : ""}`}>
-      <span className="win-bar" aria-hidden="true"><i /><i /><i /><span>{p.name}</span>{p.featured ? <span className="win-vis">Featured</span> : null}</span>
-      <span className="win-shot">
+    <Link className="catalog-card project-tile" href={projectHref(p.slug)} prefetch={false} aria-label={`${p.name}${p.tagline ? `: ${p.tagline}` : ""}`}>
+      {p.featured ? <span className="project-featured">Featured</span> : null}
+      <span className="project-card-image">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {shot ? <img src={shot} alt="" loading="lazy" /> : <span className="win-placeholder" aria-hidden="true"><span>◻</span></span>}
       </span>
-      <span className="win-body">
-        <strong className="project-tile-name">{p.name}</strong>
+      <span className="catalog-card-body">
+        <strong className="catalog-card-title project-tile-name">{p.name}</strong>
         {p.tagline ? <span className="project-tile-tagline">{p.tagline}</span> : null}
         {p.tags.length ? <span className="project-tile-tags">{p.tags.slice(0, 4).map((t) => <span key={t}>{t}</span>)}</span> : null}
-        <span className="project-tile-go">Read more <span aria-hidden="true">→</span></span>
       </span>
+      <span className="catalog-card-footer"><span className="site-auth-button project-tile-go">Read more <span aria-hidden="true">→</span></span></span>
     </Link>
   );
 }
