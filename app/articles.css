@@ -132,3 +132,5 @@
 .article-card > .article-card-image-link { display: block; margin: 0; }
 .article-card-image-link:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
 .article-card-image-link:hover img { filter: brightness(.96); }
+
+.articles-list-heading { margin: 0 8px 6px; font: 700 12px/1.4 var(--f-body); color: var(--secondary); letter-spacing: .06em; text-transform: uppercase; }

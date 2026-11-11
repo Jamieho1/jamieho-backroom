@@ -61,3 +61,5 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-11 CI recheck: supplied failures match committed legacy glass-card assertions and pre-fix phone overflow. Verified pending local fixes against a full isolated browser rerun: 125 passed, 3 existing skips. No new code changes; docs updated. Fixes still need Jamie’s commit/push before CI can run them.
 
 2026-11-11: Projects list/detail/manage now share the plain Resources-style shell/palette. Added direct Projects link to top/floating bars; Journey showcase renamed Work, preserving #projects and project content. Typecheck, 518 unit/DB tests (maxWorkers=2 after local setup timeouts), build/static and full browser suite (125 passed/3 existing skips) passed. No database/migration/deployment, commit or push. Docs updated.
+
+2026-11-11: Fixed Articles index hiding the sidebar post list behind currentId. Latest posts now shows on index and detail pages with existing filters/newest-first data/eight-at-a-time paging. Typecheck, 13 article UI tests, build and 8 Articles desktop/phone checks passed. No database/migration change; docs updated, uncommitted.

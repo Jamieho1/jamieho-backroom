@@ -10,7 +10,7 @@ const LIST_STEP=8,GRID_STEP=6;
 const PLATFORMS:(Platform|'')[]=['','youtube','instagram','xiaohongshu'];
 
 /**
- * Articles app: a left column with search, category pills, a platform toggle and (on an article page) a short list
+ * Articles app: a left column with search, category pills, a platform toggle and a short newest-first list
  * of posts; the main column shows either the cards (index) or the article itself.
  */
 export function ArticlesShell({articles,currentId,children,footer}:{articles:ArticleCard[];currentId?:string;children?:ReactNode;footer?:ReactNode}){
@@ -30,11 +30,12 @@ export function ArticlesShell({articles,currentId,children,footer}:{articles:Art
    {usedPlatforms.length>2?<div className="articles-toggle" role="group" aria-label="Platform">
     {usedPlatforms.map(p=><button key={p||'all'} type="button" aria-pressed={platform===p} onClick={()=>{setPlatform(p);reset();}}>{p?PLATFORM_LABEL[p]:'All'}</button>)}
    </div>:null}
-   {currentId?<nav aria-label="Articles" className="articles-list">
+   <nav aria-label="Articles" className="articles-list">
+    <h2 className="articles-list-heading">Latest posts</h2>
     {shown.slice(0,listN).map(a=><Link key={a.id} href={articleHref(a.slug)} prefetch={false} aria-current={a.id===currentId?'page':undefined}><span>{a.title}</span><small>{articleDate(a.created_at)} · {CATEGORY_LABEL[a.category]}</small></Link>)}
-    {!shown.length?empty:null}
+    {!shown.length?<p className="muted">{articles.length?'No matching posts.':'No published posts yet.'}</p>:null}
     {shown.length>listN?<button type="button" className="btn ghost small" onClick={()=>setListN(n=>n+LIST_STEP)}>Show more</button>:null}
-   </nav>:null}
+   </nav>
   </aside>
   <div className="articles-main">
    {children??<section aria-label="All articles">

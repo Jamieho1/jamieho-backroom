@@ -17,10 +17,11 @@ it('readers filter by category pills and platform toggle, with no dropdowns or "
  fireEvent.click(within(screen.getByRole('group',{name:'Category'})).getByRole('button',{name:'All'}));fireEvent.click(within(screen.getByRole('group',{name:'Platform'})).getByRole('button',{name:'YouTube'}));expect(screen.queryByRole('link',{name:'Second post'})).toBeNull();
  fireEvent.change(screen.getByPlaceholderText('Search articles…'),{target:{value:'no-match'}});expect(screen.getByText('No articles match these filters.')).toBeTruthy();
 });
-it('shows a short list beside an article, not every post',()=>{
+it.each([undefined,'3'])('shows the latest-post sidebar on index and article views (%s)',(currentId)=>{
  const many=Array.from({length:20},(_,i)=>({...article,id:String(i),slug:`post-${i}`,title:`Post ${i}`}));
- render(<ArticlesShell articles={many} currentId="3"><p>body</p></ArticlesShell>);
- const nav=screen.getByRole('navigation',{name:'Articles'});expect(within(nav).getAllByRole('link')).toHaveLength(8);expect(within(nav).getByRole('link',{name:/Post 3/}).getAttribute('aria-current')).toBe('page');
+ render(<ArticlesShell articles={many} currentId={currentId}>{currentId?<p>body</p>:undefined}</ArticlesShell>);
+ expect(screen.getByRole('heading',{name:'Latest posts'})).toBeTruthy();
+ const nav=screen.getByRole('navigation',{name:'Articles'});expect(within(nav).getAllByRole('link')).toHaveLength(8);expect(within(nav).getByRole('link',{name:/Post 3/}).getAttribute('aria-current')).toBe(currentId?'page':null);
  fireEvent.click(within(nav).getByRole('button',{name:'Show more'}));expect(within(nav).getAllByRole('link')).toHaveLength(16);
 });
 it('recommends same-category posts first and reads YouTube ids and social links',()=>{

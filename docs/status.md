@@ -20,6 +20,10 @@ Updated 2026-11-11. Changes remain local/uncommitted unless stated as live. Jami
 
 - Projects follow-up: catalogue, case studies and management use the plain shared app shell and Cloud & Ink palette. Direct Projects link in top/floating navigation; Journey showcase renamed Work with existing #projects anchor preserved. Typecheck, all 518 unit/database tests (local maxWorkers=2), production build/static assertions and full browser suite (125 passed, 3 existing skips) passed.
 
+- Articles sidebar follow-up: Latest posts now appears on index and detail views; filters, newest-first published data and pagination retained. No database change.
+
 ## Validation
+
+Latest Articles sidebar follow-up: typecheck, 13 article UI unit tests, production build and all 8 Articles desktop/phone browser checks passed. Earlier broader counts below are from the Projects change.
 
 2026-11-11 Projects follow-up: typecheck, 518 unit/database tests, production build and required static assertions passed. Local database setup hooks timed out under overlapping test load; rerun with maxWorkers=2 passed all tests. Full isolated desktop/390px browser suite: 125 passed, 3 existing skips, including Projects/Work navigation, plain project pages, article links and Notes resizing/sticky visuals. Existing app access/logging remains unchanged. No database/migration/dependency/deployment change; Jamie commits, pushes and verifies live.
