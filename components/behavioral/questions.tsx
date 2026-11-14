@@ -7,7 +7,7 @@ import { saveAnswer } from '@/app/actions/behavioral';
 export function QuestionBank({stories,initialAnswers,canEdit,onEditing,onOpenStory}:{stories:Story[];initialAnswers:Answer[];canEdit:boolean;onEditing(v:boolean):void;onOpenStory(id:string):void}){
  const [answers,setAnswers]=useState(initialAnswers);
  const [set,setSet]=useState<QuestionSet|''>('');const [theme,setTheme]=useState<Theme|''>('');const [search,setSearch]=useState('');
- const [selected,setSelected]=useState<string|null>(null);const [draft,setDraft]=useState<AnswerEdit|null>(null);
+ const [selected,setSelected]=useState<string|null>(initialAnswers.find(a=>a.draftChanged)?.question_id??null);const [draft,setDraft]=useState<AnswerEdit|null>(null);
  const [saving,setSaving]=useState(false);const [error,setError]=useState('');
  const visible=QUESTIONS.filter(q=>(!set||q.set===set)&&(!theme||q.theme===theme)&&q.text.toLowerCase().includes(search.toLowerCase().trim()));
  const question=visible.find(q=>q.id===selected)??visible[0];
@@ -27,7 +27,7 @@ export function QuestionBank({stories,initialAnswers,canEdit,onEditing,onOpenSto
   </div>
   <div className="behavioral-columns">
    <nav aria-label="Choose question">{THEMES.map(t=>{const rows=visible.filter(q=>q.theme===t);return rows.length?<section key={t}><h4>{t}</h4>{rows.map(q=><button type="button" className="btn ghost behavioral-question" key={q.id} disabled={!!draft} aria-pressed={question?.id===q.id} onClick={()=>setSelected(q.id)}>{q.text}<span className="muted">{q.set}</span></button>)}</section>:null;})}{!visible.length?<p>No questions match these filters.</p>:null}</nav>
-   {question?<article className="behavioral-answer" aria-label="Selected question">
+   {question?<article data-draft-changed={answer?.draftChanged||undefined} className="behavioral-answer" aria-label="Selected question">
     <p className="eyebrow">{question.theme} · {question.set}</p><h3>{question.text}</h3>
     {draft&&canEdit?<form aria-label="Edit answer" onSubmit={e=>{e.preventDefault();void save();}}>
      {(['primary_story_id','secondary_story_id'] as const).map((key,i)=><label className="field" key={key}><span>Best story {i+1}</span><select value={draft[key]??''} disabled={saving} onChange={e=>setDraft({...draft,[key]:e.target.value||null})}><option value="">No story mapped</option>{draft[key]&&!stories.some(s=>s.id===draft[key])?<option value={draft[key]!}>Previous story (unavailable)</option>:null}{stories.map(s=><option key={s.id} value={s.id}>{s.title}</option>)}</select></label>)}

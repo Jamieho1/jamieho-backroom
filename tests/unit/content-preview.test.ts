@@ -52,3 +52,12 @@ it('publishing snapshots are fetched only after owner validation and reject stal
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
  m.viewer.mockResolvedValue({role:'member',id:'member'});rows.mockClear();expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();
 });
+it('private app snapshots load only for the verified owner; stale and invalid merged rows fail closed',async()=>{
+ const note={id:'fixture-note',title:'Fixture',body:'Live',free:'',visual:[],sort:1,updated_at:'2026-01-01'};
+ const rows=vi.fn().mockResolvedValue({data:[note],error:null});
+ m.single.mockResolvedValue({data:{id,status:'draft',summary:'App proposal',operations:[{table:'notes',op:'update',key:'fixture-note',fields:{body:'Private proposal'}}],photo_slots:[]},error:null});
+ m.from.mockImplementation((table:string)=>table==='notes'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ expect((await getHomePreview())?.appData?.notes?.[0]).toMatchObject({body:'Private proposal',draftChanged:true});expect(note.body).toBe('Live');
+ rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
+ for(const role of ['anonymous','member']){rows.mockClear();m.viewer.mockResolvedValue({role,id:'other'});expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();}
+});

@@ -8,7 +8,7 @@ vi.mock('@/components/sign-in-button',()=>({SignInButton:({next}:{next:string})=
 vi.mock('@/app/desktop/notes-content',()=>({NotesContent:({canEdit}:{canEdit:boolean})=><div>Notes editing: {String(canEdit)}</div>}));
 vi.mock('@/app/desktop/behavioral-content',()=>({BehavioralContent:({canEdit}:{canEdit:boolean})=><div>Behavioral editing: {String(canEdit)}</div>}));
 vi.mock('@/app/settings/content',()=>({SettingsContent:()=>null}));
-vi.mock('@/components/practice/arena',()=>({PracticeArena:({initialProblem}:{initialProblem:number})=><div>Practice problem: {initialProblem}</div>}));
+vi.mock('@/app/desktop/practice-content',()=>({PracticeContent:({initialProblem}:{initialProblem:number})=><div>Practice problem: {initialProblem}</div>}));
 import {AppPage} from '@/app/desktop/app-page';
 beforeEach(()=>{vi.clearAllMocks();m.viewer.mockResolvedValue({role:'member',id:'example'});m.order.mockResolvedValue({data:[],error:null});m.server.mockResolvedValue({from:()=>({select:()=>({order:()=>({order:m.order})})})});});afterEach(cleanup);
 it('anonymous clean-route sign-in returns to that route, including the problem path',async()=>{

@@ -11,7 +11,7 @@ import "../notes.css";
 import "../practice.css";
 import "../behavioral.css";
 import { BehavioralContent } from "./behavioral-content";
-import { PracticeArena } from "@/components/practice/arena";
+import { PracticeContent } from "./practice-content";
 
 export const dynamic = "force-dynamic";
 
@@ -33,5 +33,5 @@ export async function AppPage({app,problem}:{app?:string;problem?:string}) {
   const notes = app === "notes" && apps.some((row) => row.id === "notes" && row.kind === "internal");
   const practice = app === "practice" && apps.some((row) => row.id === "practice" && row.kind === "internal");
   const behavioral = app === "behavioral" && apps.some((row) => row.id === "behavioral" && row.kind === "internal");
-  return <Desktop signedIn viewerId={viewer.id} apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeArena canEdit={viewer.role === "owner"} viewerKey={viewer.id!} initialProblem={Number(problem)} /> : behavioral ? <BehavioralContent canEdit={viewer.role === "owner"} /> : undefined} />;
+  return <Desktop signedIn viewerId={viewer.id} apps={apps} initialApp={app} content={settings ? <SettingsContent /> : notes ? <NotesContent canEdit={viewer.role === "owner"} /> : practice ? <PracticeContent canEdit={viewer.role === "owner"} viewerKey={viewer.id!} initialProblem={Number(problem)} /> : behavioral ? <BehavioralContent canEdit={viewer.role === "owner"} /> : undefined} />;
 }

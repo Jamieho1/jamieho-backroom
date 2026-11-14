@@ -1,0 +1,10 @@
+import {getHomePreview} from '@/lib/content-drafts/preview';
+import {practicePreviewData} from '@/lib/content-drafts/app-overlay';
+import {PagePreview} from '@/components/content-drafts/page-preview';
+import {PracticeArena} from '@/components/practice/arena';
+export async function PracticeContent({viewerKey,initialProblem,canEdit}:{viewerKey:string;initialProblem?:number;canEdit:boolean}){
+ const candidate=await getHomePreview();const preview=candidate?.appData?.question_notes?candidate:null;
+ const first=preview?.operations.find(op=>['question_notes','practice_code','practice_stars'].includes(op.table));
+ const selected=Number.isFinite(initialProblem)?initialProblem:first?Number(first.key):undefined;
+ return <><PracticeArena key={preview?.id??"live"} viewerKey={viewerKey} initialProblem={selected} canEdit={canEdit} previewData={preview?practicePreviewData(preview.appData!,preview.operations):undefined}/><PagePreview preview={preview} page={initialProblem?`/practices/${initialProblem}`:'/practices'}/></>;
+}

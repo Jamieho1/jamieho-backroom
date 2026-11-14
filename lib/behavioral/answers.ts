@@ -6,7 +6,7 @@ export const answerSchema=z.object({
  outline:z.string().max(20000),followups:z.string().max(10000),
 }).refine(a=>!a.primary_story_id||a.primary_story_id!==a.secondary_story_id,{message:'Choose two different stories.'});
 export type AnswerEdit=z.infer<typeof answerSchema>;
-export type Answer=AnswerEdit&{updated_at:string};
+export type Answer=AnswerEdit&{updated_at:string;draftChanged?:boolean};
 export type AnswerSave={ok:true;answer:Answer}|{ok:false;message:string};
 export const ANSWER_SELECT='question_id,primary_story_id,secondary_story_id,outline,followups,updated_at';
 export const emptyAnswer=(question_id:string):AnswerEdit=>({question_id,primary_story_id:null,secondary_story_id:null,outline:'',followups:''});

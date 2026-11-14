@@ -24,8 +24,12 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
   const proposed = new Map<string, ReviewField>();
   for (const operation of operations) {
     const row = operation.table === "site_sections" ? live[operation.key] : experience[operation.table]?.[operation.key];
+    if(operation.table === "practice_stars" && operation.op === "insert") {
+      proposed.set(`practice_stars.${operation.key}`,{field:`practice_stars.${operation.key}`,current:row?"Starred":"Not starred",proposed:"Starred"});
+      continue;
+    }
     if (operation.op === "delete") {
-      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "experience_bullets" ? "(delete bullet)" : "(unpublish; keep row)"});
+      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "practice_stars" ? "(unstar problem)" : operation.table === "experience_bullets" ? "(delete bullet)" : "(unpublish; keep row)"});
       continue;
     }
     for (const [field,value] of Object.entries(operation.fields)) {
@@ -41,6 +45,7 @@ export interface HomePreview {
   id: string;
   summary: string;
   operations: ContentOperation[];
+  appData?: import("./app-overlay").AppPreview;
   publishing?: import("./publishing-overlay").PublishingPreview;
   targets?: {href:string;label:string}[];
   experience?: import("@/lib/experience").ExperienceRow[];

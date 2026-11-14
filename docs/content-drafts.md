@@ -1,6 +1,6 @@
-# Content drafts — TKT-98 / TKT-101 / TKT-104 / TKT-105
+# Content drafts — TKT-98 through TKT-106
 
-Pending owner changes for site_sections, experience_items, experience_bullets, projects, articles and guides. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
+Pending owner changes for site_sections, experience_items, experience_bullets, projects, articles, guides and the six app tables listed below. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
 ## Contract
 
@@ -75,3 +75,23 @@ Migration 20261114120122_content_drafts_publishing.sql applied live through Supa
 Coverage: publishing-drafts unit/DB tests, approval/preview guard tests and publishing-preview.spec.ts using the existing disposable loopback adapter/config. Tests include full-schema parity, limits/links, duplicate/missing rows, cross-table rollback, unpublish/restore, old/new slug refresh, new draft slug privacy and all required preview surfaces at desktop/390px. Current results/file inventory are in status.md.
 
 Live TKT-105 verification confirmed exact function-source parity, hardened settings/API revocations, owner draft policy/RLS, valid/invalid URL behavior and unchanged content/draft fingerprints. No new public RPC or TKT-105 security advisory; no content approvals or test records created.
+
+
+## Private app drafts — TKT-106
+
+app-allowlist.ts reuses existing editor fields/constraints; app-overlay.ts clones owner-validated snapshots. These six tables are owner-managed, with no per-user ownership columns. Existing app-reader RLS remains unchanged; identity fields cannot be supplied.
+
+| Table | Operations | Editable fields |
+| --- | --- | --- |
+| notes | update | body, free |
+| question_notes | insert/update | body |
+| practice_code | insert/update | code |
+| practice_stars | insert/delete | none; key identifies the problem |
+| behavioral_stories | insert/update | bullet_id, title, situation, task, action, result, skills, numbers |
+| behavioral_answers | insert/update | primary_story_id, secondary_story_id, outline, followups |
+
+Practice keys must be existing numeric catalogue IDs; behavioral answer keys must match the question bank. Notes preserve imported metadata/visuals. Limits match existing editors, including UTF-16 notes/code limits and Zod code-point story/answer limits. Story references retain foreign-key checks; duplicate answer mappings fail. SQL independently validates complete merged rows; all edits/status/history remain one transaction. Unstarring retains the full previous row. No attempts, problem catalogue or app-registry edits.
+
+Review compares current/proposed app values and supplies validated app/problem preview destinations. /notes, /practices and /practices/[problem], /behavioral keep normal access checks and apply overlays only after owner verification. Changed content is gold outlined; changed note/story/answer/problem is initially selected. Preview editors are read-only. Practice loads the full owner note/code/star snapshot, bypasses async live replacement, disables execution/saves and never stores proposed code in browser storage. Approval refreshes affected app routes and exact practice problem paths. Normal editors and shared live reads remain unchanged.
+
+Migration 20261114151936_content_drafts_apps.sql is **NOT applied live**. It adds hardened private helpers and extends the approval trigger; no new public RPC or table grants/policies. Code-catalogue changes must update the SQL identifier validation in a new migration; parity tests enforce this. Deployment and Jamie’s live verification remain pending. App unit/DB tests and app-preview.spec.ts use synthetic data and the disposable loopback adapter only.

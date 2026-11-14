@@ -85,3 +85,12 @@ it('failed initial load blocks saving unseen remote code; Retry preserves typing
  fireEvent.click(screen.getByRole('button',{name:'Restore browser draft'}));
  expect((screen.getByRole('textbox',{name:'Python code'}) as HTMLTextAreaElement).value).toBe('Draft typed offline');expect(mocks.saveCode).not.toHaveBeenCalled();
 });
+it('owner draft preview bypasses live reads and execution and never persists proposed code',async()=>{
+ localStorage.setItem(codeKey('owner',217),'Browser draft');
+ render(<PracticeArena viewerKey="owner" initialProblem={217} canEdit previewData={{notes:[{problem:217,body:'Proposed question note',updated_at:'2026-01-01',draftChanged:true}],code:[{problem:217,code:'Proposed saved code',updated_at:'2026-01-01',draftChanged:true}],stars:[],changedStars:[217]}}/>);
+ expect((await screen.findByRole('textbox',{name:'Python code'}) as HTMLTextAreaElement).value).toBe('Proposed saved code');
+ expect(mocks.load).not.toHaveBeenCalled();expect(mocks.warm).not.toHaveBeenCalled();expect((screen.getByRole('button',{name:/^Run$/}) as HTMLButtonElement).disabled).toBe(true);
+ fireEvent.change(screen.getByRole('textbox',{name:'Python code'}),{target:{value:'Attempted change'}});
+ expect(localStorage.getItem(codeKey('owner',217))).toBe('Browser draft');expect(mocks.saveCode).not.toHaveBeenCalled();expect(mocks.saveAttempt).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole('tab',{name:/^Notes$/}));expect(screen.getByText('Proposed question note')).toBeTruthy();expect(screen.queryByRole('button',{name:'Edit question notes'})).toBeNull();
+});

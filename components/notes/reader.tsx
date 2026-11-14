@@ -14,8 +14,9 @@ import { Markdown, type AutoLink } from "./markdown";
 
 export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]; canEdit?: boolean; save?: SaveNote }) {
   const panels = useResizablePanels("jamieho.notes.panels.v1");
-  const [selected, setSelected] = useState(notes[0]?.id ?? "");
-  const [track, setTrack] = useState<NoteTrack>(() => noteTrack(notes[0]?.id ?? ""));
+  const first=notes.find(n=>n.draftChanged)??notes[0];
+  const [selected, setSelected] = useState(first?.id ?? "");
+  const [track, setTrack] = useState<NoteTrack>(() => noteTrack(first?.id ?? ""));
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState<Record<string, NoteRow>>({});
@@ -44,7 +45,7 @@ export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]
         ) : null}
         <label className="field"><span>Search notes</span><input type="search" placeholder="Search notes…" value={query} disabled={editing && canEdit} onChange={(e) => setQuery(e.target.value)} /></label>
         <nav aria-label={nav}>
-          {filtered.map((n) => <button className="notes-topic" type="button" key={n.id} disabled={editing && canEdit} aria-current={n.id === selected ? "page" : undefined} onClick={() => { setSelected(n.id); setSavedMessage(""); }}>{shelfTitle(n.title)}</button>)}
+          {filtered.map((n) => <button data-draft-changed={n.draftChanged||undefined} className="notes-topic" type="button" key={n.id} disabled={editing && canEdit} aria-current={n.id === selected ? "page" : undefined} onClick={() => { setSelected(n.id); setSavedMessage(""); }}>{shelfTitle(n.title)}</button>)}
           {!filtered.length ? <p className="muted">No matching notes.</p> : null}
         </nav>
         {editing && canEdit ? <p className="hint">Save or cancel before switching topics.</p> : null}
@@ -77,7 +78,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { spl
   const showVisuals = groups.length > 0 || parsed.invalid || noteTrack(note.id) === "coding";
   return (
     <div className={`notes-columns${showVisuals ? "" : " notes-single"}`} ref={columns} style={showVisuals ? ({"--notes-columns": `${split}fr 8px ${100 - split}fr`} as CSSProperties) : undefined}>
-      <section className="notes-main" aria-labelledby="notes-topic-title">
+      <section data-draft-changed={note.draftChanged||undefined} className="notes-main" aria-labelledby="notes-topic-title">
         <ConceptCards body={body} links={links} visualConcepts={concepts} onVisual={(concept) => setFocus({concept, tick: Date.now()})} toolbar={(toggle) => <header className="notes-heading"><h2 id="notes-topic-title">{note.title}</h2><div className="actions">{toggle}{canEdit ? <button type="button" className="btn ghost small" onClick={onEdit}>Edit note</button> : null}</div></header>} />
         {savedMessage ? <p role="status">{savedMessage}</p> : null}
         {!body ? <p>No content for this topic yet.</p> : null}

@@ -4,7 +4,7 @@ import { STORY_SELECT,type Story } from '@/lib/behavioral';
 import { ANSWER_SELECT,type Answer } from '@/lib/behavioral/answers';
 import { Behavioral } from '@/components/behavioral/workspace';
 import {getHomePreview} from "@/lib/content-drafts/preview";
-import {ContentPreviewBar} from "@/components/content-drafts/preview-bar";
+import {PagePreview} from "@/components/content-drafts/page-preview";
 import "@/components/content-drafts/preview.css";
 export async function BehavioralContent({canEdit=false}:{canEdit?:boolean}={}){
  try{
@@ -19,7 +19,7 @@ export async function BehavioralContent({canEdit=false}:{canEdit?:boolean}={}){
   ]);
   if(cv.error||stories.error||answers.error)throw new Error('unavailable');
   const candidate=await getHomePreview();
-  const preview=candidate?.experience ? candidate : null;
-  return <><Behavioral key={preview?.id??"live"} items={fromRows(preview?.experience??cv.data??[])} initialStories={(stories.data??[]) as Story[]} initialAnswers={(answers.data??[]) as Answer[]} canEdit={preview ? false : canEdit} />{preview ? <ContentPreviewBar summary={preview.summary} page="/behavioral" experience /> : null}</>;
+  const preview=candidate&&(candidate.experience||candidate.appData?.behavioral_stories||candidate.appData?.behavioral_answers)?candidate:null;
+  return <><Behavioral key={preview?.id??"live"} items={fromRows(preview?.experience??cv.data??[])} initialStories={(preview?.appData?.behavioral_stories??stories.data??[]) as Story[]} initialAnswers={(preview?.appData?.behavioral_answers??answers.data??[]) as Answer[]} canEdit={preview ? false : canEdit} /><PagePreview preview={preview} page="/behavioral"/></>;
  }catch{return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/behavioral">Try again</a></div>;}
 }

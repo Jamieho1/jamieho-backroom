@@ -11,11 +11,11 @@ const labels={situation:'Situation',task:'Task',action:'Action',result:'Result',
 export function Behavioral({items:initialItems,initialStories,initialAnswers=[],canEdit=false}:{items:Item[];initialStories:Story[];initialAnswers?:Answer[];canEdit?:boolean}){
  const [items,setItems]=useState(initialItems);
  const [resumeEditing,setResumeEditing]=useState(false);
- const [view,setView]=useState<'cv'|'questions'>('cv');
+ const [view,setView]=useState<'cv'|'questions'>(initialAnswers.some(a=>a.draftChanged)?'questions':'cv');
  const [questionEditing,setQuestionEditing]=useState(false);
  const [stories,setStories]=useState(initialStories);
  const [bullet,setBullet]=useState<string|null>(null);
- const [selected,setSelected]=useState<string|null>(null);
+ const [selected,setSelected]=useState<string|null>(initialStories.find(s=>s.draftChanged)?.id??null);
  const [draft,setDraft]=useState<StoryEdit|null>(null);
  const [error,setError]=useState('');const [saving,setSaving]=useState(false);
  const current=stories.find(s=>s.id===selected);
@@ -36,12 +36,12 @@ export function Behavioral({items:initialItems,initialStories,initialAnswers=[],
  }
  return <div className="behavioral">
   <header className="behavioral-head"><h2>Resume &amp; Stories</h2><div className="behavioral-toolbar"><div className="behavioral-tabs" role="tablist" aria-label="Behavioral view"><button type="button" role="tab" id="behavioral-tab-cv" aria-controls="behavioral-cv" aria-selected={view==='cv'} disabled={questionEditing||resumeEditing} onClick={()=>setView('cv')}>CV</button><button type="button" role="tab" id="behavioral-tab-questions" aria-controls="behavioral-questions" aria-selected={view==='questions'} disabled={!!draft||resumeEditing} onClick={()=>setView('questions')}>Questions</button></div>{canEdit?<button className="btn" disabled={!!draft||questionEditing||resumeEditing} onClick={()=>{setView('cv');edit(emptyStory(bullet));}}>Add story</button>:null}</div></header>
-  <div id="behavioral-questions" role="tabpanel" aria-labelledby="behavioral-tab-questions" hidden={view!=='questions'}><details className="behavioral-story-library"><summary>Story library ({stories.length})</summary><nav aria-label="Story library">{stories.map(story=><button type="button" className="btn ghost small" key={story.id} disabled={questionEditing} onClick={()=>{setSelected(story.id);setBullet(null);setView('cv')}}>{story.title}</button>)}{!stories.length?<p>No stories added yet.</p>:null}</nav></details><QuestionBank stories={stories} initialAnswers={initialAnswers} canEdit={canEdit} onEditing={setQuestionEditing} onOpenStory={id=>{setSelected(id);setBullet(null);setView('cv');}} /></div>
+  <div id="behavioral-questions" role="tabpanel" aria-labelledby="behavioral-tab-questions" hidden={view!=='questions'}><details className="behavioral-story-library"><summary>Story library ({stories.length})</summary><nav aria-label="Story library">{stories.map(story=><button type="button" data-draft-changed={story.draftChanged||undefined} className="btn ghost small" key={story.id} disabled={questionEditing} onClick={()=>{setSelected(story.id);setBullet(null);setView('cv')}}>{story.title}</button>)}{!stories.length?<p>No stories added yet.</p>:null}</nav></details><QuestionBank stories={stories} initialAnswers={initialAnswers} canEdit={canEdit} onEditing={setQuestionEditing} onOpenStory={id=>{setSelected(id);setBullet(null);setView('cv');}} /></div>
   <div id="behavioral-cv" role="tabpanel" aria-labelledby="behavioral-tab-cv" hidden={view!=='cv'}>
   <div className={`behavioral-resume-layout${draft||bullet||selected?' has-story':''}`}>
    <ResumeSections items={items} canEdit={canEdit} disabled={!!draft} onItems={updateResume} onEditing={setResumeEditing} activeBullet={bullet} storyCount={id=>stories.filter(s=>s.bullet_id===id).length} onBullet={id=>{setBullet(id);setSelected(stories.find(s=>s.bullet_id===id)?.id??null)}} />
    {draft||bullet||selected ?
-   <section className="behavioral-stories" aria-label="STAR stories">
+   <section data-draft-changed={current?.draftChanged||undefined} className="behavioral-stories" aria-label="STAR stories">
     {draft&&canEdit?<form onSubmit={e=>{e.preventDefault();void save();}} aria-label="Edit STAR story">
      <h3>{stories.some(s=>s.id===draft.id)?'Edit story':'New story'}</h3>
      <label className="field"><span>Title</span><input required maxLength={160} value={draft.title} disabled={saving} onChange={e=>setDraft({...draft,title:e.target.value})} /></label>

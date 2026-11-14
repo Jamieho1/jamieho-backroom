@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
+import {isAppTable} from "./app-allowlist";
+import {appTargets,appKey} from "./app-overlay";
 import {publishingTargets} from "./publishing-overlay";
 import { validateOperations } from "./allowlist";
 import { reviewFields, type ContentChange, type ReviewDraft } from "./types";
@@ -19,11 +21,17 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
     sb.from("projects").select("*"),sb.from("articles").select("*"),sb.from("guides").select("*"),
   ]);
   if (sets.error || sections.error || items.error || bullets.error||projects.error||articles.error||guides.error) return { drafts: [], error: "Could not load content drafts and current live values. Try again." };
+  const appRows:Record<string,Record<string,Record<string,unknown>>>={};
+  const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isAppTable(op.table)?[op.table]:[]):[];}));
+  for(const table of appTables){
+    const rows=await sb.from(table).select("*");if(rows.error)return {drafts:[],error:"Could not load current app values. Try again."};
+    appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[appKey(table,row),row]));
+  }
   const live = Object.fromEntries((sections.data ?? []).map(row => [row.key, { title: row.title ?? "", body: row.body ?? "" }]));
   const drafts = ((sets.data ?? []) as ContentChange[]).map(set => {
     const result = validateOperations(set.operations);
     const photos = !Array.isArray(set.photo_slots) || set.photo_slots.length !== 0;
-    return { ...set, previewTargets:result.ok?publishingTargets(result.operations):[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
+    return { ...set, previewTargets:result.ok?[...publishingTargets(result.operations),...appTargets(result.operations)]:[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {...appRows,projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
       validationError: !result.ok ? result.message : photos ? "Photo slots are not supported in this slice." : undefined };
   });
   return { drafts };

@@ -126,3 +126,24 @@ About copy request (2026-11-14): created pending site_sections/about body draft 
 
 
 TKT-105 live application (2026-11-14): Supabase MCP applied the unchanged reviewed SQL as remote 20261114125201. Verified all three function bodies match local SQL, empty search_path, revoked anon/authenticated/service_role EXECUTE, owner-only content_changes policy and enabled RLS on all seven affected/read tables. record_signin remains the sole public API-callable function. Valid HTTPS/IPv6 and rejected HTTP/invalid-host queries passed. Before/after fingerprints matched for projects, articles, guides, content_changes, site_sections, experience_items and experience_bullets; no content approvals or test rows were created. Security advisors showed no TKT-105 finding; existing record_signin/password-protection warnings remain. About wording approval was not part of this migration. Docs/MEMORY and diff checked; no website visit, commit, push or frontend deployment.
+
+
+## TKT-106 — private app drafts (2026-11-14)
+
+Implemented locally: strict editor-derived draft fields for notes, question_notes, practice_code, practice_stars, behavioral_stories and behavioral_answers; atomic owner-checked SQL approval with complete prior rows, validated catalogue/question IDs, foreign keys and editor limits. Notes metadata stays unchanged; star deletion unstars with history. No catalogue, attempts, editor UI, journey design or RLS changes.
+
+Owner-only gold previews work on Notes, Practice/problem routes and Resume & Stories, including changed-entry selection and read-only controls. Practice preview bypasses live async replacement, disables execution/saves and leaves browser code untouched. Members with app access and visitors cannot see draft values with copied owner cookies. Approval refreshes affected app/problem routes.
+
+Migration **20261114151936_content_drafts_apps.sql — NOT applied live**. No production data, secret, dependency, commit, push or deployment change. Jamie must approve migration application, deploy and verify live before the ticket is Done.
+
+Checks actually run: npm run typecheck passed; full unit/database suite 908 tests / 91 files passed (maxWorkers=2); final isolated production build and unchanged static assertions passed for /, /resources, /privacy, /projects and /articles. Real Next/PGlite preview integration: 36 passed at desktop/390px, including previous ticket regressions; existing Notes/Practice/Behavioral UI checks: 28 passed. A test-only unsupported locator option initially failed typechecking; corrected and final typecheck/build plus its 7 focused unit tests passed. Initial browser selector mismatch corrected before the complete successful run. Local phone preview screenshot inspected. git diff --check passed. Tests use synthetic data and local headless Chromium only; no live website/Supabase access.
+
+Changed files:
+- supabase/migrations/20261114151936_content_drafts_apps.sql
+- lib/content-drafts/{app-allowlist,app-overlay,allowlist,preview,review,types}.ts; app/actions/content-drafts.ts
+- app/desktop/{app-page,notes-content,practice-content,behavioral-content}.tsx
+- components/notes/reader.tsx; components/practice/{arena,question-notes}.tsx and use-saved-practice.ts; components/behavioral/{questions,workspace}.tsx
+- lib/notes.ts, lib/behavioral.ts, lib/behavioral/answers.ts (optional preview markers only)
+- tests/db/app-drafts.test.ts; tests/unit/app-drafts.test.ts; tests/e2e/app-preview.spec.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
+- tests/unit/{app-routes,notes-content,practice-owner-ui}.test.tsx; tests/unit/{content-drafts-actions,content-preview}.test.ts
+- docs/content-drafts.md, architecture.md, security.md, status.md; MEMORY.md

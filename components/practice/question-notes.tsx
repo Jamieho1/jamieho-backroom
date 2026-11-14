@@ -2,10 +2,10 @@
 import { useState,useTransition } from 'react';
 import { Markdown } from '@/components/notes/markdown';
 import { saveQuestionNotes } from '@/app/actions/practice';
-export function QuestionNotes({problem,body,canEdit,onSaved,onEditing}:{problem:number;body:string;canEdit:boolean;onSaved(body:string):void;onEditing(v:boolean):void}){
+export function QuestionNotes({problem,body,canEdit,onSaved,onEditing,draftChanged}:{draftChanged?:boolean;problem:number;body:string;canEdit:boolean;onSaved(body:string):void;onEditing(v:boolean):void}){
  const [editing,setEditing]=useState(false);const [draft,setDraft]=useState(body);const [error,setError]=useState('');const [pending,start]=useTransition();
  function close(){setEditing(false);onEditing(false);setError('');}
- return <aside className="practice-question-notes" aria-label="Question notes">
+ return <aside data-draft-changed={draftChanged||undefined} className="practice-question-notes" aria-label="Question notes">
   <h3>Question notes</h3>
   {editing&&canEdit?<form aria-label="Edit question notes" onSubmit={e=>{e.preventDefault();start(async()=>{
    setError('');try{const result=await saveQuestionNotes(problem,draft);if(result.ok){onSaved(draft);close();}else setError(result.message);}catch{setError("Couldn't save. Your draft is still here — retry.");}

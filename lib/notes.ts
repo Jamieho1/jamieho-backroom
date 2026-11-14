@@ -1,6 +1,6 @@
 import { Visual, visualIssues, type Visual as VisualData } from "./notes/visual";
 
-export interface NoteRow {
+export interface NoteRow { draftChanged?:boolean;
   id: string;
   title: string;
   body: string;

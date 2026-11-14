@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
 import { affectedRoutes, validateOperations } from "@/lib/content-drafts/allowlist";
+import {loadAppPreview} from "@/lib/content-drafts/app-overlay";
 import {loadPublishingPreview} from "@/lib/content-drafts/publishing-overlay";
 import type { ContentChange, DraftResult } from "@/lib/content-drafts/types";
 
@@ -26,7 +27,7 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     const result = validateOperations(set.operations);
     if (!result.ok) return result;
     if (!Array.isArray(set.photo_slots) || set.photo_slots.length !== 0) return { ok: false, message: "Photo slots are not supported in this slice." };
-    try { await loadPublishingPreview(sb,result.operations); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid publishing draft."};}
+    try { await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
     // Re-check the verified session immediately before the mutation; SQL independently checks ownership.
     const current = await getViewer();
     if (current.role !== "owner" || current.id !== viewer.id) return denied();

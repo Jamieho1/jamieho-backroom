@@ -1,3 +1,4 @@
+import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
 import { projectSchema } from "@/lib/portfolio-core";
 import { articleSchema } from "@/lib/articles";
@@ -21,6 +22,7 @@ const projectFields=projectSchema.omit({id:true}).shape;
 const articleFields=articleSchema.omit({id:true}).shape;
 const guideFields=guideSchema.omit({id:true}).shape;
 export const CONTENT_ALLOWLIST = {
+  ...APP_ALLOWLIST,
   projects: {key:uuid,fields:projectFields,operations:["insert","update","delete"] as const,routes:["/projects","/","/journey"] as const},
   articles: {key:uuid,fields:articleFields,operations:["insert","update","delete"] as const,routes:["/articles","/","/journey"] as const},
   guides: {key:uuid,fields:guideFields,operations:["insert","update","delete"] as const,routes:["/guides","/resources"] as const},
@@ -79,7 +81,7 @@ const publishingOperations={projects:publishingOperation("projects"),articles:pu
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
-  const schema = typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
+  const schema = typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
     : op?.table === "experience_items" ? op.op === "insert" ? itemInsert : itemUpdate
     : op?.table === "experience_bullets" ? op.op === "insert" ? bulletInsert : op.op === "delete" ? bulletDelete : bulletUpdate
     : null;
@@ -98,6 +100,7 @@ export function validateOperations(input: unknown): { ok: true; operations: Cont
 export function affectedRoutes(operations: ContentOperation[], previous:unknown = []): string[] {
   const routes=operations.flatMap(operation=>[...CONTENT_ALLOWLIST[operation.table].routes] as string[]);
   for(const operation of operations)if(isPublishingTable(operation.table)&&"slug" in operation.fields&&typeof operation.fields.slug==="string")routes.push(`/${operation.table}/${encodeURIComponent(operation.fields.slug)}`);
+  for(const op of operations)if(op.table==="question_notes"||op.table==="practice_code"||op.table==="practice_stars")routes.push(`/practices/${op.key}`);
   if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(`/${row.table}/${encodeURIComponent(row.values.slug)}`);
   return [...new Set(routes)];
 }

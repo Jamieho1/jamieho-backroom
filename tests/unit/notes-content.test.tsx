@@ -3,6 +3,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 const server = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/supabase/server", () => ({ supabaseServer: server }));
+vi.mock("@/lib/content-drafts/preview",()=>({getHomePreview:async()=>null}));
 import { NotesContent } from "@/app/desktop/notes-content";
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 it("shows the data-unavailable message when the notes query fails", async () => {

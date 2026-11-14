@@ -5,6 +5,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { SELECT, type ExperienceRow } from "@/lib/experience";
 import { overlayExperience } from "./experience-overlay";
 import { validateOperations } from "./allowlist";
+import {loadAppPreview,appTargets} from "./app-overlay";
 import {loadPublishingPreview,publishingTargets} from "./publishing-overlay";
 import type { HomePreview } from "./types";
 
@@ -27,9 +28,10 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
     if(rows.error)return null;
     try {experience=overlayExperience((rows.data??[]) as ExperienceRow[],result.operations);} catch {return null;}
   }
-  let publishing;
-  try {publishing=await loadPublishingPreview(sb,result.operations);} catch {return null;}
-  return { ...(Object.keys(publishing).length?{publishing,targets:publishingTargets(result.operations)}:{}), id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
+  let publishing,appData;
+  try {publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations);} catch {return null;}
+  const targets=[...publishingTargets(result.operations),...appTargets(result.operations)];
+  return { ...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }
 
 /** Draft Mode is false at prerender time. Only its enabled branch reads request cookies/auth. */
