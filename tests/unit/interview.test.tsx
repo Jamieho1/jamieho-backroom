@@ -21,8 +21,8 @@ it('renders links and active navigation while persisting both independent collap
  const {unmount}=render(<InterviewShell><h1>Fixture</h1></InterviewShell>);expect(screen.getByRole('link',{name:'Data Structures & Algorithms'}).getAttribute('aria-current')).toBe('page');
  fireEvent.click(screen.getByRole('button',{name:'Collapse section rail'}));fireEvent.click(screen.getByRole('button',{name:'Collapse topics'}));
  expect(localStorage.getItem(INTERVIEW_STORAGE.rail)).toBe('true');expect(localStorage.getItem(INTERVIEW_STORAGE.topics)).toBe('true');unmount();render(<InterviewShell><h1>Fixture</h1></InterviewShell>);
- await waitFor(()=>expect(document.querySelector('.iv-shell')?.getAttribute('data-rail-collapsed')).toBe('true'));expect(screen.getByRole('button',{name:'Expand topics'})).toBeTruthy();
- fireEvent.click(screen.getByRole('button',{name:'Expand topics'}));expect(localStorage.getItem(INTERVIEW_STORAGE.topics)).toBe('false');
+ await waitFor(()=>expect(document.querySelector('.iv-shell')?.getAttribute('data-rail-collapsed')).toBe('true'));expect(document.querySelector<HTMLButtonElement>('.iv-expand-topics')!).toBeTruthy();
+ fireEvent.click(document.querySelector<HTMLButtonElement>('.iv-expand-topics')!);expect(localStorage.getItem(INTERVIEW_STORAGE.topics)).toBe('false');
 });
 it('collapsed links have tooltips on pointer hover and keyboard focus',()=>{
  localStorage.setItem(INTERVIEW_STORAGE.rail,'true');render(<InterviewShell>Fixture</InterviewShell>);

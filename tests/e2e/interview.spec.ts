@@ -10,9 +10,26 @@ test('Interview renders its own dark shell and every rail destination is a worki
 });
 test('desktop collapse modes persist, tooltips work on hover/focus and keyboard reaches topics',async({page},info)=>{
  test.skip(info.project.name==='phone','desktop controls');await page.goto('/interview/dsa/practice');await expect(page.getByRole('navigation',{name:'Topics'}).getByRole('link')).toHaveCount(17);
- await page.getByRole('button',{name:'Collapse section rail'}).click();const finance=page.getByRole('link',{name:'Finance',exact:true});await finance.hover();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.mouse.move(600,100);await finance.focus();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.keyboard.press('Tab');await expect(page.getByRole('tooltip')).toHaveText('AI Engineering');
- await page.getByRole('button',{name:'Collapse topics'}).click();await expect(page.getByRole('complementary',{name:'Topic list'})).not.toBeVisible();await expect(page.getByRole('button',{name:'Expand topics'})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Expand section rail'})).toBeVisible();await expect(page.getByRole('button',{name:'Expand topics'})).toBeVisible();
- await page.getByRole('button',{name:'Expand topics'}).click();await page.getByRole('navigation',{name:'Topics'}).getByRole('link',{name:'Trees',exact:true}).focus();await page.keyboard.press('Enter');await expect(page).toHaveURL('/interview/dsa/practice/trees');await expect(page.getByRole('heading',{level:1,name:'Trees'})).toBeVisible();await overflow(page);
+ await page.setViewportSize({width:1280,height:720});
+ for(const selector of ['.iv-sections','.iv-topics'])expect(await page.locator(selector).evaluate(el=>el.scrollHeight<=el.clientHeight)).toBe(true);
+ const logo=await page.locator('.iv-brand').boundingBox(),toggle=await page.getByRole('button',{name:'Collapse section rail'}).boundingBox();expect(Math.abs(logo!.y+logo!.height/2-toggle!.y-toggle!.height/2)).toBeLessThan(2);expect(toggle!.x).toBeGreaterThan(logo!.x+logo!.width);
+ const topicCollapse=await page.getByRole('button',{name:'Collapse topics'}).boundingBox();
+ const centerY=(box:{y:number;height:number})=>box.y+box.height/2;
+ expect(Math.abs(centerY(toggle!)-centerY(topicCollapse!))).toBeLessThan(1);
+ await expect(page.getByRole('button',{name:'Collapse section rail'})).toHaveText('');
+
+ await page.getByRole('button',{name:'Collapse section rail'}).click();
+ await expect(page.locator('.iv-brand')).not.toBeVisible();
+ const expandRail=await page.getByRole('button',{name:'Expand section rail'}).boundingBox();
+ const dashboardIcon=await page.getByRole('link',{name:'Dashboard',exact:true}).locator('.iv-icon').boundingBox();
+ expect(Math.abs(expandRail!.x+expandRail!.width/2-dashboardIcon!.x-dashboardIcon!.width/2)).toBeLessThan(1);
+ expect(Math.abs(centerY(expandRail!)-centerY(topicCollapse!))).toBeLessThan(1);
+ const finance=page.getByRole('link',{name:'Finance',exact:true});await finance.hover();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.mouse.move(600,100);await finance.focus();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.keyboard.press('Tab');await expect(page.getByRole('tooltip')).toHaveText('AI Engineering');
+ await page.getByRole('button',{name:'Collapse topics'}).click();await expect(page.getByRole('complementary',{name:'Topic list'})).not.toBeVisible();await expect(page.getByRole('button',{name:'Topics'})).toBeVisible();
+ const expandTopics=await page.getByRole('button',{name:'Topics'}).boundingBox();
+ expect(Math.abs(centerY(expandTopics!)-centerY(topicCollapse!))).toBeLessThan(1);
+ await page.reload();await expect(page.getByRole('button',{name:'Expand section rail'})).toBeVisible();await expect(page.getByRole('button',{name:'Topics'})).toBeVisible();
+ await page.getByRole('button',{name:'Topics'}).click();await page.getByRole('navigation',{name:'Topics'}).getByRole('link',{name:'Trees',exact:true}).focus();await page.keyboard.press('Enter');await expect(page).toHaveURL('/interview/dsa/practice/trees');await expect(page.getByRole('heading',{level:1,name:'Trees'})).toBeVisible();await overflow(page);
 });
 test('phone drawer traps focus, closes with Escape, and Topics reveals selectable topics',async({page},info)=>{
  test.skip(info.project.name!=='phone','phone controls');await page.goto('/interview/dsa/practice');await expect(page.getByRole('complementary',{name:'Interview menu'})).not.toBeVisible();await page.getByRole('button',{name:'Open interview menu'}).click();const drawer=page.getByRole('dialog',{name:'Interview menu'});await expect(drawer).toBeVisible();await expect(drawer.getByRole('link',{name:'Jamie Ho — home'})).toBeFocused();await page.keyboard.press('Shift+Tab');await expect(drawer.getByRole('link',{name:'Back to site'})).toBeFocused();await page.keyboard.press('Tab');await expect(drawer.getByRole('link',{name:'Jamie Ho — home'})).toBeFocused();await page.keyboard.press('Escape');await expect(drawer).toHaveCount(0);await expect(page.getByRole('button',{name:'Open interview menu'})).toBeFocused();
@@ -20,7 +37,7 @@ test('phone drawer traps focus, closes with Escape, and Topics reveals selectabl
 });
 test('blocked browser storage leaves the shell usable and the saved desktop state does not hide phone menus',async({page},info)=>{
  await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('blocked')};Storage.prototype.setItem=()=>{throw Error('blocked')};});await page.goto('/interview/dsa/practice');
- if(info.project.name==='phone'){await page.getByRole('button',{name:'Topics',exact:true}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}else{await page.getByRole('button',{name:'Collapse topics'}).click();await page.getByRole('button',{name:'Expand topics'}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}await overflow(page);
+ if(info.project.name==='phone'){await page.getByRole('button',{name:'Topics',exact:true}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}else{await page.getByRole('button',{name:'Collapse topics'}).click();await page.getByRole('button',{name:'Topics'}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}await overflow(page);
 });
 test('Interview is between Projects and Articles; Resources has only Guides; old app routes still work',async({page})=>{
  await page.goto('/resources');const nav=page.getByRole('navigation',{name:'Site',exact:true});expect(await nav.locator(':scope > a').allTextContents()).toEqual(['Projects','Interview','Articles','Resources','Privacy']);await expect(nav.getByRole('link',{name:'Interview',exact:true})).toHaveAttribute('href','/interview');await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);await overflow(page);

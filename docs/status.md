@@ -187,3 +187,8 @@ Changed files:
 - components/site-header.tsx, site-navigation.tsx; app/resources/page.tsx
 - tests/unit/interview.test.tsx; tests/e2e/interview.spec.ts, home.spec.ts, desktop.spec.ts
 - docs/interview.md, README.md, architecture.md, security.md, status.md; MEMORY.md
+
+
+Interview compact controls (2026-11-14): rail collapse/expand is now icon-only, aligned to the right of the Interview logo. Removed the separate labelled collapse row; renamed the content expand control Topics. Scoped navigation typography/icons, column widths, row gaps and placeholder spacing reduced. Complete rail and all 17 DSA topics fit at 1280×720; smaller screens retain independent scrolling and phone touch targets. No route, permission, data or migration change. Typecheck, five focused unit tests, isolated production build/static assertions and 11 desktop/390px browser checks passed (three viewport-specific skips). Browser assertions cover no vertical list scrolling at 720px, logo/toggle alignment, stored states, tooltips and phone controls. Desktop screenshot inspected; diff checked. No commit/push/deployment.
+
+Interview control alignment (2026-11-14): collapsed rail expand button replaces the logo and centres over navigation icons. Rail toggle, topic collapse and Topics expand share a 32px control height and vertical centre. Updated browser geometry assertions; typecheck, five focused unit tests, isolated production build/static assertions and 11 desktop/390px browser tests passed (three viewport-specific skips). No migration, live change, push or deployment; Jamie verifies live.

@@ -12,7 +12,7 @@ components/interview/icons.tsx contains original inline SVG paths for sections a
 
 ## Interaction
 
-Desktop: rail and topic column collapse independently. Browser keys jb.interview.rail-collapsed.v1 and jb.interview.topics-collapsed.v1 hold booleans; all localStorage reads/writes are guarded. Collapsed rail keeps accessible names and hover/focus tooltips (Escape dismisses). Collapsed topics disappear, leaving Expand topics at the content's top-left.
+Desktop: rail and topic column collapse independently. Browser keys jb.interview.rail-collapsed.v1 and jb.interview.topics-collapsed.v1 hold booleans; all localStorage reads/writes are guarded. Collapsed rail keeps accessible names and hover/focus tooltips (Escape dismisses). Collapsed topics disappear, leaving a Topics button at the content's top-left. The icon-only rail toggle sits beside the expanded logo; when collapsed, it replaces the logo and centres over the navigation icons. Rail and topic collapse/expand controls share a 32px height and vertical centre. Compact 13px navigation, 232px rail and 232px topic column keep the complete rail and 17-topic DSA list visible at 1280×720; shorter viewports retain independent scrolling.
 
 At ≤768px, desktop collapse preferences are ignored visually. Menu opens a slide-in modal rail with an inert background, trapped Tab/Shift+Tab, backdrop/close control and Escape focus restoration. Topics opens an independently scrollable dropdown above full-width content; Escape closes it and returns focus. Route changes close mobile panels. Drawer motion uses transform/opacity and is removed for reduced motion. Each column scrolls independently; layout is tested at 390px.
 
