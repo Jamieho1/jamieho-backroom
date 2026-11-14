@@ -40,3 +40,19 @@ Account pins (2026-11-11): typecheck, 530 unit/database tests (maxWorkers=2), pr
 
 
 Experience artwork (2026-11-14): generated Media/Experience-art/experience-bg.png (1672×941), experience-mascot.png (1024×1536, genuine alpha) and experience-phone.png (941×1672). Warm cloud-to-London path; separate walking mascot and composed phone scene. References/prompts/dimensions in that folder’s generation-notes.md. Assets remain outside Git; no website integration, Storage upload or deployment. Visual review, dimensions, transparency and saved-copy hashes checked; runtime tests not applicable.
+
+
+## TKT-98 — content draft first slice (2026-11-14)
+
+Local implementation: site_sections title/body update proposals, strict allowlist, atomic owner-checked private SQL trigger, audited approval, status-only discard and owner-only dynamic /manage/review with current/proposed values. Fixed sections cannot be inserted/deleted through drafts. Existing editors/rendering/navigation and live data unchanged. Migration 20261114020933_content_changes.sql is NOT applied live; do not deploy before explicit approval/application. No commit or push. Public RPC restriction preserved. content_changes included in encrypted exports. Validation complete: npm run typecheck; full unit/database suite (80 files, 604 tests, maxWorkers=2); isolated production build and static assertions; new desktop/390px browser suite (4 passed). Real Next server-action verification against disposable local PGlite also passed: current/proposed review, approval audit, homepage ISR without rebuild, discard unchanged and visitor 404. Owner/visitor response headers verified private/no-cache/no-store. Local review screenshot inspected. git diff --check passed. No production browser or live database used. See content-drafts.md for scope. Ticket is not Done pending Jamie’s live verification.
+
+
+TKT-98 file inventory:
+- supabase/migrations/20261114020933_content_changes.sql
+- app/actions/content-drafts.ts; app/manage/review/page.tsx and review.css
+- components/content-drafts/review-list.tsx
+- lib/content-drafts/allowlist.ts, review.ts, types.ts
+- tests/db/content-drafts.test.ts; tests/e2e/content-drafts.spec.ts
+- tests/unit/content-drafts.test.ts, content-drafts-actions.test.ts, content-drafts-review.test.ts
+- scripts/export-tables.json
+- docs/content-drafts.md, README.md, architecture.md, security.md, status.md; MEMORY.md
