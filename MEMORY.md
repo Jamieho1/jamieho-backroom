@@ -79,3 +79,15 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 
 ## 2026-11-13 — About photos and click isolation
 Replaced the Imperial still with three supplied portraits driven by chapter scroll, plus manual reduced-motion fallback. Disabled About Markdown navigation and made inactive chapters inert to stop invisible project links intercepting clicks. Kept existing title/body; suggested shorter copy in chat. Jamie chose Storage, not Git: optimized ignored about-*.jpg files need his upload to home-media before deployment. No database/live update. Typecheck, 540 tests, isolated build/static checks and 19 journey browser checks passed (one phone-only test skipped on desktop); inspected local desktop/390px layouts.
+
+## 2026-11-14 — Status sync
+Production verified on cf9b3c3 (all work through 2026-11-13 deployed). About photos still missing from home-media Storage; flagged in docs/status.md. No code change.
+About photos confirmed uploaded to home-media later the same day; status updated.
+
+## 2026-11-14 — Content Drafts planned
+Grilled, specced and ticketed "Claude drafts, Jamie approves" (Resources/Content Drafts - PRD.md, TKT-98–108; TKT-99/100 later). Build prompts in Resources/Prompts - Content Drafts.md. Builds before Home v1.3 (homepage redesign, decisions agreed same day; spec next). No code change.
+Home v1.3 specced and ticketed (Resources/Home v1.3 - PRD.md, TKT-109–116; build + image prompts in Resources/Prompts - Home v1.3.md). Starts after TKT-108; TKT-109 mascot art startable now.
+
+
+## 2026-11-14 — Experience artwork
+Generated the requested landscape, transparent walking mascot and portrait still in sibling Media/Experience-art/, with prompt notes. Verified dimensions/alpha and exact saved copies. Assets only; no code, database, upload or deployment change.

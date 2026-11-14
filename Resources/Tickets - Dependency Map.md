@@ -164,3 +164,45 @@ TKT-94 ─┤
 TKT-95 ─┘
 Jamie's 9:16 stills ─> TKT-96 Phone portrait mode
 ```
+
+## Content Drafts (Claude drafts, Jamie approves) — 2026-11-14
+
+PRD: `Resources/Content Drafts - PRD.md` (signed off 2026-11-14). Builds before Home v1.3. Build prompts: `Resources/Prompts - Content Drafts.md`.
+
+Startable now: **TKT-98** (tracer; its migration needs Jamie's "apply it").
+
+```
+TKT-98 Tracer: change-set table, approve engine, review list (homepage sections)
+ ├─ TKT-101 Preview on page (homepage)
+ │   ├─ TKT-104 CV entries and bullets ───────────────┐
+ │   ├─ TKT-105 Projects, Articles, Guides            │
+ │   │   └─ TKT-107 Photo slots on the review page ───┤
+ │   └─ TKT-106 Private material (Notes, Practice, Stories) ┤
+ ├─ TKT-102 'N to review' badge ──────────────────────┤
+ └─ TKT-103 Claude drafting skill + docs (Claude) ────┤
+                                                      └─ TKT-108 Gate: real sets per area, Jamie verifies live → opens Home v1.3
+```
+
+Parallel after TKT-98: 101, 102, 103. After TKT-101: 104, 105, 106 in parallel. TKT-107 after 105.
+
+Later, unblocked, P2: TKT-99 Redo the old editors in the new simple style; TKT-100 Layout pass for Notes, Practice and Resume & Stories (needs its own grill first).
+
+## Home v1.3 (About constellation, Experience journey, My story) — 2026-11-14
+
+PRD: `Resources/Home v1.3 - PRD.md` (signed off 2026-11-14). Build prompts + image prompts: `Resources/Prompts - Home v1.3.md`. Starts after Content Drafts gate TKT-108.
+
+Startable now: **TKT-109** Mascot art (Jamie generates; Claude checks).
+
+```
+TKT-108 (Content Drafts gate)
+ ├─ TKT-110 Data: About photos, journey flag + icon, story key ──┐
+ └─ TKT-111 New order, #about, My story link, retirements ───────┤
+                                                                 ├─ TKT-112 About constellation ─────────┐
+                                                                 ├─ TKT-113 Experience journey curve ─┐  │
+                                                                 └─ TKT-114 My story page at /about ──┼──┤
+TKT-109 Mascot art (Jamie) ───────────────────────────────────────────────────────────────────────┤  │
+                                                                       TKT-115 Mascot walks ◄──────┘  │
+                                                                       TKT-115 ───────────────────────┴─ TKT-116 Gate: verify and launch
+```
+
+Parallel after TKT-108: 110 and 111. After both: 112, 113, 114 in parallel. TKT-115 needs 113 + 109. TKT-116 needs 112, 114, 115.

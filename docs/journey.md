@@ -38,3 +38,6 @@ Projects navigation (2026-11-11): top/floating bars include a direct /projects l
 
 
 About media update (2026-11-13): Jamie chose Storage, not Git. Optimized JPEGs are in ignored public/home-media/: about-imperial-graduation.jpg, about-jungfraujoch.jpg, about-graduation-hall.jpg. Upload these three files to the root of the existing public home-media bucket before deploying; URLs use the existing NEXT_PUBLIC_HOME_MEDIA_URL plus manifest hashes. Source files remain in Downloads, unchanged; encoded copies auto-orient, strip metadata and cap height at 1400px. No live upload or database change performed. About wording recommendations were discussed only; stored title/body remain unchanged.
+
+
+Experience artwork (2026-11-14): generated Media/Experience-art/experience-bg.png (1672×941), experience-mascot.png (1024×1536, genuine alpha) and experience-phone.png (941×1672). Warm cloud-to-London path; separate walking mascot and composed phone scene. References/prompts/dimensions in that folder’s generation-notes.md. Assets remain outside Git; no website integration, Storage upload or deployment. Visual review, dimensions, transparency and saved-copy hashes checked; runtime tests not applicable.
