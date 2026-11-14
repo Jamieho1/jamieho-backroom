@@ -3,6 +3,8 @@
  * The page is pre-rendered from them and re-rendered on demand when the owner saves.
  */
 import { createClient } from "@supabase/supabase-js";
+import { overlaySections } from "@/lib/content-drafts/overlay";
+import type { HomePreview } from "@/lib/content-drafts/types";
 import { readSupabaseEnv } from "@/lib/env";
 
 export const SECTION_KEYS = ["hero", "now", "about", "interests", "technology", "writing", "contact"] as const;
@@ -35,13 +37,13 @@ export function isSectionKey(k: unknown): k is SectionKey {
  * Read with the public key and no cookies, so the page can be pre-rendered.
  * When Supabase is configured but unreachable this throws: Next then keeps serving the last good page.
  */
-export async function getSections(): Promise<Record<SectionKey, Section>> {
+export async function getSections(preview?: HomePreview | null): Promise<Record<SectionKey, Section>> {
   const env = readSupabaseEnv();
-  if (!env) return FALLBACK_SECTIONS;
+  if (!env) return preview ? overlaySections(FALLBACK_SECTIONS, preview.operations) : FALLBACK_SECTIONS;
   const sb = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
   const { data, error } = await sb.from("site_sections").select("key, title, body");
   if (error) throw new Error(`site_sections: ${error.message}`);
   const out = { ...FALLBACK_SECTIONS };
   for (const row of data ?? []) if (isSectionKey(row.key)) out[row.key] = { key: row.key, title: row.title ?? "", body: row.body ?? "" };
-  return out;
+  return preview ? overlaySections(out, preview.operations) : out;
 }

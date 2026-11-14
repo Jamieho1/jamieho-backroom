@@ -15,6 +15,8 @@ import { ScreenContact, ContactContent, type ScreenContactHandle } from "./scree
 import type { SocialLink } from "@/lib/social";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
+import type { SectionKey } from "@/lib/sections";
+import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
 import { AboutPhotos, type AboutPhotosHandle } from "./about-photos";
 import { HeroArtwork } from "./hero-artwork";
@@ -34,7 +36,7 @@ import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/ass
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
 
-export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[] }) {
+export function Journey({ chapters: all, base, socials = [], draftSections = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[] }) {
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
@@ -262,7 +264,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
-              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} inert>
+              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} inert>
                 {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
@@ -289,15 +291,15 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
-                    {c.id === "sky" ? <HeroCopy p={p} split /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "pivot"} />}
+                    data-draft-changed={c.id !== "sky" && draftChapterChanged(c.id, draftSections) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
+                    {c.id === "sky" ? <HeroCopy p={p} split draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "pivot"} />}
                   </section>
                 ))}
               </div>
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
             <a ref={cue} className="journey-cue" href="#pivot" onClick={event => { event.preventDefault(); jump.current("pivot"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
-            <ScreenContact ref={cta} socials={socials} />
+            <ScreenContact ref={cta} socials={socials} draftChanged={draftSections.includes("contact")} />
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
             <div className="journey-grain" aria-hidden="true" />
@@ -307,7 +309,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
           </div>
         </div>
       ) : (
-        <StillJourney chapters={chapters} base={base} socials={socials} />
+        <StillJourney chapters={chapters} base={base} socials={socials} draftSections={draftSections} />
       )}
     </div>
   );
@@ -345,11 +347,11 @@ function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: 
 }
 
 /** No JavaScript, reduced motion or before hydration: every chapter as a sharp still with its text, in order. */
-export function StillJourney({ chapters, base, socials = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[] }) {
+export function StillJourney({ chapters, base, socials = [], draftSections = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[] }) {
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} id={c.id === "room" ? "desk" : c.id}
+        <li key={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -395,12 +397,12 @@ export function StillJourney({ chapters, base, socials = [] }: { chapters: Chapt
             </section>
           ) : null}
           {(c.panels ?? []).map((p) => (
-            <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
-              {c.id === "sky" ? <HeroCopy p={p} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "pivot"} />}
+            <section key={p.id} data-draft-changed={c.id !== "sky" && draftChapterChanged(c.id, draftSections) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
+              {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "pivot"} />}
             </section>
           ))}
           {c.id === "screen" ? (
-            <div className="journey-contact-static"><ContactContent socials={socials} /></div>
+            <div className="journey-contact-static"><ContactContent socials={socials} draftChanged={draftSections.includes("contact")} /></div>
           ) : null}
         </li>
       ))}
@@ -429,15 +431,15 @@ function RotatorLine({ r }: { r: NonNullable<Panel["rotator"]> }) {
   );
 }
 
-function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
+function HeroCopy({ p, split = false, draftChanged = false, contactChanged = false }: { p: Panel; split?: boolean; draftChanged?: boolean; contactChanged?: boolean }) {
   const title = p.title.replace(/\.(?=\s*$)/, "");
   return <>
-    <div className="journey-hero-heading">
+    <div className="journey-hero-heading" data-draft-changed={draftChanged || undefined}>
       {p.eyebrow ? <p className="journey-eyebrow journey-welcome">{p.eyebrow}</p> : null}
       <h1 className="journey-title">{split ? <Words text={title} /> : stripKeys(title)}</h1>
     </div>
     <div className="journey-hero-intro">
-      <div className="journey-hero-glass">
+      <div className="journey-hero-glass" data-draft-changed={draftChanged || contactChanged || undefined}>
         <PanelBody p={{ ...p, eyebrow: undefined, title: "", meta: undefined, body: "Building systems. Exploring AI. Sharing what works.", md: false, rotator: undefined }} heading="h2" scheduleCall />
       </div>
     </div>

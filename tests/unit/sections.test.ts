@@ -25,6 +25,15 @@ describe("getSections", () => {
     expect(s.interests.body).toBe("");
     expect(s.technology.body).toBe("");
   });
+  it("overlays only the explicit owner-validated preview context and leaves public reads unchanged", async () => {
+    const preview = { id: "draft", summary: "Hero edit", operations: [{ op: "update" as const, table: "site_sections" as const, key: "hero" as const, fields: { title: "Owner preview" } }] };
+    expect((await getSections(preview)).hero.title).toBe("Owner preview");
+    expect((await getSections()).hero.title).toBe("Jamie Ho");
+    Object.assign(process.env, ENV);
+    select.mockResolvedValue({ data: [{key:"hero",title:"Live heading",body:"Live body"}],error:null });
+    expect((await getSections(preview)).hero).toEqual({key:"hero",title:"Owner preview",body:"Live body"});
+    expect((await getSections()).hero.title).toBe("Live heading");
+  });
   it("throws when Supabase is down, so Next keeps serving the last good page instead of placeholders", async () => {
     Object.assign(process.env, ENV);
     select.mockResolvedValue({ data: null, error: { message: "fetch failed" } });

@@ -9,8 +9,8 @@ import { BrandIcon } from "./brand-icon";
 export interface ScreenContactHandle { setOpacity(o: number): void }
 
 /** Shared by the monitor overlay and the readable reduced-motion/no-JS ending. */
-export function ContactContent({ socials }: { socials: SocialLink[] }) {
-  return <section id="home-contact" className="journey-contact-window" aria-label="Contact Us" data-lenis-prevent>
+export function ContactContent({ socials, draftChanged = false }: { socials: SocialLink[]; draftChanged?: boolean }) {
+  return <section data-draft-changed={draftChanged || undefined} id="home-contact" className="journey-contact-window" aria-label="Contact Us" data-lenis-prevent>
     <header>
       <h2>Contact Us</h2>
       <nav className="journey-contact-socials" aria-label="Contact social profiles">
@@ -27,7 +27,7 @@ export function ContactContent({ socials }: { socials: SocialLink[] }) {
 }
 
 /** The contact form appears on the monitor once the camera has finished pushing in. */
-export const ScreenContact = forwardRef<ScreenContactHandle, { socials: SocialLink[] }>(function ScreenContact({ socials }, ref) {
+export const ScreenContact = forwardRef<ScreenContactHandle, { socials: SocialLink[]; draftChanged?: boolean }>(function ScreenContact({ socials, draftChanged }, ref) {
   const root = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => ({ setOpacity: o => {
     const el = root.current;
@@ -38,6 +38,6 @@ export const ScreenContact = forwardRef<ScreenContactHandle, { socials: SocialLi
     el.inert = o <= .6;
   } }), []);
   return <div ref={root} className="journey-contact-screen" inert style={{ opacity: 0, visibility: "hidden", pointerEvents: "none" }}>
-    <ContactContent socials={socials} />
+    <ContactContent socials={socials} draftChanged={draftChanged} />
   </div>;
 });

@@ -26,3 +26,9 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
   }
   return [...proposed.values()];
 }
+
+export interface HomePreview {
+  id: string;
+  summary: string;
+  operations: ContentOperation[];
+}

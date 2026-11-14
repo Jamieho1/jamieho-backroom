@@ -1,10 +1,10 @@
-# Content drafts — TKT-98
+# Content drafts — TKT-98 / TKT-101
 
-First slice: pending owner changes for site_sections only. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors, homepage renderer and navigation are unchanged.
+First slice: pending owner changes for site_sections only. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
 ## Contract
 
-summary is plain text (1–500 characters). operations is a JSON array (1–100 on approval); each operation has op, table, key and fields. Only update/site_sections is supported. key must be a SECTION_KEYS value; fields may contain title (120 Unicode code points) and/or body (20,000). Empty strings clear fields. Unknown properties, non-text values and NUL are rejected. photo_slots must be empty to approve; preview, uploads, badges and other tables are later slices. Private content must never be put in fixtures or Git.
+summary is plain text (1–500 characters). operations is a JSON array (1–100 on approval); each operation has op, table, key and fields. Only update/site_sections is supported. key must be a SECTION_KEYS value; fields may contain title (120 Unicode code points) and/or body (20,000). Empty strings clear fields. Unknown properties, non-text values and NUL are rejected. photo_slots must be empty to approve or preview; homepage preview is implemented, while uploads, badges and other tables are later slices. Private content must never be put in fixtures or Git.
 
 lib/content-drafts/allowlist.ts defines field rules and affected routes; the migration mirrors them in SQL. Extend both and their parity tests for a future content type. Inserts/deletes are intentionally refused for fixed site sections, consistent with the PRD’s delete scope.
 
@@ -27,3 +27,14 @@ Policy/transaction tests use disposable PGlite; browser owner fixtures exercise 
 ## How Claude drafts (TKT-103)
 
 Claude follows the saved `site-content-drafts` skill: read the live rows and `lib/content-drafts/allowlist.ts`; insert one `content_changes` row per request (summary + operations only, status left as draft); never write live tables, set status, or fill approval fields; reply with a one-line summary and the `/manage/review` link; after Jamie approves, read back the set and the live row. Requests for tables or operations not yet in the allowlist are declined with the ticket that adds them. To reverse an approved set, Claude drafts a new set from its `previous` values. Photo slots (TKT-107): Claude renames Jamie's attached photos to the slot filename and saves them in `Personal Website/Media/Uploads/<YYYY-MM-DD>-<short-name>/`, outside Git.
+
+
+## Homepage preview — TKT-101
+
+Preview on page opens / in the same tab after a successful owner-verified server action. loadOwnerPreview checks ownership, draft status and the TKT-98 allowlist; getHomePreview calls it only when Next Draft Mode is enabled and the httpOnly jb.content-preview UUID cookie exists. getSections applies the validated operations to a copy of current live sections. Other pages call the normal loader without preview context. No query-string enablement or caller-controlled redirect. Proposed contact links also feed existing homepage social bindings; currently unused section fields remain unused.
+
+ContentPreviewBar shows the summary with Approve/Discard/Back to list. Mutations derive the set from verified server preview state, call the existing TKT-98 actions and exit only on success; failures keep preview open with an error. Normal browser navigation after cookie clearing avoids stale client router content. Invalid/finalized/missing sets fail closed to live content.
+
+Implementation: app/actions/content-preview.ts; lib/content-drafts/preview.ts and overlay.ts; components/content-drafts/preview-bar.tsx and preview.css. Homepage and journey markup receive preview-only changed markers; default layout/motion and approval rules remain unchanged. TKT-101 needs no migration; TKT-98’s applied migration is unchanged.
+
+Verification: tests/unit/content-preview*.test.ts and sections.test.ts cover guards, immutable overlays, entry/exit and reuse of actions. tests/e2e/content-preview.spec.ts includes a normal forged-cookie browser check plus real owner/member cases using tests/support/content-preview-api.cjs (disposable PGlite, loopback only, no production credentials). Run that adapter from an isolated checkout, build/start Next with NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:3208 and NEXT_PUBLIC_SUPABASE_ANON_KEY=local-preview-test-key, then run tests/content-preview.playwright.config.ts with CONTENT_PREVIEW_TEST_API=http://127.0.0.1:3208 and CONTENT_PREVIEW_TEST_APP=http://127.0.0.1:3209. CONTENT_PREVIEW_CHROMIUM can select an installed executable. The dedicated config runs both viewports sequentially; normal e2e skips the adapter-dependent cases when its API flag is absent. Never point these checks at live services.

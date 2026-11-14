@@ -99,3 +99,10 @@ Built the site_sections-only review/approve/discard slice at /manage/review. Pri
 
 ## 2026-11-14 — TKT-98 migration applied live
 Jamie explicitly said “apply it”. Applied local 20261114020933_content_changes.sql through Supabase MCP as remote 20261114101016 (content_changes). Verified RLS, owner policy, denied anon CRUD/private function execution, export-only service role, trigger hardening and record_signin-only public RPCs. No draft rows created; site_sections fingerprint unchanged. No new feature-related advisor findings. Docs updated; frontend deployment and Jamie’s live verification still pending. No commit/push.
+
+## 2026-11-14 — Article image folders
+Jamie renamed article-images folders to post<N>-<slug> (post1-3-personal-ai-agents, post2-stop-copy-pasting-into-claude) and wants this convention for future posts. With his "apply", Claude rewrote both articles' cover_url/body links to the new folders (23 links, all verified to exist). The article editor still uploads to <slug>/ folders; changing it is a pending small ticket. Renaming folders breaks links: update links in the same step.
+
+
+## 2026-11-14 — TKT-101 homepage preview
+Implemented owner-only Draft Mode + httpOnly set-id cookie, immutable section overlays, preview-only gold markers and bottom approval/discard/exit bar. Existing engine and public rendering/motion preserved. Passed typecheck, 618 unit/DB tests, build/static assertions, 23 journey/review browser checks (one existing desktop skip), and 14 real Next/local PGlite preview browser checks including copied cookies with signed-out/member sessions. No schema/live data changes, secrets, commit or push; needs deployment and Jamie’s live verification. TKT-98 fixture typing fix already present and reverified. Details/file inventory in docs/status.md; cookie/test workflow in docs/content-drafts.md.

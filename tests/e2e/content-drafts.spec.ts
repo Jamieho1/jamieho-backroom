@@ -10,6 +10,8 @@ const ownerId='00000000-0000-4000-8000-0000000000f1';
 test.beforeAll(async()=>{
  db=await freshDb();await db.query("insert into private.settings(key,value) values ('owner_email','local-owner@example.test')");await addUser(db,{id:ownerId,email:'local-owner@example.test'});
  const result=await build({stdin:{contents:`import React from 'react';import {createRoot} from 'react-dom/client';import {ContentReviewList} from './components/content-drafts/review-list';createRoot(document.getElementById('review-fixture')).render(<main className="app-page"><div className="app-page-content content-review-page"><h1>Review content</h1><ContentReviewList drafts={window.reviewDrafts}/></div></main>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'review-fixture',setup(b){
+  b.onResolve({filter:/app\/actions\/content-preview$/},()=>({path:'preview',namespace:'preview-action'}));
+  b.onLoad({filter:/.*/,namespace:'preview-action'},()=>({contents:'export async function startContentPreview(){return {ok:false,message:"Preview is exercised separately"}}'}));
   b.onResolve({filter:/app\/actions\/content-drafts$/},()=>({path:'actions',namespace:'review'}));
   b.onLoad({filter:/.*/,namespace:'review'},()=>({contents:`async function run(id,approve){const r=await fetch('/__review_action',{method:'POST',body:JSON.stringify({id,approve})});return r.json()}export const approveContentChange=id=>run(id,true);export const discardContentChange=id=>run(id,false);`}));
   b.onResolve({filter:/^next\/navigation$/},()=>({path:'navigation',namespace:'review-nav'}));
