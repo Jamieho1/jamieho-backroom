@@ -5,7 +5,7 @@ export function GuideShelf({guides,heading='Guides',showAll=false}:{guides:Guide
  return <section className="guide-shelf" aria-labelledby="guides-h">
   <div className="guide-shelf-head"><h2 id="guides-h">{heading}</h2>{showAll?<Link href="/guides" prefetch={false}>All guides</Link>:null}</div>
   <p className="muted">Free, in-depth guides with prompts, checklists and templates. Open to everyone.</p>
-  {guides.length?<ul className="resource-grid guide-grid">{guides.map(g=><li key={g.id}><Link className="guide-card" href={guideHref(g.slug)} prefetch={false}>
+  {guides.length?<ul className="resource-grid guide-grid">{guides.map(g=><li key={g.id}><Link data-draft-changed={g.draftChanged||undefined} className="guide-card" href={guideHref(g.slug)} prefetch={false}>
    {/* eslint-disable-next-line @next/next/no-img-element */}
    {g.cover_url?<img src={g.cover_url} alt="" referrerPolicy="no-referrer" />:null}
    <h3>{g.title}</h3>{g.summary?<p>{g.summary}</p>:null}

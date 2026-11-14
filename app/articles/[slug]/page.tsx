@@ -1,3 +1,5 @@
+import {getHomePreview} from "@/lib/content-drafts/preview";
+import {PagePreview} from "@/components/content-drafts/page-preview";
 import type {Metadata} from 'next';
 import {notFound} from 'next/navigation';
 import Link from 'next/link';
@@ -15,22 +17,24 @@ import {CATEGORY_LABEL,PLATFORM_LABEL,adjacentArticles,articleDate,articleHref,a
 import '../../articles.css';
 export const dynamic='force-dynamic';
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
- try{const article=await getPublicArticle((await params).slug);return article?{title:`${article.title} · Jamie Ho`,description:article.summary,openGraph:{title:article.title,description:article.summary,type:'article',...(article.cover_url?{images:[article.cover_url]}:{})}}:{title:'Article not found · Jamie Ho',robots:{index:false}};}catch{return {title:'Articles · Jamie Ho'};}
+ try{const article=await getPublicArticle((await params).slug,await getHomePreview());return article?{title:`${article.title} · Jamie Ho`,description:article.summary,openGraph:{title:article.title,description:article.summary,type:'article',...(article.cover_url?{images:[article.cover_url]}:{})}}:{title:'Article not found · Jamie Ho',robots:{index:false}};}catch{return {title:'Articles · Jamie Ho'};}
 }
 export default async function ArticlePage({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params;
+ const preview=await getHomePreview();
  let article,all,sections;
- try{[article,all,sections]=await Promise.all([getPublicArticle(slug),getPublicArticles(),getSections()]);}catch{return <Desktop apps={[]} initialApp="articles" discoverApps content={<div className="page"><p role="alert">Can&apos;t load this article right now.</p><a href={articleHref(slug)}>Try again</a></div>} />;}
+ try{[article,all,sections]=await Promise.all([getPublicArticle(slug,preview),getPublicArticles(preview),getSections()]);}catch{return <Desktop apps={[]} initialApp="articles" discoverApps content={<div className="page"><p role="alert">Can&apos;t load this article right now.</p><a href={articleHref(slug)}>Try again</a></div>} />;}
  if(!article)notFound();
  const project=article.project_id?(await getProjectApps().catch(()=>[])).find(p=>p.id===article.project_id):undefined;
  const video=article.source_url?youtubeId(article.source_url):null;
  const related=relatedArticles(all,article);
  const {prev,next}=adjacentArticles(all,article.id);
  const toc=articleSections(article.body);
- return <Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
+ return <><PagePreview preview={preview} page={article.published?`/articles/${article.slug}`:"/articles"}/><Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
   <div className="article-layout">
-  <article className="article-read">
+  <article className="article-read" data-draft-changed={article.draftChanged||undefined}>
    <p className="article-meta" id="overview">{articleDate(article.created_at)} · {CATEGORY_LABEL[article.category]}</p>
+   {article.draftChanged&&!article.published?<p role="status">Unpublished in this preview</p>:null}
    <h1>{article.title}</h1>
    {article.summary?<p className="article-summary">{article.summary}</p>:null}
    {project?<p className="article-project">Part of <Link href="/projects" prefetch={false}>{project.name}</Link></p>:null}
@@ -46,5 +50,5 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
   </article>
   <OnThisPage sections={toc} topId="overview" />
   </div>
- </ArticlesShell>} />;
+ </ArticlesShell>} /></>;
 }

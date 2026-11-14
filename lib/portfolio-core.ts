@@ -5,6 +5,7 @@
 import { z } from "zod";
 
 export interface Project {
+  draftChanged?: boolean;
   id: string;
   slug: string;
   name: string;

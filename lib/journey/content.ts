@@ -101,7 +101,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       const scroll = showcaseScroll(featured.length);
       return {
         ...c, scroll, wipe: SHOWCASE_WIPE / scroll,
-        showcase: featured.map((p) => ({ slug: p.slug, name: p.name, tagline: p.tagline, tags: p.tags.slice(0, 3), href: projectHref(p.slug), shots: p.screenshots })),
+        showcase: featured.map((p) => ({ draftChanged:p.draftChanged, slug: p.slug, name: p.name, tagline: p.tagline, tags: p.tags.slice(0, 3), href: projectHref(p.slug), shots: p.screenshots })),
       };
     }
     const panels: Panel[] = [];

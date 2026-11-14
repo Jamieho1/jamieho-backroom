@@ -84,7 +84,7 @@ Implemented locally: experience_items insert/update and experience_bullets inser
 
 Owner preview supports Home Experience and /behavioral CV, with entry/bullet gold outlines, Home publication filtering before client serialization and a read-only CV preview. Review offers Home/CV previews; the bottom bar switches views and reuses approve/discard/exit. Preview controls wait for hydration, fixing a phone click-before-handler race found in local testing. Approval revalidates /, /journey, /about and /behavioral. No journey design, motion, navigation, other-table rules or live content changed.
 
-Migration: 20261114110327_content_drafts_experience.sql — **NOT applied live**. TKT-98's applied SQL is untouched. Jamie must authorize live application before deployment; no commit/push/deployment. Ticket remains pending migration, deployment and Jamie's live verification.
+Migration: 20261114110327_content_drafts_experience.sql — **applied live with Jamie’s explicit approval on 2026-11-14**, remote version 20261114114045 (content_drafts_experience). TKT-98's applied SQL is untouched. No commit/push/deployment; ticket remains pending frontend deployment and Jamie’s live verification.
 
 Checks actually run: npm run typecheck passed; full unit/database suite passed (87 files, 706 tests, maxWorkers=2); isolated production builds and unchanged static assertions passed (/, /resources, /privacy, /projects, /articles remain pre-rendered). Relevant journey/CV/review browser checks: 33 passed, one existing phone-only check skipped on desktop. Real Next/PGlite preview integration: final 20 passed at desktop/390px, including approval/discard, deleted history, private/no-store responses, visitor/member copied-cookie isolation and no phone overflow. An earlier phone approval failed before hydration; fixed and the entire integration suite reran successfully. Local preview screenshots inspected. git diff --check passed. No production browser or live database used.
 
@@ -97,3 +97,32 @@ Changed files:
 - tests/db/experience-drafts.test.ts; tests/unit/{experience-drafts,content-preview-bar,behavioral-content,content-drafts-actions,content-drafts-review,content-preview-actions,content-preview}.test.ts[x]
 - tests/e2e/experience-preview.spec.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
 - docs/content-drafts.md, architecture.md, security.md, journey.md, status.md; MEMORY.md
+
+
+TKT-104 live application (2026-11-14): Supabase MCP applied the unchanged reviewed migration as remote 20261114114045. Read-only verification confirmed both function bodies exactly match local SQL, SECURITY DEFINER/empty search_path, no anon/authenticated/service_role EXECUTE, owner-only content_changes policy and enabled RLS on all three tables. record_signin remains the only public API-callable function. Before/after fingerprints matched for experience_items, experience_bullets, content_changes and site_sections; no test rows or content approvals were made. Security advisors reported no TKT-104 finding; existing record_signin/password-protection warnings remain. Topic docs and MEMORY updated; git diff --check passed. No website visit, commit, push or frontend deployment.
+
+## TKT-105 — projects, articles and guides drafts (2026-11-14)
+
+Implemented locally: editor-derived publishing allowlists and complete merged-row validation in TypeScript/SQL, hidden insert defaults, atomic cross-table approval and full prior-row history. Delete proposals unpublish only; new sets can republish retained rows. Slug revalidation uses committed audit values plus proposed slugs, covering old/new/intermediate paths and all aggregate consumers. Draft links require literal valid HTTPS ASCII hosts (IDNs use punycode), with shared host/port checks; no editor rule is relaxed.
+
+Owner preview covers /projects and details, Home Work, /articles and details, /guides and details, Resources Guides shelf and existing Home latest-media bindings. Gold markers identify changed cards/details/Work items. Lists/Home filter unpublished records; changed unpublished detail rows remain owner-inspectable and labelled. Guide preview timestamps simulate approval ordering; review preserves structured array values. Metadata/new draft slugs have the same owner gate, not cookie-only access. Editors, card designs, navigation and journey motion are unchanged.
+
+Migration: 20261114120122_content_drafts_publishing.sql — **applied live with Jamie’s explicit TKT-105 approval on 2026-11-14**, remote version 20261114125201 (content_drafts_publishing). It adds hardened private URL/publishing helpers and extends the existing trigger; no new public RPC, table RLS/grant or live content changes. Prior applied SQL untouched. No agent commit/push/frontend deployment; frontend deployment and Jamie’s live verification remain pending, so ticket is not Done.
+
+Checks actually run: npm run typecheck passed; full unit/database suite passed (89 files, 826 tests, maxWorkers=2); isolated production build and unchanged static assertions passed. Public /, /resources, /privacy, /projects and /articles remain pre-rendered. Relevant Projects/Articles/journey/review browser checks: 48 passed, 2 existing skips. Real Next/PGlite preview integration: final clean run 30 passed across desktop/390px, including new featured-project publication without rebuild, article/guide previews and discard, unpublish-only deletes, old/new slug HTTP results, new unpublished-slug 404/metadata privacy, stolen-cookie isolation and no phone overflow. Local screenshots inspected. A reused fixture/cache mismatch caused an earlier rerun to fail; clean isolated .next plus fresh disposable database resolved it, and that requirement is documented. Syntax/diff checks passed. No production browser or live Supabase used.
+
+Changed files:
+- supabase/migrations/20261114120122_content_drafts_publishing.sql
+- lib/content-drafts/{allowlist,publishing-overlay,preview,review,types}.ts; app/actions/{content-drafts,content-preview}.ts
+- app/page.tsx; app/projects/{page,[slug]/page}.tsx; app/articles/{page,[slug]/page}.tsx; app/guides/{page,[slug]/page}.tsx; app/resources/page.tsx
+- lib/{portfolio-core,portfolio,articles,articles-public,guides,guides-public}.ts; lib/journey/{content,timeline}.ts
+- components/content-drafts/{page-preview,preview-bar,review-list}.tsx and preview.css
+- components/portfolio/views.tsx; components/articles/library.tsx; components/guides/shelf.tsx; components/journey/{journey,showcase}.tsx (markers only)
+- tests/unit/publishing-drafts.test.ts; tests/db/publishing-drafts.test.ts; tests/e2e/publishing-preview.spec.ts
+- tests/unit/{content-drafts-actions,content-preview}.test.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
+- docs/content-drafts.md, architecture.md, security.md, journey.md, status.md; MEMORY.md
+
+About copy request (2026-11-14): created pending site_sections/about body draft ecc6ecb3-1e8c-47bf-a04a-1bb0e1aca1f4 for the requested phrase emphasis and generalized employer wording. Preserved the remaining live text/title. Read-back confirmed exact proposed values, draft status and unchanged live body. Existing Markdown rendering supports the emphasis; the first paragraph still fits the existing excerpt limit. Await Jamie’s approval at /manage/review. No code, schema, live-content publication, deployment or browser change; documentation diff check passed.
+
+
+TKT-105 live application (2026-11-14): Supabase MCP applied the unchanged reviewed SQL as remote 20261114125201. Verified all three function bodies match local SQL, empty search_path, revoked anon/authenticated/service_role EXECUTE, owner-only content_changes policy and enabled RLS on all seven affected/read tables. record_signin remains the sole public API-callable function. Valid HTTPS/IPv6 and rejected HTTP/invalid-host queries passed. Before/after fingerprints matched for projects, articles, guides, content_changes, site_sections, experience_items and experience_bullets; no content approvals or test rows were created. Security advisors showed no TKT-105 finding; existing record_signin/password-protection warnings remain. About wording approval was not part of this migration. Docs/MEMORY and diff checked; no website visit, commit, push or frontend deployment.

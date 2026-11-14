@@ -1,3 +1,5 @@
+import {getHomePreview} from "@/lib/content-drafts/preview";
+import {PagePreview} from "@/components/content-drafts/page-preview";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Desktop } from "@/components/desktop";
@@ -15,7 +17,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   try {
-    const p = await getPublicProject((await params).slug);
+    const p = await getPublicProject((await params).slug,await getHomePreview());
     return p
       ? { title: `${p.name} · Projects · Jamie Ho`, description: p.tagline, openGraph: { title: p.name, description: p.tagline, ...(p.screenshots[0] ? { images: [p.screenshots[0]] } : {}) } }
       : { title: "Project not found · Jamie Ho", robots: { index: false } };
@@ -26,7 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   // No try/catch: if Supabase is down the render fails and Next keeps serving the last good page.
-  const p = await getPublicProject(slug);
+  const preview=await getHomePreview();
+  const p = await getPublicProject(slug,preview);
   if (!p) notFound();
-  return <Desktop apps={[]} initialApp="projects" discoverApps content={<ProjectDetail p={p} />} />;
+  return <><PagePreview preview={preview} page={p.public?`/projects/${p.slug}`:"/projects"}/><Desktop apps={[]} initialApp="projects" discoverApps content={<ProjectDetail p={p} />} /></>;
 }

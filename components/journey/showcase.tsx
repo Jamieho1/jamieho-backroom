@@ -55,7 +55,7 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
         <p className="journey-eyebrow">Selected work · <span ref={count}>01</span> / {String(n).padStart(2, "0")}</p>
         <div className="journey-showcase-items">
           {items.map((it, k) => (
-            <div key={it.slug} ref={(el) => { texts.current[k] = el; }} className="journey-showcase-item journey-reading-card" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
+            <div data-draft-changed={it.draftChanged||undefined} key={it.slug} ref={(el) => { texts.current[k] = el; }} className="journey-showcase-item journey-reading-card" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
               <h2 className="journey-title">{it.name}</h2>
               {it.tagline ? <p className="journey-body">{it.tagline}</p> : null}
               {it.tags.length ? <ul className="journey-chips" aria-label="Built with">{it.tags.map((t) => <li key={t}>{t}</li>)}</ul> : null}

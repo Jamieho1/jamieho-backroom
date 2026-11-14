@@ -1,3 +1,5 @@
+import {getHomePreview} from "@/lib/content-drafts/preview";
+import {PagePreview} from "@/components/content-drafts/page-preview";
 import type { Metadata } from "next";
 import { Desktop } from "@/components/desktop";
 import { getPublicProjects } from "@/lib/portfolio";
@@ -12,12 +14,13 @@ export const revalidate = 86400;
 /** Home v1.1 (TKT-83): every public project, featured first. Each card opens the project's own page. */
 export default async function ProjectsPage() {
   // No try/catch: if Supabase is down the render fails and Next keeps serving the last good page.
-  const projects = await getPublicProjects();
+  const preview=await getHomePreview();
+  const projects = await getPublicProjects(preview);
   return (
-    <Desktop apps={[]} initialApp="projects" discoverApps content={<div className="page projects-page">
+    <><PagePreview preview={preview} page="/projects"/><Desktop apps={[]} initialApp="projects" discoverApps content={<div className="page projects-page">
       <header className="articles-heading"><h1>Projects</h1><ProjectManageLink /></header>
       <p className="muted">Things I&apos;ve built: what each one does, how it works and where to try it.</p>
       <ProjectList projects={projects} />
-    </div>} />
+    </div>} /></>
   );
 }

@@ -4,11 +4,13 @@ import { loadOwnerPreview, getHomePreview, PREVIEW_COOKIE } from "@/lib/content-
 import { approveContentChange, discardContentChange } from "./content-drafts";
 import type { DraftResult } from "@/lib/content-drafts/types";
 
-export async function startContentPreview(id: string, target: "/" | "/behavioral" = "/"): Promise<DraftResult> {
+export async function startContentPreview(id: string, target: string = "/"): Promise<DraftResult> {
   try {
     const preview = await loadOwnerPreview(id);
     if (!preview) return { ok: false, message: "Preview unavailable. Sign in as the owner and choose a valid pending draft." };
-    if (target !== "/" && (target !== "/behavioral" || !preview.experience)) return {ok:false,message:"This set has no CV preview."};
+    const routes=["/",...(preview.experience?["/behavioral"]:[]),...(preview.targets??[]).map(t=>t.href)];
+    for(const [table,rows] of Object.entries(preview.publishing??{}))for(const row of rows??[])if(row.draftChanged)routes.push(`/${table}/${encodeURIComponent(row.slug)}`);
+    if(!routes.includes(target))return {ok:false,message:"This set has no preview at that route."};
     const store = await cookies();
     store.set(PREVIEW_COOKIE, preview.id, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 3600 });
     (await draftMode()).enable();

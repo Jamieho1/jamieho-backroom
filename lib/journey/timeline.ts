@@ -93,6 +93,7 @@ export interface SectionChapter extends Base {
 }
 
 export interface ShowcaseItem {
+  draftChanged?:boolean;
   slug: string;
   name: string;
   tagline: string;

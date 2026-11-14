@@ -63,3 +63,16 @@ it('experience approval refreshes every CV consumer through the same atomic stat
  expect((await approveContentChange(id)).ok).toBe(true);expect(mocks.update).toHaveBeenCalledExactlyOnceWith({status:'approved'});
  expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(['/','/journey','/about','/behavioral','/manage/review']);
 });
+it('publishing approval refreshes both slugs from committed audit history',async()=>{
+ const key='00000000-0000-4000-8000-000000000601';const publishingOps=[{table:'projects',op:'update',key,fields:{slug:'new-project'}}];
+ const project={id:key,slug:'old-project',name:'Example',tagline:'',body:'',tags:[],screenshots:[],url:'',featured:true,public:true,sort:1,created_at:'2025-01-01'};
+ const normal=mocks.from.getMockImplementation()!;mocks.from.mockImplementation((table:string)=>table==='projects'?{select:async()=>({data:[project],error:null})}:normal(table));
+ mocks.single.mockResolvedValue({data:{...set,operations:publishingOps},error:null});mocks.saveSelect.mockResolvedValue({data:[{id,previous:[{table:'projects',key,values:project}]}],error:null});
+ expect((await approveContentChange(id)).ok).toBe(true);expect(mocks.update).toHaveBeenCalledExactlyOnceWith({status:'approved'});
+ expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(expect.arrayContaining(['/projects','/projects/old-project','/projects/new-project','/','/manage/review']));
+});
+it('publishing row validation errors happen before the approval transaction',async()=>{
+ const key='00000000-0000-4000-8000-000000000601';const normal=mocks.from.getMockImplementation()!;mocks.from.mockImplementation((table:string)=>table==='guides'?{select:async()=>({data:[],error:null})}:normal(table));
+ mocks.single.mockResolvedValue({data:{...set,operations:[{table:'guides',op:'update',key,fields:{title:'Valid title'}}]},error:null});
+ expect(await approveContentChange(id)).toMatchObject({ok:false,message:expect.stringContaining('no longer exists')});expect(mocks.update).not.toHaveBeenCalled();
+});

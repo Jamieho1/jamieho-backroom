@@ -26,6 +26,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   await db.query("update public.site_sections set title='Live About heading',body='Live About body' where key='about'");
   // Allow the member fixture to read CV data, so cookie isolation is tested beyond a gate screen.
   await db.query("insert into public.invites(email) values ($1)",[users.member.email]);
+  let publishingSeed=0;
   const send = (res,status,data) => { res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); };
   const server = http.createServer(async (req,res) => {
     if (/^http:\/\/127\.0\.0\.1:\d+$/.test(req.headers.origin || '')) {
@@ -54,18 +55,27 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await db.query("insert into public.experience_bullets(id,item_id,text,sort,public) values ('00000000-0000-4000-8000-000000000503',$1,'Delete fixture proof',1,true),('00000000-0000-4000-8000-000000000505',$1,'Private fixture proof',2,false)",[ids[0]]);
         return send(res,200,{ok:true});
       }
-      if (url.pathname === '/__state') return send(res,200,{ sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
+      if (url.pathname === '/__publishing_seed' && req.method === 'POST') {
+        const suffix=++publishingSeed;
+        const ids=['00000000-0000-4000-8000-000000000701','00000000-0000-4000-8000-000000000702','00000000-0000-4000-8000-000000000703','00000000-0000-4000-8000-000000000704'];
+        for(const table of ['projects','articles','guides'])await db.query('delete from public.'+table+' where id=any($1::uuid[])',[ids]);
+        await db.query("insert into public.projects(id,slug,name,public,featured) values ($1,$2,'Live fixture project',true,true)",[ids[0],'live-fixture-project-'+suffix]);
+        await db.query("insert into public.articles(id,slug,title,published) values ($1,$2,'Live fixture article',true)",[ids[1],'live-fixture-article-'+suffix]);
+        await db.query("insert into public.guides(id,slug,title,published) values ($1,$2,'Live fixture guide',true)",[ids[2],'live-fixture-guide-'+suffix]);
+        return send(res,200,{project:'live-fixture-project-'+suffix,article:'live-fixture-article-'+suffix,guide:'live-fixture-guide-'+suffix});
+      }
+      if (url.pathname === '/__state') return send(res,200,{ projects:(await db.query('select * from public.projects')).rows,articles:(await db.query('select * from public.articles')).rows,guides:(await db.query('select * from public.guides')).rows,sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
       const session=Object.values(sessions).find(s=>req.headers.authorization==='Bearer '+s.access_token);
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
-      if (!['content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps'].includes(table)) return send(res,200,[]);
+      if (!['content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides'].includes(table)) return send(res,200,[]);
       const rows=await db.transaction(async tx=>{
         await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session?.user.id || '',role:session?'authenticated':'anon'})]);
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table==='content_changes'?['id','status','operations']:table==='site_sections'?['key']:['id'])) {
+        for (const col of (table==='content_changes'?['id','status','operations']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['id'])) {
           const value=url.searchParams.get(col);
           if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(col==='operations'?'::jsonb':'')); }
         }

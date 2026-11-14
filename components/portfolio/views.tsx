@@ -15,7 +15,7 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 export function ProjectTile({ p }: { p: Project }) {
   const shot = p.screenshots[0];
   return (
-    <Link className="catalog-card project-tile" href={projectHref(p.slug)} prefetch={false} aria-label={`${p.name}${p.tagline ? `: ${p.tagline}` : ""}`}>
+    <Link data-draft-changed={p.draftChanged||undefined} className="catalog-card project-tile" href={projectHref(p.slug)} prefetch={false} aria-label={`${p.name}${p.tagline ? `: ${p.tagline}` : ""}`}>
       {p.featured ? <span className="project-featured">Featured</span> : null}
       <span className="project-card-image">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -36,8 +36,9 @@ export function ProjectDetail({ p }: { p: Project }) {
   const [hero, ...rest] = p.screenshots;
   const host = p.url ? siteHost(p.url) : "";
   return (
-    <article className="page project-read">
+    <article data-draft-changed={p.draftChanged||undefined} className="page project-read">
       <p className="project-back"><Link href="/projects" prefetch={false}>← All projects</Link> <ProjectManageLink slug={p.slug} /></p>
+      {p.draftChanged&&!p.public?<p role="status">Unpublished in this preview</p>:null}
       <header className="project-head">
         <h1>{p.name}</h1>
         {p.tagline ? <p className="project-tagline">{p.tagline}</p> : null}

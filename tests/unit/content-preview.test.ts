@@ -43,3 +43,12 @@ it('experience preview reads the complete owner snapshot and rejects stale targe
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
  rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
 });
+it('publishing snapshots are fetched only after owner validation and reject stale references',async()=>{
+ const project={id,slug:'new-project',name:'Example',tagline:'',body:'',tags:[],screenshots:[],url:'',featured:false,public:true,sort:100,created_at:'2025-01-01'};
+ m.single.mockResolvedValue({data:{id,status:'draft',summary:'Edit project',created_at:'2026-11-14',operations:[{table:'projects',op:'update',key:id,fields:{name:'Draft project'}}],photo_slots:[]},error:null});
+ const rows=vi.fn().mockResolvedValue({data:[project],error:null});m.from.mockImplementation((table:string)=>table==='projects'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ expect((await getHomePreview())?.publishing?.projects?.[0]).toMatchObject({name:'Draft project',draftChanged:true});
+ expect(m.from.mock.calls.map(([table])=>table)).not.toContain('experience_items');
+ rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
+ m.viewer.mockResolvedValue({role:'member',id:'member'});rows.mockClear();expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();
+});

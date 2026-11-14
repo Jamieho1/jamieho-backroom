@@ -384,7 +384,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [] 
               <p className="journey-eyebrow">Selected work</p>
               <ul>
                 {c.showcase.map((it) => (
-                  <li key={it.slug}>
+                  <li data-draft-changed={it.draftChanged||undefined} key={it.slug}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt="" loading="lazy" /> : null}
                     <h2 className="journey-title">{it.name}</h2>

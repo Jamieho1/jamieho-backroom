@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { approvePreviewChange, discardPreviewChange, exitContentPreview } from "@/app/actions/content-preview";
 
-export function ContentPreviewBar({ summary, page = "/", experience = false }: { summary: string; page?: "/" | "/behavioral"; experience?: boolean }) {
+export function ContentPreviewBar({ summary, page = "/", experience = false, targets = [] }: { summary: string; page?: string; experience?: boolean; targets?: {href:string;label:string}[] }) {
   const [ready, setReady] = useState(false);
   useEffect(() => { setReady(true); }, []);
   const [pending, setPending] = useState(false);
@@ -19,6 +19,7 @@ export function ContentPreviewBar({ summary, page = "/", experience = false }: {
   return <aside className="content-preview-bar" aria-label="Content preview" data-lenis-prevent>
     <p>Previewing: <strong>{summary}</strong></p>
     <div className="content-preview-actions">
+      {targets.filter(t=>t.href!==page).map(t=><a key={t.href} href={t.href}>{t.label}</a>)}
       {experience ? <a href={page === "/" ? "/behavioral" : "/"}>{page === "/" ? "Preview CV" : "Preview homepage"}</a> : null}
       <button className="site-auth-button" disabled={pending || !ready} onClick={() => run("approve")}>Approve</button>
       <button disabled={pending || !ready} onClick={() => run("discard")}>Discard</button>

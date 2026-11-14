@@ -1,5 +1,5 @@
 /* Preview-only affordances: no public journey layout or animation changes. */
-:is(.journey,.behavioral) [data-draft-changed="true"] { outline: 2px solid var(--j-accent, var(--cta-face)); outline-offset: -2px; }
+[data-draft-changed="true"] { outline: 2px solid var(--j-accent, var(--cta-face)); outline-offset: -2px; }
 .content-preview-bar { --j-accent: #f2b45c; position: fixed; z-index: 100; inset: auto 12px max(12px, env(safe-area-inset-bottom)); display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; padding: 14px 18px; border: 1px solid var(--j-accent); border-radius: 12px; background: #142234; color: #eef4fa; box-shadow: 0 8px 30px rgb(0 0 0 / .24); max-height: 40dvh; overflow-y: auto; }
 .content-preview-bar > p { margin: 0; flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
 .content-preview-actions { display: flex; flex-wrap: wrap; gap: 8px; }

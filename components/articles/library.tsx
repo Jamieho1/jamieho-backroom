@@ -62,7 +62,7 @@ export function ArticlesShell({articles,currentId,children,footer}:{articles:Art
 }
 
 export function ArticleCardView({a}:{a:ArticleCard}){
- return <Link className="catalog-card article-card" href={articleHref(a.slug)} prefetch={false} aria-label={a.title}>
+ return <Link data-draft-changed={a.draftChanged||undefined} className="catalog-card article-card" href={articleHref(a.slug)} prefetch={false} aria-label={a.title}>
    {a.cover_url?/* eslint-disable-next-line @next/next/no-img-element */<img className="article-card-cover" src={a.cover_url} alt="" loading="lazy" referrerPolicy="no-referrer" />:<div className="article-card-cover placeholder" aria-hidden="true">{CATEGORY_LABEL[a.category]}</div>}
   <div className="catalog-card-body article-card-body">
    <p className="article-meta">{articleDate(a.created_at)} · {CATEGORY_LABEL[a.category]}</p>
