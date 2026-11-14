@@ -19,11 +19,11 @@ export function ContentReviewList({ drafts, error }: { drafts: ReviewDraft[]; er
     } catch { setMessages(current => ({ ...current, [id]: { ok: false, message: "Connection failed. Reload to check the draft before retrying." } })); }
     finally { setPending(null); }
   }
-  async function preview(id: string) {
+  async function preview(id: string, target: "/" | "/behavioral" = "/") {
     setPending(id);
     try {
-      const result = await startContentPreview(id);
-      if (result.ok) { window.location.assign("/"); return; }
+      const result = await startContentPreview(id, target);
+      if (result.ok) { window.location.assign(target); return; }
       setMessages(current => ({ ...current, [id]: result }));
     } catch { setMessages(current => ({ ...current, [id]: { ok: false, message: "Could not open preview. Try again." } })); }
     setPending(null);
@@ -40,7 +40,7 @@ export function ContentReviewList({ drafts, error }: { drafts: ReviewDraft[]; er
         </table>
       </div>}
       {messages[set.id] && !messages[set.id].ok ? <p role="alert">{messages[set.id].message}</p> : null}
-      <footer><button disabled={!!pending || !!set.validationError} onClick={() => preview(set.id)}>Preview on page</button><button className="site-auth-button" disabled={!!pending || !!set.validationError} onClick={() => review(set.id, true)}>{pending === set.id ? "Saving…" : "Approve"}</button>
+      <footer><button disabled={!!pending || !!set.validationError} onClick={() => preview(set.id)}>Preview on page</button>{set.previewCv ? <button disabled={!!pending || !!set.validationError} onClick={()=>preview(set.id,"/behavioral")}>Preview CV</button> : null}<button className="site-auth-button" disabled={!!pending || !!set.validationError} onClick={() => review(set.id, true)}>{pending === set.id ? "Saving…" : "Approve"}</button>
         <button disabled={!!pending} onClick={() => review(set.id, false)}>Discard</button></footer>
     </article>)}
   </>;

@@ -57,3 +57,9 @@ it('handles load and connection failures without claiming success',async()=>{
  mocks.single.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect((await approveContentChange(id)).ok).toBe(false);
  mocks.server.mockRejectedValueOnce(Error('offline'));expect((await discardContentChange(id)).ok).toBe(false);expect(mocks.update).not.toHaveBeenCalled();
 });
+
+it('experience approval refreshes every CV consumer through the same atomic status action',async()=>{
+ mocks.single.mockResolvedValue({data:{...set,operations:[{op:'update',table:'experience_items',key:id,fields:{title:'Draft role'}}]},error:null});
+ expect((await approveContentChange(id)).ok).toBe(true);expect(mocks.update).toHaveBeenCalledExactlyOnceWith({status:'approved'});
+ expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(['/','/journey','/about','/behavioral','/manage/review']);
+});

@@ -22,7 +22,7 @@ const MEDIA_BASE = (process.env.NEXT_PUBLIC_HOME_MEDIA_URL ?? "/home-media").rep
 
 export default async function Home() {
   const preview = await getHomePreview();
-  const [sections, experience, apps, latest, projects] = await Promise.all([getSections(preview), getPublicExperience(), getProjectApps(), getLatestMedia(), getPublicProjects()]);
+  const [sections, experience, apps, latest, projects] = await Promise.all([getSections(preview), getPublicExperience(preview), getProjectApps(), getLatestMedia(), getPublicProjects()]);
   const chapters = withContent(HOME_CHAPTERS, { sections, experience, latest, projects, technologies: projectTechnologies(apps).map((t) => t.name) });
   return <main className="journey-page">
     {/* Journey typefaces (polish pass): wide display, mono labels, clean body. React hoists these into <head>. */}
@@ -30,7 +30,7 @@ export default async function Home() {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
     <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700&display=swap" />
     <AuthErrorNotice />
-    <Journey chapters={chapters} base={MEDIA_BASE} socials={socialLinks(sections.contact.body)} draftSections={preview ? [...new Set(preview.operations.map(operation => operation.key))] : []} />
-    {preview ? <ContentPreviewBar summary={preview.summary} /> : null}
+    <Journey chapters={chapters} base={MEDIA_BASE} socials={socialLinks(sections.contact.body)} draftSections={preview ? [...new Set(preview.operations.filter(operation=>operation.table==="site_sections").map(operation => operation.key))] : []} />
+    {preview ? <ContentPreviewBar summary={preview.summary} experience={!!preview.experience} /> : null}
   </main>;
 }

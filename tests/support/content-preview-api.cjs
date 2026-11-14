@@ -24,8 +24,17 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   for (const user of Object.values(users)) await db.query('insert into auth.users(id,email,email_confirmed_at) values ($1,$2,now())', [user.id,user.email]);
   await db.query("update public.site_sections set title='Live hero heading',body='Live hero body' where key='hero'");
   await db.query("update public.site_sections set title='Live About heading',body='Live About body' where key='about'");
+  // Allow the member fixture to read CV data, so cookie isolation is tested beyond a gate screen.
+  await db.query("insert into public.invites(email) values ($1)",[users.member.email]);
   const send = (res,status,data) => { res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); };
   const server = http.createServer(async (req,res) => {
+    if (/^http:\/\/127\.0\.0\.1:\d+$/.test(req.headers.origin || '')) {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+      res.setHeader('Access-Control-Allow-Headers','authorization, apikey, x-client-info, content-type, prefer, range, x-supabase-api-version');
+      res.setHeader('Access-Control-Allow-Methods','GET,HEAD,PATCH,POST,OPTIONS');
+      res.setHeader('Access-Control-Expose-Headers','Content-Range');
+    }
+    if(req.method==='OPTIONS'){res.writeHead(204);return res.end();}
     let body=''; for await (const chunk of req) body+=chunk;
     const url = new URL(req.url, `http://127.0.0.1:${port}`);
     try {
@@ -38,18 +47,25 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         const proposal=JSON.parse(body); const r=await db.query('insert into public.content_changes(summary,operations) values ($1,$2) returning id',[proposal.summary,JSON.stringify(proposal.operations)]);
         return send(res,200,r.rows[0]);
       }
-      if (url.pathname === '/__state') return send(res,200,{ sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by from public.content_changes')).rows });
+      if (url.pathname === '/__experience_seed' && req.method === 'POST') {
+        const ids=['00000000-0000-4000-8000-000000000501','00000000-0000-4000-8000-000000000502'];
+        await db.query('delete from public.experience_items where id=any($1::uuid[])',[ids]);
+        await db.query("insert into public.experience_items(id,title,summary,sort,public) values ($1,'Live fixture role','Live fixture summary',1,true),($2,'Hide fixture role','Second fixture summary',2,true)",ids);
+        await db.query("insert into public.experience_bullets(id,item_id,text,sort,public) values ('00000000-0000-4000-8000-000000000503',$1,'Delete fixture proof',1,true),('00000000-0000-4000-8000-000000000505',$1,'Private fixture proof',2,false)",[ids[0]]);
+        return send(res,200,{ok:true});
+      }
+      if (url.pathname === '/__state') return send(res,200,{ sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
       const session=Object.values(sessions).find(s=>req.headers.authorization==='Bearer '+s.access_token);
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
-      if (!['content_changes','site_sections','profiles'].includes(table)) return send(res,200,[]);
+      if (!['content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps'].includes(table)) return send(res,200,[]);
       const rows=await db.transaction(async tx=>{
         await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session?.user.id || '',role:session?'authenticated':'anon'})]);
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table==='content_changes'?['id','status','operations']:['key'])) {
+        for (const col of (table==='content_changes'?['id','status','operations']:table==='site_sections'?['key']:['id'])) {
           const value=url.searchParams.get(col);
           if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(col==='operations'?'::jsonb':'')); }
         }
@@ -58,9 +74,13 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
           const patch=JSON.parse(body); if (Object.keys(patch).join(',')!=='status') throw Error('Test adapter accepts status changes only');
           params.push(patch.status);return (await tx.query('update public.content_changes set status=$'+params.length+clause+' returning *',params)).rows;
         }
-        if (req.method!=='GET') throw Error('Unsupported local request');
+        if (req.method!=='GET' && req.method!=='HEAD') throw Error('Unsupported local request');
+        if (table==='experience_items' && url.searchParams.get('select')?.includes('experience_bullets(')) {
+          return (await tx.query('select i.*, coalesce((select jsonb_agg(b) from public.experience_bullets b where b.item_id=i.id),\'[]\'::jsonb) as experience_bullets from public.experience_items i'+clause+' order by sort',params)).rows;
+        }
         return (await tx.query('select * from public.'+table+clause+(table==='content_changes'?' order by created_at desc':''),params)).rows;
       });
+      if(req.method==='HEAD'){res.writeHead(200,{'Content-Range':`0-${Math.max(0,rows.length-1)}/${rows.length}`});return res.end();}
       const single=(req.headers.accept||'').includes('application/vnd.pgrst.object+json');
       send(res,200,single?(rows[0] || null):rows);
     } catch(error) { send(res,400,{code:error.code || 'XX000',message:error.message,details:null,hint:null}); }

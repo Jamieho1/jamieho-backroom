@@ -32,3 +32,14 @@ it('overlay is immutable, preserves live fields and applies repeated edits in or
 it('maps outlines to existing sections without adding or changing chapters',()=>{
  expect(draftChapterChanged('pivot',['about'])).toBe(true);expect(draftChapterChanged('creator',['contact'])).toBe(true);expect(draftChapterChanged('screen',['contact'])).toBe(true);expect(draftChapterChanged('sky',['hero'])).toBe(true);expect(draftChapterChanged('projects',['about'])).toBe(false);expect(draftChapterChanged('experience',[])).toBe(false);
 });
+
+it('experience preview reads the complete owner snapshot and rejects stale targets or failed reads',async()=>{
+ const operations=[{op:'update',table:'experience_items',key:id,fields:{title:'Draft role'}}];
+ const live={id,kind:'role',title:'Live role',org:'',dates:'',location:'',summary:'',sort:1,public:true,experience_bullets:[]};
+ const rows=vi.fn().mockResolvedValue({data:[live],error:null});
+ m.single.mockResolvedValue({data:{id,summary:'Edit role',status:'draft',operations,photo_slots:[]},error:null});
+ m.from.mockImplementation((table:string)=>table==='experience_items'?{select:()=>({order:rows})}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ expect((await getHomePreview())?.experience).toEqual([{...live,title:'Draft role',draftChanged:true}]);expect(live.title).toBe('Live role');
+ rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
+ rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
+});

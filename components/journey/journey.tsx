@@ -291,7 +291,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    data-draft-changed={c.id !== "sky" && draftChapterChanged(c.id, draftSections) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
+                    data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
                     {c.id === "sky" ? <HeroCopy p={p} split draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "pivot"} />}
                   </section>
                 ))}
@@ -397,7 +397,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [] 
             </section>
           ) : null}
           {(c.panels ?? []).map((p) => (
-            <section key={p.id} data-draft-changed={c.id !== "sky" && draftChapterChanged(c.id, draftSections) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
+            <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
               {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "pivot"} />}
             </section>
           ))}
@@ -454,7 +454,7 @@ function PanelBody({ p, heading, split = false, scheduleCall = false, disableLin
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {split && p.rotator ? <RotatorLine r={p.rotator} />
       : p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} disableLinks={disableLinks} /></div> : <p className="journey-body">{p.body}</p>) : null}
-    {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}><Inline text={t} /></li>)}</ul> : null}
+    {p.points?.length ? <ul className="journey-points">{p.points.map((t,index) => <li data-draft-changed={p.draftPoints?.[index]||undefined} key={t}><Inline text={t} /></li>)}</ul> : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.links?.some((l) => l.platform) ? (
       <ul className="journey-media">

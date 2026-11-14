@@ -28,3 +28,9 @@ it('failed approval keeps preview open and reports the existing engine error',as
 it('cookie exit failure never misreports a committed approval as rolled back',async()=>{
  m.disable.mockImplementation(()=>{throw Error('cookie failure')});expect(await approvePreviewChange()).toMatchObject({ok:true,applied:true,message:expect.stringContaining('could not close')});
 });
+
+it('CV entry needs experience operations and permits only known local preview routes',async()=>{
+ expect((await startContentPreview(id,'/behavioral')).ok).toBe(false);expect(m.enable).not.toHaveBeenCalled();
+ m.owner.mockResolvedValue({id,experience:[]});expect((await startContentPreview(id,'/behavioral')).ok).toBe(true);
+ expect((await startContentPreview(id,'https://example.test' as '/')).ok).toBe(false);
+});

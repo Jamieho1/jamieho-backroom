@@ -77,3 +77,23 @@ Implemented locally: small gold “N to review” link to /manage/review in shar
 Checks passed: npm run typecheck; full unit/database suite (84 files, 625 tests, maxWorkers=2); isolated production build and unchanged static assertions; 22 desktop/390px browser checks across badge, shared navigation and existing Settings window behavior. Badge checks cover 2/0 drafts, visitors/non-owners, both bar states and no horizontal overflow. Unit tests cover server owner gate, query status filter/HEAD count, account changes, stale responses, zero/error handling and refresh events. git diff --check passed.
 
 Changed files: app/actions/content-draft-count.ts; components/content-drafts/review-badge.tsx and review-list.tsx; components/site-navigation.tsx; app/globals.css; tests/unit/content-draft-count.test.ts and content-review-badge.test.tsx; tests/e2e/content-review-badge.spec.ts and desktop-window.spec.ts; docs/architecture.md, content-drafts.md, status.md; MEMORY.md.
+
+## TKT-104 — experience content drafts (2026-11-14)
+
+Implemented locally: experience_items insert/update and experience_bullets insert/update/delete in the shared strict allowlist and private SQL transaction. CV editor field limits/normalization, UUID parents, integer sorting and hidden insert defaults are enforced independently in TypeScript/SQL. Approval retains complete previous rows, including deleted bullets; a failed later operation rolls back earlier writes and audit/status. Existing editor UI/direct deletion remains unchanged, as Jamie confirmed.
+
+Owner preview supports Home Experience and /behavioral CV, with entry/bullet gold outlines, Home publication filtering before client serialization and a read-only CV preview. Review offers Home/CV previews; the bottom bar switches views and reuses approve/discard/exit. Preview controls wait for hydration, fixing a phone click-before-handler race found in local testing. Approval revalidates /, /journey, /about and /behavioral. No journey design, motion, navigation, other-table rules or live content changed.
+
+Migration: 20261114110327_content_drafts_experience.sql — **NOT applied live**. TKT-98's applied SQL is untouched. Jamie must authorize live application before deployment; no commit/push/deployment. Ticket remains pending migration, deployment and Jamie's live verification.
+
+Checks actually run: npm run typecheck passed; full unit/database suite passed (87 files, 706 tests, maxWorkers=2); isolated production builds and unchanged static assertions passed (/, /resources, /privacy, /projects, /articles remain pre-rendered). Relevant journey/CV/review browser checks: 33 passed, one existing phone-only check skipped on desktop. Real Next/PGlite preview integration: final 20 passed at desktop/390px, including approval/discard, deleted history, private/no-store responses, visitor/member copied-cookie isolation and no phone overflow. An earlier phone approval failed before hydration; fixed and the entire integration suite reran successfully. Local preview screenshots inspected. git diff --check passed. No production browser or live database used.
+
+Changed files:
+- supabase/migrations/20261114110327_content_drafts_experience.sql
+- lib/content-drafts/{allowlist,experience-overlay,overlay,preview,review,types}.ts
+- app/actions/content-preview.ts; app/page.tsx; app/desktop/behavioral-content.tsx
+- components/content-drafts/{review-list,preview-bar}.tsx and preview.css; components/behavioral/resume.tsx
+- lib/experience.ts; lib/journey/{content,timeline}.ts; components/journey/journey.tsx (preview markers only)
+- tests/db/experience-drafts.test.ts; tests/unit/{experience-drafts,content-preview-bar,behavioral-content,content-drafts-actions,content-drafts-review,content-preview-actions,content-preview}.test.ts[x]
+- tests/e2e/experience-preview.spec.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
+- docs/content-drafts.md, architecture.md, security.md, journey.md, status.md; MEMORY.md

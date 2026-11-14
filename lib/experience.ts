@@ -11,11 +11,13 @@ export const KIND_LABEL: Record<Kind, string> = { role: "Role", project: "Projec
 
 export interface Bullet {
   id?: string;
+  draftChanged?: boolean;
   text: string;
   public: boolean;
 }
 export interface Item {
   id?: string;
+  draftChanged?: boolean;
   kind: Kind;
   title: string;
   org: string;
@@ -31,7 +33,8 @@ export const LIMITS = { title: 160, org: 160, dates: 80, location: 80, summary: 
 
 export const emptyItem = (): Item => ({ kind: "role", title: "", org: "", dates: "", location: "", summary: "", public: false, bullets: [] });
 
-interface Row {
+export interface ExperienceRow {
+  draftChanged?: boolean;
   id: string;
   kind: Kind;
   title: string;
@@ -41,16 +44,17 @@ interface Row {
   summary: string;
   public: boolean;
   sort: number;
-  experience_bullets: { id: string; text: string; public: boolean; sort: number }[] | null;
+  experience_bullets: { id: string; text: string; public: boolean; sort: number; draftChanged?: boolean }[] | null;
 }
 
 export const SELECT = "id, kind, title, org, dates, location, summary, public, sort, experience_bullets(id, text, public, sort)";
 
-export function fromRows(rows: Row[]): Item[] {
+export function fromRows(rows: ExperienceRow[]): Item[] {
   return [...rows]
     .sort((a, b) => a.sort - b.sort)
     .map((r) => ({
       id: r.id,
+      ...(r.draftChanged ? {draftChanged:true} : {}),
       kind: r.kind,
       title: r.title,
       org: r.org,
@@ -59,7 +63,7 @@ export function fromRows(rows: Row[]): Item[] {
       summary: r.summary,
       public: r.public,
       sort: r.sort,
-      bullets: [...(r.experience_bullets ?? [])].sort((a, b) => a.sort - b.sort).map((b) => ({ id: b.id, text: b.text, public: b.public })),
+      bullets: [...(r.experience_bullets ?? [])].sort((a, b) => a.sort - b.sort).map((b) => ({ id: b.id, text: b.text, public: b.public, ...(b.draftChanged ? {draftChanged:true} : {}) })),
     }));
 }
 
@@ -73,11 +77,15 @@ export function validateItem(item: Item): string | null {
 }
 
 /** For the pre-rendered landing page: only what the database lets anyone see. Throws if Supabase is down. */
-export async function getPublicExperience(): Promise<Item[]> {
+export async function getPublicExperience(preview?: import("@/lib/content-drafts/types").HomePreview | null): Promise<Item[]> {
+  if (preview?.experience) {
+    const { publicExperienceRows } = await import("@/lib/content-drafts/experience-overlay");
+    return fromRows(publicExperienceRows(preview.experience));
+  }
   const env = readSupabaseEnv();
   if (!env) return [];
   const sb = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
   const { data, error } = await sb.from("experience_items").select(SELECT).order("sort");
   if (error) throw new Error(`experience: ${error.message}`);
-  return fromRows((data ?? []) as Row[]).map((i) => ({ ...i, bullets: i.bullets.filter((b) => b.text.trim()) }));
+  return fromRows((data ?? []) as ExperienceRow[]).map((i) => ({ ...i, bullets: i.bullets.filter((b) => b.text.trim()) }));
 }

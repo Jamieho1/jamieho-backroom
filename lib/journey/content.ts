@@ -72,7 +72,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       const panels: Panel[] = tpl ? spread(roles.length, lead, 1).map((w, k) => {
         const r = roles[k];
         return {
-          ...tpl, id: `r${k + 1}`, ...w, eyebrow: r.dates.trim() || "Role", title: r.title, meta: r.org.trim() || undefined,
+          ...tpl, draftChanged:r.draftChanged, draftPoints:r.bullets.filter(b=>b.public&&b.text.trim()).slice(0,3).map(b=>!!b.draftChanged), id: `r${k + 1}`, ...w, eyebrow: r.dates.trim() || "Role", title: r.title, meta: r.org.trim() || undefined,
           body: r.summary.trim() ? excerpt(r.summary, 220) : undefined, md: false,
           points: r.bullets.filter((b) => b.public && b.text.trim()).slice(0, 3).map((b) => b.text.trim()),
         };

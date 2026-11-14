@@ -4,7 +4,7 @@ import type { ContentOperation } from "./allowlist";
 /** Pure, immutable overlay. Callers supply only the owner-validated pending set. Never writes live data. */
 export function overlaySections(live: Record<SectionKey, Section>, operations: ContentOperation[]): Record<SectionKey, Section> {
   const sections = { ...live };
-  for (const operation of operations) sections[operation.key] = { ...sections[operation.key], ...operation.fields };
+  for (const operation of operations) if (operation.table === "site_sections") sections[operation.key] = { ...sections[operation.key], ...operation.fields };
   return sections;
 }
 

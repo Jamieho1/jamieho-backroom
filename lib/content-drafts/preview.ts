@@ -2,6 +2,8 @@ import { cookies, draftMode } from "next/headers";
 import { z } from "zod";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
+import { SELECT, type ExperienceRow } from "@/lib/experience";
+import { overlayExperience } from "./experience-overlay";
 import { validateOperations } from "./allowlist";
 import type { HomePreview } from "./types";
 
@@ -18,7 +20,13 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
   if (error || !data || data.status !== "draft" || !Array.isArray(data.photo_slots) || data.photo_slots.length !== 0) return null;
   const result = validateOperations(data.operations);
   if (!result.ok) return null;
-  return { id: data.id, summary: data.summary, operations: result.operations };
+  let experience:ExperienceRow[]|undefined;
+  if (result.operations.some(op=>op.table!=="site_sections")) {
+    const rows=await sb.from("experience_items").select(SELECT).order("sort");
+    if(rows.error)return null;
+    try {experience=overlayExperience((rows.data??[]) as ExperienceRow[],result.operations);} catch {return null;}
+  }
+  return { id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }
 
 /** Draft Mode is false at prerender time. Only its enabled branch reads request cookies/auth. */

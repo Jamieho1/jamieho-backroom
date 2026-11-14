@@ -1,10 +1,14 @@
-# Content drafts — TKT-98 / TKT-101
+# Content drafts — TKT-98 / TKT-101 / TKT-104
 
-First slice: pending owner changes for site_sections only. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
+Pending owner changes for site_sections, experience_items and experience_bullets. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
 ## Contract
 
-summary is plain text (1–500 characters). operations is a JSON array (1–100 on approval); each operation has op, table, key and fields. Only update/site_sections is supported. key must be a SECTION_KEYS value; fields may contain title (120 Unicode code points) and/or body (20,000). Empty strings clear fields. Unknown properties, non-text values and NUL are rejected. photo_slots must be empty to approve or preview; homepage preview is implemented, while uploads and other tables are later slices. Private content must never be put in fixtures or Git.
+summary is plain text (1–500 characters). operations is a JSON array (1–100 on approval); each operation has op, table, key and fields. site_sections permits updates only: key must be a SECTION_KEYS value; title allows 120 Unicode code points, body 20,000. Empty strings clear these fields.
+
+experience_items permits insert/update by explicit UUID key: kind, title, org, dates, location, summary, sort, public. experience_bullets permits insert/update/delete by UUID: item_id, text, sort, public. Item inserts require title; bullet inserts require text and an existing parent (or an item inserted earlier in the set). Other insert defaults match the tables, including public=false. Updates need at least one field; bullet deletes accept omitted/empty fields only. No item deletes.
+
+CV text follows the editor's UTF-16 limits: title/org 160, dates/location 80, summary 2,000, bullet text 1,000; text is trimmed, title/bullet text cannot be blank. kind uses the six existing values; sort is a signed 32-bit integer, public is boolean. Unknown fields/properties, wrong types and NUL fail. photo_slots must be empty; uploads and other tables remain later slices. Private content must never be put in fixtures or Git.
 
 lib/content-drafts/allowlist.ts defines field rules and affected routes; the migration mirrors them in SQL. Extend both and their parity tests for a future content type. Inserts/deletes are intentionally refused for fixed site sections, consistent with the PRD’s delete scope.
 
@@ -14,9 +18,9 @@ lib/content-drafts/allowlist.ts defines field rules and affected routes; the mig
 
 app/actions/content-drafts.ts verifies the owner, loads/validates the set and re-checks the session before submitting one conditional status update. The pending set and its operations must still match. This protects the proposal from a concurrent edit; it does not compare against or reject changed live content.
 
-That UPDATE locks the draft row and invokes private.apply_content_change(), a SECURITY DEFINER trigger with an empty search_path and no API EXECUTE grants. It independently checks the verified owner and validates the same allowlist. No public RPC or new secret is required; record_signin remains the sole public API-callable function. The trigger applies every operation, captures prior section values per operation, and fills previous, approved_at and approved_by (a historical UUID retained independently of account deletion) in the same transaction. Any exception rolls everything back. Inserts must start as draft; finalized sets cannot be reapproved or edited. RLS restricts all API table operations to the owner. Administrative draft insertion does not require pretending to be Jamie; administrative approval without his authenticated session is refused.
+That UPDATE locks the draft row and invokes private.apply_content_change(), a SECURITY DEFINER trigger with an empty search_path and no API EXECUTE grants. It independently checks the verified owner and validates the same allowlist. No public RPC or new secret is required; record_signin remains the sole public API-callable function. The trigger applies every operation, captures prior values per operation (complete experience rows; null for inserts), and fills previous, approved_at and approved_by (a historical UUID retained independently of account deletion) in the same transaction. Any exception rolls everything back. Inserts must start as draft; finalized sets cannot be reapproved or edited. RLS restricts all API table operations to the owner. Administrative draft insertion does not require pretending to be Jamie; administrative approval without his authenticated session is refused.
 
-Successful approval revalidates /, /journey, /about and /manage/review. Cache-refresh failures are reported separately from committed database writes. Discard updates status only and never changes site_sections or approval history. The encrypted export includes content_changes; it contains owner audit data, not new visitor tracking.
+Successful approval revalidates /, /journey, /about and /manage/review; experience operations also revalidate /behavioral. Cache-refresh failures are reported separately from committed database writes. Discard updates status only and never changes managed content or approval history. The encrypted export includes content_changes; it contains owner audit data, not new visitor tracking.
 
 ## State and verification
 
@@ -31,7 +35,7 @@ Claude follows the saved `site-content-drafts` skill: read the live rows and `li
 
 ## Homepage preview — TKT-101
 
-Preview on page opens / in the same tab after a successful owner-verified server action. loadOwnerPreview checks ownership, draft status and the TKT-98 allowlist; getHomePreview calls it only when Next Draft Mode is enabled and the httpOnly jb.content-preview UUID cookie exists. getSections applies the validated operations to a copy of current live sections. Other pages call the normal loader without preview context. No query-string enablement or caller-controlled redirect. Proposed contact links also feed existing homepage social bindings; currently unused section fields remain unused.
+Preview on page opens / in the same tab after a successful owner-verified server action. loadOwnerPreview checks ownership, draft status and the TKT-98 allowlist; getHomePreview calls it only when Next Draft Mode is enabled and the httpOnly jb.content-preview UUID cookie exists. getSections applies the validated operations to a copy of current live sections. Experience sets also offer Preview CV at /behavioral; the bottom bar links between the two views. Other routes use normal loaders. No query-string enablement or caller-controlled redirect. Proposed contact links also feed existing homepage social bindings; currently unused section fields remain unused.
 
 ContentPreviewBar shows the summary with Approve/Discard/Back to list. Mutations derive the set from verified server preview state, call the existing TKT-98 actions and exit only on success; failures keep preview open with an error. Normal browser navigation after cookie clearing avoids stale client router content. Invalid/finalized/missing sets fail closed to live content.
 
@@ -43,3 +47,12 @@ Verification: tests/unit/content-preview*.test.ts and sections.test.ts cover gua
 ## Owner review badge
 
 Shared top/floating navigation loads an exact pending-set count after the client viewer resolves to owner. The request-scoped count action checks the server session and existing table RLS; it returns no draft content. A positive count links to /manage/review in a compact gold pill. Zero/error/visitor/member/loading states render nothing. Account changes hide stale values immediately; navigation, visible-tab focus and successful review refresh the count. No public-page dynamic reads, policy changes or new migration.
+
+
+## Experience preview — TKT-104
+
+loadOwnerPreview fetches the complete owner CV snapshot only for experience sets, then experience-overlay.ts applies operations sequentially to cloned rows. Missing targets, duplicate inserts or absent parents refuse preview. Home filters public entries/bullets after overlay, before sending data to the client; hidden content is not serialized into its preview. Existing Home role/education/certificate bindings and display limits remain. /behavioral retains its normal access checks, displays the overlaid CV with changed entry/bullet outlines and disables editing only during preview. Normal editor behavior, including direct bullet deletion, remains unchanged by Jamie's explicit choice. Draft deletion occurs only on approval and retains the full old bullet in previous; existing foreign-key effects are preserved.
+
+Migration 20261114110327_content_drafts_experience.sql extends the private approval trigger with an owner-checked, non-API-callable helper. It is NOT applied live; Jamie's approval is required before application. No public RPC, RLS/grant or live content changes. TKT-98's applied migration stays unchanged.
+
+Coverage: tests/unit/experience-drafts.test.ts, tests/db/experience-drafts.test.ts and tests/e2e/experience-preview.spec.ts; the last runs with the same disposable adapter/dedicated configuration above. It covers Home/CV overlays, hidden filtering, read-only preview, full delete history, real approve/discard, cache bypass and visitor/member cookie isolation at desktop/390px. Current check totals and pending deployment are in status.md.

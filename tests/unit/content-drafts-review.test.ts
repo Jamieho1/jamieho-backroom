@@ -4,7 +4,7 @@ vi.mock('@/lib/viewer',()=>({getViewer:m.viewer}));vi.mock('@/lib/supabase/serve
 vi.mock('next/navigation',()=>({notFound:m.notFound}));
 import {loadContentReview} from '@/lib/content-drafts/review';
 beforeEach(()=>{vi.resetAllMocks();m.notFound.mockImplementation(()=>{throw Error('404')});m.viewer.mockResolvedValue({role:'owner',id:'owner'});m.server.mockResolvedValue({from:m.from});
- m.from.mockImplementation((table:string)=>({select:()=>table==='site_sections'?m.live():({eq:()=>({order:m.order})})}));
+ m.from.mockImplementation((table:string)=>({select:()=>table!=='content_changes'?m.live():({eq:()=>({order:m.order})})}));
  m.live.mockResolvedValue({data:[{key:'hero',title:'Current live title',body:'Current body'}],error:null});
  m.order.mockResolvedValue({data:[{id:'draft',summary:'Proposed edit',status:'draft',operations:[{op:'update',table:'site_sections',key:'hero',fields:{title:'Proposed title'}}],photo_slots:[],created_at:'2026-11-14'}],error:null});
 });

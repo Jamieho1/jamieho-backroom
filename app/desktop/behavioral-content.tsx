@@ -3,6 +3,9 @@ import { SELECT,fromRows } from '@/lib/experience';
 import { STORY_SELECT,type Story } from '@/lib/behavioral';
 import { ANSWER_SELECT,type Answer } from '@/lib/behavioral/answers';
 import { Behavioral } from '@/components/behavioral/workspace';
+import {getHomePreview} from "@/lib/content-drafts/preview";
+import {ContentPreviewBar} from "@/components/content-drafts/preview-bar";
+import "@/components/content-drafts/preview.css";
 export async function BehavioralContent({canEdit=false}:{canEdit?:boolean}={}){
  try{
   const sb=await supabaseServer();if(!sb)throw new Error('unavailable');
@@ -15,6 +18,8 @@ export async function BehavioralContent({canEdit=false}:{canEdit?:boolean}={}){
    sb.from('behavioral_answers').select(ANSWER_SELECT).order('question_id'),
   ]);
   if(cv.error||stories.error||answers.error)throw new Error('unavailable');
-  return <Behavioral items={fromRows(cv.data??[])} initialStories={(stories.data??[]) as Story[]} initialAnswers={(answers.data??[]) as Answer[]} canEdit={canEdit} />;
+  const candidate=await getHomePreview();
+  const preview=candidate?.experience ? candidate : null;
+  return <><Behavioral key={preview?.id??"live"} items={fromRows(preview?.experience??cv.data??[])} initialStories={(stories.data??[]) as Story[]} initialAnswers={(answers.data??[]) as Answer[]} canEdit={preview ? false : canEdit} />{preview ? <ContentPreviewBar summary={preview.summary} page="/behavioral" experience /> : null}</>;
  }catch{return <div className="desktop-placeholder"><p role="alert">Can&apos;t reach the data right now.</p><a href="/behavioral">Try again</a></div>;}
 }

@@ -14,6 +14,8 @@ export interface PanelLink {
 }
 
 export interface Panel {
+  draftChanged?: boolean;
+  draftPoints?: boolean[];
   id: string;
   /** Visible between these local scroll fractions (fades in/out over `fade`). */
   from: number;
