@@ -206,3 +206,17 @@ TKT-109 Mascot art (Jamie) ─────────────────�
 ```
 
 Parallel after TKT-108: 110 and 111. After both: 112, 113, 114 in parallel. TKT-115 needs 113 + 109. TKT-116 needs 112, 114, 115.
+
+## Interview (sidebar workspace) — 2026-11-14
+
+PRD: `Resources/Interview - PRD.md` (signed off 2026-11-14). Prompts: `Resources/Prompts - Interview.md`. Starts after Content Drafts TKT-107/108; Home v1.3 (TKT-110/111) now also waits for TKT-125. Supersedes TKT-100.
+
+Run strictly in order (shared files and migrations): **118 → 119 → 120 → 121 → 122 → 123 → 124 → 125**.
+
+```
+TKT-108 → TKT-118 Shell
+            ├─ TKT-119 Sections (DSA / System Design / LLD) → TKT-120 Per-user progress ─┐
+            ├─ TKT-121 Resume (per-user + template) ──────────────────────────────────┤
+            ├─ TKT-122 Behavioral Playbook ────────────────────────────────────────────┼─ TKT-124 Access → TKT-125 Gate → Home v1.3
+            └─ TKT-123 Feedback ───────────────────────────────────────────────────────┘
+```
