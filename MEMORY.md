@@ -140,3 +140,6 @@ Jamie explicitly selected the TKT-105 migration. Supabase MCP applied unchanged 
 
 ## 2026-11-14 — Interview planned
 Grilled, specced and ticketed the Interview sidebar workspace (Resources/Interview - PRD.md, TKT-118–125, prompts in Resources/Prompts - Interview.md). Runs after TKT-107/108 and before Home v1.3; supersedes TKT-100. Decisions: per-user progress/resume/behavioral answers, Jamie anonymised resume template, question-based Behavioral Playbook (TechPrep shape), Notes button switches mode, dark theme first.
+
+
+2026-11-14 — TKT-118: built additive dark Interview shell with section/topic/content columns, independent stored collapse states, coloured original SVGs, keyboard tooltips and accessible phone drawer/Topics controls. Generic Soon routes only; no private content/access migration. Added Interview navigation link; Resources now Guides-only, membership code/legacy routes retained. docs/interview.md plus reading map/architecture/security/status updated. Typecheck, 939 unit/DB tests, isolated production build/static assertions and 57 desktop/390px browser checks passed (3 viewport-specific skips). Fixed drawer Escape focus timing; final screenshots/diff checked. No migration/live change/dependency/commit/push/deployment; Jamie verifies live.

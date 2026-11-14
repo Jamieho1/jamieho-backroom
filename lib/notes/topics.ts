@@ -17,7 +17,7 @@ export const TOPICS = [
   { id: "dp-1d", label: "1-D DP", dot: "#C2410C" },
   { id: "dp-2d", label: "2-D DP", dot: "#B45309" },
   { id: "math-geometry", label: "Math & Geometry", dot: "#9EA096" },
-  { id: "class-design", label: "Class design / stateful", dot: "currentColor" },
+  { id: "class-design", label: "Class design / stateful", dot: "#38BDF8" },
 ] as const;
 
 export type TopicId = (typeof TOPICS)[number]["id"];

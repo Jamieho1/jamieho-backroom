@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 
-test("the retired desktop redirects to locked resource previews", async ({ page }) => {
+test("the retired desktop redirects to the Guides resource shelf", async ({ page }) => {
  await page.goto('/desktop'); await expect(page).toHaveURL(/\/resources$/);
  await expect(page.getByRole('heading',{name:'Resources',level:1})).toBeVisible();
- await expect(page.getByText('Sign in to unlock',{exact:true})).toHaveCount(3);
+ await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();
+ await expect(page.locator('.resource-preview')).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 

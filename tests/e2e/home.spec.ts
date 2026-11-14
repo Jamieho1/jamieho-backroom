@@ -7,12 +7,11 @@ test("retired About and desktop pages redirect without exposing the old screens"
   await page.goto("/desktop?app=notes"); await expect(page).toHaveURL(/\/notes$/);
 });
 
-test("resources show generic locked previews without signed-out content", async ({ page }) => {
+test("Resources shows only public Guides and old Notes stays gated", async ({ page }) => {
   await page.goto("/resources");
-  for (const name of ["Notes", "Practice", "Resume & Stories"]) await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
-  await expect(page.getByText("Sign in to unlock", { exact: true })).toHaveCount(3);
-  await expect(page.getByRole("link", { name: /^Open / })).toHaveCount(0);
-  for (const preview of await page.locator('.resource-preview').all()) expect(await preview.evaluate(el => getComputedStyle(el).filter)).toContain('blur');
+  await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();
+  for(const name of ['Notes','Practice','Resume & Stories','Member apps'])await expect(page.getByRole('heading',{name,exact:true})).toHaveCount(0);
+  await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);
   await page.goto('/notes'); await expect(page.getByText('Sign in to unlock', {exact:true})).toBeVisible();
   await expect(page.locator('.notes-layout')).toHaveCount(0);
 });
@@ -34,7 +33,7 @@ test("navigation controls remain available in the floating bar", async ({ page }
   await page.goto('/'); await page.locator('.is-journey summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
-  for(const name of ['Projects','Articles','Resources','Privacy']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
+  for(const name of ['Projects','Interview','Articles','Resources','Privacy']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
   await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

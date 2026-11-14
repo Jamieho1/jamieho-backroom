@@ -1,0 +1,40 @@
+import type {SVGProps} from 'react';
+import type {TopicId} from '@/lib/notes/topics';
+import type {InterviewSection} from '@/lib/interview/navigation';
+/** Original 24px line drawings, shared 1.7px rounded stroke; no external icon artwork. */
+const paths:Record<InterviewSection['id']|TopicId|'brand'|'menu'|'close'|'collapse'|'expand'|'feedback'|'back'|'account'|'topics',string>={
+ brand:'M8 5 3 12l5 7M16 5l5 7-5 7M14 4l-4 16',
+ dashboard:'M4 4h6v6H4ZM14 4h6v10h-6ZM4 14h6v6H4ZM14 18h6v2h-6Z',
+ dsa:'M4 5h5v5H4ZM15 5h5v5h-5ZM9 7h6M6.5 10v7h11v-7M10 15h4v5h-4Z',
+ 'system-design':'M3 4h6v5H3ZM15 4h6v5h-6ZM9 16h6v5H9ZM6 9v3h12V9M12 12v4',
+ 'low-level-design':'M4 4h16v16H4ZM4 9h16M4 14h16M8 6.5h3M8 11.5h7M8 16.5h5',
+ finance:'M4 20V10M10 20V6M16 20v-7M3 4l6 4 6-5 6 4M3 20h18',
+ 'ai-engineering':'M7 7h10v10H7ZM10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4M10 10h4v4h-4Z',
+ resume:'M6 3h9l4 4v14H6ZM14 3v5h5M9 12h7M9 16h7',
+ behavioral:'M4 4h16v12H9l-5 4ZM8 8h8M8 12h5',
+ companies:'M3 21h18M5 21V6l7-3v18M12 9h7v12M8 8v1M8 12v1M8 16v1M15 12h1M15 16h1',
+ roadmaps:'M5 4h5l4 5h5v11h-5l-4-5H5ZM5 4v11M10 4v11M14 9v11',
+ applications:'M8 5V3h8v2M4 5h16v16H4ZM8 10h1M12 10h5M8 15h1M12 15h5',
+ 'arrays-hashing':'M3 7h18v10H3ZM9 7v10M15 7v10M5.5 12h1M11.5 12h1M17.5 12h1',
+ 'two-pointers':'M3 12h18M7 4v5M4 6l3 3 3-3M17 20v-5M14 18l3-3 3 3',
+ stack:'M5 5h14v4H5ZM5 12h14M5 17h14M5 21h14',
+ 'binary-search':'M3 6h18M3 18h18M12 3v18M5 9l3 3-3 3M19 9l-3 3 3 3',
+ 'sliding-window':'M3 8h18v8H3ZM8 5h8v14H8M18 4l3 2-3 2',
+ 'linked-list':'M2 9h5v6H2ZM17 9h5v6h-5ZM7 12h10M13 9l4 3-4 3',
+ trees:'M10 3h4v4h-4ZM3 17h4v4H3ZM17 17h4v4h-4ZM12 7v5M5 17v-5h14v5',
+ tries:'M10 2h4v4h-4ZM3 10h4v4H3ZM17 10h4v4h-4ZM12 6v2M5 10V8h14v2M5 14v6M2 20h6M19 14v6M16 20h6',
+ backtracking:'M8 4H4v7h12a4 4 0 0 1 0 8h-4M8 7 4 11l4 4M12 16l-4 3 4 3',
+ heap:'M10 3h4v4h-4ZM3 12h4v4H3ZM17 12h4v4h-4ZM10 7l-4 5M14 7l4 5M3 16v5M7 16v5M17 16v5M21 16v5',
+ intervals:'M3 7h11M3 5v4M14 5v4M10 17h11M10 15v4M21 15v4M6 12h12',
+ greedy:'M3 20h18M5 20v-5h5v-5h5V5h5M16 3l4 2-1 4',
+ graphs:'M4 4h4v4H4ZM17 5h4v4h-4ZM9 17h4v4H9ZM8 6l9 1M6 8l5 9M19 9l-7 8',
+ 'advanced-graphs':'M3 3h4v4H3ZM17 3h4v4h-4ZM3 17h4v4H3ZM17 17h4v4h-4ZM7 5h10M5 7v10M19 7v10M7 19h10M7 7l10 10M17 7 7 17',
+ 'dp-1d':'M3 7h18v10H3ZM9 7v10M15 7v10M4 3h9l4 4',
+ 'dp-2d':'M4 4h16v16H4ZM4 10h16M4 15h16M10 4v16M15 4v16M6 7h1M12 12h1M17 17h1',
+ 'math-geometry':'M3 20 12 4l9 16ZM7 20v-4h4M12 4v16',
+ 'class-design':'M4 4h16v16H4ZM4 9h16M4 14h16M8 6.5h4M8 11.5h7M8 16.5h5',
+ menu:'M4 6h16M4 12h16M4 18h16',close:'m6 6 12 12M18 6 6 18',collapse:'m14 6-6 6 6 6',expand:'m10 6 6 6-6 6',
+ feedback:'M4 4h16v12H9l-5 4ZM12 7v4M12 13h.01',back:'M20 12H4M10 6l-6 6 6 6',account:'M9 3h6v6H9ZM4 21v-5l4-3h8l4 3v5Z',topics:'M4 5h3M10 5h10M4 12h3M10 12h10M4 19h3M10 19h10',
+};
+export type InterviewIconName=keyof typeof paths;
+export function InterviewIcon({name,...props}:{name:InterviewIconName}&SVGProps<SVGSVGElement>){return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" {...props}><path d={paths[name]}/></svg>;}

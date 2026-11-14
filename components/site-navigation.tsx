@@ -42,7 +42,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
           {items.map((item, k) => onJump ? <button type="button" key={item.id} ref={node => { if (navRefs) navRefs.current[k] = node; }} onClick={() => { onJump(item.id); closeMenu(); }}>{item.label}</button> : <Link key={item.id} prefetch={false} href={`${journey ? "" : "/"}#${item.id}`} onClick={closeMenu}>{item.label}</Link>)}
         </nav>
       </details>
-      <Link href="/projects">Projects</Link><Link href="/articles">Articles</Link><Link href="/resources">Resources</Link><Link href="/privacy">Privacy</Link>
+      <Link href="/projects">Projects</Link><Link href="/interview">Interview</Link><Link href="/articles">Articles</Link><Link href="/resources">Resources</Link><Link href="/privacy">Privacy</Link>
     </nav>
     <div className="site-navigation-account">
       <ContentReviewBadge />

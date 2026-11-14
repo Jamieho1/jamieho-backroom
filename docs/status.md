@@ -6,8 +6,8 @@ Updated 2026-11-14. Jamie pushes and verifies production.
 - About photos: the three about-*.jpg files are in the home-media bucket (verified 2026-11-14), so the deployed About strip has its images.
 
 - Home journey is /. /journey redirects home; retired /about redirects to /#pivot, /desktop to /resources. Legacy desktop app queries redirect to canonical app routes.
-- Shared arrival/floating/app navigation: Journey dropdown, Projects, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. Privacy/Projects/Articles/Notes/Practice/Resume & Stories use plain pages; only Settings retains window controls. Owner Settings/edit controls are available there.
-- Resources lists Notes (/notes), Practice (/practices) and Resume & Stories (/behavioral). Locked previews contain generic blurred placeholders only. Existing server-filtered discovery and server/RLS checks determine unlocks; missing access gets a membership gate. Payment integration is not implemented.
+- Shared arrival/floating/app navigation: Journey dropdown, Projects, Interview, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. Privacy/Projects/Articles/Notes/Practice/Resume & Stories use plain pages; only Settings retains window controls. Owner Settings/edit controls are available there.
+- Resources now lists only public Guides (TKT-118). Interview is an additive placeholder shell at /interview. Notes (/notes), Practice (/practices) and Resume & Stories (/behavioral) retain existing server/RLS access checks; membership-gate components remain available for future courses. Payment integration is not implemented.
 - Hero uses matching generated 1920×1080 day/night landscapes with extended sky and aligned larger characters. Yellow/white editable heading sits above them; existing phone portraits remain. No CSS colour grading/pale halo. Welcome/name sit closer to the characters; compact tagline and social buttons are raised toward the lower cloud bank over a soft local scrim; the large glass card is removed. Schedule a call remains disabled.
 - Reading cards behind About/Projects/Experience/Creator copy retain geometry. About keeps its original smaller heading, full-opacity paragraph and untruncated phone text; grade omitted only from journey display.
 - Contact Us ending removes desk copy/page-opening CTA. Monitor holds social logos and the existing contact form/action; static fallback included. Contact anchors navigate to the form.
@@ -171,3 +171,19 @@ Changed files:
 
 
 TKT-107 live application (2026-11-14): Supabase MCP applied the unchanged tested SQL as remote 20261114220519. Both function source hashes match local SQL; SECURITY DEFINER, empty search_path and revoked anon/authenticated/service_role EXECUTE verified. content_changes/projects/Storage RLS remains enabled, owner draft and project-media policies unchanged, and record_signin is still the sole API-callable public function. project-media stays public-read, owner-write, 5 MB, PNG/JPG/WebP. All 13 content/draft table fingerprints and project-media object metadata/count matched before/after; no test records, uploads or approvals created. Security advisors show no new finding; existing record_signin/password-protection warnings remain. Docs/MEMORY and git diff --check updated; no application tests rerun for this unchanged migration/documentation step. Frontend deployment and Jamie’s live verification remain pending.
+
+
+## TKT-118 — Interview shell (2026-11-14)
+
+Implemented locally: dark-only three-column /interview layout with no site top bar; grouped section rail, original coloured line SVGs, DSA/LLD topic taxonomy and Soon placeholder routes. Independent browser-persisted rail/topics collapse, keyboard/hover tooltips, responsive modal drawer with focus trap/Escape return, Topics dropdown and reduced-motion support. DSA Notes/Practice mode links preserve topic; real content/access changes remain later tickets. Class-design now uses a real topic colour.
+
+Shared top/floating navigation includes Interview between Projects and Articles. Resources shows Guides only; membership components are retained. Canonical Notes/Practice/Behavioral routes and their permissions/editors remain unchanged. New interview.md documents structure/routes/icons/preferences and is linked in docs/README.md. No migration, dependency, live data, production visit, commit, push or deployment; Jamie must deploy and verify live before Done.
+
+Checks actually run: npm run typecheck passed; final full unit/database suite passed (939 tests / 95 files, maxWorkers=2); isolated credential-free production build and unchanged static assertions passed for /, /resources, /privacy, /projects and /articles. Interview/Home/desktop/smoke browser checks: final 57 passed, 3 intentional viewport-specific skips across desktop and 390px. Coverage includes persistence, tooltips/focus, drawer trapping/Escape, phone preference overrides, topic links, Guides-only Resources, top/floating navigation and existing gated routes. An initial test selector matched two heading levels; fixed. Browser testing found Escape focus restoration attempted before the inert background cleared; fixed and the complete set passed. Desktop/phone screenshots inspected; no sideways overflow. git diff --check passed.
+
+Changed files:
+- app/interview/layout.tsx, page.tsx, interview.css, [section]/page.tsx, [section]/[mode]/[[...topic]]/page.tsx
+- components/interview/{shell,icons,placeholder}.tsx; lib/interview/navigation.ts; lib/notes/topics.ts
+- components/site-header.tsx, site-navigation.tsx; app/resources/page.tsx
+- tests/unit/interview.test.tsx; tests/e2e/interview.spec.ts, home.spec.ts, desktop.spec.ts
+- docs/interview.md, README.md, architecture.md, security.md, status.md; MEMORY.md
