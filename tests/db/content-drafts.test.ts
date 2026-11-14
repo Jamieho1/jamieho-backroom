@@ -125,7 +125,7 @@ it("the SQL owner guard refuses administrative approval without a signed-in owne
   expect((await db.query<{status:string}>("select status from public.content_changes where id=$1",[seeded])).rows[0].status).toBe('draft');
 });
 it("an absent second target rolls the first update back, including its timestamp", async () => {
-  const removed=(await db.query("delete from public.site_sections where key='about' returning *")).rows[0];
+  const removed=(await db.query<{key:string;title:string;body:string;sort:number;updated_at:string}>("delete from public.site_sections where key='about' returning *")).rows[0];
   try {
     await as(db, owner, async q => {
       const before=await q("select title,updated_at from public.site_sections where key='hero'");

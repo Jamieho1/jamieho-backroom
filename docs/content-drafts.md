@@ -20,6 +20,10 @@ Successful approval revalidates /, /journey, /about and /manage/review. Cache-re
 
 ## State and verification
 
-Migration: 20261114020933_content_changes.sql — NOT applied live. Jamie must explicitly say “apply it” before live application. Code requires this migration before deployment; no live test data was created.
+Migration: 20261114020933_content_changes.sql — applied live through Supabase MCP on 2026-11-14 after Jamie said “apply it”. Remote version: 20261114101016 (content_changes); MCP timestamps differ from local filenames, so retain the applied local file unchanged. Verified live RLS/owner policy, table/function grants, hardened trigger, no new public RPC and unchanged site_sections fingerprint. No live test data was created. Frontend deployment and Jamie’s live review remain pending.
 
 Policy/transaction tests use disposable PGlite; browser owner fixtures exercise the same SQL engine. An additional real Next build was tested against a loopback Supabase HTTP adapter backed by PGlite: owner session, review before/after, real server-action approval, history, homepage refresh without rebuilding, discard and visitor 404 passed. No production browser or live Supabase was used.
+
+## How Claude drafts (TKT-103)
+
+Claude follows the saved `site-content-drafts` skill: read the live rows and `lib/content-drafts/allowlist.ts`; insert one `content_changes` row per request (summary + operations only, status left as draft); never write live tables, set status, or fill approval fields; reply with a one-line summary and the `/manage/review` link; after Jamie approves, read back the set and the live row. Requests for tables or operations not yet in the allowlist are declined with the ticket that adds them. To reverse an approved set, Claude drafts a new set from its `previous` values. Photo slots (TKT-107): Claude renames Jamie's attached photos to the slot filename and saves them in `Personal Website/Media/Uploads/<YYYY-MM-DD>-<short-name>/`, outside Git.

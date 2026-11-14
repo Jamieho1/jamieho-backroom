@@ -95,3 +95,7 @@ Generated the requested landscape, transparent walking mascot and portrait still
 
 ## 2026-11-14 — TKT-98 content drafts
 Built the site_sections-only review/approve/discard slice at /manage/review. Private owner-checked SQL trigger applies the whole set atomically without exposing a new RPC; TypeScript and SQL allowlists reject unsupported operations and fields. Existing editors/rendering/navigation untouched. Migration 20261114020933_content_changes.sql NOT applied live; wait for Jamie’s explicit “apply it”. No live data, secrets, dependencies, commit or push. Passed: typecheck, all 604 unit/database tests, isolated production build/static assertions and 4 desktop/phone review browser checks. Additional real Next/PGlite approval→homepage ISR, discard, audit, visitor 404 and private/no-store headers verified; temporary servers stopped. Scope/contract and file inventory are in docs/content-drafts.md and docs/status.md. Pending explicit live migration approval and Jamie’s later live verification.
+
+
+## 2026-11-14 — TKT-98 migration applied live
+Jamie explicitly said “apply it”. Applied local 20261114020933_content_changes.sql through Supabase MCP as remote 20261114101016 (content_changes). Verified RLS, owner policy, denied anon CRUD/private function execution, export-only service role, trigger hardening and record_signin-only public RPCs. No draft rows created; site_sections fingerprint unchanged. No new feature-related advisor findings. Docs updated; frontend deployment and Jamie’s live verification still pending. No commit/push.
