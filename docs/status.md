@@ -134,7 +134,7 @@ Implemented locally: strict editor-derived draft fields for notes, question_note
 
 Owner-only gold previews work on Notes, Practice/problem routes and Resume & Stories, including changed-entry selection and read-only controls. Practice preview bypasses live async replacement, disables execution/saves and leaves browser code untouched. Members with app access and visitors cannot see draft values with copied owner cookies. Approval refreshes affected app/problem routes.
 
-Migration **20261114151936_content_drafts_apps.sql — NOT applied live**. No production data, secret, dependency, commit, push or deployment change. Jamie must approve migration application, deploy and verify live before the ticket is Done.
+Migration **20261114151936_content_drafts_apps.sql — applied live with Jamie’s explicit approval on 2026-11-14**, remote version 20261114155720 (content_drafts_apps). No content, secret, dependency, commit, push or frontend deployment change. Jamie’s frontend deployment/live verification remains pending before the ticket is Done.
 
 Checks actually run: npm run typecheck passed; full unit/database suite 908 tests / 91 files passed (maxWorkers=2); final isolated production build and unchanged static assertions passed for /, /resources, /privacy, /projects and /articles. Real Next/PGlite preview integration: 36 passed at desktop/390px, including previous ticket regressions; existing Notes/Practice/Behavioral UI checks: 28 passed. A test-only unsupported locator option initially failed typechecking; corrected and final typecheck/build plus its 7 focused unit tests passed. Initial browser selector mismatch corrected before the complete successful run. Local phone preview screenshot inspected. git diff --check passed. Tests use synthetic data and local headless Chromium only; no live website/Supabase access.
 
@@ -146,4 +146,25 @@ Changed files:
 - lib/notes.ts, lib/behavioral.ts, lib/behavioral/answers.ts (optional preview markers only)
 - tests/db/app-drafts.test.ts; tests/unit/app-drafts.test.ts; tests/e2e/app-preview.spec.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
 - tests/unit/{app-routes,notes-content,practice-owner-ui}.test.tsx; tests/unit/{content-drafts-actions,content-preview}.test.ts
+- docs/content-drafts.md, architecture.md, security.md, status.md; MEMORY.md
+
+
+TKT-106 live verification (2026-11-14): Supabase MCP applied the unchanged tested SQL as remote 20261114155720. All three function source hashes match local SQL; empty search_path and revoked anon/authenticated/service_role EXECUTE confirmed. RLS remains enabled on six app tables and content_changes; owner-only draft policy retained. record_signin is still the only API-callable public function. Catalogue validator accepts the 145 code IDs and rejects unknown IDs. Before/after fingerprints and counts matched across all 13 app/content/draft tables; no test rows or content approvals were created. Security advisors show no new finding; existing record_signin/password-protection warnings remain. Documentation and git diff --check updated; no browser visit, commit, push or frontend deployment. No application tests rerun for this unchanged migration/documentation step; prior test results above remain the implementation evidence.
+
+
+## TKT-107 — photo slots (2026-11-14)
+
+Implemented locally: strict caption/filename/bucket/target/path slots for project-media → projects.screenshots; drag-and-drop/choose upload in review and preview bar using makeUploader and existing file rules. Unique draft folders, exact filenames, owner/session/Storage metadata checks and compare-and-set path recording. Missing slots disable Approve; filled slots overlay existing project previews. SQL independently verifies uploaded object ownership/type/size and atomically appends screenshot URLs after ordinary operations, retaining full previous rows. Photo-only sets are supported; late failures roll back everything. Bucket policies/editors/card designs/public static rendering unchanged. Existing public bucket URLs remain directly readable if known, but unapproved objects never appear on public pages.
+
+Migration **20261114161231_content_drafts_photos.sql — NOT applied live**. No production uploads/data, secrets, dependency, commit, push or deployment changes. Await Jamie’s migration approval, deployment and live verification before Done.
+
+Checks actually run: npm run typecheck passed; full unit/database suite passed (934 tests / 94 files, maxWorkers=2); final isolated production build and unchanged static assertions passed. Final real Next/PGlite/Storage preview suite: 40 passed across desktop/390px, including uploaded-slot approval/discard, wrong files, exact filenames and visitor/member isolation. Existing Projects/Articles/review browser regressions: 29 passed, one existing skip. An old component-only review fixture initially bundled the new server action; its mock was updated and the entire regression set passed. After the final cache-refresh handling change, the four owner-upload action tests passed again. Phone inspection prompted a filename contrast correction; full preview browser checks passed afterward. git diff --check passed. All data/media are synthetic and services/browser checks local; no live website or Supabase access for this ticket.
+
+Changed files:
+- supabase/migrations/20261114161231_content_drafts_photos.sql
+- lib/content-drafts/{photo-slots,photo-server,preview,review,types}.ts
+- app/actions/{content-photo,content-drafts}.ts; app/page.tsx (preview props only)
+- components/content-drafts/{photo-slots,review-list,preview-bar,page-preview}.tsx; preview.css
+- tests/unit/{photo-slots,content-photo-actions}.test.ts; tests/db/{photo-drafts.test,content-drafts.test,harness}.ts; tests/e2e/{photo-preview,content-drafts}.spec.ts
+- tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs and storage-bootstrap.sql
 - docs/content-drafts.md, architecture.md, security.md, status.md; MEMORY.md

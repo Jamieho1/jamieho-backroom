@@ -4,7 +4,7 @@ import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SELECT, type ExperienceRow } from "@/lib/experience";
 import { overlayExperience } from "./experience-overlay";
-import { validateOperations } from "./allowlist";
+import {parsePhotoSet,withPhotoOperations} from "./photo-server";
 import {loadAppPreview,appTargets} from "./app-overlay";
 import {loadPublishingPreview,publishingTargets} from "./publishing-overlay";
 import type { HomePreview } from "./types";
@@ -19,9 +19,9 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
   if (!sb) return null;
   const { data, error } = await sb.from("content_changes").select("id, summary, status, operations, photo_slots, created_at")
     .eq("id", id).eq("status", "draft").maybeSingle();
-  if (error || !data || data.status !== "draft" || !Array.isArray(data.photo_slots) || data.photo_slots.length !== 0) return null;
-  const result = validateOperations(data.operations);
-  if (!result.ok) return null;
+  if (error || !data || data.status !== "draft") return null;
+  let result,photoSlots;
+  try {const parsed=parsePhotoSet(data.operations,data.photo_slots,id);photoSlots=parsed.slots;result={operations:await withPhotoOperations(sb,parsed.operations,photoSlots)};}catch{return null;}
   let experience:ExperienceRow[]|undefined;
   if (result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets")) {
     const rows=await sb.from("experience_items").select(SELECT).order("sort");
@@ -31,7 +31,7 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
   let publishing,appData;
   try {publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations);} catch {return null;}
   const targets=[...publishingTargets(result.operations),...appTargets(result.operations)];
-  return { ...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
+  return { ...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }
 
 /** Draft Mode is false at prerender time. Only its enabled branch reads request cookies/auth. */

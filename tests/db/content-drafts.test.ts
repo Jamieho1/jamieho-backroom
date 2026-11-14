@@ -105,8 +105,8 @@ describe("transactional approval", () => {
     await expect(as(db, owner, q => q("update public.content_changes set status='approved', operations='[]' where id=$1",[seeded]))).rejects.toThrow(/Save draft edits/);
     await expect(as(db, owner, q => q("update public.content_changes set approved_by=$1 where id=$2",[memberUser.id,seeded]))).rejects.toThrow(/metadata/);
   });
-  it("rejects unsupported photo slots and empty operation sets", async () => {
-    await expect(as(db, owner, async q => { await q("update public.content_changes set photo_slots='[{}]' where id=$1",[seeded]); await q("update public.content_changes set status='approved' where id=$1",[seeded]); })).rejects.toThrow(/Photo slots/);
+  it("rejects malformed photo slots and empty operation sets", async () => {
+    await expect(as(db, owner, async q => { await q("update public.content_changes set photo_slots='[{}]' where id=$1",[seeded]); await q("update public.content_changes set status='approved' where id=$1",[seeded]); })).rejects.toThrow(/photo slot/i);
     await expect(as(db, owner, async q => { await q("update public.content_changes set operations='[]' where id=$1",[seeded]); await q("update public.content_changes set status='approved' where id=$1",[seeded]); })).rejects.toThrow(/between 1 and 100/);
   });
   it("preserves intermediate previous values for repeated edits to the same section", async () => {

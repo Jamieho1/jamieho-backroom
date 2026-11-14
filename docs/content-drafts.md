@@ -1,14 +1,14 @@
-# Content drafts — TKT-98 through TKT-106
+# Content drafts — TKT-98 through TKT-107
 
 Pending owner changes for site_sections, experience_items, experience_bullets, projects, articles, guides and the six app tables listed below. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
 ## Contract
 
-summary is plain text (1–500 characters). operations is a JSON array (1–100 on approval); each operation has op, table, key and fields. site_sections permits updates only: key must be a SECTION_KEYS value; title allows 120 Unicode code points, body 20,000. Empty strings clear these fields.
+summary is plain text (1–500 characters). operations is a JSON array (up to 100; empty only for a valid photo-only set); each operation has op, table, key and fields. site_sections permits updates only: key must be a SECTION_KEYS value; title allows 120 Unicode code points, body 20,000. Empty strings clear these fields.
 
 experience_items permits insert/update by explicit UUID key: kind, title, org, dates, location, summary, sort, public. experience_bullets permits insert/update/delete by UUID: item_id, text, sort, public. Item inserts require title; bullet inserts require text and an existing parent (or an item inserted earlier in the set). Other insert defaults match the tables, including public=false. Updates need at least one field; bullet deletes accept omitted/empty fields only. No item deletes.
 
-CV text follows the editor's UTF-16 limits: title/org 160, dates/location 80, summary 2,000, bullet text 1,000; text is trimmed, title/bullet text cannot be blank. kind uses the six existing values; sort is a signed 32-bit integer, public is boolean. Unknown fields/properties, wrong types and NUL fail. photo_slots must be empty; publishing records follow the contract below; uploads and other tables remain later slices. Private content must never be put in fixtures or Git.
+CV text follows the editor's UTF-16 limits: title/org 160, dates/location 80, summary 2,000, bullet text 1,000; text is trimmed, title/bullet text cannot be blank. kind uses the six existing values; sort is a signed 32-bit integer, public is boolean. Unknown fields/properties, wrong types and NUL fail. photo_slots follows the TKT-107 contract below; publishing records follow their contract below; unsupported upload targets remain later slices. Private content must never be put in fixtures or Git.
 
 lib/content-drafts/allowlist.ts defines field rules and affected routes; the migration mirrors them in SQL. Extend both and their parity tests for a future content type. Inserts/deletes are intentionally refused for fixed site sections, consistent with the PRD’s delete scope.
 
@@ -94,4 +94,19 @@ Practice keys must be existing numeric catalogue IDs; behavioral answer keys mus
 
 Review compares current/proposed app values and supplies validated app/problem preview destinations. /notes, /practices and /practices/[problem], /behavioral keep normal access checks and apply overlays only after owner verification. Changed content is gold outlined; changed note/story/answer/problem is initially selected. Preview editors are read-only. Practice loads the full owner note/code/star snapshot, bypasses async live replacement, disables execution/saves and never stores proposed code in browser storage. Approval refreshes affected app routes and exact practice problem paths. Normal editors and shared live reads remain unchanged.
 
-Migration 20261114151936_content_drafts_apps.sql is **NOT applied live**. It adds hardened private helpers and extends the approval trigger; no new public RPC or table grants/policies. Code-catalogue changes must update the SQL identifier validation in a new migration; parity tests enforce this. Deployment and Jamie’s live verification remain pending. App unit/DB tests and app-preview.spec.ts use synthetic data and the disposable loopback adapter only.
+Migration 20261114151936_content_drafts_apps.sql was **applied live with Jamie’s explicit approval on 2026-11-14**, remote version 20261114155720 (content_drafts_apps). It adds hardened private helpers and extends the approval trigger; no new public RPC or table grants/policies. Code-catalogue changes must update the SQL identifier validation in a new migration; parity tests enforce this. Deployment and Jamie’s live verification remain pending. App unit/DB tests and app-preview.spec.ts use synthetic data and the disposable loopback adapter only.
+
+Live TKT-106 verification: all three function bodies exactly match tested local SQL; empty search_path/revoked API execution, enabled RLS and sole public record_signin execution confirmed. Catalogue validation passed. All 13 content/app/draft fingerprints matched before/after; no live test rows or content approvals. Security advisors report no new finding.
+
+
+## Photo slots — TKT-107
+
+Each slot has slot, expected_filename, bucket, target {table,key,field}, caption and path (object key or null). This slice supports project-media → projects.screenshots only; other buckets/fields are rejected. At most six slots, unique slot names and canonical lowercase PNG/JPG/WebP filenames (basename up to 60 characters). A photo-only set may have no ordinary operations; a completely empty set remains invalid.
+
+Review and preview bar both show captions, exact filenames and accessible choose/drop upload controls. The existing makeUploader(bucket), imageProblem and 5 MB rules are reused; GIF is rejected to match the existing project-media bucket. Files must have the exact expected name. Uploads use drafts/<set UUID>/<slot>/<filename>, never the live project's slug folder. saveContentPhoto verifies owner/session, slot identity and Storage metadata, then compares-and-sets pending photo_slots. It changes no live content. Refreshing the preview applies filled slots and leaves missing slots uploadable; Approve stays disabled until every path is present.
+
+Approval independently checks all paths, file ownership, Storage metadata/type/size and target constraints in SQL. After ordinary operations, it appends slot URLs in slot order, retaining existing screenshots, enforcing the six-image limit and auditing complete previous project rows. Any late failure rolls back all content/status/history. TypeScript previews compose the same post-operation screenshot values. Approval compares both operations and photo_slots and invalidates aggregate plus audited slug routes.
+
+The canonical project-media public URL prefix is shared in photo-slots.ts and SQL for this site's Supabase project; changing the Storage deployment requires updating both through a new migration. Existing public-read bucket/owner-only write policies are unchanged. Unapproved objects are unlinked from public pages; a known public-bucket URL remains directly readable. Discard leaves uploads unlinked rather than deleting Storage objects. No private photos enter Git.
+
+Migration 20261114161231_content_drafts_photos.sql is NOT applied live. It adds private.apply_draft_photos and extends the existing approval trigger; no public RPC or bucket/policy changes. Local tests use synthetic photos, a minimal disposable Storage catalogue with the real migrated RLS policies, and the existing loopback API/browser harness. Frontend deployment and Jamie's live verification remain pending.

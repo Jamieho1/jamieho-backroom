@@ -19,6 +19,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   const db = new PGlite();
   const bootstrap = fs.readFileSync(path.join(root, 'tests/db/harness.ts'), 'utf8').match(/const BOOTSTRAP = `([\s\S]*?)`;/)[1];
   await db.exec(bootstrap);
+  await db.exec(fs.readFileSync(path.join(root,"tests/support/storage-bootstrap.sql"),"utf8"));
   for (const file of fs.readdirSync(path.join(root, 'supabase/migrations')).filter(f => f.endsWith('.sql')).sort()) await db.exec(fs.readFileSync(path.join(root, 'supabase/migrations', file), 'utf8'));
   await db.query("insert into private.settings(key,value) values ('owner_email',$1)", [users.owner.email]);
   for (const user of Object.values(users)) await db.query('insert into auth.users(id,email,email_confirmed_at) values ($1,$2,now())', [user.id,user.email]);
@@ -31,12 +32,12 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   const server = http.createServer(async (req,res) => {
     if (/^http:\/\/127\.0\.0\.1:\d+$/.test(req.headers.origin || '')) {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-      res.setHeader('Access-Control-Allow-Headers','authorization, apikey, x-client-info, content-type, prefer, range, x-supabase-api-version');
+      res.setHeader('Access-Control-Allow-Headers','authorization, apikey, x-client-info, content-type, prefer, range, x-supabase-api-version, x-upsert');
       res.setHeader('Access-Control-Allow-Methods','GET,HEAD,PATCH,POST,OPTIONS');
       res.setHeader('Access-Control-Expose-Headers','Content-Range');
     }
     if(req.method==='OPTIONS'){res.writeHead(204);return res.end();}
-    let body=''; for await (const chunk of req) body+=chunk;
+    const chunks=[]; for await(const chunk of req)chunks.push(chunk); const rawBody=Buffer.concat(chunks);const body=rawBody.toString('utf8');
     const url = new URL(req.url, `http://127.0.0.1:${port}`);
     try {
       if (url.pathname === '/__session') {
@@ -45,7 +46,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         return send(res,200,{ cookie: {name:'sb-127-auth-token',value:'base64-'+Buffer.from(JSON.stringify(session)).toString('base64url')} });
       }
       if (url.pathname === '/__seed' && req.method === 'POST') {
-        const proposal=JSON.parse(body); const r=await db.query('insert into public.content_changes(summary,operations) values ($1,$2) returning id',[proposal.summary,JSON.stringify(proposal.operations)]);
+        const proposal=JSON.parse(body); const r=await db.query('insert into public.content_changes(summary,operations,photo_slots) values ($1,$2,$3) returning id',[proposal.summary,JSON.stringify(proposal.operations),JSON.stringify(proposal.photo_slots??[])]);
         return send(res,200,r.rows[0]);
       }
       if (url.pathname === '/__experience_seed' && req.method === 'POST') {
@@ -70,8 +71,24 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await db.exec("insert into public.behavioral_stories(id,title,situation) values ('00000000-0000-4000-8000-000000000903','Live fixture story','Live fixture situation'); insert into public.behavioral_answers(question_id,outline) values ('g-intro','Live fixture outline')");
         return send(res,200,{ok:true});
       }
-      if (url.pathname === '/__state') return send(res,200,{ app:Object.fromEntries(await Promise.all(['notes','question_notes','practice_code','practice_stars','behavioral_stories','behavioral_answers'].map(async table=>[table,(await db.query('select * from public.'+table)).rows]))),projects:(await db.query('select * from public.projects')).rows,articles:(await db.query('select * from public.articles')).rows,guides:(await db.query('select * from public.guides')).rows,sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
+      if (url.pathname === '/__state') return send(res,200,{ app:Object.fromEntries(await Promise.all(['notes','question_notes','practice_code','practice_stars','behavioral_stories','behavioral_answers'].map(async table=>[table,(await db.query('select * from public.'+table)).rows]))),projects:(await db.query('select * from public.projects')).rows,articles:(await db.query('select * from public.articles')).rows,guides:(await db.query('select * from public.guides')).rows,sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by,photo_slots from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
       const session=Object.values(sessions).find(s=>req.headers.authorization==='Bearer '+s.access_token);
+      if(url.pathname.startsWith('/storage/v1/object/')){
+        if(!session)return send(res,403,{message:'Owner session required'});
+        const info=url.pathname.startsWith('/storage/v1/object/info/');
+        const objectName=decodeURIComponent(url.pathname.slice(info?'/storage/v1/object/info/'.length:'/storage/v1/object/'.length));
+        const [bucket,...parts]=objectName.split('/');const name=parts.join('/');
+        const result=await db.transaction(async tx=>{
+          await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session.user.id,role:'authenticated'})]);await tx.exec('set local role authenticated');
+          if(info){const rows=(await tx.query('select * from storage.objects where bucket_id=$1 and name=$2',[bucket,name])).rows;if(!rows.length)throw Error('Object not found');const row=rows[0];return {id:row.id,name:row.name,bucket_id:row.bucket_id,size:row.metadata.size,content_type:row.metadata.mimetype};}
+          if(req.method!=='POST')throw Error('Unsupported storage request');
+          const request=new Request('http://127.0.0.1/storage',{method:'POST',headers:{'content-type':req.headers['content-type']},body:rawBody});
+          const form=await request.formData();const file=[...form.values()].find(value=>typeof value!=='string');
+          if(!file||!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5242880)throw Error('Invalid file type or size');
+          const rows=(await tx.query('insert into storage.objects(bucket_id,name,owner_id,metadata) values ($1,$2,$3,$4) on conflict(bucket_id,name) do update set metadata=excluded.metadata returning id',[bucket,name,session.user.id,JSON.stringify({mimetype:file.type,size:file.size})])).rows;
+          return {Key:objectName,Id:rows[0].id};
+        });return send(res,200,result);
+      }
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
@@ -81,14 +98,14 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table==='content_changes'?['id','status','operations']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem']:table==='behavioral_answers'?['question_id']:['id'])) {
+        for (const col of (table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem']:table==='behavioral_answers'?['question_id']:['id'])) {
           const value=url.searchParams.get(col);
-          if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(col==='operations'?'::jsonb':'')); }
+          if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(['operations','photo_slots'].includes(col)?'::jsonb':'')); }
         }
         const clause=where.length?' where '+where.join(' and '):'';
         if (req.method==='PATCH' && table==='content_changes') {
-          const patch=JSON.parse(body); if (Object.keys(patch).join(',')!=='status') throw Error('Test adapter accepts status changes only');
-          params.push(patch.status);return (await tx.query('update public.content_changes set status=$'+params.length+clause+' returning *',params)).rows;
+          const patch=JSON.parse(body); if (!['status','photo_slots'].includes(Object.keys(patch).join(','))) throw Error('Test adapter accepts status changes only');
+          const field=Object.keys(patch)[0];params.push(field==='photo_slots'?JSON.stringify(patch[field]):patch[field]);return (await tx.query('update public.content_changes set '+field+'=$'+params.length+(field==='photo_slots'?'::jsonb':'')+clause+' returning *',params)).rows;
         }
         if (req.method!=='GET' && req.method!=='HEAD') throw Error('Unsupported local request');
         if (table==='experience_items' && url.searchParams.get('select')?.includes('experience_bullets(')) {

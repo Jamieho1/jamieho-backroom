@@ -11,3 +11,12 @@
 @media (max-width: 768px) { .content-preview-bar { padding: 12px; gap: 8px; } .content-preview-bar > p { flex-basis: 100%; } }
 
 .content-preview-actions a {color: #f2b45c; align-self: center; font-size:14px;}
+
+.draft-photo-slots {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;width:100%;min-width:0;}
+.draft-photo-slot {border:1px dashed var(--cta-face,#f2b45c);border-radius:10px;padding:12px;min-width:0;}
+.draft-photo-slot p {margin:0 0 8px;}
+.draft-photo-slot code {display:block;overflow-wrap:anywhere;margin-bottom:8px;background:transparent;color:inherit;font-weight:600;}
+.draft-photo-slot img {display:block;max-width:100%;max-height:130px;object-fit:contain;margin-bottom:8px;}
+
+.draft-photo-slot button {min-height:36px;padding:6px 12px;border:1px solid currentColor;border-radius:7px;background:transparent;color:inherit;font:inherit;cursor:pointer;}
+.draft-photo-slot button:disabled {opacity:.65;cursor:wait;}

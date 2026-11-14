@@ -4,7 +4,9 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
-import { affectedRoutes, validateOperations } from "@/lib/content-drafts/allowlist";
+import {slotsComplete} from "@/lib/content-drafts/photo-slots";
+import {parsePhotoSet,withPhotoOperations,checkSlotObject} from "@/lib/content-drafts/photo-server";
+import { affectedRoutes } from "@/lib/content-drafts/allowlist";
 import {loadAppPreview} from "@/lib/content-drafts/app-overlay";
 import {loadPublishingPreview} from "@/lib/content-drafts/publishing-overlay";
 import type { ContentChange, DraftResult } from "@/lib/content-drafts/types";
@@ -24,15 +26,19 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     if (loaded.error) return { ok: false, message: "Could not load this change set. Try again." };
     const set = loaded.data as ContentChange | null;
     if (!set || set.status !== "draft") return { ok: false, message: "This change set is missing or already reviewed." };
-    const result = validateOperations(set.operations);
-    if (!result.ok) return result;
-    if (!Array.isArray(set.photo_slots) || set.photo_slots.length !== 0) return { ok: false, message: "Photo slots are not supported in this slice." };
+    let result:{operations:import("@/lib/content-drafts/allowlist").ContentOperation[]};
+    try {
+      const parsed=parsePhotoSet(set.operations,set.photo_slots,id);
+      if(!slotsComplete(parsed.slots))return {ok:false,message:"Upload every expected photo before approving."};
+      for(const slot of parsed.slots)await checkSlotObject(sb,slot);
+      result={operations:await withPhotoOperations(sb,parsed.operations,parsed.slots)};
+    }catch(error){return {ok:false,message:error instanceof Error?error.message:"Invalid photo draft."};}
     try { await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
     // Re-check the verified session immediately before the mutation; SQL independently checks ownership.
     const current = await getViewer();
     if (current.role !== "owner" || current.id !== viewer.id) return denied();
     const saved = await sb.from("content_changes").update({ status: "approved" }).eq("id", id).eq("status", "draft")
-      .filter("operations", "eq", JSON.stringify(set.operations)).select("id,previous");
+      .filter("operations", "eq", JSON.stringify(set.operations)).filter("photo_slots","eq",JSON.stringify(set.photo_slots)).select("id,previous");
     if (saved.error) return { ok: false, message: saved.error.code === "22023" || saved.error.code === "42501"
       ? saved.error.message : "Approval failed. No content changes were applied. Try again." };
     if (!saved.data?.length) return { ok: false, message: "This draft changed or was already reviewed. Reload the review list." };

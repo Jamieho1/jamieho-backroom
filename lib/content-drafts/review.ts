@@ -5,6 +5,8 @@ import {isAppTable} from "./app-allowlist";
 import {appTargets,appKey} from "./app-overlay";
 import {publishingTargets} from "./publishing-overlay";
 import { validateOperations } from "./allowlist";
+import {photoUrl} from "./photo-slots";
+import {parsePhotoSet} from "./photo-server";
 import { reviewFields, type ContentChange, type ReviewDraft } from "./types";
 
 /** Request-scoped only. Never read owner drafts through the public/cached content loader. */
@@ -29,10 +31,13 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
   }
   const live = Object.fromEntries((sections.data ?? []).map(row => [row.key, { title: row.title ?? "", body: row.body ?? "" }]));
   const drafts = ((sets.data ?? []) as ContentChange[]).map(set => {
-    const result = validateOperations(set.operations);
-    const photos = !Array.isArray(set.photo_slots) || set.photo_slots.length !== 0;
-    return { ...set, previewTargets:result.ok?[...publishingTargets(result.operations),...appTargets(result.operations)]:[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {...appRows,projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
-      validationError: !result.ok ? result.message : photos ? "Photo slots are not supported in this slice." : undefined };
+    let photoSlots:import('./photo-slots').PhotoSlot[]=[];let photoError:string|undefined;
+    let result=validateOperations(set.operations);
+    try {const parsed=parsePhotoSet(set.operations,set.photo_slots,set.id);photoSlots=parsed.slots;result={ok:true,operations:parsed.operations};}catch(error){photoError=error instanceof Error?error.message:'Invalid photo slots.';}
+    const previewOps=result.ok?[...result.operations,...photoSlots.map(slot=>({op:'update' as const,table:'projects' as const,key:slot.target.key,fields:{}}))]:[];
+    return { ...set, photoSlots, previewTargets:result.ok?[...publishingTargets(previewOps),...appTargets(result.operations)]:[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {...appRows,projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
+      validationError: !result.ok ? result.message : photoError };
   });
+  for(const draft of drafts)for(const slot of draft.photoSlots??[])draft.fields.push({field:`projects.${slot.target.key}.screenshots (${slot.slot})`,current:JSON.stringify((projects.data??[]).find(row=>row.id===slot.target.key)?.screenshots??[]),proposed:slot.path?`Append ${photoUrl(slot.path)}`:`Awaiting ${slot.expected_filename}`});
   return { drafts };
 }

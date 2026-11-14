@@ -31,6 +31,6 @@ export default async function Home() {
     <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700&display=swap" />
     <AuthErrorNotice />
     <Journey chapters={chapters} base={MEDIA_BASE} socials={socialLinks(sections.contact.body)} draftSections={preview ? [...new Set(preview.operations.filter(operation=>operation.table==="site_sections").map(operation => operation.key))] : []} />
-    {preview ? <ContentPreviewBar summary={preview.summary} experience={!!preview.experience} targets={preview.targets} /> : null}
+    {preview ? <ContentPreviewBar id={preview.id} photoSlots={preview.photoSlots} summary={preview.summary} experience={!!preview.experience} targets={preview.targets} /> : null}
   </main>;
 }

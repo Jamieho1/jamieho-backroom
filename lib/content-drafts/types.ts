@@ -13,6 +13,7 @@ export interface ReviewField {
   proposed: string;
 }
 export interface ReviewDraft extends ContentChange {
+  photoSlots?: import("./photo-slots").PhotoSlot[];
   fields: ReviewField[];
   validationError?: string;
   previewCv?: boolean;
@@ -42,6 +43,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
 }
 
 export interface HomePreview {
+  photoSlots?: import("./photo-slots").PhotoSlot[];
   id: string;
   summary: string;
   operations: ContentOperation[];
