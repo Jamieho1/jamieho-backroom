@@ -106,3 +106,7 @@ Jamie renamed article-images folders to post<N>-<slug> (post1-3-personal-ai-agen
 
 ## 2026-11-14 — TKT-101 homepage preview
 Implemented owner-only Draft Mode + httpOnly set-id cookie, immutable section overlays, preview-only gold markers and bottom approval/discard/exit bar. Existing engine and public rendering/motion preserved. Passed typecheck, 618 unit/DB tests, build/static assertions, 23 journey/review browser checks (one existing desktop skip), and 14 real Next/local PGlite preview browser checks including copied cookies with signed-out/member sessions. No schema/live data changes, secrets, commit or push; needs deployment and Jamie’s live verification. TKT-98 fixture typing fix already present and reverified. Details/file inventory in docs/status.md; cookie/test workflow in docs/content-drafts.md.
+
+
+## 2026-11-14 — Owner draft-count badge
+Added a gold N to review link to shared top/floating navigation, visible only for owners with positive draft counts. Owner-checked server HEAD count retains existing RLS; zero/errors/non-owners render nothing and account switches reject stale replies. Refreshes on navigation/focus and successful reviews. Passed typecheck, all 625 unit/DB tests, build/static assertions and 22 desktop/390px browser checks including visibility/zero/overflow. Docs updated; no migration, live data change, commit or push. Jamie deploys/verifies live.

@@ -10,6 +10,7 @@ test.beforeAll(async()=>{
  `,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'desktop-fixture',setup(b){
  b.onResolve({filter:/^next\/navigation$/},()=>({path:'navigation',namespace:'navigation-fixture'}));b.onLoad({filter:/.*/,namespace:'navigation-fixture'},()=>({contents:'export function useRouter(){return {refresh(){}}};export function usePathname(){return "/"}'}));
  b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'link-fixture'}));b.onLoad({filter:/.*/,namespace:'link-fixture'},()=>({resolveDir:process.cwd(),contents:'import React from "react";export default function Link({prefetch,children,...props}){return React.createElement("a",props,children)}'}));
+ b.onResolve({filter:/app\/actions\/content-draft-count$/},()=>({path:'draft-count',namespace:'draft-count-fixture'}));b.onLoad({filter:/.*/,namespace:'draft-count-fixture'},()=>({contents:'export async function getContentDraftCount(){return null}'}));
  b.onResolve({filter:/app\/actions\/desktop$/},()=>({path:'desktop',namespace:'desktop-fixture'}));b.onLoad({filter:/.*/,namespace:'desktop-fixture'},()=>({contents:'export async function logDesktopOpen(){};export async function getDesktopApps(){return []}'}));
  }}]});bundle=out.outputFiles[0].text;
 });

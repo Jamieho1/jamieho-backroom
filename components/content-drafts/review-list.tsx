@@ -15,7 +15,7 @@ export function ContentReviewList({ drafts, error }: { drafts: ReviewDraft[]; er
     try {
       const result = await (approve ? approveContentChange(id) : discardContentChange(id));
       setMessages(current => ({ ...current, [id]: result }));
-      if (result.ok) { setReviewed(current => new Set(current).add(id)); router.refresh(); }
+      if (result.ok) { window.dispatchEvent(new Event("content-drafts-changed")); setReviewed(current => new Set(current).add(id)); router.refresh(); }
     } catch { setMessages(current => ({ ...current, [id]: { ok: false, message: "Connection failed. Reload to check the draft before retrying." } })); }
     finally { setPending(null); }
   }
