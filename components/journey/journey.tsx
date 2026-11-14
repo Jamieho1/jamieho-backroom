@@ -16,6 +16,7 @@ import type { SocialLink } from "@/lib/social";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
 import { BrandIcon } from "./brand-icon";
+import { AboutPhotos, type AboutPhotosHandle } from "./about-photos";
 import { HeroArtwork } from "./hero-artwork";
 import { JourneyNavigation } from "./navigation";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
@@ -45,6 +46,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
+  const aboutPhotos = useRef<AboutPhotosHandle>(null);
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
   const toolkits = useRef<(ToolkitHandle | null)[]>([]);
@@ -167,6 +169,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
         if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : 1;
         else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 : joinOpacity(active, local) < 1)) opacity = 1;
         else if (active.kind === "fade" && i === index + 1 && local >= 0.5) opacity = 1;
+        el.inert = i !== index;
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
@@ -175,6 +178,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
+          if (c.id === "pivot" && opacity > 0) aboutPhotos.current?.setProgress(at);
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
@@ -258,13 +262,15 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
-              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id}>
+              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} inert>
                 {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
+                ) : c.id === "pivot" ? (
+                  <AboutPhotos ref={aboutPhotos} base={base} />
                 ) : c.kind === "section" && c.toolkit?.layers.length ? (
                   <Toolkit ref={(h) => { toolkits.current[i] = h; }} data={c.toolkit} />
                 ) : c.kind === "section" && c.showcase?.length ? (
@@ -284,7 +290,7 @@ export function Journey({ chapters: all, base, socials = [] }: { chapters: Chapt
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
                     className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
-                    {c.id === "sky" ? <HeroCopy p={p} split /> : <PanelBody p={p} heading="h2" split />}
+                    {c.id === "sky" ? <HeroCopy p={p} split /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "pivot"} />}
                   </section>
                 ))}
               </div>
@@ -348,6 +354,8 @@ export function StillJourney({ chapters, base, socials = [] }: { chapters: Chapt
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mediaUrl(base, `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg`)} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
+          ) : c.id === "pivot" ? (
+            <AboutPhotos base={base} still />
           ) : c.kind === "section" && c.still ? (
             <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -388,7 +396,7 @@ export function StillJourney({ chapters, base, socials = [] }: { chapters: Chapt
           ) : null}
           {(c.panels ?? []).map((p) => (
             <section key={p.id} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
-              {c.id === "sky" ? <HeroCopy p={p} /> : <PanelBody p={p} heading="h2" />}
+              {c.id === "sky" ? <HeroCopy p={p} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "pivot"} />}
             </section>
           ))}
           {c.id === "screen" ? (
@@ -436,14 +444,14 @@ function HeroCopy({ p, split = false }: { p: Panel; split?: boolean }) {
   </>;
 }
 
-function PanelBody({ p, heading, split = false, scheduleCall = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean; scheduleCall?: boolean }) {
+function PanelBody({ p, heading, split = false, scheduleCall = false, disableLinks = false }: { p: Panel; heading: "h1" | "h2"; split?: boolean; scheduleCall?: boolean; disableLinks?: boolean }) {
   const H = heading;
   return <>
     {p.eyebrow ? <p className={`journey-eyebrow${heading === "h1" ? " journey-welcome" : ""}`}>{p.eyebrow}</p> : null}
     {p.title ? <H className="journey-title">{split ? <Words text={p.title} /> : stripKeys(p.title)}</H> : null}
     {p.meta ? <p className="journey-meta">{p.meta}</p> : null}
     {split && p.rotator ? <RotatorLine r={p.rotator} />
-      : p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} /></div> : <p className="journey-body">{p.body}</p>) : null}
+      : p.body ? (p.md ? <div className="journey-md"><Markdown text={p.body} disableLinks={disableLinks} /></div> : <p className="journey-body">{p.body}</p>) : null}
     {p.points?.length ? <ul className="journey-points">{p.points.map((t) => <li key={t}><Inline text={t} /></li>)}</ul> : null}
     {p.chips?.length ? <ul className="journey-chips" aria-label="Technologies">{p.chips.map((t) => <li key={t}>{t}</li>)}</ul> : null}
     {p.links?.some((l) => l.platform) ? (

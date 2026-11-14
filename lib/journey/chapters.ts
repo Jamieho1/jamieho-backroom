@@ -17,10 +17,9 @@ export const HOME_CHAPTERS: Chapter[] = [
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
     panels: [{ id: "hero", from: 0, to: 0.85, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
-  // The pivot: one giant statement on off-white, the education line, and the Imperial entrance framed beside it.
+  // About: biography and education beside a scroll-driven personal photo strip.
   {
     id: "pivot", label: "About", nav: "About", kind: "section", tone: "light", scroll: 1.5,
-    still: { file: "still-imperial.jpg", side: "right" },
     panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.

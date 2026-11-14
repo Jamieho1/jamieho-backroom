@@ -75,3 +75,7 @@ Earlier dated history is preserved in [docs/archive/memory-through-2026-11-05.md
 2026-11-11: With explicit approval, applied local 20261111180819_article_pins.sql through Supabase MCP to lhacrrnwddvpawsreamk; remote version 20261111181807 (article_pins). Verified RLS enabled, all 3 self-only policies, no anonymous or authenticated UPDATE access, backup SELECT and cascading account/article FKs. Advisors had no article-pins finding (existing record_signin/password advisories remain). No live test records created. Frontend/privacy/export code still needs Jamie’s push/deployment. Docs updated; whitespace check passed.
 
 - 2026-11-11: Added Guides (public resource pages separate from articles) locally; migration applied live (remote 20261111224113); frontend needs deploy. See docs/status.md.
+
+
+## 2026-11-13 — About photos and click isolation
+Replaced the Imperial still with three supplied portraits driven by chapter scroll, plus manual reduced-motion fallback. Disabled About Markdown navigation and made inactive chapters inert to stop invisible project links intercepting clicks. Kept existing title/body; suggested shorter copy in chat. Jamie chose Storage, not Git: optimized ignored about-*.jpg files need his upload to home-media before deployment. No database/live update. Typecheck, 540 tests, isolated build/static checks and 19 journey browser checks passed (one phone-only test skipped on desktop); inspected local desktop/390px layouts.

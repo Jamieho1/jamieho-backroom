@@ -74,7 +74,7 @@ test("section photos stay framed through hand-over instead of growing fullscreen
   await page.mouse.wheel(0, 600);
   await page.waitForTimeout(600);
   await expect(page.locator('[data-grow]')).toHaveCount(0);
-  expect(await about.locator("figure").evaluate(el => el.style.transform)).toBe("");
+  expect(await about.locator(".journey-about-photos").evaluate(el => el.style.transform)).toBe("");
 });
 
 test("journey ends with the contact form on the monitor instead of a desktop link", async ({ page }) => {
@@ -123,4 +123,43 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
   }
   expect(clips).toEqual([]);
   await expect(page.getByRole("region", { name: "Contact Us", exact: true })).toBeVisible();
+});
+
+
+test("About photos follow scroll and inactive project links cannot intercept the biography", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".is-journey summary").click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "About", exact: true }).click();
+  const about = page.locator('[data-chapter="pivot"]');
+  await expect(about.locator(".journey-panel")).toBeVisible();
+  await expect(about).not.toHaveAttribute("inert");
+  await expect(page.locator('[data-chapter="sky"]')).toHaveAttribute("inert", "");
+  await expect(about.locator(".journey-md a")).toHaveCount(0);
+  await expect(about.locator(".journey-about-photos img")).toHaveCount(3);
+  const strip = about.locator(".journey-about-photos ol");
+  const x = () => strip.evaluate(el => new DOMMatrix(getComputedStyle(el).transform).m41);
+  // Let the 1.6s navigation glide settle before measuring wheel-driven motion.
+  await page.waitForTimeout(1800);
+  const start = await x();
+  await page.mouse.wheel(0, 240);
+  await expect.poll(x).toBeLessThan(start - 20);
+  await page.waitForTimeout(1000);
+  const forward = await x();
+  await page.mouse.wheel(0, -180);
+  await expect.poll(x).toBeGreaterThan(forward + 20);
+  const body = about.locator(".journey-md");
+  if (await body.count()) {
+    const intercepted = await body.evaluate(el => {
+      const r = el.getBoundingClientRect();
+      // Model a project child overriding visibility inside an invisible inactive chapter.
+      const inactive = document.querySelector<HTMLElement>('[data-chapter="sky"]')!;
+      const link = document.createElement('a'); link.href = 'https://example.com/finai'; link.textContent = 'Hidden project';
+      Object.assign(link.style, {position:'fixed',left:r.x+'px',top:r.y+'px',width:r.width+'px',height:r.height+'px',visibility:'visible',zIndex:'999'});
+      inactive.append(link);
+      const intercepted = !!document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('a');
+      link.remove(); return intercepted;
+    });
+    expect(intercepted).toBe(false);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

@@ -5,13 +5,14 @@ import ReactMarkdown from "react-markdown";
  * Safe Markdown for site content: raw HTML in the text is never rendered (react-markdown escapes it),
  * and links to other sites open in a new tab without access to this page.
  */
-export function Markdown({ text }: { text: string }) {
+export function Markdown({ text, disableLinks = false }: { text: string; disableLinks?: boolean }) {
   return (
     <div className="md">
       <ReactMarkdown
         skipHtml
         components={{
           a: ({ href = "", children }) => {
+            if (disableLinks) return <>{children}</>;
             const external = /^https?:\/\//.test(href);
             if(href.startsWith("/")&&!href.startsWith("//"))return <Link href={href} prefetch={false}>{children}</Link>;
             return (
