@@ -4,6 +4,8 @@ import {usePathname} from 'next/navigation';
 import {useEffect,useRef,useState,type ReactNode,type CSSProperties} from 'react';
 import {useViewer} from '@/components/viewer-provider';
 import {SignInButton} from '@/components/sign-in-button';
+import {PRACTICE_LIST} from '@/lib/practice/catalog';
+import {modeHref,sectionQuestions,topicIcon} from '@/lib/interview/content';
 import {INTERVIEW_SECTIONS,interviewSection,interviewTopics} from '@/lib/interview/navigation';
 import {InterviewIcon,type InterviewIconName} from './icons';
 export const INTERVIEW_STORAGE={rail:'jb.interview.rail-collapsed.v1',topics:'jb.interview.topics-collapsed.v1'};
@@ -13,9 +15,15 @@ function useCollapse(key:string){
  const toggle=()=>setCollapsed(value=>{const next=!value;try{localStorage.setItem(key,String(next));}catch{/* Keep in-memory controls working. */}return next;});
  return [collapsed,toggle] as const;
 }
-export function InterviewShell({children}:{children:ReactNode}){
- const path=usePathname();const section=interviewSection(path);const topics=interviewTopics(section.id);const notes=path.includes('/notes');
- const [railCollapsed,toggleRail]=useCollapse(INTERVIEW_STORAGE.rail);const [topicsCollapsed,toggleTopics]=useCollapse(INTERVIEW_STORAGE.topics);
+export function InterviewShell({children,noteTopics=[]}:{children:ReactNode;noteTopics?:{id:string;title:string}[]}){
+ const path=usePathname();const section=interviewSection(path);const topics=interviewTopics(section.id,noteTopics);const notes=path.includes('/notes');
+ const problemPage=path.startsWith('/interview/problems/');
+ const selectedTopic=problemPage?PRACTICE_LIST.find(p=>p.lc===Number(path.split('/').at(-1)))?.topic:path.split('/')[4];
+ const [railCollapsed,toggleRail]=useCollapse(INTERVIEW_STORAGE.rail);const [savedTopicsCollapsed,toggleSavedTopics]=useCollapse(INTERVIEW_STORAGE.topics);
+ const [problemTopicsOpen,setProblemTopicsOpen]=useState(false);
+ useEffect(()=>setProblemTopicsOpen(false),[path]);
+ const topicsCollapsed=problemPage?!problemTopicsOpen:savedTopicsCollapsed;
+ const toggleTopics=()=>problemPage?setProblemTopicsOpen(value=>!value):toggleSavedTopics();
  const [mobile,setMobile]=useState(false);const [drawer,setDrawer]=useState(false);const [topicsOpen,setTopicsOpen]=useState(false);
  const [tip,setTip]=useState<{label:string;x:number;y:number}|null>(null);
  const rail=useRef<HTMLElement>(null);const topicPanel=useRef<HTMLElement>(null);const menuButton=useRef<HTMLButtonElement>(null);const topicsButton=useRef<HTMLButtonElement>(null);
@@ -40,7 +48,7 @@ export function InterviewShell({children}:{children:ReactNode}){
  const tipProps=(label:string)=>({onMouseEnter:(e:React.MouseEvent<HTMLElement>)=>tooltip(label,e.currentTarget),onMouseLeave:(e:React.MouseEvent<HTMLElement>)=>{if(document.activeElement!==e.currentTarget)setTip(null);},onFocus:(e:React.FocusEvent<HTMLElement>)=>tooltip(label,e.currentTarget),onBlur:()=>setTip(null),'aria-describedby':tip?.label===label?'iv-tooltip':undefined});
  const iconLabel=(icon:InterviewIconName,label:string,color?:string)=><><span className="iv-icon" style={{color}}><InterviewIcon name={icon}/></span><span className="iv-rail-label">{label}</span></>;
  const closeDrawer=()=>{setDrawer(false);requestAnimationFrame(()=>menuButton.current?.focus());};
- return <div className="iv-shell" data-rail-collapsed={railCollapsed} data-topics-collapsed={topicsCollapsed}>
+ return <div className="iv-shell" data-rail-collapsed={railCollapsed} data-topics-collapsed={topicsCollapsed} data-problem={problemPage}>
   <a className="iv-skip" href="#interview-content">Skip to content</a>
   {mobile&&drawer?<button className="iv-backdrop" aria-label="Dismiss interview menu" onClick={closeDrawer}/>:null}
   <aside id="interview-rail" ref={rail} className="iv-rail" data-open={drawer} role={mobile&&drawer?'dialog':undefined} aria-modal={mobile&&drawer?true:undefined} aria-label="Interview menu" inert={mobile&&!drawer}>
@@ -53,8 +61,8 @@ export function InterviewShell({children}:{children:ReactNode}){
   </aside>
   <aside id="interview-topics" ref={topicPanel} className="iv-topics" data-open={topicsOpen} inert={mobile&&drawer} aria-label="Topic list">
    <header><div><span className="iv-overline">Explore</span><h2>{section.label}</h2></div><button className="iv-icon-button iv-topic-collapse" aria-label="Collapse topics" aria-expanded="true" onClick={toggleTopics}><InterviewIcon name="collapse"/></button><button className="iv-icon-button iv-mobile-close" aria-label="Close topics" onClick={()=>{setTopicsOpen(false);topicsButton.current?.focus();}}><InterviewIcon name="close"/></button></header>
-   {['dsa','system-design','low-level-design'].includes(section.id)?notes&&section.id!=='dsa'?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:<Link className="iv-mode-link" href={path.replace(/\/(practice|notes)(?=\/|$)/,notes?'/practice':'/notes')} prefetch={false}>{notes?'Practice':'Notes'}</Link>:null}
-   <nav aria-label="Topics">{topics.length?topics.map(topic=><Link key={topic.id} prefetch={false} href={`/interview/${section.id}/${notes?'notes':'practice'}/${topic.id}`} aria-current={path.endsWith('/'+topic.id)?'page':undefined}><span className="iv-icon" style={{color:topic.dot} as CSSProperties}><InterviewIcon name={topic.id}/></span><span>{topic.label}</span></Link>):<p className="iv-empty-topics">{section.id==='dashboard'?'Choose an Interview Skills section to explore its topics.':'Topics are coming soon.'}</p>}</nav>
+   {['dsa','system-design','low-level-design','finance','ai-engineering'].includes(section.id)?<>{notes&&!sectionQuestions(section.id).length?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:<Link className="iv-mode-link" href={modeHref(section.id,!notes,selectedTopic)} prefetch={false}>{notes?'Practice':'Notes'}</Link>}{!notes&&!sectionQuestions(section.id).length?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:null}</>:null}
+   <nav aria-label="Topics">{topics.length?topics.map(topic=><Link key={topic.id} prefetch={false} href={`/interview/${section.id}/${notes?'notes':'practice'}/${topic.id}`} aria-current={selectedTopic===topic.id?'page':undefined}><span className="iv-icon" style={{color:topic.dot} as CSSProperties}><InterviewIcon name={topicIcon(topic.id)}/></span><span>{topic.label}</span></Link>):<p className="iv-empty-topics">{section.id==='dashboard'?'Choose an Interview Skills section to explore its topics.':'Topics are coming soon.'}</p>}</nav>
   </aside>
   <section className="iv-workspace" aria-label="Interview workspace" inert={mobile&&drawer}>
    <div className="iv-mobile-toolbar"><button ref={menuButton} className="iv-toolbar-button" aria-label="Open interview menu" aria-controls="interview-rail" aria-expanded={drawer} onClick={()=>{setTopicsOpen(false);setDrawer(true);}}><InterviewIcon name="menu"/>Menu</button><button ref={topicsButton} className="iv-toolbar-button" aria-controls="interview-topics" aria-expanded={topicsOpen} onClick={()=>setTopicsOpen(value=>!value)}>Topics <span aria-hidden="true">▾</span></button></div>

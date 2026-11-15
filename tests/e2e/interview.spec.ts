@@ -4,7 +4,7 @@ test('Interview renders its own dark shell and every rail destination is a worki
  await page.emulateMedia({colorScheme:'light'});await page.goto('/interview');await expect(page.getByRole('heading',{level:1,name:'Dashboard',exact:true})).toBeVisible();await expect(page.locator('.site-header,.site-navigation')).toHaveCount(0);expect(await page.locator('.iv-shell').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(14, 19, 28)');
  for(const [label,url] of [['Data Structures & Algorithms','/interview/dsa/practice'],['System Design','/interview/system-design/practice'],['Low Level Design','/interview/low-level-design/practice'],['Finance','/interview/finance/practice'],['AI Engineering','/interview/ai-engineering/practice'],['Resume','/interview/resume'],['Behavioral','/interview/behavioral'],['Companies','/interview/companies'],['Roadmaps','/interview/roadmaps'],['Application Tracker','/interview/applications']]){
   if(info.project.name==='phone')await page.getByRole('button',{name:'Open interview menu'}).click();
-  await page.getByRole('navigation',{name:'Interview sections'}).getByRole('link',{name:label,exact:true}).click();await expect(page).toHaveURL(url);await expect(page.getByRole('heading',{level:1,name:label,exact:true})).toBeVisible();await expect(page.locator('.iv-soon')).toHaveText('Soon');await overflow(page);
+  await page.getByRole('navigation',{name:'Interview sections'}).getByRole('link',{name:label,exact:true}).click();await expect(page).toHaveURL(url);await expect(page.getByRole('heading',{level:1,name:label,exact:true})).toBeVisible();if(!url.includes('/practice'))await expect(page.locator('.iv-soon')).toHaveText('Soon');await overflow(page);
  }
  await page.screenshot({path:info.outputPath('interview.png')});
 });
@@ -24,6 +24,9 @@ test('desktop collapse modes persist, tooltips work on hover/focus and keyboard 
  const dashboardIcon=await page.getByRole('link',{name:'Dashboard',exact:true}).locator('.iv-icon').boundingBox();
  expect(Math.abs(expandRail!.x+expandRail!.width/2-dashboardIcon!.x-dashboardIcon!.width/2)).toBeLessThan(1);
  expect(Math.abs(centerY(expandRail!)-centerY(topicCollapse!))).toBeLessThan(1);
+ const railLine=await page.locator('.iv-group').first().boundingBox();
+ const contentLine=await page.locator('.iv-content-toolbar').evaluate(el=>{const style=getComputedStyle(el,'::after');return el.getBoundingClientRect().top+parseFloat(style.top);});
+ expect(Math.abs(contentLine-railLine!.y)).toBeLessThan(1);
  const finance=page.getByRole('link',{name:'Finance',exact:true});await finance.hover();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.mouse.move(600,100);await finance.focus();await expect(page.getByRole('tooltip')).toHaveText('Finance');await page.keyboard.press('Tab');await expect(page.getByRole('tooltip')).toHaveText('AI Engineering');
  await page.getByRole('button',{name:'Collapse topics'}).click();await expect(page.getByRole('complementary',{name:'Topic list'})).not.toBeVisible();await expect(page.getByRole('button',{name:'Topics'})).toBeVisible();
  const expandTopics=await page.getByRole('button',{name:'Topics'}).boundingBox();
@@ -46,11 +49,41 @@ test('Interview is between Projects and Articles; Resources has only Guides; old
 
 test('topic mode links preserve the selected DSA topic',async({page},info)=>{
  await page.goto('/interview/dsa/practice/trees');if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();
- await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/trees');await expect(page.getByRole('heading',{level:1,name:'Trees'})).toBeVisible();
+ await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/trees');await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
  if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();await page.getByRole('link',{name:'Practice',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/practice/trees');
 });
 
 test('desktop collapse preferences do not hide the phone drawer or Topics',async({page},info)=>{
  test.skip(info.project.name!=='phone','phone preference override');
  await page.addInitScript(()=>{localStorage.setItem('jb.interview.rail-collapsed.v1','true');localStorage.setItem('jb.interview.topics-collapsed.v1','true');});await page.goto('/interview/dsa/practice');await page.getByRole('button',{name:'Open interview menu'}).click();await expect(page.getByRole('dialog',{name:'Interview menu'}).getByRole('link',{name:'Data Structures & Algorithms',exact:true})).toBeVisible();await page.keyboard.press('Escape');await page.getByRole('button',{name:'Topics',exact:true}).click();await expect(page.getByRole('navigation',{name:'Topics'}).getByRole('link',{name:'Trees',exact:true})).toBeVisible();await overflow(page);
+});
+
+test('DSA questions search and open a full-width workspace; Notes switch keeps topic',async({page},info)=>{
+ await page.goto('/interview/dsa/practice/arrays-hashing');
+ await expect(page.getByRole('heading',{level:1,name:'Arrays & Hashing'})).toBeVisible();
+ await page.getByRole('searchbox',{name:'Search questions'}).fill('Contains Duplicate');
+ await expect(page.locator('.iv-questions > li')).toHaveCount(1);
+ await expect(page.getByRole('img',{name:'Not flagged (coming soon)'})).toBeVisible();
+ await expect(page.getByRole('img',{name:'Not completed (coming soon)'})).toBeVisible();
+ await page.locator('.iv-questions a').click();await expect(page).toHaveURL('/interview/problems/217');
+ await expect(page.getByRole('region',{name:'Contains Duplicate',exact:true})).toBeVisible();
+ await expect(page.locator('.practice-sidebar')).toHaveCount(0);await overflow(page);
+ if(info.project.name==='desktop')await expect(page.locator('.iv-shell')).toHaveAttribute('data-topics-collapsed','true');
+ if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();else await page.getByRole('button',{name:'Topics',exact:true}).click();
+ await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/arrays-hashing');
+ await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
+ if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();
+ await page.getByRole('link',{name:'Practice',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/practice/arrays-hashing');
+ await overflow(page);
+});
+test('practice workspace executes the existing Python runner on the new address',async({page},info)=>{
+ test.skip(info.project.name!=='desktop','Runner is the same at both sizes');test.setTimeout(120000);
+ await page.goto('/interview/problems/217');
+ await expect(page.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});
+ await page.getByRole('tab',{name:'Solution',exact:true}).click();
+ const solution=await page.locator('.practice-solution pre.code').textContent();
+ const editor=page.getByRole('textbox',{name:'Python code',exact:true});
+ await editor.fill(solution!);await page.getByRole('button',{name:'Run',exact:true}).click();
+ await expect(page.getByRole('region',{name:'Test results'})).toContainText('passed',{timeout:60000});
+ await expect(page.getByRole('region',{name:'Test results'})).not.toContainText('fail');
 });

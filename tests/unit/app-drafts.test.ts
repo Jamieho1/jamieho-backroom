@@ -10,7 +10,7 @@ it('accepts only editor operations/fields and revalidates app plus specific prac
  const operations=parse([op(),op('question_notes','insert',{body:'Draft question'},217),op('practice_code','insert',{code:'return 1'},217),op('practice_stars','insert',{},217),op('practice_stars','delete',{},1),op('behavioral_stories','insert',{title:' Title ',bullet_id:null},story),op('behavioral_answers','insert',{outline:'Draft outline'},'g-intro')]);
  expect(operations[5].fields).toMatchObject({title:'Title'});
  expect(affectedRoutes(operations)).toEqual(expect.arrayContaining(['/notes','/practices','/practices/217','/practices/1','/behavioral']));
- expect(appTargets(operations).filter(t=>t.href==='/practices/217')).toHaveLength(1);
+ expect(appTargets(operations).filter(t=>t.href==='/interview/problems/217')).toHaveLength(1);
 });
 for(const [table,field,max,key] of [['notes','body',200000,'fixture-note'],['notes','free',200000,'fixture-note'],['question_notes','body',200000,217],['practice_code','code',100000,217],['behavioral_stories','title',160,story],['behavioral_stories','situation',20000,story],['behavioral_stories','task',20000,story],['behavioral_stories','action',20000,story],['behavioral_stories','result',20000,story],['behavioral_stories','skills',1000,story],['behavioral_stories','numbers',2000,story],['behavioral_answers','outline',20000,'g-intro'],['behavioral_answers','followups',10000,'g-intro']] as const){
  it(`${table}.${field} matches its editor limits for update${table==='notes'?'':' and insert'}`,()=>{

@@ -1,3 +1,4 @@
+import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import {validateNoteEdit,type NoteRow} from '@/lib/notes';
 import {validCode,validProblem,type PracticeData} from '@/lib/practice/data';
@@ -54,8 +55,11 @@ export async function loadAppPreview(sb:SupabaseClient,operations:ContentOperati
  return result;
 }
 export function appTargets(operations:ContentOperation[]):{href:string;label:string}[]{
- const routes=[...new Set(operations.filter(op=>isAppTable(op.table)).flatMap(op=>[...APP_ALLOWLIST[op.table as AppTable].routes]))];
- const targets:{href:string;label:string}[]=routes.map(href=>({href,label:href==='/notes'?'Preview Notes':href==='/practices'?'Preview Practice':'Preview Resume & Stories'}));
- for(const op of operations)if(op.table==='question_notes'||op.table==='practice_code'||op.table==='practice_stars')targets.push({href:`/practices/${op.key}`,label:`Preview problem ${op.key}`});
+ const targets:{href:string;label:string}[]=[];
+ for(const op of operations){
+  if(op.table==='notes')targets.push({href:noteHref(String(op.key)),label:'Preview Notes'});
+  else if(op.table==='question_notes'||op.table==='practice_code'||op.table==='practice_stars')targets.push({href:interviewProblemHref(op.key),label:`Preview problem ${op.key}`});
+  else if(op.table==='behavioral_stories'||op.table==='behavioral_answers')targets.push({href:'/behavioral',label:'Preview Resume & Stories'});
+ }
  return targets.filter((t,i,a)=>a.findIndex(x=>x.href===t.href)===i);
 }

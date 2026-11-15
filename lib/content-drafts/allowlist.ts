@@ -1,3 +1,4 @@
+import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
 import { projectSchema } from "@/lib/portfolio-core";
@@ -100,7 +101,8 @@ export function validateOperations(input: unknown): { ok: true; operations: Cont
 export function affectedRoutes(operations: ContentOperation[], previous:unknown = []): string[] {
   const routes=operations.flatMap(operation=>[...CONTENT_ALLOWLIST[operation.table].routes] as string[]);
   for(const operation of operations)if(isPublishingTable(operation.table)&&"slug" in operation.fields&&typeof operation.fields.slug==="string")routes.push(`/${operation.table}/${encodeURIComponent(operation.fields.slug)}`);
-  for(const op of operations)if(op.table==="question_notes"||op.table==="practice_code"||op.table==="practice_stars")routes.push(`/practices/${op.key}`);
+  for(const op of operations)if(op.table==="question_notes"||op.table==="practice_code"||op.table==="practice_stars")routes.push(`/practices/${op.key}`,interviewProblemHref(op.key));
+  for(const op of operations)if(op.table==="notes")routes.push(noteHref(String(op.key)));
   if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(`/${row.table}/${encodeURIComponent(row.values.slug)}`);
   return [...new Set(routes)];
 }

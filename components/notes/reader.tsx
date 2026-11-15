@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {interviewProblemHref} from '@/lib/interview/content';
 import { practiceHref } from "@/lib/desktop-pages";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -12,7 +13,7 @@ import { NoteEditor, type SaveNote } from "./editor";
 import { VisualsTab } from "./visuals-tab";
 import { Markdown, type AutoLink } from "./markdown";
 
-export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]; canEdit?: boolean; save?: SaveNote }) {
+export function NotesReader({ notes, canEdit = false, save, singleTopic=false, interviewLinks=false }: { notes: NoteRow[]; canEdit?: boolean; save?: SaveNote; singleTopic?:boolean;interviewLinks?:boolean }) {
   const panels = useResizablePanels("jamieho.notes.panels.v1");
   const first=notes.find(n=>n.draftChanged)??notes[0];
   const [selected, setSelected] = useState(first?.id ?? "");
@@ -35,7 +36,7 @@ export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]
   if (!notes.length) return <div className="desktop-placeholder"><h2>Notes</h2><p>No notes have been added yet.</p></div>;
   return (
     <div className={`notes-reader${panels.state.collapsed ? " notes-collapsed" : ""}`} style={{"--notes-sidebar": `${panels.state.collapsed ? 52 : panels.state.sidebar}px`} as CSSProperties}>
-      <aside className="notes-sidebar">
+      {!singleTopic?<><aside className="notes-sidebar">
         <button className="btn ghost small" type="button" aria-label={panels.state.collapsed ? "Expand topics" : "Collapse topics"} aria-expanded={!panels.state.collapsed} onClick={() => panels.setState(s => ({...s, collapsed: !s.collapsed}))}>{panels.state.collapsed ? "»" : "«"}</button>
         <div hidden={panels.state.collapsed}>
         {tracks.length > 1 ? (
@@ -51,14 +52,14 @@ export function NotesReader({ notes, canEdit = false, save }: { notes: NoteRow[]
         {editing && canEdit ? <p className="hint">Save or cancel before switching topics.</p> : null}
         </div>
       </aside>
-      {!panels.state.collapsed ? <ResizeHandle className="notes-resizer" label="Resize topics" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar => panels.setState(s => ({...s, sidebar}))} /> : <div className="notes-resizer-spacer" />}
+      {!panels.state.collapsed ? <ResizeHandle className="notes-resizer" label="Resize topics" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar => panels.setState(s => ({...s, sidebar}))} /> : <div className="notes-resizer-spacer" />}</>:null}
       {note ? editing && canEdit ? <NoteEditor key={note.id} note={note} save={save} onCancel={() => setEditing(false)} onSaved={(next) => { setSaved((rows) => ({ ...rows, [next.id]: next })); setEditing(false); setSavedMessage("Saved."); }} />
-        : <NoteView key={`${note.id}:${note.updated_at}`} note={note} split={panels.state.split} onSplit={split => panels.setState(s => ({...s, split}))} canEdit={canEdit} savedMessage={savedMessage} onEdit={() => { setSavedMessage(""); setEditing(true); }} /> : null}
+        : <NoteView key={`${note.id}:${note.updated_at}`} note={note} split={panels.state.split} onSplit={split => panels.setState(s => ({...s, split}))} practiceLink={interviewLinks?interviewProblemHref:practiceHref} canEdit={canEdit} savedMessage={savedMessage} onEdit={() => { setSavedMessage(""); setEditing(true); }} /> : null}
     </div>
   );
 }
 
-function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { split: number; onSplit(n: number): void; note: NoteRow; canEdit: boolean; onEdit(): void; savedMessage: string }) {
+function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit, practiceLink=practiceHref }: { practiceLink?:(id:number|string)=>string; split: number; onSplit(n: number): void; note: NoteRow; canEdit: boolean; onEdit(): void; savedMessage: string }) {
   const columns = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(1);
   useEffect(() => {
@@ -74,7 +75,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { spl
   const groups = useMemo(() => galleryGroups(note.body, parsed.visuals), [note.body, parsed]);
   const concepts = useMemo(() => new Set(groups.map((g) => g.concept)), [groups]);
   const problems = PRACTICE_ANCHORS.filter((p) => p.topic === note.id);
-  const links: AutoLink[] = problems.map((p) => ({ alias: p.title, href: practiceHref(p.lc), exact: false }));
+  const links: AutoLink[] = problems.map((p) => ({ alias: p.title, href: practiceLink(p.lc), exact: false }));
   const showVisuals = groups.length > 0 || parsed.invalid || noteTrack(note.id) === "coding";
   return (
     <div className={`notes-columns${showVisuals ? "" : " notes-single"}`} ref={columns} style={showVisuals ? ({"--notes-columns": `${split}fr 8px ${100 - split}fr`} as CSSProperties) : undefined}>
@@ -83,7 +84,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit }: { spl
         {savedMessage ? <p role="status">{savedMessage}</p> : null}
         {!body ? <p>No content for this topic yet.</p> : null}
         {note.free ? <section className="notes-free" aria-label="Free notes"><h3>Free notes</h3><Markdown text={note.free} links={links} /></section> : null}
-        {problems.length ? <section className="notes-problems" aria-label="Practice problems"><h3>Practice problems</h3><ul>{problems.map((p) => <li key={p.lc}><Link prefetch={false} href={practiceHref(p.lc)}>{p.title} →</Link>{p.extra ? <span className="notes-extra"> · extra</span> : null}</li>)}</ul></section> : null}
+        {problems.length ? <section className="notes-problems" aria-label="Practice problems"><h3>Practice problems</h3><ul>{problems.map((p) => <li key={p.lc}><Link prefetch={false} href={practiceLink(p.lc)}>{p.title} →</Link>{p.extra ? <span className="notes-extra"> · extra</span> : null}</li>)}</ul></section> : null}
       </section>
       {showVisuals ? <>
       <ResizeHandle className="notes-resizer" label="Resize notes and visuals" value={split} min={25} max={75} reset={50} unit="percent" scale={100 / Math.max(1, width - 8)} onChange={onSplit} />

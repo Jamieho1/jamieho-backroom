@@ -67,7 +67,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
       }
       if (url.pathname === '/__app_seed' && req.method==='POST') {
         await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_code; delete from public.practice_stars");
-        await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(problem,code) values (217,'# Live fixture code'); insert into public.practice_stars(problem) values(217)");
+        await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1),('sd-fixture','System design: Synthetic architecture','Synthetic system note','',2),('class-design','Class design','Synthetic class note','',3); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(problem,code) values (217,'# Live fixture code'); insert into public.practice_stars(problem) values(217)");
         await db.exec("insert into public.behavioral_stories(id,title,situation) values ('00000000-0000-4000-8000-000000000903','Live fixture story','Live fixture situation'); insert into public.behavioral_answers(question_id,outline) values ('g-intro','Live fixture outline')");
         return send(res,200,{ok:true});
       }

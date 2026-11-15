@@ -19,7 +19,7 @@ import { usePracticeStars } from "./use-practice-stars";
 import {practiceData,type PracticePreview} from "@/lib/content-drafts/app-overlay";
 import { useSavedPractice } from "./use-saved-practice";
 
-export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previewData }: { viewerKey:string; initialProblem?:number;canEdit?:boolean;previewData?:PracticePreview }) {
+export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previewData, singleProblem=false }: {singleProblem?:boolean; viewerKey:string; initialProblem?:number;canEdit?:boolean;previewData?:PracticePreview }) {
  const panels=usePracticePanels();
  const [selected,setSelected]=useState(problemByNumber(initialProblem??0)?.lc ?? PRACTICE_LIST[0].lc);
  const [search,setSearch]=useState("");
@@ -30,7 +30,7 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previ
  const [busy,setBusy]=useState(false);
  const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canEdit||!starredOnly||stars.stars.has(p.lc)));
  return <div className={`practice-arena${panels.state.collapsed?' sidebar-collapsed':''}`} style={{'--practice-sidebar':`${panels.state.collapsed?52:panels.state.sidebar}px`} as CSSProperties}>
-  <aside className="practice-sidebar">
+  {!singleProblem?<><aside className="practice-sidebar">
    <div className="practice-sidebar-heading">{!panels.state.collapsed?<h2>Practice</h2>:null}<button type="button" className="btn ghost small" aria-label={panels.state.collapsed?'Expand question list':'Collapse question list'} aria-expanded={!panels.state.collapsed} onClick={()=>panels.setState(s=>({...s,collapsed:!s.collapsed}))}>{panels.state.collapsed?'»':'«'}</button></div>
    {!panels.state.collapsed?<>
    <label className="field"><span>Search problems</span><input type="search" placeholder="Search questions…" value={search} onChange={e=>setSearch(e.target.value)} /></label>
@@ -44,7 +44,7 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previ
    <nav aria-label="Practice problems">{list.map(p=><button data-draft-changed={previewData?.changedStars.includes(p.lc)||undefined} type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{canEdit&&stars.stars.has(p.lc)?<span aria-label="Starred">★ </span>:null}{p.title}<span className="practice-tags"><Difficulty value={p.difficulty} /><span className="practice-tag practice-collection">{p.extra?"Extra":"NeetCode 150"}</span></span></button>)}{!list.length?<p>{canEdit&&starredOnly?'No starred questions match. Star a question to revisit it here.':'No matching problems.'}</p>:null}</nav>
    </>:null}
   </aside>
-  {!panels.state.collapsed?<ResizeHandle label="Resize question list" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>panels.setState(s=>({...s,sidebar}))} />:<div className="practice-resizer-spacer" />}
+  {!panels.state.collapsed?<ResizeHandle label="Resize question list" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>panels.setState(s=>({...s,sidebar}))} />:<div className="practice-resizer-spacer" />}</>:null}
   <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} preview={previewData} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!!previewData||!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
  </div>;
 }

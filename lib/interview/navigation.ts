@@ -1,4 +1,6 @@
 import {TOPICS} from '@/lib/notes/topics';
+import {sectionTopics} from './content';
+import {PRACTICE_LIST} from '@/lib/practice/catalog';
 export const INTERVIEW_SECTIONS=[
  {id:'dashboard',label:'Dashboard',href:'/interview',group:null,color:TOPICS[0].dot},
  {id:'dsa',label:'Data Structures & Algorithms',href:'/interview/dsa/practice',group:'Interview Skills',color:TOPICS[0].dot},
@@ -13,6 +15,6 @@ export const INTERVIEW_SECTIONS=[
  {id:'applications',label:'Application Tracker',href:'/interview/applications',group:'Tools',color:TOPICS[10].dot},
 ] as const;
 export type InterviewSection=(typeof INTERVIEW_SECTIONS)[number];
-export const interviewSection=(path:string)=>INTERVIEW_SECTIONS.find(s=>s.id!=='dashboard'&&(path===`/interview/${s.id}`||path.startsWith(`/interview/${s.id}/`)))??INTERVIEW_SECTIONS[0];
-export const interviewTopics=(id:string)=>id==='dsa'?TOPICS.filter(t=>t.id!=='class-design'):id==='low-level-design'?TOPICS.filter(t=>t.id==='class-design'):[];
+export const interviewSection=(path:string)=>path.startsWith('/interview/problems/')?INTERVIEW_SECTIONS.find(s=>s.id===(PRACTICE_LIST.find(p=>p.lc===Number(path.split('/').at(-1)))?.topic==='class-design'?'low-level-design':'dsa'))!:INTERVIEW_SECTIONS.find(s=>s.id!=='dashboard'&&(path===`/interview/${s.id}`||path.startsWith(`/interview/${s.id}/`)))??INTERVIEW_SECTIONS[0];
+export const interviewTopics=sectionTopics;
 export const PRACTICE_SECTIONS=['dsa','system-design','low-level-design','finance','ai-engineering'] as const;
