@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { BUDGETS, CONTACT_LIMITS, type ContactResult } from "@/lib/contact";
+import { BUDGETS, CONTACT_LIMITS, type ContactResult } from "@/lib/contact-fields";
 
 type Action = (prev: ContactResult | null, form: FormData) => Promise<ContactResult>;
 

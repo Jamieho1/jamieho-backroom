@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {FeedbackButton} from "./feedback-button";
 import { forwardRef, useEffect, useRef, type MutableRefObject } from "react";
 import { ContentReviewBadge } from "./content-drafts/review-badge";
 import { AppMark } from "./desktop-icons";
@@ -45,6 +46,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
       <Link href="/projects">Projects</Link><Link href="/interview">Interview</Link><Link href="/articles">Articles</Link><Link href="/resources">Resources</Link><Link href="/privacy">Privacy</Link>
     </nav>
     <div className="site-navigation-account">
+      <FeedbackButton className="site-feedback-button"/>
       <ContentReviewBadge />
       <ThemeToggle />
       {viewer.status === "anonymous" && configured ? <SignInButton label="Sign in" next={journey ? "/" : undefined} className="site-auth-button" /> : null}

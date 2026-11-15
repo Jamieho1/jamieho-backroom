@@ -58,6 +58,9 @@ export default function Privacy() {
           <strong>Existing Resume, Behavioral stories and answers</strong> are stored in Supabase, including experience, projects, education, certificates, skills, CV bullets, story links, question-to-story mappings, answer outlines and follow-ups. Only the owner edits them; people allowed to open Behavioral can read them. Resume entries and bullets appear publicly on About Me only when the owner marks them Public. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>
+          <strong>Website feedback</strong> (optional) stores your Problem/Idea selection, message and optional local page link in the owner’s inbox and email alerts. It does not request your name or email; captured page links omit query parameters. It uses the same short-lived coded IP spam limits and encrypted backups as contact messages.
+        </li>
+        <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
           read and answer it. To stop spam, a one-way coded version of your IP address (not the address itself) is stored with the
           message and wiped after one hour. Each message is also forwarded to Jamie by email.
@@ -86,7 +89,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, messages and your private Interview resume, Behavioral questions and STAR answers, Practice code, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, contact messages, website feedback and your private Interview resume, Behavioral questions and STAR answers, Practice code, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>

@@ -6,6 +6,8 @@ test.beforeAll(async()=>{
  b.onResolve({filter:/components\/viewer-provider$|\.\/viewer-provider$/},()=>({path:'viewer',namespace:'badge-viewer'}));
  b.onLoad({filter:/.*/,namespace:'badge-viewer'},()=>({resolveDir:process.cwd(),contents:`import {useSyncExternalStore} from 'react';const role=new URLSearchParams(location.search).get('role')||'anonymous';let viewer={status:role,id:role};const listeners=new Set();window.changeBadgeViewer=status=>{viewer={status,id:status};for(const callback of listeners)callback()};export function useViewer(){return {viewer:useSyncExternalStore(callback=>{listeners.add(callback);return()=>listeners.delete(callback)},()=>viewer),configured:true}}`}));
  b.onResolve({filter:/app\/actions\/content-draft-count$/},()=>({path:'count',namespace:'badge-count'}));b.onLoad({filter:/.*/,namespace:'badge-count'},()=>({contents:`export async function getContentDraftCount(){const response=await fetch('/__badge_count');return response.json()}`}));
+ // Standalone esbuild fixtures do not run Next's server-action transform.
+ b.onResolve({filter:/^@\/app\/actions\/contact$/},()=>({path:'feedback',namespace:'badge-feedback'}));b.onLoad({filter:/.*/,namespace:'badge-feedback'},()=>({contents:`export async function sendFeedback(){return {ok:false,message:'Feedback is outside this badge fixture.'}}`}));
  b.onResolve({filter:/^next\/navigation$/},()=>({path:'navigation',namespace:'badge-navigation'}));b.onLoad({filter:/.*/,namespace:'badge-navigation'},()=>({contents:'export function usePathname(){return "/"}'}));
  b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'badge-link'}));b.onLoad({filter:/.*/,namespace:'badge-link'},()=>({resolveDir:process.cwd(),contents:'import React from "react";export default function Link({prefetch,children,...props}){return React.createElement("a",props,children)}'}));
  }}]});bundle=out.outputFiles[0].text;
@@ -21,7 +23,10 @@ test('owner sees two drafts in top and floating bars without overflow or changed
  for(const floating of [false,true]){
   await mount(page,'owner',2,floating);const badge=page.getByRole('link',{name:'2 to review',exact:true});await expect(badge).toBeVisible();await expect(badge).toHaveAttribute('href','/manage/review');
   await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
-  await expect(page.getByRole('navigation',{name:'Site',exact:true}).getByRole('link')).toHaveCount(4);
+  const navigation=page.getByRole('navigation',{name:'Site',exact:true});
+  const links=[['Projects','/projects'],['Interview','/interview'],['Articles','/articles'],['Resources','/resources'],['Privacy','/privacy']] as const;
+  await expect(navigation.getByRole('link')).toHaveText(links.map(([label])=>label));
+  for(const [label,href] of links)await expect(navigation.getByRole('link',{name:label,exact:true})).toHaveAttribute('href',href);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.evaluate(()=>{(window as unknown as {changeBadgeViewer:(role:string)=>void}).changeBadgeViewer('member')});await expect(badge).toHaveCount(0);
  }

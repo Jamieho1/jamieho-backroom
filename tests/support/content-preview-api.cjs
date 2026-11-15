@@ -40,6 +40,9 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
     const chunks=[]; for await(const chunk of req)chunks.push(chunk); const rawBody=Buffer.concat(chunks);const body=rawBody.toString('utf8');
     const url = new URL(req.url, `http://127.0.0.1:${port}`);
     try {
+      if(url.pathname==='/__feedback_reset'&&req.method==='POST'){await db.exec('delete from public.messages');return send(res,200,{ok:true});}
+      if(url.pathname==='/__feedback_limit'&&req.method==='POST'){await db.exec("insert into public.messages(kind,need) select 'idea','Synthetic limit fixture' from generate_series(1,30)");return send(res,200,{ok:true});}
+      if(url.pathname==='/__feedback_state')return send(res,200,(await db.query('select kind,need,page_path,name,email from public.messages order by created_at')).rows);
       if (url.pathname === '/__session') {
         const session = sessions[url.searchParams.get('role') || 'owner'];
         if (!session) return send(res,400,{});
@@ -94,7 +97,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
-      if (!['content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
+      if (!['messages','content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
       const rows=await db.transaction(async tx=>{
         await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session?.user.id || '',role:session?'authenticated':'anon'})]);
         await tx.exec('set local role '+(session?'authenticated':'anon'));
@@ -114,6 +117,11 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
           const keys=Object.keys(row);if(keys.some(k=>!allowed.includes(k)))throw Error('Unknown Behavioral field');
           const conflict=table==='interview_behavioral_answers'?' on conflict(user_id,question_id) do update set '+keys.map(k=>k+'=excluded.'+k).join(','):'';
           return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')'+conflict+' returning *',keys.map(k=>row[k]))).rows;
+        }
+        if(table==='messages'){
+          if(req.method==='POST'){const row=JSON.parse(body);const keys=Object.keys(row);if(keys.some(k=>!['kind','need','page_path','name','email','budget','ip_hash'].includes(k)))throw Error('Unknown message field');await tx.query('insert into public.messages('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')',keys.map(k=>row[k]));return [];}
+          if(req.method==='PATCH'){const row=JSON.parse(body);if(Object.keys(row).join(',')!=='read')throw Error('Only read status may change');params.push(row.read);return (await tx.query('update public.messages set read=$'+params.length+clause+' returning *',params)).rows;}
+          if(req.method==='DELETE')return (await tx.query('delete from public.messages'+clause+' returning *',params)).rows;
         }
         if(table==='user_resumes'){
           if(req.method==='POST'){const row=JSON.parse(body);return (await tx.query('insert into public.user_resumes(user_id,content) values ($1,$2) returning *',[row.user_id,JSON.stringify(row.content)])).rows;}

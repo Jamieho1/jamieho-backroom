@@ -4,7 +4,7 @@
  */
 export type AlertOutcome = "sent" | "skipped" | "failed";
 
-export async function sendAlert(subject: string, text: string, replyTo: string, fetcher: typeof fetch = fetch): Promise<AlertOutcome> {
+export async function sendAlert(subject: string, text: string, replyTo: string | undefined, fetcher: typeof fetch = fetch): Promise<AlertOutcome> {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_ALERT_TO?.trim();
   if (!key || !to) {
@@ -16,7 +16,7 @@ export async function sendAlert(subject: string, text: string, replyTo: string, 
     const res = await fetcher("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [to], subject, text, reply_to: replyTo }),
+      body: JSON.stringify({ from, to: [to], subject, text, ...(replyTo ? {reply_to:replyTo} : {}) }),
       signal: AbortSignal.timeout(8000),
     });
     if (res.ok) return "sent";

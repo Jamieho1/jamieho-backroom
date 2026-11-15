@@ -1,3 +1,5 @@
+import Link from "next/link";
+import {FEEDBACK_LABELS,validFeedbackPage} from "@/lib/feedback";
 import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -8,8 +10,10 @@ import { AddInviteForm, DeleteMessageForm, MessageReadForm, RemoveInviteForm, Vi
 
 interface Message {
   id: string;
-  name: string;
-  email: string;
+  name: string|null;
+  email: string|null;
+  kind: "contact"|"problem"|"idea";
+  page_path: string|null;
   need: string;
   budget: string;
   read: boolean;
@@ -34,7 +38,7 @@ export async function SettingsContent() {
   ] = await Promise.all([
     sb.from("apps").select("*").order("sort"),
     sb.from("invites").select("email, note, created_at").order("created_at", { ascending: false }),
-    sb.from("messages").select("id, name, email, need, budget, read, created_at").order("created_at", { ascending: false }).limit(200),
+    sb.from("messages").select("id, name, email, need, budget, read, created_at, kind, page_path").order("created_at", { ascending: false }).limit(200),
     sb.from("profiles").select("id, email, full_name, role, created_at"),
     sb.from("signins").select("user_id, at").order("at", { ascending: false }).limit(5000),
     sb.from("app_opens").select("user_id, app_id").limit(5000),
@@ -67,24 +71,25 @@ export async function SettingsContent() {
         <h2 id="inbox-h">
           Inbox {unread ? <span className="badge">{unread} new</span> : null}
         </h2>
-        <p className="muted">Messages from the contact form. Reply from your own email.</p>
+        <p className="muted">Contact messages and website feedback. Reply to contact messages from your own email.</p>
         {messagesError ? <p role="alert" className="alert">Can&apos;t reach the data right now.</p> : null}
         {inbox.length ? (
           <ul className="inbox">
             {inbox.map((m) => (
               <li key={m.id} className={m.read ? "msg" : "msg unread"}>
                 <div className="msg-head">
-                  <strong>{m.name}</strong>
-                  <a href={`mailto:${m.email}?subject=${encodeURIComponent("Re: your message")}`}>{m.email}</a>
+                  <span className="badge">{FEEDBACK_LABELS[m.kind]??"Contact"}</span><strong>{m.name??"Anonymous feedback"}</strong>
+                  <>{m.email?<a href={`mailto:${m.email}?subject=${encodeURIComponent("Re: your message")}`}>{m.email}</a>:null}</>
                   {m.budget ? <span className="badge">{m.budget}</span> : null}
                   <time className="muted small" dateTime={m.created_at}>
                     {WHEN.format(new Date(m.created_at))}
                   </time>
                 </div>
+                {m.page_path&&validFeedbackPage(m.page_path)?<p>Page: <Link prefetch={false} href={m.page_path}>{m.page_path}</Link></p>:null}
                 <p className="msg-body">{m.need}</p>
                 <div className="msg-actions">
                   <MessageReadForm id={m.id} read={m.read} />
-                  <DeleteMessageForm id={m.id} from={m.name} />
+                  <DeleteMessageForm id={m.id} from={m.name??"anonymous feedback"} />
                 </div>
               </li>
             ))}
