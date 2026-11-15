@@ -14,7 +14,8 @@ import {SiteHeader} from '@/components/site-header';
 beforeEach(()=>{vi.restoreAllMocks();localStorage.clear();m.path='/interview/dsa/practice';m.viewer={status:'anonymous',name:'Example'};vi.stubGlobal('matchMedia',()=>({matches:false,addEventListener(){},removeEventListener(){}}));});
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 it('has the complete section taxonomy, 17 DSA topics and class design in LLD with a real colour',()=>{
- expect(INTERVIEW_SECTIONS).toHaveLength(14);expect(interviewTopics('dsa')).toHaveLength(17);expect(interviewTopics('low-level-design').map(t=>t.id)).toEqual(['class-design']);expect(TOPICS.at(-1)?.dot).toMatch(/^#[0-9A-F]{6}$/i);expect(interviewSection('/interview/dsa/notes/trees').id).toBe('dsa');expect(interviewSection('/interview/behavioral').id).toBe('behavioral');
+ expect(INTERVIEW_SECTIONS.filter(s=>s.group==='Role').map(s=>s.label)).toEqual(['Full-Stack','Finance Engineering','AI Engineering','FDE','Data Science','Machine Learning']);
+ expect(INTERVIEW_SECTIONS).toHaveLength(19);expect(interviewTopics('dsa')).toHaveLength(17);expect(interviewTopics('low-level-design').map(t=>t.id)).toEqual(['class-design']);expect(TOPICS.at(-1)?.dot).toMatch(/^#[0-9A-F]{6}$/i);expect(interviewSection('/interview/dsa/notes/trees').id).toBe('dsa');expect(interviewSection('/interview/behavioral').id).toBe('behavioral');
  for(const topic of TOPICS){const {container,unmount}=render(<InterviewIcon name={topic.id}/>);expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.7');expect(container.querySelector('svg')?.getAttribute('fill')).toBe('none');expect(container.querySelector('path')?.getAttribute('d')).toBeTruthy();unmount();}
 });
 it('renders links and active navigation while persisting both independent collapse states',async()=>{
@@ -26,7 +27,7 @@ it('renders links and active navigation while persisting both independent collap
 });
 it('collapsed links have tooltips on pointer hover and keyboard focus',()=>{
  localStorage.setItem(INTERVIEW_STORAGE.rail,'true');render(<InterviewShell>Fixture</InterviewShell>);
- const link=screen.getByRole('link',{name:'Finance'});fireEvent.focus(link);expect(screen.getByRole('tooltip').textContent).toBe('Finance');expect(link.getAttribute('aria-describedby')).toBe('iv-tooltip');fireEvent.keyDown(document,{key:'Escape'});expect(screen.queryByRole('tooltip')).toBeNull();fireEvent.focus(link);fireEvent.blur(link);expect(screen.queryByRole('tooltip')).toBeNull();fireEvent.mouseEnter(link);expect(screen.getByRole('tooltip').textContent).toBe('Finance');fireEvent.mouseLeave(link);expect(screen.queryByRole('tooltip')).toBeNull();
+ const link=screen.getByRole('link',{name:'Finance Engineering'});fireEvent.focus(link);expect(screen.getByRole('tooltip').textContent).toBe('Finance Engineering');expect(link.getAttribute('aria-describedby')).toBe('iv-tooltip');fireEvent.keyDown(document,{key:'Escape'});expect(screen.queryByRole('tooltip')).toBeNull();fireEvent.focus(link);fireEvent.blur(link);expect(screen.queryByRole('tooltip')).toBeNull();fireEvent.mouseEnter(link);expect(screen.getByRole('tooltip').textContent).toBe('Finance Engineering');fireEvent.mouseLeave(link);expect(screen.queryByRole('tooltip')).toBeNull();
 });
 it('storage exceptions do not break collapse controls',()=>{
  vi.spyOn(Storage.prototype,'getItem').mockImplementation(()=>{throw Error('blocked')});vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw Error('blocked')});render(<InterviewShell>Fixture</InterviewShell>);fireEvent.click(screen.getByRole('button',{name:'Collapse section rail'}));expect(document.querySelector('.iv-shell')?.getAttribute('data-rail-collapsed')).toBe('true');

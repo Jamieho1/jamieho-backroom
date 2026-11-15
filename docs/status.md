@@ -331,3 +331,45 @@ Local UI: About is labelled Education in the journey chapter eyebrow and both na
 Checks actually run for these refinements: npm run typecheck passed; full npm test -- --maxWorkers=2 passed 1,031 tests / 114 files. Credential-free and synthetic-config production builds passed; unchanged static assertions passed for /, /resources, /privacy, /projects, /articles. Full two-worker local Playwright: 160 passed, 66 conditional integration/viewport skips (226 total), zero failures. Separate synthetic owner-preview/session-isolation/Notes-access checks: 18 passed at desktop/390px. Tests cover both dropdown states/input methods, native mutual exclusion, new route links/message, compact rail, owner badge, no sideways overflow and preserved draft isolation. Updated old labels/selectors; selectors now scope to the visible navigation so hidden still fallback markup cannot create ambiguity. git diff --check passed. All browser tests use isolated localhost builds and synthetic users, never production/browser control.
 
 Additional files changed beyond the TKT-124 inventory: components/site-navigation.tsx, components/interview/icons.tsx, lib/interview/navigation.ts, app/interview/[section]/page.tsx, app/interview/interview.css, lib/journey/chapters.ts; tests/unit/interview.test.tsx, journey-timeline.test.ts; tests/e2e/home.spec.ts, journey.spec.ts, articles.spec.ts, desktop.spec.ts, interview.spec.ts, content-review-badge.spec.ts, content-preview.spec.ts; docs/journey.md and the current architecture/security/interview/operations/status notes, MEMORY.md. Original applied migration SQL is unchanged. No commit, push or deployment; Jamie pushes and verifies frontend live before Done.
+
+
+## TKT-125 — Full Interview verification (2026-11-15)
+
+Local verification complete against baseline 85aa9dc and the test changes below. No genuine runtime defect found; no application, design, schema, dependency, privacy collection or live data change. No migration prepared/applied; TKT-124’s existing applied state remains unchanged. No new feature, commit, push, deployment, production browser/control, real account, key access or real email. Stop here for Jamie to push and review live; not marked Done before that review.
+
+Checks actually run, newly for TKT-125:
+
+| Command/check | Actual result |
+| --- | --- |
+| npm run typecheck | Passed |
+| npm test -- --maxWorkers=2 | 1,031 passed / 114 files; zero failures |
+| npm run build (credential-free isolated copy) | Passed |
+| node scripts/assert-static.mjs (credential-free build) | Passed unchanged for /, /resources, /privacy, /projects, /articles |
+| npm run build (synthetic loopback Supabase config) | Passed |
+| node scripts/assert-static.mjs (synthetic build) | Same five public routes passed |
+| Full npx playwright test with temporary installed-Chromium config, two workers, desktop1280×800/390×800 (also compact desktop720px checks) | 162 passed, 66 conditional/viewport skips, zero failures; 228 total |
+| Complete tests/content-preview.playwright.config.ts against disposable PGlite API + synthetic production build, one worker, desktop/390px | 60 passed, zero skips/failures |
+| git diff --check | Passed |
+
+The 66 main-suite skips comprise 58 synthetic-account integration cases executed in the separate 60-case integration run plus eight intentionally viewport-specific counterparts. Two content-preview visitor checks run in both suites; do not add counts as unique cases. Used existing pinned dependencies and an installed local Chromium override; repository CI config/pins unchanged. Credential-free and synthetic copies exclude .env files. Build/test logs are disposable local outputs, not committed private content. No live verification claim.
+
+Coverage: expanded/collapsed rail/topic list, stored preferences/exceptions, icon tooltips, aligned controls, phone drawer/Topics/Escape/focus, all 14 destinations, Soon placeholders, disabled Practice where no catalogue, signed-out Notes prompt and uninvited-account Notes reads, topic-preserving mode links, question search, real browser Python, public visitor local code/no account progress, per-user flag/code/attempt/completion persistence, Resume public empty guide and blank/template/editor/retry flows, Behavioral guide/search/status/STAR/custom question/Course, Feedback’s two entry points/Inbox/retry/honeypot/limits, Settings/review locks, draft-cookie isolation/approve/discard, desktop and phone reduced motion, and horizontal-overflow checks all passed. Current full matrix: docs/interview.md.
+
+Two-account proof: separate synthetic owner/member browser contexts. Owner’s flag/code never appears for member; member’s flags/code never appear for owner. Member passes Contains Duplicate while owner remains incomplete; owner passes Two Sum while member remains incomplete, both after persistence/reload. Each keeps only its own resume and STAR fields. Member gets 404 for owner’s private custom question; owner gets 404 for member’s, with neither private prompt serialized to the other. Full DB tests independently prove own-row SELECT/INSERT/UPDATE/DELETE and identity/FK protections for owner and two members, anonymous denial, account cascade, preserved migrated synthetic legacy data and hardened API functions. No owner bypass.
+
+Changes: verification-only extensions to tests/e2e/practice-progress.spec.ts (reverse saved-code/completion proof), interview-behavioral.spec.ts (member-created question and owner 404), interview.spec.ts (explicit reduced-motion desktop controls and zero-duration phone drawer). Updated docs/interview.md, architecture.md, security.md, operations.md, status.md and MEMORY.md. No failures required product fixes; all final checks passed on the first run of these verification additions.
+
+## Interview Role regrouping (2026-11-15)
+
+Implemented Jamie’s requested navigation refinements. Interview Skills: DSA, System Design, Low Level Design, Fundamental. New Role group: Full-Stack, Finance Engineering, AI Engineering, FDE, Data Science, Machine Learning, in that order. Career retains Resume/Behavioral and adds Project; Tools is unchanged. Existing finance/forward-deploy-engineer/data-scientist IDs and URLs are preserved. Four new routes (fundamental, full-stack, machine-learning, project) use the existing Soon placeholder and original coloured line icons. The eighteen-destination rail retains its existing independent scrolling with fixed header/account controls; no smaller fonts or mobile targets. No database, permissions, private content or dependency changes.
+
+Checks actually run for this follow-up: npm run typecheck passed; full unit/database suite passed 1,031 tests / 114 files; production build and unchanged static assertions passed for /, /resources, /privacy, /projects, /articles. Targeted Interview Playwright desktop/390px: 16 passed, four intentional viewport-specific skips, zero failures. Covers every destination/title, Role names, new placeholder message, renamed tooltips, independent rail scroll, collapse persistence/alignment, keyboard, phone drawer/Topics, mode switch/search/browser runner and reduced motion. Full unrelated browser/integration suites were not rerun; preceding TKT-125 results remain historical. git diff --check passed.
+
+Files changed for this follow-up: lib/interview/navigation.ts, components/interview/shell.tsx, icons.tsx, app/interview/[section]/page.tsx, tests/unit/interview.test.tsx, tests/e2e/interview.spec.ts; docs/interview.md, architecture.md, status.md and MEMORY.md. Earlier uncommitted TKT-125 tests/docs are preserved. No migration, live action, commit, push or deployment. Jamie pushes and reviews live.
+
+
+## SQL Interview entry (2026-11-15)
+
+Added SQL immediately below Fundamental under Interview Skills, with its original coloured database icon and /interview/sql Soon placeholder. Nineteen destinations now use the existing independent rail scroll. Updated navigation/icon/placeholder route registration, existing taxonomy/browser assertions, current interview/architecture docs and MEMORY; prior uncommitted work preserved. No SQL editor, schema, dependency or live data change.
+
+Checks actually run: typecheck passed; targeted Interview unit tests 5 passed; production build and unchanged static assertions passed; desktop/390px Interview browser suite 16 passed, four intentional viewport skips, zero failures; git diff --check passed. Full unit/DB and unrelated browser suites were not rerun for this small navigation change. No migration, commit, push or deployment; Jamie pushes/reviews live.

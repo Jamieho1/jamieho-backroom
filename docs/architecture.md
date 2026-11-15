@@ -90,3 +90,11 @@ TKT-124 access: components/notes/sign-in.tsx is the shared Google prompt for /no
 
 
 Shared navigation groups Articles/Resources under Content; NavigationMenu provides the same hover/click, Escape/focus-return and outside-dismiss logic as Journey, with native mutually exclusive details grouping per bar. Education is the display label for pivot/about; persisted keys and anchors are unchanged. The Interview registry adds three original-icon Soon routes: forward-deploy-engineer, data-scientist and mock-interview. No additional schema or personal-data collection.
+
+
+TKT-125 verification (2026-11-15): no runtime architecture changes or genuine product defects found. Full typecheck, 1,031 unit/DB tests, credential-free/synthetic production builds, static assertions, 162 main-suite browser cases and all 60 synthetic integration cases passed. The integration API applies the real migration chain and request role/JWT-scoped RLS; separate owner/member browser contexts prove private code, flags, ticks, resumes and STAR answers stay isolated both ways, including owner denial of member custom-question URLs. Added only reverse-direction and reduced-motion browser evidence, with no app test hooks, dependencies, new routes or migrations. Coverage matrix: interview.md; exact commands/skips: status.md. Jamie pushes/reviews live.
+
+
+Interview rail taxonomy update (2026-11-15): navigation.ts and shell.tsx now render Interview Skills, Role, Career and Tools groups. Role orders Full-Stack, Finance Engineering, AI Engineering, FDE, Data Science and Machine Learning; existing finance/forward-deploy-engineer/data-scientist route IDs are retained. Fundamental follows Low Level Design; Career adds Project. Four new routes reuse the shared Soon placeholder and original icons. The nineteen-item rail uses its existing independent scrolling; no schema, auth, content loading or private-data behavior changes.
+
+SQL appears directly after Fundamental in Interview Skills at /interview/sql, using the shared Soon placeholder and an original database line icon. No database or access change.

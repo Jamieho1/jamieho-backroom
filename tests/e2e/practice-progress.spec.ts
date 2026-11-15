@@ -19,9 +19,17 @@ test('owner and member have isolated flags, saved code and completions; visitors
   await member.getByRole('button',{name:'Submit',exact:true}).click();await expect(member.getByRole('region',{name:'Test results'})).toContainText('passed',{timeout:60000});await expect(member.getByText('Saving attempt…',{exact:true})).toHaveCount(0);
   await member.reload();await expect(member.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Member synthetic code');
   await page.goto('/interview/problems/217');await expect(page.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Live fixture code');await expect(page.getByRole('textbox',{name:'Python code',exact:true})).not.toContainText('Member synthetic code');
+  // Prove the other direction too: owner progress on a different problem is never the member's.
+  await page.goto('/interview/problems/1');const ownerEditor=page.getByRole('textbox',{name:'Python code',exact:true});
+  await expect(page.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});await ownerEditor.fill(problemByNumber(1)!.solution+'\n# Owner synthetic code');
+  await page.getByRole('button',{name:'Save code',exact:true}).click();await expect(page.getByText('Saved across devices',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Submit',exact:true}).click();await expect(page.getByRole('region',{name:'Test results'})).toContainText('passed',{timeout:60000});await expect(page.getByText('Saving attempt…',{exact:true})).toHaveCount(0);
+  await page.reload();await expect(page.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Owner synthetic code');
+  await member.goto('/interview/problems/1');await expect(member.getByRole('textbox',{name:'Python code',exact:true})).toBeVisible();await expect(member.getByRole('textbox',{name:'Python code',exact:true})).not.toContainText('Owner synthetic code');
   await member.goto('/interview/dsa/practice/arrays-hashing');await page.goto('/interview/dsa/practice/arrays-hashing');
   await expect(member.getByRole('img',{name:'Contains Duplicate completed',exact:true})).toBeVisible();await expect(page.getByRole('img',{name:'Contains Duplicate not completed',exact:true})).toBeVisible();
-  await member.reload();await expect(member.getByRole('button',{name:'Unflag Two Sum',exact:true})).toBeEnabled();await fits(member);await fits(page);
+  await expect(page.getByRole('img',{name:'Two Sum completed',exact:true})).toBeVisible();await expect(member.getByRole('img',{name:'Two Sum not completed',exact:true})).toBeVisible();
+  await member.reload();await expect(member.getByRole('button',{name:'Unflag Two Sum',exact:true})).toBeEnabled();await expect(page.getByRole('button',{name:'Flag Two Sum',exact:true})).toBeEnabled();await fits(member);await fits(page);
   const visitor=await browser.newPage({viewport:page.viewportSize()!});try{await visitor.goto(baseURL+'/interview/dsa/practice/arrays-hashing');await expect(visitor.locator('.iv-question-progress')).toHaveCount(0);await fits(visitor);}finally{await visitor.close();}
  }finally{await context.close();}
 });
