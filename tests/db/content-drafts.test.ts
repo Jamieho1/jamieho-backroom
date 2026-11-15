@@ -41,7 +41,7 @@ describe("content change access", () => {
   }
   it("owner can select/insert/update/delete draft sets", async () => {
     await as(db, owner, async q => {
-      expect(await q('select id from public.content_changes')).toHaveLength(1);
+      expect(await q('select id from public.content_changes where id=$1',[seeded])).toHaveLength(1);
       const [set] = await q<{id:string}>("insert into public.content_changes(summary,operations) values ('Owner draft',$1) returning id", [JSON.stringify([operation()])]);
       expect(await q("update public.content_changes set summary='Revised summary' where id=$1 returning id", [set.id])).toHaveLength(1);
       expect(await q('delete from public.content_changes where id=$1 returning id', [set.id])).toHaveLength(1);

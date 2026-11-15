@@ -1,3 +1,5 @@
+import {isGuideTable} from '@/lib/interview/behavioral';
+import {behavioralTargets} from './behavioral-guides';
 import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -24,10 +26,10 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
   ]);
   if (sets.error || sections.error || items.error || bullets.error||projects.error||articles.error||guides.error) return { drafts: [], error: "Could not load content drafts and current live values. Try again." };
   const appRows:Record<string,Record<string,Record<string,unknown>>>={};
-  const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isAppTable(op.table)||op.table==='resume_templates'?[op.table]:[]):[];}));
+  const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isGuideTable(op.table)||isAppTable(op.table)||op.table==='resume_templates'?[op.table]:[]):[];}));
   for(const table of appTables){
     let query=sb.from(table).select("*");if(isPersonalPractice(table))query=query.eq("user_id",viewer.id);const rows=await query;if(rows.error)return {drafts:[],error:"Could not load current app values. Try again."};
-    appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[table==='resume_templates'?row.key:appKey(table as import('./app-allowlist').AppTable,row),row]));
+    appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[isGuideTable(table)?row.id:table==='resume_templates'?row.key:appKey(table as import('./app-allowlist').AppTable,row),row]));
   }
   const live = Object.fromEntries((sections.data ?? []).map(row => [row.key, { title: row.title ?? "", body: row.body ?? "" }]));
   const drafts = ((sets.data ?? []) as ContentChange[]).map(set => {
@@ -35,7 +37,7 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
     let result=validateOperations(set.operations);
     try {const parsed=parsePhotoSet(set.operations,set.photo_slots,set.id);photoSlots=parsed.slots;result={ok:true,operations:parsed.operations};}catch(error){photoError=error instanceof Error?error.message:'Invalid photo slots.';}
     const previewOps=result.ok?[...result.operations,...photoSlots.map(slot=>({op:'update' as const,table:'projects' as const,key:slot.target.key,fields:{}}))]:[];
-    return { ...set, photoSlots, previewTargets:result.ok?[...publishingTargets(previewOps),...appTargets(result.operations),...(result.operations.some(op=>op.table==='resume_templates')?[{href:'/interview/resume',label:'Preview resume template'}]:[])]:[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {...appRows,projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
+    return { ...set, photoSlots, previewTargets:result.ok?[...behavioralTargets(result.operations),...publishingTargets(previewOps),...appTargets(result.operations),...(result.operations.some(op=>op.table==='resume_templates')?[{href:'/interview/resume',label:'Preview resume template'}]:[])]:[],previewCv:result.ok && result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets"), fields: result.ok ? reviewFields(result.operations, live, {...appRows,projects:Object.fromEntries((projects.data??[]).map(row=>[row.id,row])),articles:Object.fromEntries((articles.data??[]).map(row=>[row.id,row])),guides:Object.fromEntries((guides.data??[]).map(row=>[row.id,row])),experience_items:Object.fromEntries((items.data??[]).map(row=>[row.id,row])),experience_bullets:Object.fromEntries((bullets.data??[]).map(row=>[row.id,row]))}) : [],
       validationError: !result.ok ? result.message : photoError };
   });
   for(const draft of drafts)for(const slot of draft.photoSlots??[])draft.fields.push({field:`projects.${slot.target.key}.screenshots (${slot.slot})`,current:JSON.stringify((projects.data??[]).find(row=>row.id===slot.target.key)?.screenshots??[]),proposed:slot.path?`Append ${photoUrl(slot.path)}`:`Awaiting ${slot.expected_filename}`});

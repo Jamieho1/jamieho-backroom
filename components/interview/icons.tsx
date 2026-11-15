@@ -2,7 +2,8 @@ import type {SVGProps} from 'react';
 import type {TopicId} from '@/lib/notes/topics';
 import type {InterviewSection} from '@/lib/interview/navigation';
 /** Original 24px line drawings, shared 1.7px rounded stroke; no external icon artwork. */
-const paths:Record<InterviewSection['id']|TopicId|'brand'|'menu'|'close'|'collapse'|'expand'|'feedback'|'back'|'account'|'topics',string>={
+const paths:Record<InterviewSection['id']|TopicId|'brand'|'menu'|'close'|'collapse'|'expand'|'feedback'|'back'|'account'|'topics'|'conflict'|'failure'|'leadership'|'ambiguity'|'ownership'|'impact'|'teamwork'|'customer'|'motivation',string>={
+ conflict:'M3 7h7v7H3ZM14 10h7v7h-7ZM10 11h4M7 17l3 3M17 7l-3-3',failure:'M4 12a8 8 0 1 0 3-6M4 3v5h5M12 8v5l3 2',leadership:'M12 3v18M4 21h16M12 4h8l-3 3 3 3h-8',ambiguity:'M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 4M12 18h.01M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0',ownership:'M5 5l7-2 7 2v7c0 5-7 9-7 9S5 17 5 12ZM8 11l3 3 5-6',impact:'M4 20h16M6 17v-4M12 17V9M18 17V5M4 8l6-4 5 1 5-3',teamwork:'M4 20v-4l4-3 4 3v4M12 20v-4l4-3 4 3v4M5 4h6v5H5ZM13 4h6v5h-6Z',customer:'M3 4h18v12h-7l-4 5v-5H3ZM7 8h10M7 12h6',motivation:'M12 3l3 6 6 1-5 5 1 6-5-3-5 3 1-6-5-5 6-1Z',
  brand:'M8 5 3 12l5 7M16 5l5 7-5 7M14 4l-4 16',
  dashboard:'M4 4h6v6H4ZM14 4h6v10h-6ZM4 14h6v6H4ZM14 18h6v2h-6Z',
  dsa:'M4 5h5v5H4ZM15 5h5v5h-5ZM9 7h6M6.5 10v7h11v-7M10 15h4v5h-4Z',

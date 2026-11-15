@@ -6,7 +6,7 @@ Read this index and [status.md](status.md) at session start. Load only the relev
 | --- | --- |
 | Routes, apps, content ownership | [architecture.md](architecture.md) |
 | Home design, motion, media, phones | [journey.md](journey.md) |
-| Interview shell, rail, topics, responsive behaviour | [interview.md](interview.md) |
+| Interview shell, Practice, Resume, Behavioral, responsive behaviour | [interview.md](interview.md) |
 | Owner-reviewed content proposals | [content-drafts.md](content-drafts.md) |
 | Auth, RLS, migrations, privacy, storage | [security.md](security.md) |
 | Commands, checks, deployment, infrastructure | [operations.md](operations.md) |

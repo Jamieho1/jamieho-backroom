@@ -1,3 +1,4 @@
+import {themeFields,questionFields,themeSchema,behavioralOperation,isGuideTable,questionHref} from '@/lib/interview/behavioral';
 import {templateFields,templateOperation} from '@/lib/resume';
 import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
@@ -25,6 +26,8 @@ const articleFields=articleSchema.omit({id:true}).shape;
 const guideFields=guideSchema.omit({id:true}).shape;
 export const CONTENT_ALLOWLIST = {
   ...APP_ALLOWLIST,
+  interview_behavioral_themes:{key:themeSchema.shape.id,fields:themeFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
+  interview_behavioral_questions:{key:z.uuid(),fields:questionFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
   resume_templates:{key:z.literal('default'),fields:templateFields,operations:['update'] as const,routes:['/interview/resume'] as const},
   projects: {key:uuid,fields:projectFields,operations:["insert","update","delete"] as const,routes:["/projects","/","/journey"] as const},
   articles: {key:uuid,fields:articleFields,operations:["insert","update","delete"] as const,routes:["/articles","/","/journey"] as const},
@@ -84,7 +87,7 @@ const publishingOperations={projects:publishingOperation("projects"),articles:pu
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
-  const schema = op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
+  const schema = typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
     : op?.table === "experience_items" ? op.op === "insert" ? itemInsert : itemUpdate
     : op?.table === "experience_bullets" ? op.op === "insert" ? bulletInsert : op.op === "delete" ? bulletDelete : bulletUpdate
     : null;
@@ -106,5 +109,6 @@ export function affectedRoutes(operations: ContentOperation[], previous:unknown 
   for(const op of operations)if(op.table==="question_notes"||op.table==="practice_code"||op.table==="practice_stars")routes.push(`/practices/${op.key}`,interviewProblemHref(op.key));
   for(const op of operations)if(op.table==="notes")routes.push(noteHref(String(op.key)));
   if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(`/${row.table}/${encodeURIComponent(row.values.slug)}`);
+  for(const op of operations)if(op.table==='interview_behavioral_questions')routes.push(questionHref(op.key));
   return [...new Set(routes)];
 }

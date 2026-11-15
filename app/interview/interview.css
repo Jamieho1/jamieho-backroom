@@ -134,3 +134,21 @@ body:has(.iv-shell) {background:#0e131c;}
 .iv-resume label {display:grid;gap:6px;margin:12px 0;color:var(--iv-ink);}.iv-resume :is(input,textarea,select) {width:100%;min-width:0;max-width:100%;border:1px solid var(--iv-line);border-radius:7px;padding:9px;background:var(--iv-bg);color:var(--iv-ink);font:inherit;}.iv-resume textarea {resize:vertical;}
 .iv-resume button {border:1px solid var(--iv-line);border-radius:7px;padding:8px 12px;background:var(--iv-card);color:var(--iv-ink);font:inherit;}.iv-resume button[type="submit"] {background:var(--iv-accent);color:var(--iv-bg);}.iv-resume-entry-actions,.iv-resume-start {display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}.iv-resume-bullets {border-top:1px solid var(--iv-line);margin-top:16px;padding-top:8px;}.iv-resume button:disabled {opacity:.45;}
 @media(max-width:768px){.iv-resume-guide,.iv-resume-entry {padding:12px;}}
+
+/* TKT-122: compact public guides and private STAR workspace. */
+.iv-playbook{max-width:960px;margin:0 auto;padding:24px;overflow-wrap:anywhere;min-width:0}
+.iv-playbook h1{font-size:26px}.iv-playbook h2{font-size:21px}.iv-playbook h3{font-size:16px}
+.iv-playbook p{line-height:1.65;color:var(--iv-text,#e6edf7)}
+.iv-playbook-tabs,.iv-playbook-filters{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.iv-playbook-tabs a{padding:8px 12px;border-bottom:2px solid transparent}.iv-playbook-tabs a[aria-current]{border-color:#f4c76a}
+.iv-playbook label{display:flex;flex-direction:column;gap:7px;margin:12px 0;font-size:13px;min-width:0}
+.iv-playbook input,.iv-playbook select,.iv-playbook textarea{font:inherit;color:#e6edf7;background:#151e2a;border:1px solid #344354;border-radius:7px;padding:10px;max-width:100%;width:100%;box-sizing:border-box}
+.iv-playbook textarea{resize:vertical}.iv-playbook button{font:inherit;background:#1b2838;color:#e6edf7;border:1px solid #344354;border-radius:7px;padding:9px 13px;cursor:pointer}
+.iv-playbook button[type=submit]{background:#f4c76a;color:#15202c}.iv-playbook button:disabled{opacity:.55;cursor:default}
+.iv-playbook fieldset{min-width:0;border:1px solid #344354;border-radius:10px;padding:16px;margin:22px 0}
+.iv-behavioral-guide{background:#121c29;border:1px solid #2c3b50;border-radius:12px;padding:18px;margin:18px 0}
+.iv-behavioral-guide section+section{border-top:1px solid #2c3b50;margin-top:16px}.iv-behavioral-guide p{white-space:pre-wrap}.iv-behavioral-guide pre{white-space:pre-wrap;font:inherit}
+.iv-playbook-theme ul{list-style:none;padding:0}.iv-playbook-theme li{border-bottom:1px solid #2c3b50}.iv-playbook-theme li a{display:flex;justify-content:space-between;gap:12px;padding:14px 0}.iv-playbook-theme li span{font-size:12px;flex-shrink:0;color:#a9b7cb}
+.iv-playbook [data-draft-changed=true]{outline:2px solid var(--gold,#f4c76a);outline-offset:3px}
+.iv-behavioral-signin{border-left:2px solid #f4c76a;padding:0 14px;margin:20px 0}
+@media(max-width:768px){.iv-playbook{padding:16px}.iv-playbook-theme li a{display:block}.iv-playbook-theme li span{display:block;margin-top:6px}.iv-playbook-filters>*{width:100%}}
