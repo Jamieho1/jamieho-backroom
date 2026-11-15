@@ -128,3 +128,9 @@ body:has(.iv-shell) {background:#0e131c;}
 .iv-flag[aria-pressed="true"] {color:var(--iv-accent);}
 .iv-flag svg,.iv-completion svg {width:20px;height:20px;}.iv-completion {display:flex;color:var(--iv-muted);}.iv-completion[data-complete="true"] {color:#7bd6a3;}
 @media(max-width:768px){.iv-questions li>a {grid-template-columns:minmax(0,1fr);}.iv-question-progress {gap:5px;padding:5px;}}
+
+.iv-resume {max-width:850px;min-width:0;overflow-wrap:anywhere;}.iv-resume h1 {font-size:24px;margin:0 0 20px;color:var(--iv-ink);}.iv-resume h2 {font-size:18px;color:var(--iv-ink);}.iv-resume h3 {font-size:16px;color:var(--iv-ink);}
+.iv-resume-guide,.iv-resume-entry {border:1px solid var(--iv-line);border-radius:10px;padding:18px;margin:16px 0;background:var(--iv-panel);min-width:0;}.iv-resume-guide article {border-top:1px solid var(--iv-line);padding:12px 0;}.iv-resume p {color:var(--iv-muted);}.iv-resume form>fieldset {border:0;padding:0;min-width:0;}.iv-resume legend {color:var(--iv-ink);font-weight:600;}
+.iv-resume label {display:grid;gap:6px;margin:12px 0;color:var(--iv-ink);}.iv-resume :is(input,textarea,select) {width:100%;min-width:0;max-width:100%;border:1px solid var(--iv-line);border-radius:7px;padding:9px;background:var(--iv-bg);color:var(--iv-ink);font:inherit;}.iv-resume textarea {resize:vertical;}
+.iv-resume button {border:1px solid var(--iv-line);border-radius:7px;padding:8px 12px;background:var(--iv-card);color:var(--iv-ink);font:inherit;}.iv-resume button[type="submit"] {background:var(--iv-accent);color:var(--iv-bg);}.iv-resume-entry-actions,.iv-resume-start {display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}.iv-resume-bullets {border-top:1px solid var(--iv-line);margin-top:16px;padding-top:8px;}.iv-resume button:disabled {opacity:.45;}
+@media(max-width:768px){.iv-resume-guide,.iv-resume-entry {padding:12px;}}

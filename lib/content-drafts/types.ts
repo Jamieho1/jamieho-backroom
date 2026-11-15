@@ -43,6 +43,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
 }
 
 export interface HomePreview {
+  resumeTemplate?:import('@/lib/resume').ResumeTemplate;
   photoSlots?: import("./photo-slots").PhotoSlot[];
   id: string;
   summary: string;

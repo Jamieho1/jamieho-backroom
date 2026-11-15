@@ -1,3 +1,4 @@
+import {loadTemplatePreview} from './resume-template';
 import { cookies, draftMode } from "next/headers";
 import { z } from "zod";
 import { getViewer } from "@/lib/viewer";
@@ -28,10 +29,10 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
     if(rows.error)return null;
     try {experience=overlayExperience((rows.data??[]) as ExperienceRow[],result.operations);} catch {return null;}
   }
-  let publishing,appData;
-  try {publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations,viewer.id);} catch {return null;}
-  const targets=[...publishingTargets(result.operations),...appTargets(result.operations)];
-  return { ...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
+  let publishing,appData,resumeTemplate;
+  try {resumeTemplate=await loadTemplatePreview(sb,result.operations);publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations,viewer.id);} catch {return null;}
+  const targets=[...(resumeTemplate?[{href:'/interview/resume',label:'Preview resume template'}]:[]),...publishingTargets(result.operations),...appTargets(result.operations)];
+  return { ...(resumeTemplate?{resumeTemplate}:{}),...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }
 
 /** Draft Mode is false at prerender time. Only its enabled branch reads request cookies/auth. */

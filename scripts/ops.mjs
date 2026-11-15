@@ -11,7 +11,7 @@ import { encrypt } from "./export-crypto.mjs";
 
 const TABLES = JSON.parse(readFileSync(new URL("./export-tables.json", import.meta.url), "utf8"));
 const PAGE = 1000;
-const PRACTICE_KEYS={practice_stars:["user_id","problem"],practice_code:["user_id","problem"],practice_attempts:["user_id","id"]};
+const PRACTICE_KEYS={user_resumes:["user_id"],resume_templates:["key"],practice_stars:["user_id","problem"],practice_code:["user_id","problem"],practice_attempts:["user_id","id"]};
 
 function client() {
   const url = process.env.SUPABASE_URL;

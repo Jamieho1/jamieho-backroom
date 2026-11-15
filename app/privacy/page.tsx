@@ -49,7 +49,10 @@ export default function Privacy() {
           <strong>Articles</strong> are stored in Supabase. Signed-in readers can pin published articles; the article ID, account ID and pin date are stored privately to sync their list across devices. Readers can unpin them; deleting an account or article removes its pins. These records follow the retention and backup periods below. The owner can save private drafts and publish articles and reference links for everyone to read. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>
-          <strong>Resume, Behavioral stories and answers</strong> are stored in Supabase, including experience, projects, education, certificates, skills, CV bullets, story links, question-to-story mappings, answer outlines and follow-ups. Only the owner edits them; people allowed to open Behavioral can read them. Resume entries and bullets appear publicly on About Me only when the owner marks them Public. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
+          <strong>Interview Resume</strong> stores your private entries, bullets, certificates and skills with your account ID, revision and save date in Supabase. Each signed-in user can read and edit only their own resume through the site, including the owner. The public guide is a separate shared template; starting from it copies its structure into your private resume. Account deletion removes your resume. It is included in the encrypted backups and retention periods below.
+        </li>
+        <li>
+          <strong>Existing Resume, Behavioral stories and answers</strong> are stored in Supabase, including experience, projects, education, certificates, skills, CV bullets, story links, question-to-story mappings, answer outlines and follow-ups. Only the owner edits them; people allowed to open Behavioral can read them. Resume entries and bullets appear publicly on About Me only when the owner marks them Public. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>
           <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
@@ -65,7 +68,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send, and sync your private Practice code, attempts and flags, plus the owner’s notes, resume entries, Behavioral stories, answer preparation and articles for use across devices.
+        read and reply to messages you send, and sync your private Interview resume and Practice code, attempts and flags, plus the owner’s notes, resume entries, Behavioral stories, answer preparation and articles for use across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -80,7 +83,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, messages and your private Practice code, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, messages and your private Interview resume, Practice code, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>

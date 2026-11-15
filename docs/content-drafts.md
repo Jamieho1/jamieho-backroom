@@ -1,4 +1,4 @@
-# Content drafts — TKT-98 through TKT-120
+# Content drafts — TKT-98 through TKT-121
 
 Pending owner changes for site_sections, experience_items, experience_bullets, projects, articles, guides and the six app tables listed below. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
@@ -115,3 +115,10 @@ Live TKT-107 checks confirmed exact function-source parity, hardened permissions
 
 
 TKT-120 migration 20261115000906_per_user_practice.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115005816. It preserves existing owner rows while adding per-user keys/policies; only the owner’s code/flags can enter an owner-reviewed change set. Other users’ rows cannot be read, audited, updated or deleted by the draft engine even with colliding problem keys. Prior values retain the owner user_id. No new draft fields or public RPC. Live helper source/permissions, RLS and unchanged content fingerprints verified. Frontend deployment remains pending; older applied migrations remain untouched.
+
+
+## Resume template — TKT-121
+
+resume_templates supports update only for key default, fields title/content. content uses lib/resume.ts’s strict complete-document schema; private user_resumes is not on the allowlist. Migration seeds only an empty template; Claude drafts the anonymised guide through ordinary change sets, never by importing the live CV. Review compares structured JSON; loadTemplatePreview composes owner-verified operations and exposes /interview/resume as the preview target. The guide is read-only/gold outlined in preview and never copies unapproved content into personal resumes. Approve revalidates /interview/resume; existing copied resumes stay independent.
+
+The SQL approval trigger delegates to private.apply_resume_template_draft, enforcing owner, singleton key, operation/field rules and the same nested validators before recording full prior values. Later operation failures roll back all template/content/status/history changes. No new public RPC or private-resume access. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347. Frontend deployment and Jamie’s live verification remain pending. Existing applied SQL remains unchanged.

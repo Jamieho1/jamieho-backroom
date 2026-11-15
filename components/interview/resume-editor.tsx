@@ -1,0 +1,36 @@
+'use client';
+import {useState} from 'react';
+import {useViewer} from '@/components/viewer-provider';
+import {SignInButton} from '@/components/sign-in-button';
+import {startResume,saveResume} from '@/app/actions/resume';
+import {RESUME_KINDS,RESUME_LABELS,newResumeEntry,moveResumeItem,sortResume,type UserResume,type ResumeTemplate,type ResumeEntry} from '@/lib/resume';
+export function ResumeWorkspace({initial,template,userId,configured,children}:{initial:UserResume|null;template:ResumeTemplate;userId?:string;configured:boolean;children?:React.ReactNode}){
+ const {viewer}=useViewer();
+ if(configured&&(viewer.status==='loading'||(viewer.id??undefined)!==userId))return <p role="status">Loading your resume…</p>;
+ return <ResumeEditor key={userId??'visitor'} initial={initial} template={template} signedIn={!!userId} configured={configured}>{children}</ResumeEditor>;
+}
+function ResumeGuide({template}:{template:ResumeTemplate}){return <section className="iv-resume-guide" aria-label="Resume template" data-draft-changed={template.draftChanged||undefined}><h2>{template.title}</h2><p>Read-only guide. Your resume is private and independent of this template.</p>{template.content.entries.length?sortResume(template.content).entries.map(e=><article key={e.id}><h3>{e.title}</h3><p>{[RESUME_LABELS[e.kind],e.org,e.dates,e.location].filter(Boolean).join(' · ')}</p><p>{e.summary}</p>{e.bullets.length?<ul>{e.bullets.map(b=><li key={b.id}>{b.text}</li>)}</ul>:null}</article>):<p>No template content has been added yet.</p>}</section>;}
+function ResumeEditor({initial,template,signedIn,configured,children}:{initial:UserResume|null;template:ResumeTemplate;signedIn:boolean;configured:boolean;children?:React.ReactNode}){
+ const [resume,setResume]=useState(initial);const [entries,setEntries]=useState(()=>initial?sortResume(initial.content).entries:[]);const [pending,setPending]=useState(false);const [error,setError]=useState('');const [message,setMessage]=useState('');const [startMode,setStartMode]=useState<'blank'|'template'>('blank');const [dirty,setDirty]=useState(false);
+ const preview=!!template.draftChanged;
+ const update=(next:ResumeEntry[])=>{setEntries(next);setDirty(true);setMessage('');};
+ const patch=(index:number,fields:Partial<ResumeEntry>)=>update(entries.map((e,i)=>i===index?{...e,...fields}:e));
+ async function start(mode:'blank'|'template'){
+  setStartMode(mode);setPending(true);setError('');try{const result=await startResume(mode);if(result.ok){setResume(result.resume);setEntries(sortResume(result.resume.content).entries);setMessage('Resume started.');setDirty(false);}else setError(result.message);}catch{setError('Could not start your resume. Please retry.');}finally{setPending(false);}
+ }
+ async function save(){if(!resume)return;setPending(true);setError('');setMessage('');const content={entries:entries.map((e,i)=>({...e,sort:i,bullets:e.bullets.map((b,j)=>({...b,sort:j}))}))};try{const result=await saveResume(content,resume.revision);if(result.ok){setResume(result.resume);setEntries(sortResume(result.resume.content).entries);setMessage('Saved.');setDirty(false);}else setError(result.message);}catch{setError('Could not save. Your edits are still here. Please retry.');}finally{setPending(false);}}
+ return <section className="iv-resume"><h1>Resume</h1>{!resume||preview?<ResumeGuide template={template}/>:null}
+ {!signedIn?<div className="iv-resume-start"><p>Sign in to build your own private resume.</p>{configured?<SignInButton label="Sign in to build your own" next="/interview/resume" className="iv-toolbar-button"/>:<button className="iv-toolbar-button" disabled>Sign in to build your own</button>}</div>:preview?<p>Read-only template preview.</p>:!resume?<div className="iv-resume-start"><button type="button" disabled={pending} onClick={()=>void start('template')}>Start from template</button><button type="button" disabled={pending} onClick={()=>void start('blank')}>Start blank</button></div>:<form aria-label="Your resume" onSubmit={e=>{e.preventDefault();void save();}}>
+ <fieldset disabled={pending}><legend>Your private resume</legend>
+ {entries.length?entries.map((entry,index)=><fieldset className="iv-resume-entry" key={entry.id}><legend>Entry {index+1}</legend><div className="iv-resume-entry-actions"><button type="button" aria-label={`Move entry ${index+1} up`} disabled={!index} onClick={()=>update(moveResumeItem(entries,index,-1))}>Move up</button><button type="button" aria-label={`Move entry ${index+1} down`} disabled={index===entries.length-1} onClick={()=>update(moveResumeItem(entries,index,1))}>Move down</button><button type="button" aria-label={`Remove entry ${index+1}`} onClick={()=>update(entries.filter((_,i)=>i!==index))}>Remove entry</button></div>
+ <label>Kind<select value={entry.kind} onChange={e=>patch(index,{kind:e.target.value as ResumeEntry['kind']})}>{RESUME_KINDS.map(kind=><option key={kind} value={kind}>{RESUME_LABELS[kind]}</option>)}</select></label>
+ {(['title','org','dates','location'] as const).map(field=><label key={field}>{({title:'Title',org:'Organisation',dates:'Dates',location:'Location'})[field]}<input value={entry[field]} maxLength={field==='dates'||field==='location'?80:160} required={field==='title'} onChange={e=>patch(index,{[field]:e.target.value})}/></label>)}
+ <label>Summary<textarea rows={3} maxLength={2000} value={entry.summary} onChange={e=>patch(index,{summary:e.target.value})}/></label>
+ <div className="iv-resume-bullets">{entry.bullets.map((bullet,bi)=><div key={bullet.id}><label>Bullet {bi+1}<textarea rows={2} maxLength={1000} required value={bullet.text} onChange={e=>patch(index,{bullets:entry.bullets.map((b,j)=>j===bi?{...b,text:e.target.value}:b)})}/></label><div className="iv-resume-entry-actions"><button type="button" disabled={!bi} aria-label={`Move bullet ${bi+1} up`} onClick={()=>patch(index,{bullets:moveResumeItem(entry.bullets,bi,-1)})}>Move up</button><button type="button" disabled={bi===entry.bullets.length-1} aria-label={`Move bullet ${bi+1} down`} onClick={()=>patch(index,{bullets:moveResumeItem(entry.bullets,bi,1)})}>Move down</button><button type="button" aria-label={`Remove bullet ${bi+1}`} onClick={()=>patch(index,{bullets:entry.bullets.filter((_,i)=>i!==bi)})}>Remove bullet</button></div></div>)}<button type="button" disabled={entry.bullets.length>=30} onClick={()=>patch(index,{bullets:[...entry.bullets,{id:crypto.randomUUID(),text:'',sort:entry.bullets.length}]})}>Add bullet</button></div>
+ </fieldset>):<p>Your resume is empty. Add an entry to begin.</p>}
+ <div className="iv-resume-entry-actions">{(['role','certificate','skills'] as const).map(kind=><button type="button" disabled={entries.length>=60} key={kind} onClick={()=>update([...entries,newResumeEntry(kind)])}>{kind==='role'?'Add entry':kind==='certificate'?'Add certificate':'Add skills'}</button>)}</div>
+ <button type="submit">{error?'Retry save':'Save resume'}</button>{dirty?<span> Unsaved changes</span>:null}
+ </fieldset></form>}
+ {pending?<p role="status">Saving…</p>:message?<p role="status">{message}</p>:null}{error?<div role="alert"><p>{error}</p>{!resume?<button type="button" disabled={pending} onClick={()=>void start(startMode)}>Retry</button>:null}</div>:null}{children}
+ </section>;
+}
