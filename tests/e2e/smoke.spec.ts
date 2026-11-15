@@ -58,6 +58,7 @@ test("the project page is public with the plain Resources layout", async ({ page
 });
 
 test("the contact form checks fields and quietly drops bot submissions", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" }); // Validate the form independently of scroll-camera timing.
   await page.goto("/#home-contact");
   const form = page.getByRole("region", { name: "Contact Us", exact: true });
   await form.getByRole("button", { name: "Send" }).click(); // the browser blocks it: every field is required

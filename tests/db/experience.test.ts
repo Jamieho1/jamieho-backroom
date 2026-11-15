@@ -48,9 +48,9 @@ describe("who sees what", () => {
     expect(await items(member)).toEqual(["Software Engineer"]);
     expect(await bullets(member)).toEqual(["Public bullet"]);
   });
-  it("someone invited to Behavioral sees the whole CV", async () => {
-    expect(await items(guest)).toEqual(["Secret project", "Software Engineer"]);
-    expect(await bullets(guest)).toEqual(["Hidden bullet", "Public bullet", "Ticked, but its role is hidden"]);
+  it("a Behavioral invitation does not reveal private CV entries", async () => {
+    expect(await items(guest)).toEqual(["Software Engineer"]);
+    expect(await bullets(guest)).toEqual(["Public bullet"]);
   });
   it("the owner sees everything", async () => {
     expect(await bullets(owner)).toHaveLength(3);

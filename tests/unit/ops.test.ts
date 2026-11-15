@@ -59,3 +59,8 @@ it('encrypted practice backups retain multiple user IDs and private rows without
  const tables={practice_code:[{user_id:'account-a',problem:217,code:'Synthetic A'},{user_id:'account-b',problem:217,code:'Synthetic B'}],practice_stars:[{user_id:'account-b',problem:1}],practice_attempts:[{user_id:'account-a',problem:217,mode:'submit',status:'ok',passed:2,total:2}]};
  const encrypted=encrypt(Buffer.from(JSON.stringify({tables})),'synthetic export passphrase');expect(encrypted.toString('utf8')).not.toContain('Synthetic A');expect(JSON.parse(decrypt(encrypted,'synthetic export passphrase').toString('utf8'))).toEqual({tables});
 });
+
+it('encrypted Interview backups include private resumes, custom questions, answers and import archives for every account',()=>{
+ const tables={user_resumes:[{user_id:'account-a',content:{entries:[]}},{user_id:'account-b',content:{entries:[]}}],resume_templates:[{key:'default',content:{entries:[]}}],interview_behavioral_themes:[{id:'conflict'}],interview_behavioral_questions:[{id:'synthetic-question'}],interview_behavioral_custom_questions:[{user_id:'account-a',prompt:'Synthetic private prompt'}],interview_behavioral_answers:[{user_id:'account-b',question_id:'synthetic-question',situation:'Synthetic private STAR',legacy_source:{outline:'Synthetic source archive'}}]};
+ const encrypted=encrypt(Buffer.from(JSON.stringify({tables})),'synthetic export passphrase');expect(encrypted.toString('utf8')).not.toContain('Synthetic private');expect(JSON.parse(decrypt(encrypted,'synthetic export passphrase').toString('utf8'))).toEqual({tables});
+});

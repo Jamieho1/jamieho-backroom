@@ -41,13 +41,13 @@ test("legacy journey address redirects to the homepage", async ({ page }) => {
 
 test("Journey dropdown navigates, keeps the floating controls and returns to the hero", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".is-journey summary").click();
+  await page.locator(".is-journey [data-menu=journey] summary").click();
   const nav = page.getByRole("navigation", { name: "Journey chapters" });
   await expect(nav.getByRole("button", { name: /Hello/ })).toHaveCount(0);
-  await expect(nav.getByRole("button", { name: /About/ })).toBeVisible();
+  await expect(nav.getByRole("button", { name: /Education/ })).toBeVisible();
 
   await expect(nav.getByRole("button", { name: /TechStack/ })).toBeAttached();
-  await nav.getByRole("button", { name: /About/ }).click();
+  await nav.getByRole("button", { name: /Education/ }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
   await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
   await page.getByRole("link", { name: "Jamie Ho — back to the top" }).click();
@@ -68,8 +68,8 @@ test("opening uses artwork and never downloads the opening video", async ({ page
 test("section photos stay framed through hand-over instead of growing fullscreen", async ({ page }) => {
   await page.goto("/");
   const about = page.locator('[data-chapter="pivot"]');
-  await page.locator(".is-journey summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /About/ }).click();
+  await page.locator(".is-journey [data-menu=journey] summary").click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Education/ }).click();
   await expect(about.locator(".journey-panel")).toBeVisible();
   await page.mouse.wheel(0, 600);
   await page.waitForTimeout(600);
@@ -84,9 +84,9 @@ test("journey ends with the contact form on the monitor instead of a desktop lin
   await expect(contact.getByLabel("Name", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Switch on the computer/ })).toHaveCount(0);
   await expect(page.getByText("At the desk", { exact: true })).toHaveCount(0);
-  await page.locator(".is-journey summary").click();
+  await page.locator(".is-journey [data-menu=journey] summary").click();
   await expect(page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Contact Us/ })).toBeVisible();
-  await page.locator(".is-journey summary").click();
+  await page.locator(".is-journey [data-menu=journey] summary").click();
   await contact.getByLabel("Name", { exact: true }).fill("Local form test");
   await contact.getByLabel("Email", { exact: true }).fill("visitor@example.test");
   await contact.getByLabel("What do you need?", { exact: true }).fill("Testing the contact form UI.");
@@ -128,8 +128,8 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
 
 test("About photos follow scroll and inactive project links cannot intercept the biography", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".is-journey summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "About", exact: true }).click();
+  await page.locator(".is-journey [data-menu=journey] summary").click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "Education", exact: true }).click();
   const about = page.locator('[data-chapter="pivot"]');
   await expect(about.locator(".journey-panel")).toBeVisible();
   await expect(about).not.toHaveAttribute("inert");

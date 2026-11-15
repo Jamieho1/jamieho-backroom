@@ -7,12 +7,12 @@ const s1='00000000-0000-4000-8000-0000000000b1',s2='00000000-0000-4000-8000-0000
 const who=(id:string)=>({role:'authenticated' as const,sub:id});
 beforeAll(async()=>{db=await freshDb();await db.query("insert into private.settings(key,value) values ('owner_email',$1)",[owner.email]);for(const u of [owner,member,invited])await addUser(db,u);await db.query('insert into public.invites(email) values ($1)',[invited.email]);await db.query("insert into public.behavioral_stories(id,title) values ($1,'First story'),($2,'Second story')",[s1,s2]);await db.query("insert into public.behavioral_answers(question_id,primary_story_id,outline,followups) values ('g-disagree',$1,'Outline','Follow-up')",[s1]);});
 afterAll(async()=>{await db.close();});
-it('only owner and invitees read preparation under default invite-only access',async()=>{
- for(const role of [{role:'anon' as const},who(member.id)])expect(await as(db,role,q=>q('select question_id from public.behavioral_answers'))).toEqual([]);
- for(const u of [owner,invited])expect(await as(db,who(u.id),q=>q('select outline,followups from public.behavioral_answers'))).toEqual([{outline:'Outline',followups:'Follow-up'}]);
+it('only owner reads legacy preparation, even with public app access',async()=>{
+ for(const role of [{role:'anon' as const},who(member.id),who(invited.id)])expect(await as(db,role,q=>q('select question_id from public.behavioral_answers'))).toEqual([]);
+ for(const u of [owner])expect(await as(db,who(u.id),q=>q('select outline,followups from public.behavioral_answers'))).toEqual([{outline:'Outline',followups:'Follow-up'}]);
 });
 it('read policy respects all visibility settings and invitation revocation',async()=>{
- for(const [visibility,a,m,g] of [['public',1,1,1],['signed_in',0,1,1],['invite_only',0,0,1],['owner_only',0,0,0]] as const){await db.query("update public.apps set visibility=$1 where id='behavioral'",[visibility]);for(const [role,n] of [[{role:'anon' as const},a],[who(member.id),m],[who(invited.id),g],[who(owner.id),1]] as const)expect((await as(db,role,q=>q('select question_id from public.behavioral_answers'))).length).toBe(n);}
+ for(const [visibility,a,m,g] of [['public',0,0,0],['signed_in',0,0,0],['invite_only',0,0,0],['owner_only',0,0,0]] as const){await db.query("update public.apps set visibility=$1 where id='behavioral'",[visibility]);for(const [role,n] of [[{role:'anon' as const},a],[who(member.id),m],[who(invited.id),g],[who(owner.id),1]] as const)expect((await as(db,role,q=>q('select question_id from public.behavioral_answers'))).length).toBe(n);}
  await db.query("update public.apps set visibility='invite_only' where id='behavioral'");await db.query('delete from public.invites where email=$1',[invited.email]);expect(await as(db,who(invited.id),q=>q('select question_id from public.behavioral_answers'))).toEqual([]);await db.query('insert into public.invites(email) values ($1)',[invited.email]);
 });
 it('nonowners cannot insert/update/delete; invitees remain read-only',async()=>{

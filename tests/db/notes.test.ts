@@ -20,7 +20,7 @@ it("signed-in Notes readers see rows; anonymous visitors get none", async () => 
 });
 it("all visibility modes are enforced on the data, not just the launcher", async () => {
   for (const [visibility, anonCount, memberCount, invitedCount] of [
-    ["public", 1, 1, 1], ["signed_in", 0, 1, 1], ["invite_only", 0, 0, 1], ["owner_only", 0, 0, 0],
+    ["public", 0, 1, 1], ["signed_in", 0, 1, 1], ["invite_only", 0, 0, 1], ["owner_only", 0, 0, 0],
   ] as const) {
     await db.query("update public.apps set visibility=$1 where id='notes'", [visibility]);
     expect((await as(db, { role: "anon" }, q => q("select id from public.notes"))).length).toBe(anonCount);

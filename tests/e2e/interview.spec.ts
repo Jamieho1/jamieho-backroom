@@ -2,9 +2,9 @@ import {test,expect} from '@playwright/test';
 const overflow=async(page:import('@playwright/test').Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 test('Interview renders its own dark shell and every rail destination is a working placeholder',async({page},info)=>{
  await page.emulateMedia({colorScheme:'light'});await page.goto('/interview');await expect(page.getByRole('heading',{level:1,name:'Dashboard',exact:true})).toBeVisible();await expect(page.locator('.site-header,.site-navigation')).toHaveCount(0);expect(await page.locator('.iv-shell').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(14, 19, 28)');
- for(const [label,url] of [['Data Structures & Algorithms','/interview/dsa/practice'],['System Design','/interview/system-design/practice'],['Low Level Design','/interview/low-level-design/practice'],['Finance','/interview/finance/practice'],['AI Engineering','/interview/ai-engineering/practice'],['Resume','/interview/resume'],['Behavioral','/interview/behavioral'],['Companies','/interview/companies'],['Roadmaps','/interview/roadmaps'],['Application Tracker','/interview/applications']]){
+ for(const [label,url] of [['Data Structures & Algorithms','/interview/dsa/practice'],['System Design','/interview/system-design/practice'],['Low Level Design','/interview/low-level-design/practice'],['Finance','/interview/finance/practice'],['AI Engineering','/interview/ai-engineering/practice'],['Forward Deploy Engineer','/interview/forward-deploy-engineer'],['Data Scientist','/interview/data-scientist'],['Mock Interview','/interview/mock-interview'],['Resume','/interview/resume'],['Behavioral','/interview/behavioral'],['Companies','/interview/companies'],['Roadmaps','/interview/roadmaps'],['Application Tracker','/interview/applications']]){
   if(info.project.name==='phone')await page.getByRole('button',{name:'Open interview menu'}).click();
-  await page.getByRole('navigation',{name:'Interview sections'}).getByRole('link',{name:label,exact:true}).click();await expect(page).toHaveURL(url);await expect(page.getByRole('heading',{level:1,name:label,exact:true})).toBeVisible();if(!url.includes('/practice')&&url!=='/interview/resume'&&url!=='/interview/behavioral')await expect(page.locator('.iv-soon')).toHaveText('Soon');await overflow(page);
+  await page.getByRole('navigation',{name:'Interview sections'}).getByRole('link',{name:label,exact:true}).click();await expect(page).toHaveURL(url);await expect(page.getByRole('heading',{level:1,name:label,exact:true})).toBeVisible();if(!url.includes('/practice')&&url!=='/interview/resume'&&url!=='/interview/behavioral')await expect(page.locator('.iv-soon')).toHaveText('Soon');if(['Forward Deploy Engineer','Data Scientist','Mock Interview'].includes(label))await expect(page.getByText('This workspace is coming soon. Your interview preparation will live here.',{exact:true})).toBeVisible();await overflow(page);
  }
  await page.screenshot({path:info.outputPath('interview.png')});
 });
@@ -43,13 +43,13 @@ test('blocked browser storage leaves the shell usable and the saved desktop stat
  if(info.project.name==='phone'){await page.getByRole('button',{name:'Topics',exact:true}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}else{await page.getByRole('button',{name:'Collapse topics'}).click();await page.getByRole('button',{name:'Topics'}).click();await expect(page.getByRole('navigation',{name:'Topics'})).toBeVisible();}await overflow(page);
 });
 test('Interview is between Projects and Articles; Resources has only Guides; old app routes still work',async({page})=>{
- await page.goto('/resources');const nav=page.getByRole('navigation',{name:'Site',exact:true});expect(await nav.locator(':scope > a').allTextContents()).toEqual(['Projects','Interview','Articles','Resources','Privacy']);await expect(nav.getByRole('link',{name:'Interview',exact:true})).toHaveAttribute('href','/interview');await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);await overflow(page);
- for(const url of ['/notes','/practices','/practices/217','/behavioral']){const response=await page.goto(url);expect(response?.status()).toBe(200);await expect(page.getByRole('navigation',{name:'Site',exact:true})).toBeVisible();await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();await overflow(page);}
+ await page.goto('/resources');const nav=page.getByRole('navigation',{name:'Site',exact:true});expect(await nav.locator(':scope > a').allTextContents()).toEqual(['Projects','Interview','Privacy']);await expect(nav.getByRole('link',{name:'Interview',exact:true})).toHaveAttribute('href','/interview');await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);await overflow(page);
+ for(const url of ['/notes','/practices','/practices/217','/behavioral']){const response=await page.goto(url);expect(response?.status()).toBe(200);await expect(page.getByRole('navigation',{name:'Site',exact:true})).toBeVisible();if(url==='/notes')await expect(page.getByRole('heading',{name:'Sign in to read Notes'})).toBeVisible();else if(url==='/behavioral')await expect(page.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();else await expect(page.getByLabel('Python code',{exact:true})).toBeVisible();await overflow(page);}
 });
 
 test('topic mode links preserve the selected DSA topic',async({page},info)=>{
  await page.goto('/interview/dsa/practice/trees');if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();
- await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/trees');await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
+ await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/trees');await expect(page.getByRole('heading',{name:'Sign in to read Notes'})).toBeVisible();
  if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();await page.getByRole('link',{name:'Practice',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/practice/trees');
 });
 
@@ -71,7 +71,7 @@ test('DSA questions search and open a full-width workspace; Notes switch keeps t
  if(info.project.name==='desktop')await expect(page.locator('.iv-shell')).toHaveAttribute('data-topics-collapsed','true');
  if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();else await page.getByRole('button',{name:'Topics',exact:true}).click();
  await page.getByRole('link',{name:'Notes',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/notes/arrays-hashing');
- await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Sign in to read Notes'})).toBeVisible();
  if(info.project.name==='phone')await page.getByRole('button',{name:'Topics',exact:true}).click();
  await page.getByRole('link',{name:'Practice',exact:true}).click();await expect(page).toHaveURL('/interview/dsa/practice/arrays-hashing');
  await overflow(page);

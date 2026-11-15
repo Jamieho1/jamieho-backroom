@@ -9,6 +9,7 @@ const port = Number(process.env.CONTENT_PREVIEW_TEST_PORT || 3208);
 const users = {
   owner: { id: '00000000-0000-4000-8000-000000000101', email: 'preview-owner@example.test' },
   member: { id: '00000000-0000-4000-8000-000000000102', email: 'preview-member@example.test' },
+  reader: { id: '00000000-0000-4000-8000-000000000103', email: 'preview-reader@example.test' },
 };
 const tokenFor = user => Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url') + '.' + Buffer.from(JSON.stringify({ sub: user.id, role: 'authenticated', exp: Math.floor(Date.now()/1000)+86400 })).toString('base64url') + '.local-test-signature';
 const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => [role, {
@@ -25,7 +26,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   for (const user of Object.values(users)) await db.query('insert into auth.users(id,email,email_confirmed_at) values ($1,$2,now())', [user.id,user.email]);
   await db.query("update public.site_sections set title='Live hero heading',body='Live hero body' where key='hero'");
   await db.query("update public.site_sections set title='Live About heading',body='Live About body' where key='about'");
-  // Allow the member fixture to read CV data, so cookie isolation is tested beyond a gate screen.
+  // Retain an invited member and a separate uninvited reader to test access independently.
   await db.query("insert into public.invites(email) values ($1)",[users.member.email]);
   let publishingSeed=0;
   const send = (res,status,data) => { res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); };

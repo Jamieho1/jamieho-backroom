@@ -24,9 +24,10 @@ test('owner sees two drafts in top and floating bars without overflow or changed
   await mount(page,'owner',2,floating);const badge=page.getByRole('link',{name:'2 to review',exact:true});await expect(badge).toBeVisible();await expect(badge).toHaveAttribute('href','/manage/review');
   await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
   const navigation=page.getByRole('navigation',{name:'Site',exact:true});
-  const links=[['Projects','/projects'],['Interview','/interview'],['Articles','/articles'],['Resources','/resources'],['Privacy','/privacy']] as const;
-  await expect(navigation.getByRole('link')).toHaveText(links.map(([label])=>label));
+  const links=[['Projects','/projects'],['Interview','/interview'],['Privacy','/privacy']] as const;
+  await expect(navigation.locator(':scope > a')).toHaveText(links.map(([label])=>label));
   for(const [label,href] of links)await expect(navigation.getByRole('link',{name:label,exact:true})).toHaveAttribute('href',href);
+  await page.keyboard.press('Escape');await navigation.locator('[data-menu=content] summary').click();await expect(page.getByRole('navigation',{name:'Content pages'}).getByRole('link')).toHaveText(['Articles','Resources']);await page.keyboard.press('Escape');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.evaluate(()=>{(window as unknown as {changeBadgeViewer:(role:string)=>void}).changeBadgeViewer('member')});await expect(badge).toHaveCount(0);
  }

@@ -14,7 +14,7 @@ import {SiteHeader} from '@/components/site-header';
 beforeEach(()=>{vi.restoreAllMocks();localStorage.clear();m.path='/interview/dsa/practice';m.viewer={status:'anonymous',name:'Example'};vi.stubGlobal('matchMedia',()=>({matches:false,addEventListener(){},removeEventListener(){}}));});
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 it('has the complete section taxonomy, 17 DSA topics and class design in LLD with a real colour',()=>{
- expect(INTERVIEW_SECTIONS).toHaveLength(11);expect(interviewTopics('dsa')).toHaveLength(17);expect(interviewTopics('low-level-design').map(t=>t.id)).toEqual(['class-design']);expect(TOPICS.at(-1)?.dot).toMatch(/^#[0-9A-F]{6}$/i);expect(interviewSection('/interview/dsa/notes/trees').id).toBe('dsa');expect(interviewSection('/interview/behavioral').id).toBe('behavioral');
+ expect(INTERVIEW_SECTIONS).toHaveLength(14);expect(interviewTopics('dsa')).toHaveLength(17);expect(interviewTopics('low-level-design').map(t=>t.id)).toEqual(['class-design']);expect(TOPICS.at(-1)?.dot).toMatch(/^#[0-9A-F]{6}$/i);expect(interviewSection('/interview/dsa/notes/trees').id).toBe('dsa');expect(interviewSection('/interview/behavioral').id).toBe('behavioral');
  for(const topic of TOPICS){const {container,unmount}=render(<InterviewIcon name={topic.id}/>);expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.7');expect(container.querySelector('svg')?.getAttribute('fill')).toBe('none');expect(container.querySelector('path')?.getAttribute('d')).toBeTruthy();unmount();}
 });
 it('renders links and active navigation while persisting both independent collapse states',async()=>{

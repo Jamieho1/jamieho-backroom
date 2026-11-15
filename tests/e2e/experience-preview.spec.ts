@@ -47,7 +47,7 @@ test.describe('real Experience/CV draft previews',()=>{
    const context=await browser.newContext({viewport:page.viewportSize()!,reducedMotion:'reduce'});const other=await context.newPage();
    try{
     if(role==='member')await signIn(other,baseURL!,role);await context.addCookies(cookies);
-    for(const path of ['/','/behavioral']){await other.goto(baseURL+path);const html=await other.content();expect(html).not.toContain('Draft fixture role');expect(html).not.toContain('Draft new proof');expect(html).not.toContain(set.summary);await expect(other.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);if(role==='member'&&path==='/behavioral')await expect(other.getByRole('region',{name:'CV',exact:true})).toContainText('Live fixture role');}
+    for(const path of ['/','/behavioral']){await other.goto(baseURL+path);const html=await other.content();expect(html).not.toContain('Draft fixture role');expect(html).not.toContain('Draft new proof');expect(html).not.toContain(set.summary);await expect(other.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);if(path==='/behavioral')await expect(other.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();}
    }finally{await context.close();}
   }
  });

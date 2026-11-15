@@ -11,9 +11,11 @@ vi.mock('@/app/settings/content',()=>({SettingsContent:()=>null}));
 vi.mock('@/app/desktop/practice-content',()=>({PracticeContent:({initialProblem}:{initialProblem:number})=><div>Practice problem: {initialProblem}</div>}));
 import {AppPage} from '@/app/desktop/app-page';
 beforeEach(()=>{vi.clearAllMocks();m.viewer.mockResolvedValue({role:'member',id:'example'});m.order.mockResolvedValue({data:[],error:null});m.server.mockResolvedValue({from:()=>({select:()=>({order:()=>({order:m.order})})})});});afterEach(cleanup);
-it('anonymous clean-route sign-in returns to that route, including the problem path',async()=>{
+it('anonymous Notes prompts return to Notes; Practice and Behavioral entry need no sign-in',async()=>{
  m.viewer.mockResolvedValue({role:'anonymous'});
- for(const [app,problem,path] of [['notes',undefined,'/notes'],['practice','217','/practices/217'],['behavioral',undefined,'/behavioral']] as const){render(await AppPage({app,problem}));expect(screen.getByRole('link',{name:'Sign in'}).getAttribute('href')).toBe(path);cleanup();}
+ render(await AppPage({app:'notes'}));expect(screen.getByRole('link',{name:'Sign in'}).getAttribute('href')).toBe('/notes');cleanup();
+ render(await AppPage({app:'practice',problem:'217'}));expect(screen.getByText('Practice problem: 217')).toBeTruthy();expect(screen.queryByRole('link',{name:'Sign in'})).toBeNull();cleanup();
+ render(await AppPage({app:'behavioral'}));expect(screen.getByRole('link',{name:'Open Behavioral Playbook'}).getAttribute('href')).toBe('/interview/behavioral');
  expect(m.order).not.toHaveBeenCalled();
 });
 it('unpermitted apps never render protected content',async()=>{
@@ -23,5 +25,5 @@ it('permitted members get read-only Notes and canonical practice selection',asyn
  m.order.mockResolvedValue({data:[{id:'notes',kind:'internal'},{id:'practice',kind:'internal'}],error:null});render(await AppPage({app:'notes'}));expect(screen.getByText('Notes editing: false')).toBeTruthy();cleanup();render(await AppPage({app:'practice',problem:'217'}));expect(screen.getByText('Practice problem: 217')).toBeTruthy();
 });
 it('failed app reads provide a retry to the canonical route without rendering app data',async()=>{
- m.order.mockResolvedValue({data:null,error:{message:'unavailable'}});render(await AppPage({app:'behavioral'}));expect(screen.getByRole('alert')).toBeTruthy();expect(screen.getByRole('link',{name:'Try again'}).getAttribute('href')).toBe('/behavioral');
+ m.viewer.mockResolvedValue({role:'owner',id:'example'});m.order.mockResolvedValue({data:null,error:{message:'unavailable'}});render(await AppPage({app:'behavioral'}));expect(screen.getByRole('alert')).toBeTruthy();expect(screen.getByRole('link',{name:'Try again'}).getAttribute('href')).toBe('/behavioral');
 });

@@ -19,8 +19,8 @@ export const HOME_CHAPTERS: Chapter[] = [
   },
   // About: biography and education beside a scroll-driven personal photo strip.
   {
-    id: "pivot", label: "About", nav: "About", kind: "section", tone: "light", scroll: 1.5,
-    panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From biomedical engineering to production systems", body: PLACEHOLDER }],
+    id: "pivot", label: "Education", nav: "Education", kind: "section", tone: "light", scroll: 1.5,
+    panels: [{ id: "pivot", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "Education", title: "From Biomedical Engineering to production systems", body: PLACEHOLDER }],
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
   { id: "projects", label: "Work", nav: "Work", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },

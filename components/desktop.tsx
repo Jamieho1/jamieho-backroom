@@ -39,8 +39,8 @@ export function Desktop({ apps, initialApp, content,discoverApps=false,signedIn=
       <div className="desktop-app-content app-page-content">
         {notice}
         {loadError ? <p className="desktop-notice" role="status">Can&apos;t load your apps. <a href="/resources">Try again</a></p> : null}
-        {!active ? <p className="desktop-notice" role="status">This app is unavailable or you don&apos;t have access to it.</p>
-          : content ?? <div className="desktop-placeholder"><h1>{active.name}</h1><p>{PLACEHOLDERS[active.id] ?? "This app’s content is not available yet."}</p></div>}
+        {content ?? (!active ? <p className="desktop-notice" role="status">This app is unavailable or you don&apos;t have access to it.</p>
+          : <div className="desktop-placeholder"><h1>{active.name}</h1><p>{PLACEHOLDERS[active.id] ?? "This app’s content is not available yet."}</p></div>)}
       </div>
     </main>;
   }

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import type { PGlite } from "@electric-sql/pglite";
 import { freshDb, as, addUser } from "./harness";
 
@@ -16,7 +16,7 @@ beforeAll(async () => {
   await db.query("insert into private.settings (key, value) values ('owner_email', $1)", [OWNER.email]);
   for (const u of [OWNER, MEMBER, GUEST]) await addUser(db, u);
   await db.query("insert into public.invites (email) values ('recruiter@example.com')");
-  // A stand-in for an app's private data (e.g. Behavioral stories), guarded the way every real data table will be.
+  // Synthetic course content exercising the retained membership gate; private user data uses own-row RLS.
   await db.exec(`
     create table public.demo_stories (id int primary key, app text not null, title text not null);
     alter table public.demo_stories enable row level security;
@@ -26,12 +26,12 @@ beforeAll(async () => {
 });
 
 describe("seed rows", () => {
-  it("registers Notes, Practice, Behavioral (Invite-only) public Articles and a locked owner-only Settings", async () => {
+  it("registers public Notes, Practice, Behavioral, Articles and a locked owner-only Settings", async () => {
     const r = await db.query<{ id: string; visibility: string; locked: boolean }>("select id, visibility, locked from public.apps order by sort");
     expect(r.rows).toEqual([
-      { id: "notes", visibility: "signed_in", locked: false },
-      { id: "practice", visibility: "signed_in", locked: false },
-      { id: "behavioral", visibility: "invite_only", locked: false },
+      { id: "notes", visibility: "public", locked: false },
+      { id: "practice", visibility: "public", locked: false },
+      { id: "behavioral", visibility: "public", locked: false },
       { id: "articles", visibility: "public", locked: true },
       { id: "settings", visibility: "owner_only", locked: true },
     ]);
@@ -74,6 +74,7 @@ describe("invites", () => {
 });
 
 describe("app data follows the app's visibility", () => {
+  beforeEach(async()=>{await db.exec("update public.apps set visibility=case when id='behavioral' then 'invite_only' else 'signed_in' end where id in ('notes','practice','behavioral')");});
   const titles = (rows: { title: string }[]) => rows.map((r) => r.title).sort();
   const read = (who: Parameters<typeof as>[1]) => as(db, who, (q) => q<{ title: string }>("select title from public.demo_stories"));
 

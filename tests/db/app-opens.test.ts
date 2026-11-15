@@ -27,12 +27,14 @@ describe("app_opens", () => {
     });
   });
   it("can't record apps they can't open, or for someone else, or backdated", async () => {
-    await expect(as(db, member, (q) => q("insert into public.app_opens (app_id) values ('behavioral')"))).rejects.toThrow(/row-level security/);
+    await as(db, member, (q) => q("insert into public.app_opens (app_id) values ('behavioral')"));
     await expect(as(db, member, (q) => q("insert into public.app_opens (app_id) values ('settings')"))).rejects.toThrow(/row-level security/);
     await expect(as(db, member, (q) => q(`insert into public.app_opens (user_id, app_id) values ('${OWNER.id}', 'notes')`))).rejects.toThrow(/permission denied/);
     await expect(as(db, member, (q) => q("insert into public.app_opens (app_id, day) values ('notes', '2020-01-01')"))).rejects.toThrow(/permission denied/);
   });
-  it("an invited member can record the invite-only app", async () => {
+  it("an invitation still permits logging a future invite-only course", async () => {
+    await db.query("update public.apps set visibility='invite_only' where id='behavioral'");
+    await expect(as(db, member, q=>q("insert into public.app_opens(app_id) values('behavioral')"))).rejects.toThrow(/row-level security/);
     await db.query("insert into public.invites (email) values ($1)", [MEMBER.email]);
     await as(db, { ...member, email: MEMBER.email }, (q) => q("insert into public.app_opens (app_id) values ('behavioral')"));
     await db.query("delete from public.invites");

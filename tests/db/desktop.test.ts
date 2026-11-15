@@ -14,13 +14,13 @@ afterAll(async () => { await db.close(); });
 it("anonymous callers cannot list desktop apps", async () => {
   await expect(as(db, { role: "anon" }, q => q("select id from public.desktop_apps order by sort, id"))).rejects.toThrow(/permission denied/);
 });
-it("members see signed-in apps; invitations grant and revoke Behavioral immediately", async () => {
+it("members see public Interview apps without an invitation", async () => {
   const ids = () => as(db, { role: "authenticated", sub: member.id }, q => q("select id from public.desktop_apps order by sort, id"));
-  expect(await ids()).toEqual([{ id: "notes" }, { id: "practice" }, { id: "articles" }]);
+  expect(await ids()).toEqual([{ id: "notes" }, { id: "practice" }, { id: "behavioral" }, { id: "articles" }]);
   await db.query("insert into public.invites (email) values ($1)", [member.email]);
   expect(await ids()).toEqual([{ id: "notes" }, { id: "practice" }, { id: "behavioral" }, { id: "articles" }]);
   await db.query("delete from public.invites");
-  expect(await ids()).toEqual([{ id: "notes" }, { id: "practice" }, { id: "articles" }]);
+  expect(await ids()).toEqual([{ id: "notes" }, { id: "practice" }, { id: "behavioral" }, { id: "articles" }]);
 });
 it("the owner sees Settings and invite-only apps", async () => {
   expect(await as(db, { role: "authenticated", sub: owner.id }, q => q("select id from public.desktop_apps order by sort, id"))).toEqual([{ id: "notes" }, { id: "practice" }, { id: "behavioral" }, { id: "articles" }, { id: "settings" }]);

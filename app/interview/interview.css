@@ -152,3 +152,10 @@ body:has(.iv-shell) {background:#0e131c;}
 .iv-playbook [data-draft-changed=true]{outline:2px solid var(--gold,#f4c76a);outline-offset:3px}
 .iv-behavioral-signin{border-left:2px solid #f4c76a;padding:0 14px;margin:20px 0}
 @media(max-width:768px){.iv-playbook{padding:16px}.iv-playbook-theme li a{display:block}.iv-playbook-theme li span{display:block;margin-top:6px}.iv-playbook-filters>*{width:100%}}
+
+/* Keep fourteen destinations readable within the existing compact desktop rail. */
+@media (min-width:769px) {
+ .iv-sections .iv-section-link {min-height:29px;padding-block:4px;}
+ .iv-sections .iv-group {margin-bottom:6px;}
+ .iv-sections .iv-group h2 {margin-top:8px;margin-bottom:4px;}
+}

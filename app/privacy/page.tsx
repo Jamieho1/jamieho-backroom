@@ -41,8 +41,7 @@ export default function Privacy() {
         </li>
         <li>
           <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
-          and problem. Signed-in users’ flags, explicitly saved code and run/submission attempts (including the code snapshot, results and date) are stored with their account and problem IDs in Supabase to sync across devices. Completion is derived from a passed submission. Each user can access only their own practice records through the site, including the owner; deleting an account removes its practice records. Administrative encrypted backups include these records. Question notes are also stored there; the owner edits them and people allowed to open Practice
-          can read them. Python executes only in the browser. Practice and Notes panel sizes, plus their collapsed question/topic-list preferences, are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
+          and problem. Signed-in users’ flags, explicitly saved code and run/submission attempts (including the code snapshot, results and date) are stored with their account and problem IDs in Supabase to sync across devices. Completion is derived from a passed submission. Each user can access only their own practice records through the site, including the owner; deleting an account removes its practice records. Administrative encrypted backups include these records. Shared practice question notes are public and owner-edited. Study Notes require Google sign-in and are available to every signed-in account; only the owner edits them. Python executes only in the browser. Practice and Notes panel sizes, plus their collapsed question/topic-list preferences, are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
           are covered by the retention and encrypted-backup periods below.
         </li>
         <li>
@@ -55,7 +54,7 @@ export default function Privacy() {
           <strong>Interview Behavioral</strong> stores your private custom questions, STAR answers, optional links to roles in your own resume, and save dates with your account ID. Each account, including the owner, can access only its own preparation through the site. Shared questions and guides are public and owner-managed. Existing owner preparation is copied privately with its original details retained. Account deletion removes your private questions and answers; encrypted backups follow the retention periods below.
         </li>
         <li>
-          <strong>Existing Resume, Behavioral stories and answers</strong> are stored in Supabase, including experience, projects, education, certificates, skills, CV bullets, story links, question-to-story mappings, answer outlines and follow-ups. Only the owner edits them; people allowed to open Behavioral can read them. Resume entries and bullets appear publicly on About Me only when the owner marks them Public. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
+          <strong>The owner’s legacy CV, Behavioral stories and answers</strong> are stored in Supabase. Only the owner can read hidden CV entries, private stories, story links, preparation outlines and follow-ups. CV entries and bullets appear publicly in the journey only when marked Public, with a Public parent entry. Opening the public Behavioral Playbook never grants access to this private material. These records follow the retention and encrypted-backup periods below.
         </li>
         <li>
           <strong>Website feedback</strong> (optional) stores your Problem/Idea selection, message and optional local page link in the owner’s inbox and email alerts. It does not request your name or email; captured page links omit query parameters. It uses the same short-lived coded IP spam limits and encrypted backups as contact messages.
@@ -83,7 +82,7 @@ export default function Privacy() {
         <li>Supabase (database and sign-in), hosted in London, UK.</li>
         <li>Vercel (website hosting and cookieless page-view counts).</li>
         <li>Google (only when you choose &quot;Sign in with Google&quot;).</li>
-        <li>Resend (sends Jamie an email when a contact message arrives).</li>
+        <li>Resend (sends Jamie an email when a contact message or website feedback arrives).</li>
         <li>GitHub (runs the daily health check and stores the encrypted weekly backup).</li>
       </ul>
 

@@ -8,26 +8,29 @@ test("the retired desktop redirects to the Guides resource shelf", async ({ page
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
-test("legacy resource deep links stay behind sign-in", async ({ page }) => {
+test("legacy Behavioral deep links open the public Playbook entry", async ({ page }) => {
  await page.goto('/desktop?app=behavioral'); await expect(page).toHaveURL(/\/behavioral$/);
- await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
+ await expect(page.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();
  await expect(page.getByRole('region',{name:'Question bank'})).toHaveCount(0);
 });
 
-test('clean resource routes stay gated and legacy desktop links redirect to them',async({page})=>{
+test('legacy desktop links preserve account-only Notes and public Practice/Behavioral entry points',async({page})=>{
  for(const [old,path] of [['/desktop?app=notes','/notes'],['/desktop?app=practice','/practices'],['/desktop?app=practice&problem=217','/practices/217'],['/desktop?app=behavioral','/behavioral']]){
   await page.goto(old);expect(new URL(page.url()).pathname).toBe(path);
-  await expect(page.getByText('Sign in to unlock',{exact:true})).toBeVisible();
-  await expect(page.getByRole('region',{name:'Question bank'})).toHaveCount(0);
+  if(path==='/notes')await expect(page.getByRole('heading',{name:'Sign in to read Notes'})).toBeVisible();
+  else if(path==='/behavioral')await expect(page.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();
+  else await expect(page.getByLabel('Python code',{exact:true})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });
 
 test('Resources and Articles use client navigation without replacing the document',async({page})=>{
  await page.goto('/resources');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
+ await page.locator('.site-navigation:visible [data-menu=content] summary').click();
  await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Articles',exact:true}).click();
  await expect(page).toHaveURL(/\/articles$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
+ await page.locator('.site-navigation:visible [data-menu=content] summary').click();
  await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Resources',exact:true}).click();
  await expect(page).toHaveURL(/\/resources$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');

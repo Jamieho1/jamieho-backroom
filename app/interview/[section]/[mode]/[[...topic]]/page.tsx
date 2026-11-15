@@ -5,7 +5,7 @@ import {InterviewQuestions} from '@/components/interview/questions';
 import {getInterviewNotes} from '@/lib/interview/notes';
 import {NotesReader} from '@/components/notes/reader';
 import {PagePreview} from '@/components/content-drafts/page-preview';
-import {ResourceGate} from '@/components/resource-gate';
+import {NotesSignIn} from '@/components/notes/sign-in';
 import {modeHref,noteSection} from '@/lib/interview/content';
 export const dynamic='force-dynamic';
 export default async function InterviewTopicPage({params}:{params:Promise<{section:string;mode:string;topic?:string[]}>}){
@@ -19,10 +19,10 @@ export default async function InterviewTopicPage({params}:{params:Promise<{secti
   if((section==='finance'||section==='ai-engineering')&&!topics.length)return <InterviewPlaceholder section={item}/>;
   return <InterviewQuestions section={section} topic={id} title={selected?.label??item.label}/>;
  }
- if(!id)return <section className="iv-question-page"><h1>{item.label} notes</h1><p>This notes overview will be designed later.</p></section>;
  const page=modeHref(section,true,id);
- if(!data.allowed)return <ResourceGate app="notes" next={page} configured={data.configured} signedIn={data.viewer.role!=='anonymous'}/>;
- if(data.error)return <p role="alert">Can&apos;t reach the notes right now. Please try again.</p>;
+ if(data.viewer.role==='anonymous')return <NotesSignIn next={page} configured={data.configured}/>;
+ if(!data.allowed||data.error)return <p role="alert">Can&apos;t reach the notes right now. Please try again.</p>;
+ if(!id)return <section className="iv-question-page"><h1>{item.label} notes</h1><p>This notes overview will be designed later.</p></section>;
  const note=data.notes.find(n=>n.id===id);if(!note)return <section className="iv-question-page"><h1>{selected?.label}</h1><p>No notes have been added for this topic yet.</p></section>;
  return <div className="iv-note-reader"><NotesReader key={`${id}:${data.preview?.id??'live'}`} notes={[note]} canEdit={data.viewer.role==='owner'&&!data.preview} singleTopic interviewLinks/><PagePreview preview={data.preview} page={page}/></div>;
 }

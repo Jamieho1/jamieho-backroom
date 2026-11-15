@@ -16,12 +16,12 @@ beforeAll(async()=>{
  await db.query("insert into public.behavioral_stories(bullet_id,title,situation) values ($1,'Example story','Example situation')",[bullet]);
 });
 afterAll(async()=>{await db.close();});
-it('Behavioral starts invite-only; uninvited users get no private CV or stories',async()=>{
- expect((await db.query<{visibility:string}>("select visibility from public.apps where id='behavioral'")).rows[0].visibility).toBe('invite_only');
+it('Behavioral opens publicly without revealing private CV or stories',async()=>{
+ expect((await db.query<{visibility:string}>("select visibility from public.apps where id='behavioral'")).rows[0].visibility).toBe('public');
  for(const role of [{role:'anon' as const},who(member.id)])for(const table of ['behavioral_stories','experience_items','experience_bullets'])expect(await as(db,role,q=>q(`select id from public.${table}`))).toEqual([]);
 });
-it('invitees and owner read the hidden CV and linked story',async()=>{
- for(const u of [owner,invited])await as(db,who(u.id),async q=>{
+it('only the owner reads the hidden CV and linked story',async()=>{
+ for(const u of [owner])await as(db,who(u.id),async q=>{
   expect(await q('select text from public.experience_bullets')).toEqual([{text:'Hidden bullet'}]);
   expect(await q('select bullet_id,title from public.behavioral_stories')).toEqual([{bullet_id:bullet,title:'Example story'}]);
  });
@@ -32,7 +32,7 @@ it('revoking an invitation immediately removes story and hidden CV access',async
  await db.query('insert into public.invites(email) values ($1)',[invited.email]);
 });
 it('each story read respects registry visibility modes',async()=>{
- for(const [visibility,a,m,g] of [['public',1,1,1],['signed_in',0,1,1],['invite_only',0,0,1],['owner_only',0,0,0]] as const){
+ for(const [visibility,a,m,g] of [['public',0,0,0],['signed_in',0,0,0],['invite_only',0,0,0],['owner_only',0,0,0]] as const){
   await db.query("update public.apps set visibility=$1 where id='behavioral'",[visibility]);
   for(const [role,n] of [[{role:'anon' as const},a],[who(member.id),m],[who(invited.id),g],[who(owner.id),1]] as const)expect((await as(db,role,q=>q('select id from public.behavioral_stories'))).length).toBe(n);
  }

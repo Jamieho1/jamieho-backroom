@@ -37,7 +37,7 @@ test.describe('real owner app draft previews',()=>{
    for(const path of ['/notes','/interview/dsa/notes/fixture-note','/interview/system-design/notes/sd-fixture','/practices/217','/interview/problems/217','/behavioral']){await other.goto(baseURL+path);await expect(other.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);const html=await other.content();for(const secret of ['Draft fixture note','Draft fixture question','Draft fixture code','Draft fixture story','Draft fixture situation','Draft fixture outline',set.summary])expect(html).not.toContain(secret);
     if(role==='member'&&(path==='/notes'||path==='/interview/dsa/notes/fixture-note'))await expect(other.locator('.notes-main')).toContainText('Live fixture note');
     if(role==='member'&&(path==='/practices/217'||path==='/interview/problems/217')){await other.getByRole('tab',{name:'Notes',exact:true}).click();await expect(other.locator('.practice-question-notes')).toContainText('Live fixture question');await expect(other.getByLabel('Python code',{exact:true})).not.toContainText('Live fixture code');await expect(other.getByRole('button',{name:'Edit question notes'})).toHaveCount(0);}
-    if(role==='member'&&path==='/behavioral'){await other.getByRole('tab',{name:'Questions',exact:true}).click();await expect(other.getByRole('article',{name:'Selected question'})).toContainText('Live fixture outline');}
+    if(path==='/behavioral'){await expect(other.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();expect(await other.content()).not.toContain('Live fixture outline');}
    }
   }finally{await context.close();}}
  });
