@@ -80,6 +80,6 @@ it('app approval refreshes notes, behavioral and the exact practice problem path
  const ops=[{table:'notes',op:'update',key:'fixture-note',fields:{body:'Synthetic note'}},{table:'question_notes',op:'update',key:217,fields:{body:'Synthetic question'}},{table:'behavioral_stories',op:'update',key:id,fields:{title:'Synthetic story'}}];
  mocks.single.mockResolvedValue({data:{...set,operations:ops},error:null});
  const rows:Record<string,unknown[]>={notes:[{id:'fixture-note',body:'Live',free:''}],question_notes:[{problem:217,body:'Live'}],practice_code:[],practice_stars:[],behavioral_stories:[{id,bullet_id:null,title:'Live',situation:'',task:'',action:'',result:'',skills:'',numbers:'',updated_at:'2026-01-01'}]};
- mocks.from.mockImplementation(table=>table==='content_changes'?{select:mocks.select,update:mocks.update}:{select:async()=>({data:rows[table]??[],error:null})});
+ mocks.from.mockImplementation(table=>table==='content_changes'?{select:mocks.select,update:mocks.update}:{select:()=>{const result={data:rows[table]??[],error:null};return {...result,eq:()=>Promise.resolve(result)};}});
  expect(await approveContentChange(id)).toMatchObject({ok:true,applied:true});expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(expect.arrayContaining(['/notes','/practices','/practices/217','/behavioral','/manage/review']));
 });

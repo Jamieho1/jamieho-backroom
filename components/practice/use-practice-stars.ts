@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {loadPracticeStars,savePracticeStar} from '@/app/actions/practice-stars';
-export function usePracticeStars(enabled:boolean){
+export function usePracticeStars(enabled:boolean,scope=""){
  const [stars,setStars]=useState<Set<number>>(new Set());const [loaded,setLoaded]=useState(false);const [loading,setLoading]=useState(enabled);const [loadError,setLoadError]=useState('');
  const [saving,setSaving]=useState(false);const [saveError,setSaveError]=useState('');const [pending,setPending]=useState<{problem:number;starred:boolean}|null>(null);
  const live=useRef(false);const version=useRef(0);
@@ -10,7 +10,7 @@ export function usePracticeStars(enabled:boolean){
   catch{if(live.current&&request===version.current)setLoadError("Couldn't load your starred questions. Retry.");}
   finally{if(live.current&&request===version.current)setLoading(false);}
  }
- useEffect(()=>{live.current=true;if(enabled)void load();else{setStars(new Set());setLoaded(false);setLoading(false);setSaving(false);setLoadError('');setPending(null);setSaveError('');}return()=>{live.current=false;version.current++;};},[enabled]);
+ useEffect(()=>{live.current=true;if(enabled)void load();else{setStars(new Set());setLoaded(false);setLoading(false);setSaving(false);setLoadError('');setPending(null);setSaveError('');}return()=>{live.current=false;version.current++;};},[enabled,scope]);
  async function save(problem:number,starred:boolean){if(!enabled||saving||!loaded||loadError)return;setSaving(true);setSaveError('');setPending({problem,starred});const request=version.current;
   try{const result=await savePracticeStar(problem,starred);if(!live.current||request!==version.current)return;if(result.ok){setStars(previous=>{const next=new Set(previous);starred?next.add(problem):next.delete(problem);return next;});setPending(null);}else setSaveError(result.message);}
   catch{if(live.current&&request===version.current)setSaveError("Couldn't save the change to your review list. Retry.");}

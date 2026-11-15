@@ -63,8 +63,8 @@ test('DSA questions search and open a full-width workspace; Notes switch keeps t
  await expect(page.getByRole('heading',{level:1,name:'Arrays & Hashing'})).toBeVisible();
  await page.getByRole('searchbox',{name:'Search questions'}).fill('Contains Duplicate');
  await expect(page.locator('.iv-questions > li')).toHaveCount(1);
- await expect(page.getByRole('img',{name:'Not flagged (coming soon)'})).toBeVisible();
- await expect(page.getByRole('img',{name:'Not completed (coming soon)'})).toBeVisible();
+ await expect(page.locator('.iv-question-progress')).toHaveCount(0);
+ await expect(page.locator('.iv-flag,.iv-completion')).toHaveCount(0);
  await page.locator('.iv-questions a').click();await expect(page).toHaveURL('/interview/problems/217');
  await expect(page.getByRole('region',{name:'Contains Duplicate',exact:true})).toBeVisible();
  await expect(page.locator('.practice-sidebar')).toHaveCount(0);await overflow(page);

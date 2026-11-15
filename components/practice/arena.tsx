@@ -19,39 +19,39 @@ import { usePracticeStars } from "./use-practice-stars";
 import {practiceData,type PracticePreview} from "@/lib/content-drafts/app-overlay";
 import { useSavedPractice } from "./use-saved-practice";
 
-export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previewData, singleProblem=false }: {singleProblem?:boolean; viewerKey:string; initialProblem?:number;canEdit?:boolean;previewData?:PracticePreview }) {
+export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previewData, singleProblem=false,canSave=canEdit }: {canSave?:boolean;singleProblem?:boolean; viewerKey:string; initialProblem?:number;canEdit?:boolean;previewData?:PracticePreview }) {
  const panels=usePracticePanels();
  const [selected,setSelected]=useState(problemByNumber(initialProblem??0)?.lc ?? PRACTICE_LIST[0].lc);
  const [search,setSearch]=useState("");
  const [topic,setTopic]=useState("");
  const [starredOnly,setStarredOnly]=useState(false);
- const liveStars=usePracticeStars(canEdit&&!previewData);
+ const liveStars=usePracticeStars(canSave&&!previewData,viewerKey);
  const stars=previewData?{...liveStars,stars:new Set(previewData.stars),loaded:true,loading:false}:liveStars;
  const [busy,setBusy]=useState(false);
- const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canEdit||!starredOnly||stars.stars.has(p.lc)));
+ const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canSave||!starredOnly||stars.stars.has(p.lc)));
  return <div className={`practice-arena${panels.state.collapsed?' sidebar-collapsed':''}`} style={{'--practice-sidebar':`${panels.state.collapsed?52:panels.state.sidebar}px`} as CSSProperties}>
   {!singleProblem?<><aside className="practice-sidebar">
    <div className="practice-sidebar-heading">{!panels.state.collapsed?<h2>Practice</h2>:null}<button type="button" className="btn ghost small" aria-label={panels.state.collapsed?'Expand question list':'Collapse question list'} aria-expanded={!panels.state.collapsed} onClick={()=>panels.setState(s=>({...s,collapsed:!s.collapsed}))}>{panels.state.collapsed?'»':'«'}</button></div>
    {!panels.state.collapsed?<>
    <label className="field"><span>Search problems</span><input type="search" placeholder="Search questions…" value={search} onChange={e=>setSearch(e.target.value)} /></label>
    <label className="field"><span>Topic</span><select value={topic} onChange={e=>setTopic(e.target.value)}><option value="">All topics</option>{TOPICS.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}</select></label>
-   {canEdit?<>
+   {canSave?<>
     <div className="practice-review-filter" aria-label="Review list"><button type="button" className="btn ghost small" aria-pressed={!starredOnly} onClick={()=>setStarredOnly(false)}>All questions</button><button type="button" className="btn ghost small" aria-pressed={starredOnly} disabled={!stars.loaded} onClick={()=>setStarredOnly(true)}>★ Starred ({stars.stars.size})</button></div>
     {stars.loading?<p role="status">Loading starred questions…</p>:null}
     {stars.loadError?<div role="alert"><p>{stars.loadError}</p><button type="button" className="btn ghost small" onClick={()=>void stars.load()}>Retry loading stars</button></div>:null}
     {stars.saveError?<div role="alert"><p>{stars.saveError}</p><button type="button" className="btn ghost small" disabled={stars.saving} onClick={()=>void stars.retry()}>Retry saving star</button></div>:null}
    </>:null}
-   <nav aria-label="Practice problems">{list.map(p=><button data-draft-changed={previewData?.changedStars.includes(p.lc)||undefined} type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{canEdit&&stars.stars.has(p.lc)?<span aria-label="Starred">★ </span>:null}{p.title}<span className="practice-tags"><Difficulty value={p.difficulty} /><span className="practice-tag practice-collection">{p.extra?"Extra":"NeetCode 150"}</span></span></button>)}{!list.length?<p>{canEdit&&starredOnly?'No starred questions match. Star a question to revisit it here.':'No matching problems.'}</p>:null}</nav>
+   <nav aria-label="Practice problems">{list.map(p=><button data-draft-changed={previewData?.changedStars.includes(p.lc)||undefined} type="button" key={p.lc} disabled={busy} aria-current={selected===p.lc?"page":undefined} onClick={()=>setSelected(p.lc)}>{canSave&&stars.stars.has(p.lc)?<span aria-label="Starred">★ </span>:null}{p.title}<span className="practice-tags"><Difficulty value={p.difficulty} /><span className="practice-tag practice-collection">{p.extra?"Extra":"NeetCode 150"}</span></span></button>)}{!list.length?<p>{canSave&&starredOnly?'No starred questions match. Star a question to revisit it here.':'No matching problems.'}</p>:null}</nav>
    </>:null}
   </aside>
   {!panels.state.collapsed?<ResizeHandle label="Resize question list" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>panels.setState(s=>({...s,sidebar}))} />:<div className="practice-resizer-spacer" />}</>:null}
-  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} preview={previewData} viewerKey={viewerKey} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!!previewData||!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
+  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} preview={previewData} flagMode={singleProblem} viewerKey={viewerKey} canSave={canSave} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!!previewData||!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
  </div>;
 }
 
 function Difficulty({value}:{value:string}){return <span className={`practice-tag practice-difficulty ${value.toLowerCase()}`} data-difficulty={value.toLowerCase()}>{value}</span>;}
 
-function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,starDisabled,onStar,preview}:{preview?:PracticePreview;lc:number;viewerKey:string;canEdit:boolean;onBusy(b:boolean):void;split:number;onSplit(n:number):void;starred:boolean;starDisabled:boolean;onStar():void}) {
+function ProblemWorkspace({lc,viewerKey,canEdit,canSave,flagMode,onBusy,split,onSplit,starred,starDisabled,onStar,preview}:{preview?:PracticePreview;lc:number;viewerKey:string;canEdit:boolean;canSave:boolean;flagMode:boolean;onBusy(b:boolean):void;split:number;onSplit(n:number):void;starred:boolean;starDisabled:boolean;onStar():void}) {
  const columns=useRef<HTMLDivElement>(null);
  const [columnsWidth,setColumnsWidth]=useState(800);
  useEffect(()=>{if(!columns.current||typeof ResizeObserver==='undefined')return;const observer=new ResizeObserver(([entry])=>setColumnsWidth(entry.contentRect.width));observer.observe(columns.current);return()=>observer.disconnect();},[]);
@@ -62,8 +62,8 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,sta
  const [browserDraft,setBrowserDraft]=useState(()=>readCode(viewerKey,lc));
  const [notesEditing,setNotesEditing]=useState(false);
  const previewRow=useMemo(()=>preview?practiceData(preview,lc):undefined,[preview,lc]);
- const saved=useSavedPractice(lc,canEdit&&!preview,remote=>{if(remote!==null){setCode(remote);setEditorVersion(v=>v+1);}},previewRow);
- const ownerReady=!canEdit||saved.loaded;
+ const saved=useSavedPractice(lc,canSave&&!preview,remote=>{if(remote!==null){setCode(remote);setEditorVersion(v=>v+1);}},previewRow);
+ const ownerReady=!canSave||saved.loaded;
  const [tab,setTab]=useState("Problem");
  const [phase,setPhase]=useState<"loading"|"ready"|"busy"|"failed">("loading");
  const [failure,setFailure]=useState("");
@@ -88,10 +88,10 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,sta
   const snapshot=code;
   setPhase("busy");setMode(nextMode);setResult(null);
   const out=await current.run(problem,snapshot,nextMode);
-  if(mounted.current){setResult(out);setPhase("loading");void prepare(current);if(canEdit)void saved.record(snapshot,nextMode,out);}
+  if(mounted.current){setResult(out);setPhase("loading");void prepare(current);if(canSave)void saved.record(snapshot,nextMode,out);}
  }
  return <section className="practice-workspace" aria-label={meta.title}>
-  <header data-draft-changed={preview?.changedStars.includes(lc)||undefined} className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">{meta.extra?"Extra":"NeetCode 150"}</span><PracticeTimer title={meta.title} /><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canEdit?<button type="button" className="btn ghost small practice-star" aria-label={`${starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
+  <header data-draft-changed={preview?.changedStars.includes(lc)||undefined} className="practice-heading"><h2>{meta.title}</h2><div className="practice-heading-meta"><Difficulty value={meta.difficulty} /><span className="practice-tag practice-collection">{meta.extra?"Extra":"NeetCode 150"}</span><PracticeTimer title={meta.title} /><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canSave?<button type="button" className="btn ghost small practice-star" aria-label={`${flagMode?starred?'Unflag':'Flag':starred?'Unstar':'Star'} ${meta.title} for later`} aria-pressed={starred} disabled={starDisabled} onClick={onStar}>{flagMode?starred?'⚑ Flagged':'⚐ Flag':starred?'★ Starred':'☆ Star'}</button>:null}</div></header>
   <div className="practice-columns" ref={columns} style={{'--practice-columns':`${split}fr 8px ${100-split}fr`} as CSSProperties}>
    <div className="practice-description">
     <div className="notes-tabs" role="tablist" aria-label="Problem view">{["Problem","Solution","Notes"].map(t=><button type="button" role="tab" key={t} disabled={notesEditing&&t!=="Notes"} id={`practice-tab-${t}`} aria-selected={tab===t} aria-controls="practice-panel" onClick={()=>setTab(t)}>{t}</button>)}</div>
@@ -108,9 +108,9 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,sta
    </div>
    <ResizeHandle label="Resize problem and code panels" value={split} min={25} max={75} reset={50} unit="percent" scale={100/Math.max(1,columnsWidth-8)} onChange={onSplit} />
    <div data-draft-changed={preview?.code.find(c=>c.problem===lc)?.draftChanged||undefined} className="practice-coding">
-    <h3>Python</h3><p className="muted small">{canEdit?"Save code to sync it across devices. Runs and submissions are recorded automatically.":"Code is saved in this browser only."} Run checks examples; Submit checks all local tests.</p>
+    <h3>Python</h3><p className="muted small">{canSave?"Save code to sync it across devices. Runs and submissions are recorded automatically.":"Code is saved in this browser only."} Run checks examples; Submit checks all local tests.</p>
     {!ownerReady?<p role="status">Loading saved code…</p>:<CodeEditor key={editorVersion} initial={previewRow?.code??code} readOnly={!!preview} label="Python code" onChange={value=>{if(preview)return;setCode(value);setBrowserDraft(value);setStorageFailed(!storeCode(viewerKey,lc,value));}} />}
-    {canEdit&&!preview&&ownerReady?<div className="practice-owner-save">
+    {canSave&&!preview&&ownerReady?<div className="practice-owner-save">
      <button type="button" className="btn ghost small" disabled={saved.savingCode||saved.loading||!!saved.loadError} onClick={()=>void saved.saveCode(code)}>{saved.savingCode?'Saving code…':saved.codeError?'Retry saving code':'Save code'}</button>
      <span role="status">{saved.savingCode?'Saving…':saved.data.code===code?'Saved across devices':'Unsaved changes'}</span>
      {saved.codeError?<p role="alert">{saved.codeError}</p>:null}
@@ -126,7 +126,7 @@ function ProblemWorkspace({lc,viewerKey,canEdit,onBusy,split,onSplit,starred,sta
     </div>
     {phase==="failed"?<div role="alert"><p>{failure}</p><button type="button" className="btn ghost small" onClick={()=>{runner.current?.dispose();const current=new PythonRunner();runner.current=current;setPhase("loading");void prepare(current);}}>Retry Python</button></div>:null}
     {result?<Results result={result} mode={mode} />:null}
-    {canEdit&&!preview?<>
+    {canSave&&!preview?<>
      {saved.savingAttempt?<p role="status">Saving attempt…</p>:null}
      {saved.attemptError?<div role="alert"><p>{saved.attemptError} Retry saving this attempt before starting another run.</p><button type="button" className="btn ghost small" disabled={saved.savingAttempt} onClick={()=>void saved.retryAttempt()}>Retry saving attempt</button></div>:null}
      {saved.data.attempts.length?<details className="practice-history"><summary>Recent attempts</summary><ol>{saved.data.attempts.map(a=><li key={a.id}><time dateTime={a.created_at}>{new Date(a.created_at).toLocaleString()}</time> · {a.mode} · {a.status} · {a.passed}/{a.total}</li>)}</ol></details>:null}

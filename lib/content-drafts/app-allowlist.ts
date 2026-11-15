@@ -11,11 +11,12 @@ const answerFields={primary_story_id:answerSchema.shape.primary_story_id,seconda
 export const APP_ALLOWLIST={
  notes:{key:noteKey,fields:{body:rawText(NOTE_TEXT_LIMIT),free:rawText(NOTE_TEXT_LIMIT)},operations:['update'] as const,routes:['/notes'] as const},
  question_notes:{key:problem,fields:{body:rawText(200000)},operations:['insert','update'] as const,routes:['/practices'] as const},
- practice_code:{key:problem,fields:{code:rawText(100000)},operations:['insert','update'] as const,routes:['/practices'] as const},
- practice_stars:{key:problem,fields:{},operations:['insert','delete'] as const,routes:['/practices'] as const},
+ practice_code:{scope:'owner-user' as const,key:problem,fields:{code:rawText(100000)},operations:['insert','update'] as const,routes:['/practices'] as const},
+ practice_stars:{scope:'owner-user' as const,key:problem,fields:{},operations:['insert','delete'] as const,routes:['/practices'] as const},
  behavioral_stories:{key:z.uuid().transform(s=>s.toLowerCase()),fields:storyFields,operations:['insert','update'] as const,routes:['/behavioral'] as const},
  behavioral_answers:{key:answerSchema.shape.question_id,fields:answerFields,operations:['insert','update'] as const,routes:['/behavioral'] as const},
 };
+export const isPersonalPractice=(table:string)=>table==='practice_code'||table==='practice_stars';
 export type AppTable=keyof typeof APP_ALLOWLIST;
 export const isAppTable=(value:string):value is AppTable=>Object.hasOwn(APP_ALLOWLIST,value);
 function operation<T extends AppTable>(table:T){

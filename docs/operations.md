@@ -22,3 +22,5 @@ Infrastructure:
 Public health: /api/health. Manual service setup remains in README.md. Journey media hash/upload process is in journey.md; do not regenerate or upload media as part of unrelated changes. New subdomain apps follow Resources/Subdomain Apps - Playbook.md after domain purchase.
 
 Local browser verification may use an installed Chromium via a temporary config if the pinned executable is absent. Keep repository CI pins unchanged. Use an isolated copy excluding .env files for tests that assume unconfigured placeholder content.
+
+Practice export (TKT-120): retained practice_code/practice_stars/practice_attempts entries in export-tables.json include every account’s user_id and data through the existing encrypted service-role export. scripts/ops.mjs pages these tables in user_id plus problem/id order; do not apply per-viewer filters to backups. Account deletion cascades live progress; encrypted retention stays 90 days. Migration 20261115000906_per_user_practice.sql is NOT applied live; apply with Jamie’s explicit approval before deploying this frontend.

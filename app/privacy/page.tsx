@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "What this site collects, why, and how to have it deleted.",
 };
 
-const UPDATED = "11 November 2026";
+const UPDATED = "15 November 2026";
 
 /**
  * Privacy policy (needed for Google sign-in to be published). Keep it true to what the code does:
@@ -41,8 +41,7 @@ export default function Privacy() {
         </li>
         <li>
           <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
-          and problem. Only the owner's starred review list, explicitly saved code and run/submission attempts are stored in Supabase to sync
-          across devices. Question notes are also stored there; the owner edits them and people allowed to open Practice
+          and problem. Signed-in users’ flags, explicitly saved code and run/submission attempts (including the code snapshot, results and date) are stored with their account and problem IDs in Supabase to sync across devices. Completion is derived from a passed submission. Each user can access only their own practice records through the site, including the owner; deleting an account removes its practice records. Administrative encrypted backups include these records. Question notes are also stored there; the owner edits them and people allowed to open Practice
           can read them. Python executes only in the browser. Practice and Notes panel sizes, plus their collapsed question/topic-list preferences, are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
           are covered by the retention and encrypted-backup periods below.
         </li>
@@ -66,7 +65,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send, and store the owner’s notes, saved Practice code, attempts, starred review list, resume entries, Behavioral stories, answer preparation and articles for use across devices.
+        read and reply to messages you send, and sync your private Practice code, attempts and flags, plus the owner’s notes, resume entries, Behavioral stories, answer preparation and articles for use across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -81,7 +80,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, messages and the owner’s saved notes, Practice code, attempts, starred review list, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, messages and your private Practice code, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>

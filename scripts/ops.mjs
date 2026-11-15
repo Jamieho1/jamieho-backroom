@@ -11,6 +11,7 @@ import { encrypt } from "./export-crypto.mjs";
 
 const TABLES = JSON.parse(readFileSync(new URL("./export-tables.json", import.meta.url), "utf8"));
 const PAGE = 1000;
+const PRACTICE_KEYS={practice_stars:["user_id","problem"],practice_code:["user_id","problem"],practice_attempts:["user_id","id"]};
 
 function client() {
   const url = process.env.SUPABASE_URL;
@@ -34,7 +35,9 @@ async function ping(sb) {
 async function dumpTable(sb, table) {
   const rows = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await sb.from(table).select("*").range(from, from + PAGE - 1);
+    let query=sb.from(table).select("*");
+    for(const key of PRACTICE_KEYS[table]??[])query=query.order(key);
+    const { data, error } = await query.range(from, from + PAGE - 1);
     if (error) throw new Error(`${table}: ${error.message}`);
     rows.push(...data);
     if (data.length < PAGE) return rows;

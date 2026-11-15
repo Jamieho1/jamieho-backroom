@@ -4,7 +4,7 @@ import {validateNoteEdit,type NoteRow} from '@/lib/notes';
 import {validCode,validProblem,type PracticeData} from '@/lib/practice/data';
 import {storySchema,type Story} from '@/lib/behavioral';
 import {answerSchema,type Answer} from '@/lib/behavioral/answers';
-import {APP_ALLOWLIST,isAppTable,type AppTable} from './app-allowlist';
+import {APP_ALLOWLIST,isPersonalPractice,isAppTable,type AppTable} from './app-allowlist';
 import type {ContentOperation} from './allowlist';
 export interface AppRows {
  notes:NoteRow[];question_notes:{problem:number;body:string;updated_at:string;draftChanged?:boolean}[];
@@ -21,7 +21,7 @@ export function practiceData(preview:PracticePreview,problem:number):PracticeDat
  return {note:preview.notes.find(n=>n.problem===problem)?.body??'',code:preview.code.find(c=>c.problem===problem)?.code??null,attempts:[]};
 }
 export const appKey=(table:AppTable,row:Record<string,unknown>)=>String(row[table==='notes'||table==='behavioral_stories'?'id':table==='behavioral_answers'?'question_id':'problem']);
-/** Owner-managed tables have no per-user identity columns; callers must verify owner before loading. */
+/** Callers verify the owner; personal practice snapshots also require and filter that owner ID. */
 export function overlayApp<T extends AppTable>(table:T,live:AppRows[T],operations:ContentOperation[],stamp='1970-01-01T00:00:00.000Z'):AppRows[T]{
  const rows=new Map<string,Record<string,unknown>>(live.map(row=>{const copy={...structuredClone(row)};return [appKey(table,copy),copy];}));
  for(const op of operations){
@@ -46,12 +46,12 @@ export function overlayApp<T extends AppTable>(table:T,live:AppRows[T],operation
  }
  return [...rows.values()] as unknown as AppRows[T];
 }
-export async function loadAppPreview(sb:SupabaseClient,operations:ContentOperation[]):Promise<AppPreview>{
+export async function loadAppPreview(sb:SupabaseClient,operations:ContentOperation[],ownerId?:string):Promise<AppPreview>{
  const tables=new Set(operations.filter(op=>isAppTable(op.table)).map(op=>op.table as AppTable));
  // Practice preview replaces its complete owner view, preventing async live reads from overwriting it.
  if(['question_notes','practice_code','practice_stars'].some(t=>tables.has(t as AppTable)))for(const t of ['question_notes','practice_code','practice_stars'] as const)tables.add(t);
  const result:AppPreview={};const stamp=new Date().toISOString();
- for(const table of tables){const {data,error}=await sb.from(table).select('*');if(error)throw Error(`Could not load ${table} for draft validation.`);Object.assign(result,{[table]:overlayApp(table,data??[],operations,stamp)});}
+ for(const table of tables){let query=sb.from(table).select('*');if(isPersonalPractice(table)){if(!ownerId)throw Error('Owner identity is required for practice drafts.');query=query.eq('user_id',ownerId);}const {data,error}=await query;if(error)throw Error(`Could not load ${table} for draft validation.`);Object.assign(result,{[table]:overlayApp(table,data??[],operations,stamp)});}
  return result;
 }
 export function appTargets(operations:ContentOperation[]):{href:string;label:string}[]{

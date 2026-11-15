@@ -36,11 +36,12 @@ grant execute on function auth.jwt(), auth.uid() to anon, authenticated, service
 
 export const MIGRATIONS_DIR = join(__dirname, "..", "..", "supabase", "migrations");
 
-export async function freshDb(options:{storage?:boolean}={}): Promise<PGlite> {
+export async function freshDb(options:{storage?:boolean;beforeMigration?:(db:PGlite,file:string)=>Promise<void>}={}): Promise<PGlite> {
   const db = new PGlite();
   await db.exec(BOOTSTRAP);
   if(options.storage)await db.exec(readFileSync(join(__dirname,"../support/storage-bootstrap.sql"),"utf8"));
   for (const f of readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith(".sql")).sort()) {
+    await options.beforeMigration?.(db,f);
     await db.exec(readFileSync(join(MIGRATIONS_DIR, f), "utf8"));
   }
   return db;

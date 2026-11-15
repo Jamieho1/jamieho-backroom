@@ -208,3 +208,21 @@ Files changed:
 - lib/content-drafts/allowlist.ts, app-overlay.ts
 - tests/e2e/interview.spec.ts, app-preview.spec.ts; tests/unit/app-drafts.test.ts; new interview-content.test.ts; tests/support/content-preview-api.cjs
 - docs/interview.md, architecture.md, content-drafts.md, security.md, status.md; MEMORY.md
+
+## TKT-120 — Per-user practice (2026-11-15)
+
+Prepared locally; migration 20261115000906_per_user_practice.sql is NOT applied live. Retains practice_stars/practice_code/practice_attempts; adds auth user IDs, account-scoped primary keys, account-delete cascade and own-row CRUD RLS with no owner read/write bypass. Anon grants are revoked. Legacy rows retain their values/timestamps/IDs and are assigned to the unique owner profile; ambiguous or missing ownership with populated tables aborts. No live data inspected or changed. Apply with Jamie’s explicit approval before deploying frontend changes; Jamie pushes and verifies live before Done.
+
+Signed-in users sync only their own flags, explicit saved code and run/submit history. Completion derives from nonempty fully passed submits, with paged history reads. Visitors keep local code and see no flag/completion controls. Shared question notes remain owner-edited; legacy route access and code-catalogue/browser runner remain unchanged. Account-keyed state and PracticeSession prevent stale account content during logout/switches. Draft TypeScript validation/review/preview and SQL approval explicitly scope practice snapshots/writes to Jamie’s user ID; identity injection is refused. Existing encrypted export tables include the new columns/all accounts, with composite-key paging; privacy updated.
+
+Checks actually run: typecheck passed; final full unit/database suite 960 tests / 98 files passed; isolated credential-free production build and unchanged static assertions passed for /, /resources, /privacy, /projects, /articles. Desktop/390px Interview + legacy Practice UI + real Pyodide checks: 36 passed, six intentional viewport skips. Disposable PGlite owner/member app-preview + practice flows: ten passed, including private flags/code, real passed submission → completion, reload persistence, copied-preview-cookie isolation, owner approval/discard and visitor controls. Total 46 browser passes. Tests prove owner cannot access member rows, own CRUD/reassignment prevention/account cascade, migration row preservation/fail-closed ownership, draft collisions/identity rejection, long-history completions and encrypted per-user backup round-trip. Fixed old owner-only test fixtures, a missing owner-ID approval call and test-adapter CORS support before final passing runs. git diff --check passed. No production browser use, dependency change, push or deployment.
+
+Files changed:
+- supabase/migrations/20261115000906_per_user_practice.sql (new; NOT applied live)
+- app/actions/practice.ts, practice-stars.ts, content-drafts.ts; new practice-progress.ts; app/desktop/practice-content.tsx; app/interview/interview.css; app/privacy/page.tsx
+- components/interview/questions.tsx; components/practice/arena.tsx, use-practice-stars.ts; new session.tsx; new lib/practice/progress.ts
+- lib/content-drafts/app-allowlist.ts, app-overlay.ts, preview.ts, review.ts; scripts/ops.mjs (existing export manifest retained)
+- tests/db/harness.ts, app-drafts.test.ts, practice-data.test.ts, practice-stars.test.ts; new practice-migration.test.ts
+- tests/unit/app-drafts.test.ts, content-drafts-actions.test.ts, ops.test.ts, practice-actions.test.ts, practice-star-actions.test.ts; new practice-progress.test.ts
+- tests/e2e/interview.spec.ts, app-preview.spec.ts; new practice-progress.spec.ts; tests/content-preview.playwright.config.ts; tests/support/content-preview-api.cjs
+- docs/security.md, interview.md, content-drafts.md, architecture.md, operations.md, status.md; MEMORY.md

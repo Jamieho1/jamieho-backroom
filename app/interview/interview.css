@@ -120,3 +120,11 @@ body:has(.iv-shell) {background:#0e131c;}
  .iv-shell[data-problem="true"] main {padding:8px;}
  .iv-shell .practice-workspace {padding:8px;}
 }
+
+.iv-questions li {display:flex;min-width:0;border:1px solid var(--iv-line);border-radius:9px;background:var(--iv-panel);}
+.iv-questions li>a {flex:1;min-width:0;border:0;grid-template-columns:minmax(0,1fr) auto;}
+.iv-question-progress {display:flex;align-items:center;gap:8px;padding:8px;}
+.iv-flag {display:grid;place-items:center;width:32px;height:32px;padding:5px;border:1px solid var(--iv-line);border-radius:7px;background:var(--iv-card);color:var(--iv-muted);}
+.iv-flag[aria-pressed="true"] {color:var(--iv-accent);}
+.iv-flag svg,.iv-completion svg {width:20px;height:20px;}.iv-completion {display:flex;color:var(--iv-muted);}.iv-completion[data-complete="true"] {color:#7bd6a3;}
+@media(max-width:768px){.iv-questions li>a {grid-template-columns:minmax(0,1fr);}.iv-question-progress {gap:5px;padding:5px;}}

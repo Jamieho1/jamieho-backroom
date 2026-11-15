@@ -7,7 +7,7 @@ const user={id:'00000000-0000-4000-8000-000000000901',email:'app-owner@example.t
 const owner={role:'authenticated' as const,sub:user.id};const story='00000000-0000-4000-8000-000000000903',added='00000000-0000-4000-8000-000000000904';
 const op=(table='notes',action='update',fields:unknown={body:'Draft note'},key:string|number='fixture-note')=>({table,op:action,fields,key});
 let db:PGlite;
-beforeAll(async()=>{db=await freshDb();await db.query("insert into private.settings(key,value) values ('owner_email',$1)",[user.email]);await addUser(db,user);await addUser(db,member);await db.query("insert into public.invites(email) values ($1)",[member.email]);await db.exec("insert into public.notes(id,title,body,free,visual,sort) values ('fixture-note','Live title','Live body','Live free','[]',4); insert into public.question_notes(problem,body) values (217,'Live question'); insert into public.practice_code(problem,code) values (217,'Live code'); insert into public.practice_stars(problem) values(217)");await db.query("insert into public.behavioral_stories(id,title) values ($1,'Live story')",[story]);await db.query("insert into public.behavioral_answers(question_id,primary_story_id,outline) values ('g-intro',$1,'Live outline')",[story]);},30000);
+beforeAll(async()=>{db=await freshDb();await db.query("insert into private.settings(key,value) values ('owner_email',$1)",[user.email]);await addUser(db,user);await addUser(db,member);await db.query("insert into public.invites(email) values ($1)",[member.email]);await db.exec("insert into public.notes(id,title,body,free,visual,sort) values ('fixture-note','Live title','Live body','Live free','[]',4); insert into public.question_notes(problem,body) values (217,'Live question'); insert into public.practice_code(user_id,problem,code) values ('00000000-0000-4000-8000-000000000901',217,'Live code'); insert into public.practice_stars(user_id,problem) values('00000000-0000-4000-8000-000000000901',217)");await db.query("insert into public.behavioral_stories(id,title) values ($1,'Live story')",[story]);await db.query("insert into public.behavioral_answers(question_id,primary_story_id,outline) values ('g-intro',$1,'Live outline')",[story]);},30000);
 afterAll(async()=>{await db?.close();});
 type Query=<R=Record<string,unknown>>(sql:string,params?:unknown[])=>Promise<R[]>;
 async function seed(q:Query,operations:unknown[]){return (await q<{id:string}>("insert into public.content_changes(summary,operations) values ('Synthetic app proposal',$1) returning id",[JSON.stringify(operations)]))[0].id;}
@@ -52,4 +52,19 @@ it('discard changes no app rows; members with app access and visitors cannot rea
 });
 it('private helpers retain empty search_path and revoked API execution',async()=>{
  for(const name of ['private.apply_app_draft(jsonb)','private.valid_draft_problem(integer)']){const r=await db.query<{proconfig:string[];allowed:boolean}>("select proconfig,has_function_privilege('authenticated',oid,'EXECUTE') or has_function_privilege('anon',oid,'EXECUTE') or has_function_privilege('service_role',oid,'EXECUTE') as allowed from pg_proc where oid=$1::regprocedure",[name]);expect(r.rows[0]).toEqual({proconfig:['search_path=""'],allowed:false});}
+});
+
+it('practice drafts are hard-scoped to the approving owner even with colliding member keys',async()=>{
+ await db.query("insert into public.practice_code(user_id,problem,code) values ($1,217,'Member private code'),($1,1,'Member other code')",[member.id]);
+ await db.query('insert into public.practice_stars(user_id,problem) values ($1,217)',[member.id]);
+ try{
+  await as(db,owner,async q=>{
+   const [set]=await approve(q,await seed(q,[op('practice_code','update',{code:'Owner draft'},217),op('practice_code','insert',{code:'Owner new'},1),op('practice_stars','delete',{},217)]));
+   expect(set.previous[0].values?.user_id).toBe(user.id);expect(set.previous[2].values?.user_id).toBe(user.id);
+   expect(await q('select user_id,code from public.practice_code where problem=217')).toEqual([{user_id:user.id,code:'Owner draft'}]);
+  });
+  expect((await db.query('select code from public.practice_code where user_id=$1 order by problem',[member.id])).rows).toEqual([{code:'Member other code'},{code:'Member private code'}]);
+  expect((await db.query('select problem from public.practice_stars where user_id=$1',[member.id])).rows).toEqual([{problem:217}]);
+  for(const operation of [op('practice_code','update',{user_id:member.id,code:'No'},217),{...op('practice_stars','insert',{},1),user_id:member.id}])await expect(as(db,owner,async q=>approve(q,await seed(q,[operation])))).rejects.toThrow(/Unknown/);
+ }finally{await db.query('delete from public.practice_code where user_id=$1',[member.id]);await db.query('delete from public.practice_stars where user_id=$1',[member.id]);}
 });

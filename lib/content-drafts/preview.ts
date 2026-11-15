@@ -29,7 +29,7 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
     try {experience=overlayExperience((rows.data??[]) as ExperienceRow[],result.operations);} catch {return null;}
   }
   let publishing,appData;
-  try {publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations);} catch {return null;}
+  try {publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations,viewer.id);} catch {return null;}
   const targets=[...publishingTargets(result.operations),...appTargets(result.operations)];
   return { ...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }

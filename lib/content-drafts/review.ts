@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
-import {isAppTable} from "./app-allowlist";
+import {isAppTable,isPersonalPractice} from "./app-allowlist";
 import {appTargets,appKey} from "./app-overlay";
 import {publishingTargets} from "./publishing-overlay";
 import { validateOperations } from "./allowlist";
@@ -26,7 +26,7 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
   const appRows:Record<string,Record<string,Record<string,unknown>>>={};
   const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isAppTable(op.table)?[op.table]:[]):[];}));
   for(const table of appTables){
-    const rows=await sb.from(table).select("*");if(rows.error)return {drafts:[],error:"Could not load current app values. Try again."};
+    let query=sb.from(table).select("*");if(isPersonalPractice(table))query=query.eq("user_id",viewer.id);const rows=await query;if(rows.error)return {drafts:[],error:"Could not load current app values. Try again."};
     appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[appKey(table,row),row]));
   }
   const live = Object.fromEntries((sections.data ?? []).map(row => [row.key, { title: row.title ?? "", body: row.body ?? "" }]));

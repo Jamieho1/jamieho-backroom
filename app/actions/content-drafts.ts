@@ -33,7 +33,7 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
       for(const slot of parsed.slots)await checkSlotObject(sb,slot);
       result={operations:await withPhotoOperations(sb,parsed.operations,parsed.slots)};
     }catch(error){return {ok:false,message:error instanceof Error?error.message:"Invalid photo draft."};}
-    try { await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
+    try { await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations,viewer.id); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
     // Re-check the verified session immediately before the mutation; SQL independently checks ownership.
     const current = await getViewer();
     if (current.role !== "owner" || current.id !== viewer.id) return denied();

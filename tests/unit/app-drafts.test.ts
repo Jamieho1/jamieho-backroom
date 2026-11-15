@@ -45,9 +45,18 @@ it('story/answer overlays validate complete merged values and reject duplicate r
  expect(()=>overlayApp('behavioral_stories',stories,parse([op('behavioral_stories','insert',{title:'X'},story)]))).toThrow(/already exists/);
 });
 it('practice loads a full snapshot only when needed, including stars and saved code',async()=>{
- const from=vi.fn((table:string)=>({select:async()=>({error:null,data:table==='practice_stars'?[{problem:1,created_at:'2026-01-01'}]:[]})}));const sb={from} as unknown as SupabaseClient;
+ const from=vi.fn((table:string)=>({select:()=>{const result={error:null,data:table==='practice_stars'?[{problem:1,created_at:'2026-01-01'}]:[]};return {...result,eq:()=>Promise.resolve(result)};}}));const sb={from} as unknown as SupabaseClient;
  expect(await loadAppPreview(sb,parse([{table:'site_sections',op:'update',key:'hero',fields:{title:'X'}}]))).toEqual({});expect(from).not.toHaveBeenCalled();
  const ops=parse([op('question_notes','insert',{body:'Draft notes'},217),op('practice_code','insert',{code:'Draft code'},217),op('practice_stars','delete',{},1),op('practice_stars','insert',{},217)]);
- const rows=await loadAppPreview(sb,ops);expect(from.mock.calls.map(c=>c[0]).sort()).toEqual(['practice_code','practice_stars','question_notes']);
+ const rows=await loadAppPreview(sb,ops,'owner-id');expect(from.mock.calls.map(c=>c[0]).sort()).toEqual(['practice_code','practice_stars','question_notes']);
  const preview=practicePreviewData(rows,ops);expect(preview.stars).toEqual([217]);expect(preview.changedStars).toEqual([1,217]);expect(practiceData(preview,217)).toEqual({note:'Draft notes',code:'Draft code',attempts:[]});
+});
+
+it('practice draft identity cannot be supplied and snapshots require the owner identity',async()=>{
+ expect(validateOperations([op('practice_code','update',{user_id:'member',code:'No'},217)]).ok).toBe(false);
+ expect(validateOperations([{...op('practice_stars','insert',{},1),user_id:'member'}]).ok).toBe(false);
+ const eq=vi.fn(async()=>({data:[],error:null}));const sb={from:vi.fn(()=>({select:()=>({data:[],error:null,eq})}))} as unknown as SupabaseClient;
+ const ops=parse([op('practice_code','insert',{code:'Owner'},217)]);
+ await expect(loadAppPreview(sb,ops)).rejects.toThrow(/Owner identity/);
+ await loadAppPreview(sb,ops,'owner-id');expect(eq).toHaveBeenCalledWith('user_id','owner-id');
 });

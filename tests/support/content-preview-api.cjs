@@ -32,7 +32,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
   const server = http.createServer(async (req,res) => {
     if (/^http:\/\/127\.0\.0\.1:\d+$/.test(req.headers.origin || '')) {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-      res.setHeader('Access-Control-Allow-Headers','authorization, apikey, x-client-info, content-type, prefer, range, x-supabase-api-version, x-upsert');
+      res.setHeader('Access-Control-Allow-Headers','authorization, apikey, x-client-info, content-type, prefer, range, x-supabase-api-version, x-upsert, accept-profile, content-profile, x-retry-count');
       res.setHeader('Access-Control-Allow-Methods','GET,HEAD,PATCH,POST,OPTIONS');
       res.setHeader('Access-Control-Expose-Headers','Content-Range');
     }
@@ -66,8 +66,8 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         return send(res,200,{project:'live-fixture-project-'+suffix,article:'live-fixture-article-'+suffix,guide:'live-fixture-guide-'+suffix});
       }
       if (url.pathname === '/__app_seed' && req.method==='POST') {
-        await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_code; delete from public.practice_stars");
-        await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1),('sd-fixture','System design: Synthetic architecture','Synthetic system note','',2),('class-design','Class design','Synthetic class note','',3); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(problem,code) values (217,'# Live fixture code'); insert into public.practice_stars(problem) values(217)");
+        await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_code; delete from public.practice_attempts; delete from public.practice_stars");
+        await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1),('sd-fixture','System design: Synthetic architecture','Synthetic system note','',2),('class-design','Class design','Synthetic class note','',3); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(user_id,problem,code) values ('00000000-0000-4000-8000-000000000101',217,'# Live fixture code'); insert into public.practice_stars(user_id,problem) values('00000000-0000-4000-8000-000000000101',217)");
         await db.exec("insert into public.behavioral_stories(id,title,situation) values ('00000000-0000-4000-8000-000000000903','Live fixture story','Live fixture situation'); insert into public.behavioral_answers(question_id,outline) values ('g-intro','Live fixture outline')");
         return send(res,200,{ok:true});
       }
@@ -98,7 +98,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem']:table==='behavioral_answers'?['question_id']:['id'])) {
+        for (const col of (table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem','user_id','mode','status']:table==='behavioral_answers'?['question_id']:['id'])) {
           const value=url.searchParams.get(col);
           if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(['operations','photo_slots'].includes(col)?'::jsonb':'')); }
         }
@@ -106,6 +106,15 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         if (req.method==='PATCH' && table==='content_changes') {
           const patch=JSON.parse(body); if (!['status','photo_slots'].includes(Object.keys(patch).join(','))) throw Error('Test adapter accepts status changes only');
           const field=Object.keys(patch)[0];params.push(field==='photo_slots'?JSON.stringify(patch[field]):patch[field]);return (await tx.query('update public.content_changes set '+field+'=$'+params.length+(field==='photo_slots'?'::jsonb':'')+clause+' returning *',params)).rows;
+        }
+        if(['practice_code','practice_stars','practice_attempts'].includes(table)){
+          if(req.method==='DELETE')return (await tx.query('delete from public.'+table+clause+' returning *',params)).rows;
+          if(req.method==='POST'){
+            const row=JSON.parse(body);const allowed=table==='practice_stars'?['user_id','problem']:table==='practice_code'?['user_id','problem','code','updated_at']:['user_id','id','problem','code','mode','status','passed','total','error'];
+            const keys=Object.keys(row);if(keys.some(k=>!allowed.includes(k)))throw Error('Unknown practice field');
+            const conflicts=table==='practice_attempts'?['user_id','id']:['user_id','problem'];
+            return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+') on conflict('+conflicts.join(',')+') do update set '+keys.map(k=>k+'=excluded.'+k).join(',')+' returning *',keys.map(k=>row[k]))).rows;
+          }
         }
         if (req.method!=='GET' && req.method!=='HEAD') throw Error('Unsupported local request');
         if (table==='experience_items' && url.searchParams.get('select')?.includes('experience_bullets(')) {

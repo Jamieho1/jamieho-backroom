@@ -10,14 +10,14 @@ beforeAll(async()=>{
  db=await freshDb();await db.query("insert into private.settings (key,value) values ('owner_email',$1)",[owner.email]);
  for(const user of [owner,member,invited])await addUser(db,user);
  await db.query('insert into public.invites (email) values ($1)',[invited.email]);
- await db.query("insert into public.practice_code (problem,code) values (217,'Private code')");
- await db.query("insert into public.practice_attempts (id,problem,code,mode,status,passed,total) values ('00000000-0000-4000-8000-0000000000aa',217,'Private attempt','submit','ok',2,2)");
+ await db.query("insert into public.practice_code (user_id,problem,code) values ('00000000-0000-4000-8000-0000000000b1',217,'Private code')");
+ await db.query("insert into public.practice_attempts (user_id,id,problem,code,mode,status,passed,total) values ('00000000-0000-4000-8000-0000000000b1','00000000-0000-4000-8000-0000000000aa',217,'Private attempt','submit','ok',2,2)");
  await db.query("insert into public.question_notes (problem,body) values (217,'Shared explanation')");
 });
 afterAll(async()=>{await db.close();});
 it('only the owner reads saved code and attempts, even when Practice is public',async()=>{
  await db.query("update public.apps set visibility='public' where id='practice'");
- for(const role of [{role:'anon' as const},who(member.id),who(invited.id)]){
+ for(const role of [who(member.id),who(invited.id)]){
   expect(await as(db,role,q=>q('select problem from public.practice_code'))).toEqual([]);
   expect(await as(db,role,q=>q('select problem from public.practice_attempts'))).toEqual([]);
  }
@@ -35,22 +35,12 @@ it('question notes follow all visibility modes and invitation removal',async()=>
  expect(await as(db,who(invited.id),q=>q('select problem from public.question_notes'))).toEqual([]);
  await db.query("update public.apps set visibility='signed_in' where id='practice'");
 });
-it('members cannot insert, update or delete any Practice data',async()=>{
- for(const user of [member,invited]){
-  for(const sql of ["insert into public.practice_code (problem,code) values (1,'X')","insert into public.practice_attempts (problem,code,mode,status) values (1,'X','run','ok')","insert into public.question_notes (problem,body) values (1,'X')"]){
-   await expect(as(db,who(user.id),q=>q(sql))).rejects.toThrow(/row-level security/);
-  }
-  for(const [table,col] of [['practice_code','code'],['practice_attempts','code'],['question_notes','body']]){
-   expect(await as(db,who(user.id),q=>q(`update public.${table} set ${col}='Changed' returning problem`))).toEqual([]);
-   expect(await as(db,who(user.id),q=>q(`delete from public.${table} returning problem`))).toEqual([]);
-  }
- }
-});
+it('shared question notes remain owner edited',async()=>{for(const user of [member,invited])await expect(as(db,who(user.id),q=>q("insert into public.question_notes(problem,body) values (1,'No')"))).rejects.toThrow(/row-level security/);});
 it('the owner can upsert code and question notes, and attempt retries create only one row',async()=>{
  await as(db,who(owner.id),async q=>{
-  await q("insert into public.practice_code (problem,code) values (217,'New code') on conflict (problem) do update set code=excluded.code");
+  await q("insert into public.practice_code (problem,code) values (217,'New code') on conflict (user_id,problem) do update set code=excluded.code");
   await q("insert into public.question_notes (problem,body) values (217,'New notes') on conflict (problem) do update set body=excluded.body");
-  for(let n=0;n<2;n++)await q("insert into public.practice_attempts (id,problem,code,mode,status) values ('00000000-0000-4000-8000-0000000000ab',217,'Run snapshot','run','ok') on conflict (id) do update set code=excluded.code");
+  for(let n=0;n<2;n++)await q("insert into public.practice_attempts (id,problem,code,mode,status) values ('00000000-0000-4000-8000-0000000000ab',217,'Run snapshot','run','ok') on conflict (user_id,id) do update set code=excluded.code");
   expect(await q("select count(*)::int as n from public.practice_attempts where id='00000000-0000-4000-8000-0000000000ab'")).toEqual([{n:1}]);
   for(const table of ['practice_code','practice_attempts','question_notes'])expect((await q(`delete from public.${table} returning problem`)).length).toBeGreaterThan(0);
  });

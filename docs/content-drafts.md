@@ -1,4 +1,4 @@
-# Content drafts — TKT-98 through TKT-107
+# Content drafts — TKT-98 through TKT-120
 
 Pending owner changes for site_sections, experience_items, experience_bullets, projects, articles, guides and the six app tables listed below. Administrative tooling inserts a draft into public.content_changes; Jamie reviews it at /manage/review. No runtime AI or draft-creation UI. Existing editors and navigation remain unchanged; homepage preview adds an owner-only overlay to its existing rendering.
 
@@ -79,7 +79,7 @@ Live TKT-105 verification confirmed exact function-source parity, hardened setti
 
 ## Private app drafts — TKT-106
 
-app-allowlist.ts reuses existing editor fields/constraints; app-overlay.ts clones owner-validated snapshots. These six tables are owner-managed, with no per-user ownership columns. Existing app-reader RLS remains unchanged; identity fields cannot be supplied.
+app-allowlist.ts reuses existing editor fields/constraints; app-overlay.ts clones owner-validated snapshots. Notes/question notes/stories/answers remain owner-managed. TKT-120 adds per-user ownership to practice_code/practice_stars, retaining their table names and draft keys. These draft entries have owner-user scope: review/preview/approval snapshots require the verified owner ID and filter by user_id; the private SQL apply helper independently binds all practice reads/writes to auth.uid(). Identity fields cannot be supplied or reassigned. Attempts remain outside the allowlist.
 
 | Table | Operations | Editable fields |
 | --- | --- | --- |
@@ -112,3 +112,6 @@ The canonical project-media public URL prefix is shared in photo-slots.ts and SQ
 Migration 20261114161231_content_drafts_photos.sql applied live with Jamie’s explicit approval on 2026-11-14 as remote 20261114220519 (content_drafts_photos). It adds private.apply_draft_photos and extends the existing approval trigger; no public RPC or bucket/policy changes. Local tests use synthetic photos, a minimal disposable Storage catalogue with the real migrated RLS policies, and the existing loopback API/browser harness. Frontend deployment and Jamie's live verification remain pending.
 
 Live TKT-107 checks confirmed exact function-source parity, hardened permissions/search_path, unchanged owner Storage/draft policies and record_signin-only public execution. All 13 content/draft fingerprints and project-media metadata/count were unchanged. No new security finding, uploads, approvals or test records.
+
+
+TKT-120 migration 20261115000906_per_user_practice.sql is prepared, NOT applied live. It preserves existing owner rows while adding per-user keys/policies; only the owner’s code/flags can enter an owner-reviewed change set. Other users’ rows cannot be read, audited, updated or deleted by the draft engine even with colliding problem keys. Prior values retain the owner user_id. No new draft fields or public RPC. Apply before deploying new actions/loaders; older applied migrations remain untouched.
