@@ -38,7 +38,7 @@ Migration 20261115000906_per_user_practice.sql applied live with Jamie’s expli
 
 lib/resume.ts holds strict schemas/limits/order helpers; app/actions/resume.ts derives account IDs server-side; components/interview/resume-editor.tsx renders guide/editor. Limits: 60 entries, 30 bullets each, title/org 160 UTF-16 units, dates/location 80, summary 2,000, bullet 1,000. No identity/publication fields inside documents. No local-storage resume copy, AI generation or PDF export. Existing experience_items/bullets, public journey CV and /behavioral editor are unchanged.
 
-resume_templates has one public default record, seeded empty. Only the owner writes it. Content Drafts supports title/content updates, owner-only on-page preview/outline and approval history/revalidation; private resumes are never draftable. No data is seeded from Jamie’s real CV. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347. Frontend deployment and Jamie’s live verification remain pending. Tests/check inventory: status.md.
+resume_templates has one public default record, seeded empty. Only the owner writes it. Content Drafts supports title/content updates, owner-only on-page preview/outline and approval history/revalidation; private resumes are never draftable. No data is seeded from Jamie’s real CV. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347. Tests/check inventory: status.md.
 
 ## Behavioral Playbook — TKT-122
 
@@ -50,11 +50,11 @@ Signed-in users create private questions and save private STAR answers, optional
 
 The migration copies each old story and answer-preparation record into an owner-only custom question/answer. STAR/outline remains editable; an immutable private archive retains every source field/link/timestamp, including skills, numbers and follow-ups. Known legacy question titles/themes are preserved. Populated sources require exactly one owner or migration aborts. Originals remain unchanged for /behavioral; new pages have no CV-bullet mapping or coverage strip.
 
-Migration 20261115111230_behavioral_playbook.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115114339. Frontend deployment and Jamie’s live verification remain pending. Current checks/file inventory: status.md.
+Migration 20261115111230_behavioral_playbook.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115114339. Current checks/file inventory: status.md.
 
 ## Feedback — TKT-123
 
-The bottom rail Feedback entry opens Report a problem / Suggest an idea, with Problem/Idea, message and optional local page link. Collapsed rail retains original icon and hover/focus tooltip. On phones the drawer closes before the native modal opens; closing returns focus to Menu. Desktop closing returns focus to the Feedback entry. The site top/floating bars use the same dialog via an accessible icon button. Escape/backdrop/close dismiss it; type and text survive submission errors for retry. No name, email or sign-in is required. Feedback joins the owner Settings Inbox with a type badge and page link, through the existing contact spam/alert pipeline. Migration 20261115115900_message_feedback.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115124743. Frontend deployment and Jamie’s live verification remain pending.
+The bottom rail Feedback entry opens Report a problem / Suggest an idea, with Problem/Idea, message and optional local page link. Collapsed rail retains original icon and hover/focus tooltip. On phones the drawer closes before the native modal opens; closing returns focus to Menu. Desktop closing returns focus to the Feedback entry. The site top/floating bars use the same dialog via an accessible icon button. Escape/backdrop/close dismiss it; type and text survive submission errors for retry. No name, email or sign-in is required. Feedback joins the owner Settings Inbox with a type badge and page link, through the existing contact spam/alert pipeline. Migration 20261115115900_message_feedback.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115124743.
 
 
 ## Access rollout — TKT-124
@@ -62,26 +62,3 @@ The bottom rail Feedback entry opens Report a problem / Suggest an idea, with Pr
 All Notes overviews and topics use components/notes/sign-in.tsx for signed-out visitors, with the existing Google flow returning to the requested Notes path; no membership/paywall preview. Anonymous loaders send no note bodies or private topic metadata. Practice, Resume guide and Behavioral guides remain viewable without sign-in. Authenticated readers need no invitation with the applied registry migration; private workspace access remains own-row only. Resources stays Guides-only and membership components remain available for future courses. Legacy /behavioral preserves the owner editor; nonowners see a public Playbook entry instead of owner stories/CV.
 
 20261115212120_interview_public_access.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115220149. Deploy and verify the frontend live next. Do not open Behavioral manually in Settings without the paired legacy-data RLS protections. Only approved registry visibility and RLS changed; no private content changed. Local checks and file inventory: docs/status.md.
-
-
-## Verification — TKT-125 (2026-11-15)
-
-Full local verification passed against baseline 85aa9dc plus verification-only test changes. No runtime defect or new feature was found/introduced; application code, schema, dependencies and live data are unchanged. Jamie pushes and verifies live before Done.
-
-| Area | Actual result |
-| --- | --- |
-| Typecheck / full unit and real-Postgres PGlite policy suite | Passed: 1,031 tests, 114 files |
-| Production builds / unchanged static assertions | Passed with no Supabase config and with synthetic loopback config; /, /resources, /privacy, /projects, /articles stay pre-rendered |
-| Full desktop/390px browser suite | 162 passed, 66 conditional/viewport skips (228 total); conditional flows ran separately below |
-| Entire synthetic authenticated integration suite | 60 passed, zero skips; independent owner/member browser contexts, real migrated RLS and browser Python runner |
-| Rail / topic list | Collapse/expand and persisted preferences, tooltips, keyboard/focus, blocked storage, drawer/Topics, 14 destinations, 720px compact layout and 390px overflow checks passed |
-| Notes / Practice | Topic-preserving mode links, search, code workspace, owner note reader, signed-out Google prompt, public questions, disabled no-question Practice and Soon destinations passed |
-| Personal progress | Both users saved distinct code and passed submissions on separate problems; each saw only own flags/ticks/code, including after reload; visitors saw no synced progress controls |
-| Resume | Public empty guide, blank/template starts, populated template copy, editor/reorder/certificate/skills, save retry and owner/member isolation both ways passed |
-| Behavioral | Public guides/search/status/progress, STAR retry/persistence, private custom questions and Course Soon passed; owner and member both get 404 for the other’s custom question |
-| Feedback / access / preview | Both entry points reach synthetic owner Inbox; validation/retry, query stripping, honeypot and rate limit pass. Settings/review locks, copied-preview-cookie isolation and owner approve/discard pass |
-| Reduced motion | Desktop rail/topic toggles and phone drawer/Topics work, phone drawer transition is 0s; existing journey still/contact and reduced-motion preview checks also pass |
-
-The 66 main-suite skips are 58 authenticated cases executed by the 60-case integration suite plus eight viewport-specific counterparts. This is local synthetic verification, not live Google OAuth, delivery of real emails or Jamie’s live review. New proof lives in tests/e2e/interview.spec.ts, practice-progress.spec.ts and interview-behavioral.spec.ts. Full commands/results and remaining live-review gate: status.md.
-
-Role regrouping verification (2026-11-15): eighteen destinations, renamed labels, Role ordering, new Soon routes, collapsed tooltips, independently scrolling rail, mobile drawer/Topics, Notes/Practice switch and reduced motion passed the targeted desktop/390px suite (16 passed, four viewport-specific skips). Typecheck, full 1,031 unit/DB tests, production build and unchanged static assertions passed. These checks follow the TKT-125 snapshot above; no new schema or live data change. Jamie pushes/reviews live.

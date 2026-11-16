@@ -1,10 +1,11 @@
 # Context map
 
-Read this index and [status.md](status.md) at session start. Load only the relevant topic.
+Read this index and [status.md](status.md) at session start. Load only the relevant topic. Check [decisions.md](decisions.md) before changing settled behaviour.
 
 | Task | Read |
 | --- | --- |
 | Routes, apps, content ownership | [architecture.md](architecture.md) |
+| Settled product decisions (one line each) | [decisions.md](decisions.md) |
 | Home design, motion, media, phones | [journey.md](journey.md) |
 | Interview shell, Practice, Resume, Behavioral, responsive behaviour | [interview.md](interview.md) |
 | Owner-reviewed content proposals | [content-drafts.md](content-drafts.md) |
@@ -14,6 +15,6 @@ Read this index and [status.md](status.md) at session start. Load only the relev
 
 These are concise current-state summaries, not a substitute for inspecting the affected source. Update relevant topics after every change; keep status factual and distinguish implementation, deployment and live approval.
 
-Historical product specs and import contracts remain in `Resources/`. The current Home spec is `Resources/Home v1 - PRD.md`; its later v1.1/v1.2 decisions supersede the original full London route. `PRD.md` and older handoffs contain superseded details. Read a specific historical section only if needed.
+Specs live in `Resources/`. **Active:** `Home v1.3 - PRD.md` and `Interview - PRD.md`. Retained prompts and operating/import contracts remain alongside them. **Historical:** none kept; use git history.
 
-Detailed previous work is archived in [archive/memory-through-2026-11-05.md](archive/memory-through-2026-11-05.md). `README.md` retains Jamie's manual setup instructions. Neither is a mandatory session read.
+`README.md` holds Jamie's manual setup instructions; not a session read. No changelogs: history is in git.

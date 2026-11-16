@@ -16,5 +16,5 @@ supabase/.temp/
 
 __pycache__/
 
-# Home journey media (not in git; see Resources/Home v1 - PRD.md)
+# Home journey media (not in git; see docs/journey.md)
 /public/home-media/

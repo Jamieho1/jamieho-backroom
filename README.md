@@ -7,7 +7,7 @@ Jamie Ho's personal website. It has three parts:
 - a Google-sign-in desktop of apps (Notes, practice arena, Behavioral);
 - a hub for later projects on subdomains.
 
-Current implementation summaries and task-specific reading paths are in `docs/`. Historical scope remains in `PRD.md` and `Resources/`; ticket dependencies are in `Resources/Tickets - Dependency Map.md`. Live ticket status is tracked in Notion.
+Current implementation summaries and task-specific reading paths are in `docs/`. Active product specs remain in `Resources/`; use git history for superseded scope; ticket dependencies are in `Resources/Tickets - Dependency Map.md`. Live ticket status is tracked in Notion.
 
 **This folder is the repo root.** Run every git command here, never in the parent `Personal Website` folder.
 
@@ -165,7 +165,7 @@ stories with no linked bullet, accessible under All stories. Story text is store
 `supabase/migrations/20261101104828_behavioral_stories.sql` was approved and **applied live** on
 2026-11-01 (remote version `20261101105507`). It adds RLS-protected `behavioral_stories` and splits the existing Experience
 owner write policies into INSERT/UPDATE/DELETE without changing public read rules. No data is imported.
-Claude handles TKT-69 using `Resources/Behavioral - Import Contract.md`; personal CV and story text
+Current Behavioral/Resume behavior is documented in `docs/interview.md`; personal CV and story text
 must never be committed. The question bank/coverage strip is implemented in TKT-68 below.
 
 ## Behavioral question bank (TKT-68)
@@ -205,7 +205,7 @@ of the same scene. To regenerate them and capture review frames, run `node scrip
 http://localhost:3100 [chromium-executable] [review-directory]` against a local server (use an .env-free
 copy for placeholder-only screenshots). Reading panels get a calm camera hold; the contact form keeps
 its settled view. Navigation and motion controls stay reachable inside Home; section/project links use
-native anchors and keyboard focus. See `Resources/Home - Redesign Plan.md`.
+native anchors and keyboard focus. See `docs/journey.md`.
 
 Migration `20261102005510_home_journey_sections.sql` is **APPLIED live** (approved 2026-11-02,
 remote version `20261102081107`). It extends the existing

@@ -1,6 +1,6 @@
 # Home v1.3 — About constellation, Experience journey, My story
 
-Status: draft for sign-off (2026-11-14). Settled in the grill-me session of 2026-11-14 (decision log: Claude project doc `claude/personal-website-content-drafts-home-v1.3-grill.md`). Builds **after** Content Drafts (`Resources/Content Drafts - PRD.md`, gate TKT-108); all new content is entered through Content Drafts, so this build adds no editor screens.
+Status: draft for sign-off (2026-11-14). Settled in the grill-me session of 2026-11-14 (decision log: Claude project doc `claude/personal-website-content-drafts-home-v1.3-grill.md`). Builds **after** Content Drafts (`docs/content-drafts.md`, gate TKT-108); all new content is entered through Content Drafts, so this build adds no editor screens.
 
 **Problem:** About is a heading, a paragraph and a sliding 3-photo strip; Experience is one role per screen beside a Westminster photo. Neither tells Jamie's story (biomedical engineering → ML → production systems and AI) the way the Delta Cafés homepage tells theirs. There is also no place for the longer story behind the move.
 

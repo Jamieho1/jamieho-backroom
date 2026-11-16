@@ -59,7 +59,7 @@ Status: draft for sign-off (2026-11-14). Settled in the grill of 2026-11-14 (ref
 
 ## Canonical locations/data
 
-- Code: this repo. Spec: this file. Prompts: `Resources/Prompts - Interview.md`. Tickets: Notion Tickets (project `40858664-d2d2-8191-b83d-f677a1e28165`); map in `Resources/Tickets - Dependency Map.md`.
+- Code: this repo. Spec: this file. Current implementation: `docs/interview.md`; shipped build prompts are retained in git history. Tickets: Notion Tickets (project `40858664-d2d2-8191-b83d-f677a1e28165`); map in `Resources/Tickets - Dependency Map.md`.
 - Existing sources: `lib/notes/topics.ts` (topics/colours), notes table (DSA, `sd-*`, `class-design`), `lib/practice/problems` (catalogue in code), practice tables (owner-only today), behavioral tables and question bank in code, `components/site-navigation.tsx`, `lib/resources.ts`, contact/inbox pipeline.
 - Database changes (new migrations, applied only after "apply it"): per-user practice progress; per-user resume and behavioral workspaces plus template content; section assignment for notes (System Design / LLD / Finance / AI Engineering); app visibility set to open; feedback message type; Content Drafts allowlist entries for any new shared-content tables.
 

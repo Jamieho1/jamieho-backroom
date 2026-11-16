@@ -1,8 +1,10 @@
 # Prompts — Home v1.3
 
-Two kinds of prompt here:
-- **Image prompts (TKT-109):** paste into ChatGPT image generation. You can do these now.
-- **Build prompts (TKT-110 → 116):** paste into ChatGPT with repo access, one at a time, only after Content Drafts is live (TKT-108). Order: **110 and 111** (either order) → **112, 113, 114** (any order) → **115** (needs 113 and the art) → **116**. Tell Claude when each lands.
+Updated 2026-11-16 for the current site (Interview Prep nav, Privacy out of nav, Content Drafts live, art already uploaded).
+
+- **Image prompts (TKT-109): done.** Art is in the home-media bucket as `experience-bg.webp`, `experience-mascot.webp`, `experience-phone.webp` (raw files in `Personal Website/Media/Experience-art/`).
+- **Build prompts:** paste into ChatGPT one at a time, strictly in this order (they share journey files): **110 → (Jamie: "apply it") → 110b → 111 → 112 → 113 → 114 → 115 → 116**. Tell Claude when each lands for review.
+- ChatGPT does all execution, including live content drafts. Claude plans and reviews only.
 
 ---
 
@@ -58,7 +60,7 @@ Rules: no text, letters, numbers, signs, logos, icons or markers. Keep the top t
 ## TKT-110 — Data: About photos list, journey flag + icon, story section
 
 ```
-You are working in the jamieho-backroom repo (Next.js App Router + Supabase). First read AGENTS.md, docs/README.md, docs/status.md, docs/security.md, docs/journey.md and docs/operations.md, and follow them (Jamie pushes; never push; new migrations only; never apply a migration live until Jamie says "apply it"; Jamie handles secrets; update docs/ and MEMORY.md after the change). Specs: Resources/Home v1.3 - PRD.md (this work) and Resources/Content Drafts - PRD.md (already built). Ticket: TKT-110.
+You are working in the jamieho-backroom repo (Next.js App Router + Supabase). First read AGENTS.md, docs/README.md, docs/status.md, docs/security.md, docs/journey.md and docs/operations.md, and follow them (Jamie pushes; never push; new migrations only; never apply a migration live until Jamie says "apply it"; Jamie handles secrets; update docs/ and MEMORY.md after the change). Specs: Resources/Home v1.3 - PRD.md (this work) and docs/content-drafts.md (already built). Ticket: TKT-110.
 
 Build:
 1. One migration:
@@ -67,18 +69,35 @@ Build:
    - site_sections: extend the key check constraint and lib/sections.ts SECTION_KEYS with 'story' (fallback title "My story", empty body).
    - Database policy tests for all of the above in tests/db.
 2. Loaders: a public About photos loader (public rows, by sort, centre first) and a journey-stops loader (public experience items with show-on-journey, oldest → newest by their dates/sort, with up to 3 public bullets each).
-3. Content Drafts: add the About photos table, the two new experience_items fields and the 'story' key to lib/content-drafts/allowlist.ts and the SQL apply function's allowlist, with preview overlay support in the new loaders.
+3. Content Drafts: add the About photos table (insert/update/delete), the two new experience_items fields and the 'story' key to lib/content-drafts/allowlist.ts and the SQL apply function's allowlist, with preview overlay support in the new loaders.
+4. Photo slots: extend the existing TKT-107 photo-slot support (lib/content-drafts/photo-slots.ts + private.apply_draft_photos) with a second target: bucket home-media → a new About photos row (slot carries caption/alt/sort; path written on approve). Same file rules, exact-filename check, drafts/<set id>/<slot>/ upload prefix and approve-blocked-until-filled behaviour. Keep the canonical URL prefix logic shared between TS and SQL.
 
-Do not change the homepage layout yet, the existing About photo strip, or any live data.
+Do not change the homepage layout yet, the existing About photo strip, or any live data. Existing About images in home-media: about-imperial-graduation.jpg, about-graduation-hall.jpg, about-jungfraujoch.jpg.
 
 Done when:
 - Policy tests pass (public read of public photos only; owner-only writes; one centre max; invalid icon refused).
 - Loader unit tests pass (ordering, centre first, oldest → newest stops, ≤3 bullets).
-- Content Drafts can draft and preview the new fields (tests).
+- Content Drafts can draft and preview the new fields, and a home-media About-photo slot blocks approve until filled, then creates the row (tests).
 - Typecheck, full suite, build and static assertions pass.
 - docs/security.md, docs/architecture.md, docs/status.md, MEMORY.md updated; migration recorded as NOT applied. Stop and ask Jamie before applying it.
 
 Report: files changed, migration name, checks actually run and results.
+```
+
+---
+
+## TKT-110b — Starter content drafts (only after Jamie says "apply it" for TKT-110 and it is applied)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/content-drafts.md first. Spec: Resources/Home v1.3 - PRD.md. Ticket: TKT-110 (content step). The TKT-110 migration must already be applied live; if not, stop.
+
+Create live Content Drafts change sets (content_changes rows with summary + operations only; never set status, approved_at or approved_by; Jamie approves on /manage/review). One set per item so Jamie can approve them separately:
+1. "About photos: move the current three into the new list" — insert About photos rows for about-imperial-graduation.jpg (centre=true, sort 0), about-graduation-hall.jpg (sort 1), about-jungfraujoch.jpg (sort 2), public=true. Captions/alt: short and literal from what each image shows; no invented claims (Jamie corrects by asking).
+2. "Experience journey stops" — on experience_items set show-on-journey + icon: Imperial → graduation-cap, KOLN3D → neural-network, Global Relay → streams-plug. DataKind UK stays off the journey. Look the rows up by org; do not change any other field.
+3. "About text trimmed to ~3 lines" — update site_sections key about body to the current first paragraph trimmed to about three lines, keeping Jamie's wording (cut, don't rewrite). Title unchanged.
+Leave site_sections story empty (the page shows its starter state).
+
+Before inserting, read back the live rows you reference. After inserting, read back each set's id/summary/status = draft. No other live change. Update docs/status.md and MEMORY.md (one line). Report: set ids and summaries, read-back results.
 ```
 
 ---
@@ -91,7 +110,7 @@ You are working in the jamieho-backroom repo. First read AGENTS.md, docs/README.
 Build:
 1. lib/journey/chapters.ts: order Hello (sky) → About → Experience → Work (projects) → Techstack → Creator → Contact Us. Rename the About chapter's id/anchor to "about" and keep "#pivot" working as an alias (scroll handling, nav jumps, static fallback ids, legacy redirects that point to /#pivot).
 2. Journey dropdown (components/site-navigation.tsx JOURNEY items) in the same order, all # jumps.
-3. Top bar and floating bar: Journey · My story (/about) · Projects · Articles · Resources · Privacy. /about may 404 or keep its redirect until TKT-114 lands; the link must exist now.
+3. Top bar and floating bar: Journey · My story (/about) · Projects · Interview Prep · Articles · Resources (Privacy stays out of navigation, in the Contact form only; keep the icon theme switch and review badge). /about may keep its redirect until TKT-114 lands; the link must exist now.
 4. Retire: the About photo strip (components/journey/about-photos.tsx usage), the Experience Westminster still and timeline dots, and the three.js wireframe on About and Experience (lib/journey/lines.ts SHAPE_BY_CHAPTER keeps only Work and Creator). Leave the About and Experience text panels working until TKT-112/113 replace them.
 
 Do not change Hero, Work showcase, Techstack, Creator or Contact Us behaviour.
@@ -187,7 +206,7 @@ Report: files changed, checks actually run and results.
 ## TKT-115 — Mascot walks the journey
 
 ```
-You are working in the jamieho-backroom repo. First read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md and follow them. Spec: Resources/Home v1.3 - PRD.md (Experience background). Ticket: TKT-115. Requires TKT-113 and the approved art from TKT-109 (experience-bg, experience-mascot, experience-phone in the home-media bucket and the media manifest; ask Jamie for the exact file names if they are not in lib/journey/media-manifest.json).
+You are working in the jamieho-backroom repo. First read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md and follow them. Spec: Resources/Home v1.3 - PRD.md (Experience background). Ticket: TKT-115. Requires TKT-113. Approved art is already in the home-media bucket: experience-bg.webp (background), experience-mascot.webp (transparent walking mascot), experience-phone.webp (9:16 phone still). Add them to the media manifest with hashes; raw originals are in Personal Website/Media/Experience-art/ (not Git).
 
 Build:
 1. Behind the Experience curve: the background image covering the section with a slight scroll drift (transform only).
@@ -215,6 +234,7 @@ Run the full verification for Home v1.3 and fix only genuine defects you find (n
 - Typecheck, full unit/database suite, production build, static assertions, full browser suite at desktop and 390 px.
 - Reduced-motion and no-JavaScript runs of / and /about.
 - Work section shows exactly the featured projects (Cyterly AI and DataKind UK with its Volunteer tag).
+- Content Drafts preview still outlines About photos, journey stops and story changes on / and /about.
 - /#about, /#pivot, /about, Journey dropdown and the My story link all behave as specified.
 Update docs/journey.md, docs/architecture.md, docs/status.md and MEMORY.md to the final state, and list every check with its actual result. Then stop: Jamie pushes and reviews live.
 ```

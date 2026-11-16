@@ -1,6 +1,6 @@
 # Tickets — Dependency Map (Personal Website / jamieho-backroom)
 
-_Source: `PRD.md` (signed off 2026-10-29). Tickets live in Notion → Jamie Ho — Cowork OS → Tickets (project row "Personal Website (jamieho-backroom)"). IDs match Notion. Check this before starting work; only pick tickets whose blockers are Done, and tell Jamie before starting any coding ticket._
+_Source: initial signed-off scope (2026-10-29), retained in git history. Tickets live in Notion → Jamie Ho — Cowork OS → Tickets (project row "Personal Website (jamieho-backroom)"). IDs match Notion. Check this before starting work; only pick tickets whose blockers are Done, and tell Jamie before starting any coding ticket._
 
 ## Current position (2026-11-01)
 
@@ -80,7 +80,7 @@ TKT-70 Artifact cut-over ← TKT-63 + TKT-66 + TKT-69
 
 ## Home v1: cinematic London journey (TKT-72 – TKT-81)
 
-PRD: `Resources/Home v1 - PRD.md` (from the 4 Nov 2026 grill-me). Creative pack + Scene Prompts: Website HQ › `01 Reference/Home Redesign Handoff 2026-11-04/`.
+Historical Home scope: git history (4 Nov 2026 grill-me). Creative pack + Scene Prompts: Website HQ › `01 Reference/Home Redesign Handoff 2026-11-04/`.
 
 **Unblocked now (can run in parallel):**
 - TKT-72 Media (Jamie): stills S2–S6. P0
@@ -112,7 +112,7 @@ TKT-75 ────────────────────────�
 
 ## Home v1.1 — shorter journey with BMW-style sections (added 2026-11-05)
 
-PRD: `Resources/Home v1 - PRD.md`, section "Home v1.1" (signed off 5 Nov 2026). Notion: Tickets database.
+Historical Home v1.1 scope: git history (signed off 5 Nov 2026). Notion: Tickets database.
 
 **Startable now (no blockers):**
 - **TKT-82** Section engine + Pivot section (first slice) — P0
@@ -142,7 +142,7 @@ TKT-76 Start screen + preloader (in review) ────────────
 
 ## Home v1.2, motion and polish (added 2026-11-05)
 
-PRD: `Resources/Home v1 - PRD.md`, section "Home v1.2" (signed off 5 Nov 2026). Notion: Tickets database.
+Historical Home v1.2 scope: git history (signed off 5 Nov 2026). Notion: Tickets database.
 
 **Startable now (no blockers, can run in parallel):**
 - **TKT-91** Make the next move: booking CTA section (P0)
@@ -167,7 +167,7 @@ Jamie's 9:16 stills ─> TKT-96 Phone portrait mode
 
 ## Content Drafts (Claude drafts, Jamie approves) — 2026-11-14
 
-PRD: `Resources/Content Drafts - PRD.md` (signed off 2026-11-14). Builds before Home v1.3. Build prompts: `Resources/Prompts - Content Drafts.md`.
+Current behavior: `docs/content-drafts.md`. Signed-off scope and shipped build prompts are retained in git history. Builds before Home v1.3.
 
 Startable now: **TKT-98** (tracer; its migration needs Jamie's "apply it").
 
@@ -209,7 +209,7 @@ Parallel after TKT-108: 110 and 111. After both: 112, 113, 114 in parallel. TKT-
 
 ## Interview (sidebar workspace) — 2026-11-14
 
-PRD: `Resources/Interview - PRD.md` (signed off 2026-11-14). Prompts: `Resources/Prompts - Interview.md`. Starts after Content Drafts TKT-107/108; Home v1.3 (TKT-110/111) now also waits for TKT-125. Supersedes TKT-100.
+PRD: `Resources/Interview - PRD.md` (signed off 2026-11-14). Current implementation: `docs/interview.md`; shipped build prompts are retained in git history. Starts after Content Drafts TKT-107/108; Home v1.3 (TKT-110/111) now also waits for TKT-125. Supersedes TKT-100.
 
 Run strictly in order (shared files and migrations): **118 → 119 → 120 → 121 → 122 → 123 → 124 → 125**.
 
