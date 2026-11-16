@@ -60,7 +60,7 @@ describe("journey content (TKT-77)", () => {
     const pivotSections = { ...sections, about: { key: "about" as const, title: "From labs to production", body: "First para.\n\nSecond." } };
     const out = withContent(HOME_CHAPTERS, { sections: pivotSections, experience, technologies: [] });
     expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "Second paragraph.", meta: "First line.", md: true, cta: undefined });
-    expect(panelsOf(out, "pivot")[0]).toMatchObject({
+    expect(panelsOf(out, "about")[0]).toMatchObject({
       title: "From labs to production", body: "First para.", md: true, look: "statement",
       meta: "MEng Biomedical Engineering · Imperial College London · 2016–2020",
     });
@@ -68,10 +68,10 @@ describe("journey content (TKT-77)", () => {
 
   it("keeps the pivot without an education line, and drops it when About is empty", () => {
     const withAbout = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] });
-    expect(panelsOf(withAbout, "pivot")[0]).toMatchObject({ title: "About", body: "About text.", meta: undefined });
+    expect(panelsOf(withAbout, "about")[0]).toMatchObject({ title: "About", body: "About text.", meta: undefined });
     const empty = { ...sections, about: { key: "about" as const, title: "", body: "" } };
     const skipped = withContent(HOME_CHAPTERS, { sections: empty, experience: [], technologies: [] });
-    expect(skipped.some((c) => c.id === "pivot")).toBe(false); // the whole section is skipped, not left blank
+    expect(skipped.some((c) => c.id === "about")).toBe(false); // the whole section is skipped, not left blank
   });
 
   it("puts the latest posts and Subscribe/Follow in Creator, and leaves the room free of text panels", () => {
@@ -106,7 +106,7 @@ describe("journey content (TKT-77)", () => {
     const out = withContent(HOME_CHAPTERS, { sections: quiet, experience: [], technologies: [] });
     expect(out.some((c) => c.id === "creator")).toBe(false);
     expect(panelsOf(out, "room")).toEqual([]);
-    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact");
+    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact Us");
   });
 
   it("fills the showcase with featured public projects (max 4) and sizes its scroll; skips it with none", () => {

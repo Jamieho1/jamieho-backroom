@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GRID, gridSegments, lerpInto, lineState, shapePoints, type Shape } from "@/lib/journey/lines";
+import { SHAPE_BY_CHAPTER, GRID, gridSegments, lerpInto, lineState, shapePoints, type Shape } from "@/lib/journey/lines";
 
 const chapters = [
   { id: "sky", kind: "video" }, { id: "pivot", kind: "section" }, { id: "projects", kind: "section" },
@@ -27,18 +27,14 @@ describe("line shapes (TKT-95)", () => {
     expect([...lerpInto(new Float32Array(3), a, b, 0.5)]).toEqual([1, 2, -1]);
   });
 
-  it("fades in after footage, morphs between sections, and hides where no shape is set", () => {
-    const first = lineState(chapters, 1, 0);
-    expect(first).toMatchObject({ shape: "sphere", from: "sphere", opacity: 0 });
-    expect(lineState(chapters, 1, 0.5).opacity).toBe(1);
-    const mid = lineState(chapters, 2, 0.15);
-    expect(mid.from).toBe("sphere");
-    expect(mid.shape).toBe("torus");
-    expect(mid.morph).toBeGreaterThan(0);
-    expect(mid.morph).toBeLessThan(1);
-    expect(lineState(chapters, 3, 0.5)).toMatchObject({ shape: null, opacity: 0 });
-    expect(lineState(chapters, 4, 0.1).from).toBe("helix"); // after the Toolkit (no shape) it fades in, not morphs
-    expect(lineState(chapters, 0, 0.5).shape).toBeNull();
-    expect(lineState(chapters, 1, 0.9, 1).opacity).toBe(0); // gone once the photo has grown over the screen
+  it("keeps only Work and Creator shapes; About/Experience have no geometry", () => {
+    expect(SHAPE_BY_CHAPTER).toEqual({projects:'torus',creator:'helix'});
+    for(const id of ['about','pivot','experience'])expect(lineState([{id,kind:'section'}],0,.5)).toMatchObject({shape:null,opacity:0});
+    expect(lineState(chapters,2,0)).toMatchObject({shape:'torus',from:'torus',opacity:0});
+    expect(lineState(chapters,2,.5).opacity).toBe(1);
+    expect(lineState(chapters,3,.5)).toMatchObject({shape:null,opacity:0});
+    expect(lineState(chapters,4,.1).from).toBe('helix');
+    const adjacent=[{id:'projects',kind:'section'},{id:'creator',kind:'section'}];
+    const mid=lineState(adjacent,1,.15);expect(mid.from).toBe('torus');expect(mid.shape).toBe('helix');expect(mid.morph).toBeGreaterThan(0);expect(mid.morph).toBeLessThan(1);
   });
 });

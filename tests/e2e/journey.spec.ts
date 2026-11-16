@@ -29,7 +29,7 @@ test("editorial introduction keeps full-background framing and the scroll cue op
   });
   expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();
-  await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
+  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
 });
 
@@ -44,12 +44,12 @@ test("Journey dropdown navigates, keeps the floating controls and returns to the
   await page.locator(".is-journey [data-menu=journey] summary").click();
   const nav = page.getByRole("navigation", { name: "Journey chapters" });
   await expect(nav.getByRole("button", { name: /Hello/ })).toHaveCount(0);
-  await expect(nav.getByRole("button", { name: /Education/ })).toBeVisible();
+  await expect(nav.getByRole("button", { name: /About/ })).toBeVisible();
 
-  await expect(nav.getByRole("button", { name: /TechStack/ })).toBeAttached();
-  await nav.getByRole("button", { name: /Education/ }).click();
+  await expect(nav.getByRole("button", { name: /Techstack/ })).toBeAttached();
+  await nav.getByRole("button", { name: /About/ }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
-  await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
+  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
   await page.getByRole("link", { name: "Jamie Ho — back to the top" }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "false");
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(4);
@@ -65,16 +65,16 @@ test("opening uses artwork and never downloads the opening video", async ({ page
   expect(clips).toEqual([]);
 });
 
-test("section photos stay framed through hand-over instead of growing fullscreen", async ({ page }) => {
+test("About remains readable without the retired photos, timeline or fullscreen growth", async ({ page }) => {
   await page.goto("/");
-  const about = page.locator('[data-chapter="pivot"]');
+  const about = page.locator('[data-chapter="about"]');
   await page.locator(".is-journey [data-menu=journey] summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Education/ }).click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /About/ }).click();
   await expect(about.locator(".journey-panel")).toBeVisible();
   await page.mouse.wheel(0, 600);
   await page.waitForTimeout(600);
   await expect(page.locator('[data-grow]')).toHaveCount(0);
-  expect(await about.locator(".journey-about-photos").evaluate(el => el.style.transform)).toBe("");
+  await expect(page.locator(".journey-about-photos, .journey-timeline, img[src*=still-westminster]")).toHaveCount(0);
 });
 
 test("journey ends with the contact form on the monitor instead of a desktop link", async ({ page }) => {
@@ -126,27 +126,17 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
 });
 
 
-test("About photos follow scroll and inactive project links cannot intercept the biography", async ({ page }) => {
+test("About text remains readable and inactive project links cannot intercept the biography", async ({ page }) => {
   await page.goto("/");
   await page.locator(".is-journey [data-menu=journey] summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "Education", exact: true }).click();
-  const about = page.locator('[data-chapter="pivot"]');
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "About", exact: true }).click();
+  const about = page.locator('[data-chapter="about"]');
   await expect(about.locator(".journey-panel")).toBeVisible();
   await expect(about).not.toHaveAttribute("inert");
   await expect(page.locator('[data-chapter="sky"]')).toHaveAttribute("inert", "");
   await expect(about.locator(".journey-md a")).toHaveCount(0);
-  await expect(about.locator(".journey-about-photos img")).toHaveCount(3);
-  const strip = about.locator(".journey-about-photos ol");
-  const x = () => strip.evaluate(el => new DOMMatrix(getComputedStyle(el).transform).m41);
-  // Let the 1.6s navigation glide settle before measuring wheel-driven motion.
+  await expect(about.locator('.journey-about-photos')).toHaveCount(0);
   await page.waitForTimeout(1800);
-  const start = await x();
-  await page.mouse.wheel(0, 240);
-  await expect.poll(x).toBeLessThan(start - 20);
-  await page.waitForTimeout(1000);
-  const forward = await x();
-  await page.mouse.wheel(0, -180);
-  await expect.poll(x).toBeGreaterThan(forward + 20);
   const body = about.locator(".journey-md");
   if (await body.count()) {
     const intercepted = await body.evaluate(el => {
@@ -169,4 +159,20 @@ test('Schedule a call jumps directly to the Contact form',async({page})=>{
  const call=page.getByRole('link',{name:'Schedule a call',exact:true});
  await expect(call).toHaveAttribute('href','#home-contact');await call.click();
  await expect(page.getByRole('region',{name:'Contact',exact:true}).getByLabel('Name',{exact:true})).toBeVisible();
+});
+
+for(const anchor of ['about','pivot'])test(`${anchor} hash lands on canonical About, including hash changes`,async({page})=>{
+ await page.goto('/#'+anchor);const about=page.locator('[data-chapter="about"] .journey-panel');await expect(about).toBeVisible();
+ const nav=page.locator('.site-navigation.is-journey');await expect(nav.getByRole('link',{name:'My story',exact:true})).toBeVisible();
+ await nav.getByRole('link',{name:'Jamie Ho — back to the top'}).click();await expect(nav).toHaveAttribute('data-floating','false');
+ await page.evaluate(()=>{location.hash='sky'});await page.evaluate(hash=>{location.hash=hash},anchor);await expect(about).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('reduced motion and no JavaScript retain canonical/legacy anchors without retired media',async({page,browser},info)=>{
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/#pivot');
+ expect(await page.locator('#about #pivot').count()).toBe(1);
+ expect(await page.locator('#about').evaluate(el=>Math.abs(el.getBoundingClientRect().top))).toBeLessThan(3);
+ await expect(page.locator('.journey-about-photos, .journey-timeline, img[src*=still-westminster]')).toHaveCount(0);
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:info.project.use.viewport});
+ try{const still=await context.newPage();await still.goto('/#about');await expect(still.locator('.journey-stills #about')).toBeVisible();await expect(still.locator('#about #pivot')).toHaveCount(1);expect(await still.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}finally{await context.close();}
 });

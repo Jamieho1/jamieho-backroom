@@ -167,7 +167,7 @@ export function locate(chapters: readonly Chapter[], progress: number, lay = lay
 
 /** Global progress at which a chapter starts: used for chapter navigation and `/journey#desk`. */
 export function progressOf(chapters: readonly Chapter[], id: string, lay = layout(chapters)): number {
-  const i = chapters.findIndex((c) => c.id === id);
+  const i = chapters.findIndex((c) => c.id === canonicalChapterId(id));
   return i < 0 || !lay.total ? 0 : lay.starts[i] / lay.total;
 }
 
@@ -236,12 +236,15 @@ export function stillDrift(local: number, amp = 0.06): number {
   return (0.5 - clamp01(local)) * 2 * amp;
 }
 
+/** Preserve legacy About links without maintaining a second chapter. */
+export const canonicalChapterId = (id: string): string => id === "pivot" ? "about" : id;
+
 /**
  * Where the chapter menu lands for a chapter (global progress). Video chapters start at their first frame; a solid
  * section lands just after its wipe, once its first panel is readable, so a menu jump never shows a blank screen.
  */
 export function landingOf(chapters: readonly Chapter[], id: string, lay = layout(chapters)): number {
-  const i = chapters.findIndex((c) => c.id === id);
+  const i = chapters.findIndex((c) => c.id === canonicalChapterId(id));
   if (i < 0 || !lay.total) return 0;
   const c = chapters[i];
   const settle = c.kind === "section" ? Math.min(0.9, Math.max(c.wipe ?? SECTION_WIPE, c.panels?.[0]?.from ?? 0) + 0.06) : 0;

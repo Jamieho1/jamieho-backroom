@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import {
-  type Chapter, alignAt, ctaOpacity, landingOf, stillDrift, wipeOffset, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
+  type Chapter, canonicalChapterId, alignAt, ctaOpacity, landingOf, stillDrift, wipeOffset, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
 } from "@/lib/journey/timeline";
 
 const demo: Chapter[] = [
@@ -84,8 +84,8 @@ describe("journey timeline", () => {
   });
 
   it("orders the v1.1 journey: video only at the two ends", () => {
-    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "pivot", "projects", "experience", "toolkit", "creator", "to-room", "c7a", "c7b"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Education", "Work", "Experience", "Techstack", "Creator", "Contact"]);
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "experience", "projects", "toolkit", "creator", "to-room", "c7a", "c7b"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["About", "Experience", "Work", "Techstack", "Creator", "Contact Us"]);
   });
 
   it("fades the contact screen in over the end of the push-in", () => {
@@ -127,4 +127,11 @@ describe("journey timeline", () => {
     expect(HOME_CHAPTERS.at(-1)?.id).toBe("screen"); // the journey ends on the contact monitor
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
+});
+
+it('canonical About and legacy pivot land at the same readable position',()=>{
+ expect(canonicalChapterId('pivot')).toBe('about');expect(canonicalChapterId('about')).toBe('about');
+ expect(landingOf(HOME_CHAPTERS,'pivot')).toBe(landingOf(HOME_CHAPTERS,'about'));
+ const experience=HOME_CHAPTERS.find(c=>c.id==='experience');
+ expect(experience).not.toHaveProperty('still');expect(experience).not.toHaveProperty('timeline');
 });

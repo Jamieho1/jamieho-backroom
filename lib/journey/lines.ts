@@ -11,7 +11,7 @@ export type Shape = "sphere" | "torus" | "wave" | "helix";
 export const GRID = { u: 48, v: 24 } as const;
 
 /** Which shape each section shows. Sections not listed (the Toolkit has its own 3D stack) show none. */
-export const SHAPE_BY_CHAPTER: Readonly<Record<string, Shape>> = { pivot: "sphere", projects: "torus", experience: "wave", creator: "helix" };
+export const SHAPE_BY_CHAPTER: Readonly<Record<string, Shape>> = { projects: "torus", creator: "helix" };
 
 const TAU = Math.PI * 2;
 

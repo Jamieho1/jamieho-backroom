@@ -40,10 +40,10 @@ test("Auto tracks the computer while explicit Day and Night choices persist", as
 
 test("navigation controls remain available in the floating bar", async ({ page }) => {
   await page.goto('/'); await page.locator('.is-journey [data-menu=journey] summary').click();
-  await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Education',exact:true}).click();
+  await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
   for(const name of ['Projects','Interview Prep']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
-  await expect(page.locator('.site-navigation:visible [data-menu=content] summary')).toBeVisible();
+  for(const name of ['My story','Articles','Resources'])await expect(page.locator('.site-navigation:visible').getByRole('link',{name,exact:true})).toBeVisible();
   await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
@@ -51,9 +51,9 @@ test("navigation controls remain available in the floating bar", async ({ page }
 test("Journey dropdown returns from Resources to the requested homepage section", async ({ page }) => {
   await page.goto('/resources');
   await page.locator('.site-navigation [data-menu=journey] summary').click();
-  await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('link',{name:'Education',exact:true}).click();
-  await expect(page).toHaveURL(/\/#pivot$/);
-  await expect(page.locator('[data-chapter="pivot"] .journey-panel')).toBeVisible();
+  await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('link',{name:'About',exact:true}).click();
+  await expect(page).toHaveURL(/\/#about$/);
+  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
 });
 
 test('Journey opens on hover and click, and the floating bar remains centred', async ({page}, info) => {
@@ -71,7 +71,7 @@ test('Journey opens on hover and click, and the floating bar remains centred', a
  await summary.click(); await expect(menu).not.toHaveAttribute('open','');
  await summary.click(); await page.keyboard.press('Escape'); await expect(menu).not.toHaveAttribute('open','');
  await summary.click();
- await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Education',exact:true}).click();
+ await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
  await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
  if(info.project.name==='desktop') {
   const bar=await page.locator('.site-navigation.is-journey').boundingBox();
@@ -93,29 +93,22 @@ test('Projects opens the catalogue while Journey Work links to the showcase',asy
  await expect(page.locator('.app-page[data-app="projects"]')).toBeVisible();
 });
 
-test('Content groups Articles and Resources with hover, click and keyboard in top and floating bars',async({page},info)=>{
+test('direct My story, Articles and Resources links remain visible in top and floating navigation',async({page})=>{
  await page.goto('/resources');
- const menu=page.locator('.site-navigation:visible [data-menu=content]');const summary=menu.locator('summary');
- await expect(menu).not.toHaveAttribute('open','');
- if(info.project.name==='desktop'){
-  await summary.hover();await expect(menu).toHaveAttribute('open','');
-  await page.getByRole('heading',{name:'Resources',level:1}).hover();await expect(menu).not.toHaveAttribute('open','');
- }
- await summary.focus();await page.keyboard.press('Enter');await expect(menu).toHaveAttribute('open','');
- const content=page.getByRole('navigation',{name:'Content pages'});
- await expect(content.getByRole('link')).toHaveText(['Articles','Resources']);
- await expect(content.getByRole('link',{name:'Articles',exact:true})).toHaveAttribute('href','/articles');
- await expect(content.getByRole('link',{name:'Resources',exact:true})).toHaveAttribute('href','/resources');
- await page.keyboard.press('Escape');await expect(menu).not.toHaveAttribute('open','');await expect(summary).toBeFocused();
- await summary.click();await expect(menu).toHaveAttribute('open','');await summary.click();await expect(menu).not.toHaveAttribute('open','');
- await summary.click();await page.locator('.site-navigation [data-menu=journey] summary').click();await expect(menu).not.toHaveAttribute('open','');
- await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('link',{name:'Education',exact:true}).click();
+ const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
+ const names=['My story','Projects','Interview Prep','Articles','Resources'];
+ await expect(nav.locator(':scope > a')).toHaveText(names);
+ await expect(nav.getByRole('link',{name:'My story',exact:true})).toHaveAttribute('href','/about');
+ await expect(nav.locator('[data-menu=content]')).toHaveCount(0);
+ await nav.locator('[data-menu=journey] summary').click();
+ const chapters=page.getByRole('navigation',{name:'Journey chapters'});
+ await expect(chapters.getByRole('link')).toHaveText(['About','Experience','Work','Techstack','Creator','Contact Us']);
+ await chapters.getByRole('link',{name:'About',exact:true}).click();
+ await expect(page).toHaveURL(/\/#about$/);
  await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
- await page.locator('.site-navigation:visible [data-menu=content] summary').click();
- await expect(page.getByRole('navigation',{name:'Content pages'})).toBeVisible();
+ await expect(page.locator('.site-navigation.is-journey nav[aria-label=Site] > a')).toHaveText(names);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- await page.getByRole('navigation',{name:'Content pages'}).getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);
- await expect(page.locator('.site-navigation:visible [data-menu=content]')).not.toHaveAttribute('open','');
+ await page.locator('.site-navigation.is-journey').getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);
 });
 
 // A chapter hash can remain after the logo scrolls back to the clouds.

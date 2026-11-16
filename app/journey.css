@@ -652,11 +652,11 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 }
 
 /* About: smaller editorial heading and solid ink for the reading paragraph. */
-[data-chapter="pivot"] .journey-look-statement .journey-title { font-size: clamp(30px, 3vw, 52px); line-height: 1.12; margin-bottom: 18px; text-wrap: balance; }
-[data-chapter="pivot"] .journey-body, [data-chapter="pivot"] .journey-md .md p { color: var(--s-ink); font-size: clamp(16px, 1.25vw, 19px); line-height: 1.7; }
+:is([data-chapter="about"], .journey-stills > #about) .journey-look-statement .journey-title { font-size: clamp(30px, 3vw, 52px); line-height: 1.12; margin-bottom: 18px; text-wrap: balance; }
+:is([data-chapter="about"], .journey-stills > #about) .journey-body, :is([data-chapter="about"], .journey-stills > #about) .journey-md .md p { color: var(--s-ink); font-size: clamp(16px, 1.25vw, 19px); line-height: 1.7; }
 @media (max-width: 768px) {
-  [data-chapter="pivot"] .journey-look-statement .journey-title { font-size: clamp(22px, 6vw, 28px); }
-  [data-chapter="pivot"] .journey-body, [data-chapter="pivot"] .journey-md .md p { display: block; -webkit-line-clamp: unset; overflow: visible; line-height: 1.6; }
+  :is([data-chapter="about"], .journey-stills > #about) .journey-look-statement .journey-title { font-size: clamp(22px, 6vw, 28px); }
+  :is([data-chapter="about"], .journey-stills > #about) .journey-body, :is([data-chapter="about"], .journey-stills > #about) .journey-md .md p { display: block; -webkit-line-clamp: unset; overflow: visible; line-height: 1.6; }
 }
 
 /* Dashboard previews preserve all edges instead of cropping or panning. */
@@ -776,3 +776,6 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
  [data-chapter="creator"] .journey-panel-left .journey-actions, .journey-stills #creator .journey-actions { gap: 8px; }
  [data-chapter="creator"] .journey-panel-left .journey-brand, .journey-stills #creator .journey-brand { width: calc((100% - 16px) / 3); padding: 9px 6px; gap: 5px; font-size: 12px; }
 }
+
+/* Legacy #pivot shares the canonical About position in native still/no-JS navigation. */
+.journey-anchor-alias { position: absolute; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; }

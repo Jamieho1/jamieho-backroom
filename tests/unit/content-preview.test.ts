@@ -30,7 +30,7 @@ it('overlay is immutable, preserves live fields and applies repeated edits in or
  expect(result.hero).toEqual({key:'hero',title:'Final name',body:'Draft body'});expect(JSON.stringify(FALLBACK_SECTIONS)).toBe(before);expect(overlaySections(FALLBACK_SECTIONS,[])).toEqual(FALLBACK_SECTIONS);
 });
 it('maps outlines to existing sections without adding or changing chapters',()=>{
- expect(draftChapterChanged('pivot',['about'])).toBe(true);expect(draftChapterChanged('creator',['contact'])).toBe(true);expect(draftChapterChanged('screen',['contact'])).toBe(true);expect(draftChapterChanged('sky',['hero'])).toBe(true);expect(draftChapterChanged('projects',['about'])).toBe(false);expect(draftChapterChanged('experience',[])).toBe(false);
+ expect(draftChapterChanged('about',['about'])).toBe(true);expect(draftChapterChanged('pivot',['about'])).toBe(true);expect(draftChapterChanged('creator',['contact'])).toBe(true);expect(draftChapterChanged('screen',['contact'])).toBe(true);expect(draftChapterChanged('sky',['hero'])).toBe(true);expect(draftChapterChanged('projects',['about'])).toBe(false);expect(draftChapterChanged('experience',[])).toBe(false);
 });
 
 it('experience preview reads the complete owner snapshot and rejects stale targets or failed reads',async()=>{

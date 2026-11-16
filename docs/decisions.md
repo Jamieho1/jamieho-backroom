@@ -27,3 +27,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · Superseded planning and handoff documents are deleted; use git history instead of keeping archive copies · Docs cleanup prompt
 
 - 2026-11-16 · Home photo slots create hidden/non-centre rows unless explicitly marked public/centre; centre uniqueness includes hidden rows · TKT-110 data contract
+
+- 2026-11-16 · Canonical About anchor is #about with #pivot compatibility; My story/Articles/Resources are direct nav links, About/Experience old visuals retired · TKT-111 prompt

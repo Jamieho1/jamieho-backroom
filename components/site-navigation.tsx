@@ -9,9 +9,9 @@ import { SignInButton } from "./sign-in-button";
 import { useViewer } from "./viewer-provider";
 
 export const JOURNEY_LINKS = [
-  { id: "pivot", label: "Education" }, { id: "projects", label: "Work" },
-  { id: "experience", label: "Experience" }, { id: "toolkit", label: "TechStack" },
-  { id: "creator", label: "Creator" }, { id: "screen", label: "Contact" },
+  { id: "about", label: "About" }, { id: "experience", label: "Experience" },
+  { id: "projects", label: "Work" }, { id: "toolkit", label: "Techstack" },
+  { id: "creator", label: "Creator" }, { id: "screen", label: "Contact Us" },
 ];
 interface Props {
   items?: typeof JOURNEY_LINKS;
@@ -31,10 +31,8 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
           {items.map((item, k) => onJump ? <button type="button" key={item.id} ref={node => { if (navRefs) navRefs.current[k] = node; }} onClick={() => { onJump(item.id); closeMenu(); }}>{item.label}</button> : <Link key={item.id} prefetch={false} href={`${journey ? "" : "/"}#${item.id}`} onClick={closeMenu}>{item.label}</Link>)}
         </nav>}
       </NavigationMenu>
-      <Link href="/projects">Projects</Link><Link href="/interview">Interview Prep</Link>
-      <NavigationMenu label="Content" group={menuGroup}>
-        {closeMenu=><nav className="journey-chapter-list" aria-label="Content pages"><Link href="/articles" onClick={closeMenu}>Articles</Link><Link href="/resources" onClick={closeMenu}>Resources</Link></nav>}
-      </NavigationMenu>
+      <Link href="/about">My story</Link><Link href="/projects">Projects</Link><Link href="/interview">Interview Prep</Link>
+      <Link href="/articles">Articles</Link><Link href="/resources">Resources</Link>
     </nav>
     <div className="site-navigation-account">
       <FeedbackButton className="site-feedback-button"/>
@@ -47,7 +45,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
 });
 
 
-/** Both disclosures share hover, click, keyboard and outside-dismiss behavior. */
+/** The Journey disclosure supports hover, click, keyboard and outside dismissal. */
 function NavigationMenu({label,group,children}:{label:string;group:string;children:(close:()=>void)=>ReactNode}){
   const menu = useRef<HTMLDetailsElement>(null);
   const pinned = useRef(false);

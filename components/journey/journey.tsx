@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
   type Chapter, type Panel, type VideoChapter, alignAt, approach, displayOpacity, fadeCover, joinOpacity, layout, locate,
-  ctaOpacity, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
+  ctaOpacity, canonicalChapterId, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
 } from "@/lib/journey/timeline";
 import { Motes, type MotesHandle } from "./motes";
 import { LineShape, type LineShapeHandle } from "./line-shape";
@@ -18,7 +18,6 @@ import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
-import { AboutPhotos, type AboutPhotosHandle } from "./about-photos";
 import { HeroArtwork } from "./hero-artwork";
 import { JourneyNavigation } from "./navigation";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
@@ -48,7 +47,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
-  const aboutPhotos = useRef<AboutPhotosHandle>(null);
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
   const toolkits = useRef<(ToolkitHandle | null)[]>([]);
@@ -145,8 +143,15 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
     skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
-    if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
-    else if (window.location.hash) { const id = window.location.hash.slice(1); if (chapters.some(c => c.id === id)) jump.current(id); }
+    const followHash = () => {
+      if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
+      else if (window.location.hash) {
+        const id = canonicalChapterId(window.location.hash.slice(1));
+        if (chapters.some(c => c.id === id)) jump.current(id);
+      }
+    };
+    followHash();
+    window.addEventListener("hashchange", followHash);
 
     // Word spans per panel, cached once.
     const words = new Map<string, HTMLElement[]>();
@@ -183,7 +188,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
-          if (c.id === "pivot" && opacity > 0) aboutPhotos.current?.setProgress(at);
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
@@ -255,6 +259,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
     };
     raf = requestAnimationFrame(draw);
     return () => {
+      window.removeEventListener("hashchange", followHash);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
@@ -278,8 +283,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
-                ) : c.id === "pivot" ? (
-                  <AboutPhotos ref={aboutPhotos} base={base} />
                 ) : c.kind === "section" && c.toolkit?.layers.length ? (
                   <Toolkit ref={(h) => { toolkits.current[i] = h; }} data={c.toolkit} />
                 ) : c.kind === "section" && c.showcase?.length ? (
@@ -298,14 +301,14 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
                 {(c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
-                    data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["pivot", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
-                    {c.id === "sky" ? <HeroCopy p={p} split draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "pivot"} />}
+                    data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["about", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
+                    {c.id === "sky" ? <HeroCopy p={p} split draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "about"} />}
                   </section>
                 ))}
               </div>
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
-            <a ref={cue} className="journey-cue" href="#pivot" onClick={event => { event.preventDefault(); jump.current("pivot"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
+            <a ref={cue} className="journey-cue" href="#about" onClick={event => { event.preventDefault(); jump.current("about"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
             <ScreenContact ref={cta} socials={socials} draftChanged={draftSections.includes("contact")} />
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
@@ -360,11 +363,10 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [] 
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
         <li key={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
+          {c.id === "about" ? <span id="pivot" className="journey-anchor-alias" aria-hidden="true" /> : null}
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mediaUrl(base, `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg`)} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
-          ) : c.id === "pivot" ? (
-            <AboutPhotos base={base} still />
           ) : c.kind === "section" && c.still ? (
             <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -405,7 +407,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [] 
           ) : null}
           {(c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
-              {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "pivot"} />}
+              {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "about"} />}
             </section>
           ))}
           {c.id === "screen" ? (

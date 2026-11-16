@@ -15,7 +15,11 @@ describe("phone mode (TKT-96)", () => {
     expect(screen.scroll).toBeLessThan(1);
   });
   it("leaves the sections and the hero untouched", () => {
-    expect(phone.find((c) => c.id === "pivot")).toBe(HOME_CHAPTERS.find((c) => c.id === "pivot"));
+    expect(phone.find((c) => c.id === "about")).toBe(HOME_CHAPTERS.find((c) => c.id === "about"));
     expect(phone[0]).toBe(HOME_CHAPTERS[0]);
   });
+});
+
+it('phone preserves the complete Home v1.3 chapter order',()=>{
+ expect(phoneChapters(HOME_CHAPTERS).map(c=>c.id)).toEqual(['sky','about','experience','projects','toolkit','creator','to-room','room','screen']);
 });

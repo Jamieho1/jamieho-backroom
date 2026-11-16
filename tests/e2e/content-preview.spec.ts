@@ -52,8 +52,8 @@ test.describe('real owner preview and session isolation',()=>{
   await expect(page.getByRole('complementary',{name:'Content preview'})).toBeVisible();
   const cookie=(await page.context().cookies()).find(c=>c.name===previewCookie);expect(cookie?.httpOnly).toBe(true);
   expect(await page.evaluate(()=>document.cookie.includes('jb.content-preview'))).toBe(false);
-  await page.locator('.is-journey [data-menu=journey] summary').click();await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Education',exact:true}).click();
-  const about=page.locator('[data-chapter="pivot"] .journey-panel');await expect(about.getByRole('heading',{name:set.about,exact:true})).toBeVisible();await expect(about).toHaveAttribute('data-draft-changed','true');
+  await page.locator('.is-journey [data-menu=journey] summary').click();await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'About',exact:true}).click();
+  const about=page.locator('[data-chapter="about"] .journey-panel');await expect(about.getByRole('heading',{name:set.about,exact:true})).toBeVisible();await expect(about).toHaveAttribute('data-draft-changed','true');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:'Back to list',exact:true}).click();await expect(page).toHaveURL(/\/manage\/review$/);
   expect((await page.context().cookies()).some(c=>c.name===previewCookie)).toBe(false);
@@ -99,7 +99,7 @@ test.describe('real owner preview and session isolation',()=>{
  test('reduced-motion preview uses the same proposed values and changed-block markers',async({page,baseURL})=>{
   await page.emulateMedia({reducedMotion:'reduce'});const set=await enter(page,baseURL!,'Reduced motion preview');
   await expect(page.getByRole('heading',{level:1})).toHaveText(set.title);
-  const about=page.locator('.journey-stills #pivot [data-draft-changed="true"]');await about.scrollIntoViewIfNeeded();
+  const about=page.locator('.journey-stills #about [data-draft-changed="true"]');await about.scrollIntoViewIfNeeded();
   await expect(about.getByRole('heading',{name:set.about,exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Back to list',exact:true}).click();await expect(page).toHaveURL(/\/manage\/review$/);
  });

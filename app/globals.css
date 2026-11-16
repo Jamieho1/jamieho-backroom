@@ -255,7 +255,7 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
  .site-navigation, .site-navigation[data-floating="true"] { left: 8px; right: 8px; width: auto; max-width: none; translate: none; top: 8px; gap: 7px; flex-wrap: wrap; padding: 8px; }
  .site-navigation.is-embedded { inset: auto; margin: 8px 8px 0; }
  .site-navigation-logo { width: 32px; height: 32px; flex-basis: 32px; }
- .site-navigation-links { flex: 1; justify-content: space-between; gap: 8px; font-size: 12px; }
+ .site-navigation-links { flex: 1; min-width: 0; flex-wrap: wrap; justify-content: space-between; gap: 0 6px; font-size: 11px; }
  .site-navigation-account { flex-basis: 100%; justify-content: flex-end; gap: 10px; padding-top: 5px; border-top: 1px solid #40536a; }
  .site-navigation-links > a, .journey-menu > summary { padding: 5px 0; }
 }

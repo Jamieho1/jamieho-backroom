@@ -11,8 +11,8 @@ Snapshot only (≤400 words). Replace lines when facts change; no dated logs —
 
 ## Site today
 
-- Home journey at `/`: Hello → About (heading + text + 3-photo strip) → Experience → Work → Techstack → Creator → Contact. `/about` redirects to `/#pivot` until My story ships.
-- Top bar: Journey · Projects · Interview Prep · Articles · Resources. Privacy lives in the Contact form only. Icon-only Auto/Day/Night switch.
+- Home journey at `/`: Hello → About → Experience → Work → Techstack → Creator → Contact Us in the working tree; About/Experience retain text without their retired visuals. `/about` redirects to `/#pivot` until My story ships.
+- Working-tree top/floating bars: Journey · My story · Projects · Interview Prep · Articles · Resources. Privacy lives in the Contact form only. Icon-only Auto/Day/Night switch.
 - `/interview` is PassLoop: sidebar with Interview Skills (DSA, System Design, LLD, Fundamental, SQL), Role, Career (Resume, Behavioral, Project), Tools. Open to all; per-user flags, code, resume and STAR answers, own-rows RLS. Old `/notes`, `/practices`, `/behavioral` still work (deprecation pending Jamie).
 - Resources lists Guides only, in the Articles-style sidebar layout with series filters.
 - Content Drafts: `/manage/review` with page preview, owner badge, photo slots. Covers site_sections, CV, projects/articles/guides, notes/practice/behavioral and resume template. TKT-107/108 live photo-slot test verified: approved set, exactly one expected DataKind UK project-media URL, Storage PNG 3,254,783 bytes.
@@ -20,7 +20,7 @@ Snapshot only (≤400 words). Replace lines when facts change; no dated logs —
 ## Open work (in order)
 
 1. TKT-110 schema is applied/verified; code deployment and Jamie’s live review remain pending. Prior local typecheck, 1,052 unit/DB tests, build/static checks passed. Homepage layout and strip are unchanged.
-2. TKT-110b: three live draft sets await Jamie’s separate approvals at /manage/review after TKT-110 deployment: About photos `23f1a988-4bcc-4a34-971e-f17144ebe77a`; journey stops `c0770745-b17b-4ec3-84d8-59b65d301427`; trimmed About `3ef88c4c-4cf2-4469-8078-43287d733c7e`. Read-back confirms draft status/empty approval metadata; live sections/CV unchanged, photos empty and Story blank. Next: TKT-111–116.
+2. TKT-110b: three live draft sets await Jamie’s separate approvals at /manage/review after TKT-110 deployment: About photos `23f1a988-4bcc-4a34-971e-f17144ebe77a`; journey stops `c0770745-b17b-4ec3-84d8-59b65d301427`; trimmed About `3ef88c4c-4cf2-4469-8078-43287d733c7e`. Read-back confirms draft status/empty approval metadata; live sections/CV unchanged, photos empty and Story blank. TKT-111 order/anchors/nav/retirements implemented locally; typecheck, 1,055 unit/DB tests, build/static checks and 74 browser cases pass (2 viewport skips). Next: TKT-112–116.
 3. Articles: TKT-117 (article + Resources image sizing) and the Articles/Resources redesign (to be grilled with Claude; earlier options rejected).
 4. PassLoop build-out.
 5. TKT-99 old editors redo (later).

@@ -2,7 +2,7 @@
  * TKT-77: fill the journey's placeholder panels with the site's existing content (no new content store, nothing
  * personal in git). Mapping agreed 2026-11-04:
  * - Sky: `hero` section, with no desktop shortcut.
- * - Pivot (v1.1): `about` title as the statement, its first paragraph, and the first public education entry.
+ * - About: `about` title as the statement, its first paragraph, and the first public education entry.
  * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
  * - Experience (v1.1): public roles in CV order, one per screen, ≤3 public bullets each.
  * - Creator (v1.1): `writing` pitch + Subscribe/Follow from `contact` links; latest YouTube / Instagram / article.
@@ -144,7 +144,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           if (links.length) panels.push(at({ links }));
           break;
         }
-        case "pivot:pivot":
+        case "about:about":
           // The About title is the giant statement; the education line rides under it as meta.
           if (plain(s.about.body) || plain(s.about.title)) {
             panels.push(at({ title: s.about.title || p.title, body: excerpt(s.about.body), md: true, meta: education ? educationLine(education) : undefined }));
