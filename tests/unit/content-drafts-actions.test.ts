@@ -83,3 +83,9 @@ it('app approval refreshes notes, behavioral and the exact practice problem path
  mocks.from.mockImplementation(table=>table==='content_changes'?{select:mocks.select,update:mocks.update}:{select:()=>{const result={data:rows[table]??[],error:null};return {...result,eq:()=>Promise.resolve(result)};}});
  expect(await approveContentChange(id)).toMatchObject({ok:true,applied:true});expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(expect.arrayContaining(['/notes','/practices','/practices/217','/behavioral','/manage/review']));
 });
+
+it('Story approval invalidates the editorial page without changing approval rules',async()=>{
+ mocks.single.mockResolvedValue({data:{...set,operations:[{op:'update',table:'site_sections',key:'story',fields:{title:'Synthetic story',body:'## A chapter\nSynthetic published copy.'}}]},error:null});
+ expect(await approveContentChange(id)).toMatchObject({ok:true,applied:true});expect(mocks.revalidate.mock.calls.map(([path])=>path)).toContain('/about');
+ expect(mocks.update).toHaveBeenCalledExactlyOnceWith({status:'approved'});
+});

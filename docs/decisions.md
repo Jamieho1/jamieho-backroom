@@ -33,3 +33,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · About constellation: public centre-first photos capped at twelve; sparse centre/row, desktop ring, phone swipe row, finished static/reduced-motion layout · TKT-112 prompt
 
 - 2026-11-16 · Experience uses opted-in chronological stops (newest five plus Projects at most), a reversible pinned desktop curve, natural-flow phone cards and complete static fallbacks; art follows in TKT-115 · TKT-113 prompt
+
+- 2026-11-16 · /about is an ISR My story editorial page; empty Story uses the full public About copy, shared Markdown, and the existing Contact anchor/owner approval invalidation · TKT-114 prompt

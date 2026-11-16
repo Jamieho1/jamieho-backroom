@@ -4,7 +4,7 @@ Access is enforced in database RLS with PGlite policy tests, never just hidden U
 
 Anon/authenticated may execute only public.record_signin over the API. ops_usage is service-role-only. RLS helpers belong in rls; trigger functions in private. Preserve grants, security-invoker discovery and tests/db coverage.
 
-Public /, /resources, /privacy, /projects and /articles must remain pre-rendered; scripts/assert-static.mjs enforces this. Public reads avoid request cookies. Privacy must reflect collection/storage changes in the same patch.
+Public /, /about, /resources, /privacy, /projects and /articles must remain pre-rendered; scripts/assert-static.mjs enforces this. Public reads avoid request cookies. Privacy must reflect collection/storage changes in the same patch.
 
 CV/resume, notes, saved code, attempts, private imports and provider secrets stay outside Git. New resume entries/bullets start hidden. Use own-words practice content; no copied LeetCode text/scraping. No runtime AI or server-side execution of user code.
 
@@ -16,7 +16,7 @@ Storage reads/writes require appropriate bucket/policy checks. Keep schema and e
 
 The supplied public Cyterly screenshot is delivered under public/project-art for the requested project display. This contains no private CV/notes/import data. Other project screenshots remain database/Storage managed.
 
-Resources now lists only public Guides (TKT-118). Retained membership-gate components contain generic placeholders only; their unlock state uses existing server-filtered app discovery; Notes requires Google sign-in; Practice is public. Nonowners at /behavioral receive a link to the public Playbook, while the owner retains the legacy editor. Membership gates are not used for these Interview sections; payment integration is not implemented. Retired /about and /desktop only redirect.
+Resources now lists only public Guides (TKT-118). Retained membership-gate components contain generic placeholders only; their unlock state uses existing server-filtered app discovery; Notes requires Google sign-in; Practice is public. Nonowners at /behavioral receive a link to the public Playbook, while the owner retains the legacy editor. Membership gates are not used for these Interview sections; payment integration is not implemented. My story /about reads public site_sections through the existing owner-verified preview boundary; /desktop retains its redirect.
 
 Article pins: 20261111180819_article_pins.sql (applied live 2026-11-11 as remote 20261111181807) grants authenticated SELECT/INSERT/DELETE only. RLS isolates every user, including owner; inserts require an accessible published article. No UPDATE, anonymous grants or new callable functions. Account/article deletion cascades; export-tables.json includes pins. Privacy discloses account/article IDs and pin dates. Approved application and live RLS/grant/policy/cascade checks succeeded; no article-pins security advisory.
 

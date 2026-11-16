@@ -6,7 +6,7 @@ The canonical route is `/`; `/journey` redirects home. Arrival opens directly on
 
 Order: Hello (`sky`) → About (`about`) → Experience (`experience`) → Work (`projects`) → Techstack (`toolkit`) → Creator (`creator`) → black join → room → monitor Contact Us (`screen`). Empty data-driven sections are skipped. The shared chapter definitions drive desktop, phone and server-rendered stills.
 
-`#about` is canonical. `#pivot` remains an alias in scroll calculations, initial/hash-change handling and native still/no-JS anchors. `/about` still redirects to `/#pivot` until the My story page ships. Contact hashes `#home-contact`, `#screen` and legacy `#desk` reach the monitor form. Schedule a call skips directly to that form. Theme changes preserve the current scroll position rather than replaying the URL hash.
+`#about` is canonical. `#pivot` remains an alias in scroll calculations, initial/hash-change handling and native still/no-JS anchors. `/about` renders the My story editorial page. Contact hashes `#home-contact`, `#screen` and legacy `#desk` reach the monitor form. Schedule a call skips directly to that form. Theme changes preserve the current scroll position rather than replaying the URL hash.
 
 Top and floating bars: Journey disclosure → My story (`/about`) → Projects → Interview Prep → Articles → Resources. Journey lists About, Experience, Work, Techstack, Creator and Contact Us as chapter jumps; absent chapters are omitted on Home. The logo returns to the hero. Navigation starts left-aligned at the top and becomes centred/floating after the hero. The disclosure supports hover, click, keyboard, Escape and outside dismissal. Phone links can wrap without horizontal overflow. Privacy remains in the Contact form; the review badge, feedback, icon Auto/Day/Night cycle and account controls are retained.
 
@@ -32,7 +32,7 @@ Owner preview uses verified Next Draft Mode and immutable snapshots before publi
 
 ## About constellation
 
-`components/journey/about-constellation.tsx` renders in both the live engine and StillJourney. The database About title uses Barlow Condensed (system narrow fallbacks), uppercase except a lowercase italic connector between capitalised words. The existing first-paragraph binding supplies Markdown with links disabled. Read my story is a pill link to /about (still a redirect until TKT-114). No education metadata or personal copy is added in code.
+`components/journey/about-constellation.tsx` renders in both the live engine and StillJourney. The database About title uses Barlow Condensed (system narrow fallbacks), uppercase except a lowercase italic connector between capitalised words. The existing first-paragraph binding supplies Markdown with links disabled. Read my story is a pill link to the editorial /about page. No education metadata or personal copy is added in code.
 
 `lib/journey/constellation.ts` purely selects public photos, centre first then sort/UUID, capped at twelve. Without a marked centre the first ordered photo leads. Placement takes count and board dimensions: one centre, fewer than five a centre plus short row, five to twelve an even ring; tilt stays within ±6°. The board draws a faint circle and curved SVG connectors. Images use database alt/caption text and mediaUrl’s home-media manifest hashes; no personal photos enter Git. Changed preview photos/section retain gold markers.
 

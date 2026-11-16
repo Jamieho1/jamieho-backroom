@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-test("retired About and desktop pages redirect without exposing the old screens", async ({ page }) => {
-  await page.goto("/about"); await expect(page).toHaveURL(/\/#pivot$/);
+test("My story renders and retired desktop addresses keep their redirects", async ({ page }) => {
+  await page.goto("/about"); await expect(page).toHaveURL(/\/about$/); await expect(page.locator(".story-editorial")).toBeVisible();
   await page.goto("/desktop"); await expect(page).toHaveURL(/\/resources$/);
   await expect(page.getByRole("heading", { name: "Resources", level: 1 })).toBeVisible();
   await page.goto("/desktop?app=notes"); await expect(page).toHaveURL(/\/notes$/);

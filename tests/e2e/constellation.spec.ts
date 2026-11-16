@@ -32,7 +32,7 @@ test('constellation captions, story link and keyboard targets work without page 
  const story=page.getByRole('link',{name:'Read my story',exact:true});await expect(story).toHaveAttribute('href','/about');await story.focus();
  for(let i=0;i<12;i++){await page.keyboard.press('Tab');await expect(figures.nth(i)).toBeFocused();await expect(figures.nth(i).locator('figcaption')).toHaveCSS('opacity','1');}
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- const requests:string[]=[];page.on('request',r=>{if(new URL(r.url()).pathname==='/about')requests.push(r.url())});await story.click();await expect(page).toHaveURL(/\/#pivot$/);expect(requests.length).toBeGreaterThan(0);
+ const requests:string[]=[];page.on('request',r=>{if(new URL(r.url()).pathname==='/about')requests.push(r.url())});await story.click();await expect(page).toHaveURL(/\/about$/);await expect(page.locator(".story-editorial")).toBeVisible();expect(requests.length).toBeGreaterThan(0);
 });
 test('sparse counts keep a centre plus short row and cap larger collections',async({page})=>{
  for(const count of [1,4,5,13]){await mount(page,count);await expect(page.locator('.about-photo')).toHaveCount(Math.min(count,12));await expect(page.locator('.about-constellation-board')).toHaveAttribute('data-layout',count<2?'single':count<5?'simple':'constellation');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}

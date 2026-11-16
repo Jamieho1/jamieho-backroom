@@ -5,6 +5,7 @@ Next.js App Router, React, TypeScript; Supabase Postgres/Google Auth/RLS; Vercel
 | Area | Source |
 | --- | --- |
 | Homepage/profile | app/page.tsx, components/journey/ |
+| My story | app/about/page.tsx, app/about/story.css, components/story.tsx |
 | Journey | app/page.tsx, components/journey/, lib/journey/, app/journey.css; app/journey/ redirects home |
 | App registry/access discovery | lib/apps.ts, lib/viewer.ts, lib/desktop-pages.ts, components/desktop-apps-provider.tsx |
 | Interview shell | app/interview/, components/interview/, lib/interview/; [interview.md](interview.md) |
@@ -27,7 +28,7 @@ Articles and portfolio projects have public slug pages and owner management. Pub
 
 Update this map when routes, data ownership or module boundaries change.
 
-Homepage navigation/hero are isolated in components/journey/navigation.tsx and hero-artwork.tsx. Resources is /resources. My story /about temporarily redirects to /#pivot (an alias of /#about); /desktop redirects to /resources while legacy app queries go to canonical routes. Privacy, Projects (list and details), Articles, Notes, Practice and Resume & Stories render as plain full-width pages below the root shared navigation, without window/titlebar/maximise/close/backdrop. Only owner Settings retains its existing window shell.
+Homepage navigation/hero are isolated in components/journey/navigation.tsx and hero-artwork.tsx. Resources is /resources. My story /about is a pre-rendered editorial page; /desktop redirects to /resources while legacy app queries go to canonical routes. Privacy, Projects (list and details), Articles, Notes, Practice and Resume & Stories render as plain full-width pages below the root shared navigation, without window/titlebar/maximise/close/backdrop. Only owner Settings retains its existing window shell.
 
 lib/project-art.ts provides the supplied public Cyterly image only when that public project has no database screenshots. Owner-selected screenshots override it; the editor still reads and writes the database record.
 
@@ -107,14 +108,16 @@ Branding (2026-11-16): site navigation labels /interview as Interview Prep; its 
 
 ## Home v1.3 data foundation
 
-`lib/home-content.ts` provides cookie-free `getAboutPhotos` and `getJourneyStops`, accepting only an explicitly owner-validated preview context. Photos are public-only, centre first then sort/UUID. Stops are public + show_on_journey, ordered by first year/named month in dates, then sort/UUID; undated entries follow dated ones. Each stop retains at most three public, nonblank bullets in sort order. Both loaders clone their inputs. The existing homepage layout, photo strip and CV editor remain unchanged until later Home tickets.
+`lib/home-content.ts` provides cookie-free `getAboutPhotos` and `getJourneyStops`, accepting only an explicitly owner-validated preview context. Photos are public-only, centre first then sort/UUID. Stops are public + show_on_journey, ordered by first year/named month in dates, then sort/UUID; undated entries follow dated ones. Each stop retains at most three public, nonblank bullets in sort order. Both loaders clone their inputs. The homepage consumes these public loaders; the CV editor remains unchanged.
 
 `lib/home-content-schema.ts` owns photo field rules, the eight journey icons and canonical Storage base. `about_photos` is exported with the other tables; Story is a fixed site_sections key with an empty body. `lib/content-drafts/about-photos.ts` overlays sequential photo CRUD and enforces the single-centre rule. Review/preview/approval support photos, journey fields and Story; home-media slots insert new photo rows after ordinary operations. Existing project screenshot append semantics remain intact.
 
 The TKT-110 data migration is applied live: local 20261116165138_home_v13_data.sql → remote 20261116171034. New collections are empty/defaulted; frontend deployment/live review and starter content drafts remain separate steps.
 
-Home v1.3 composition: chapters.ts orders About before Experience before Work in desktop, phone and static fallbacks. About uses the canonical about chapter/panel IDs; canonicalChapterId maps legacy pivot jumps, and StillJourney retains a nested native pivot anchor. Hash changes use the existing scroll engine; /about keeps its legacy redirect until the story page ticket. The old About strip/Experience still/dots are not rendered; SHAPE_BY_CHAPTER contains only Work/Creator. Experience now uses its public-stop curve; About uses the constellation below. No schema/media/content mutation.
+Home v1.3 composition: chapters.ts orders About before Experience before Work in desktop, phone and static fallbacks. About uses the canonical about chapter/panel IDs; canonicalChapterId maps legacy pivot jumps, and StillJourney retains a nested native pivot anchor. Hash changes use the existing scroll engine; /about renders the My story page described below. The old About strip/Experience still/dots are not rendered; SHAPE_BY_CHAPTER contains only Work/Creator. Experience now uses its public-stop curve; About uses the constellation below. No schema/media/content mutation.
 
 Homepage About: app/page.tsx reads getAboutPhotos(preview) alongside existing public content and passes its filtered records into Journey/StillJourney. AboutConstellation replaces the generic About panel and consumes the same bound title/first paragraph. constellation.ts owns deterministic selection/layout/title-token rules; the component owns SVG/photo markup, responsive measurement and GSAP transform drift driven by the existing clock. Public prerendering/ISR and owner-verified preview boundaries remain unchanged. No schema, bucket policy or live content mutation.
 
 Homepage Experience: app/page.tsx calls the existing cookie-free getJourneyStops(preview) alongside the public loaders. withContent attaches capped ExperienceStop records to SectionChapter; experience-curve.ts owns selection, pure path layout, present detection and reversible progress. ExperienceCurve consumes the existing engine clock on desktop; phones use a measured natural-flow segment inside the journey track. StillJourney renders complete accessible cards/paths. The original inline icon set and empty art layer require no schema, media, policy or preview-engine changes.
+
+My story: /about uses the shared root SiteHeader and plain app-page shell, daily ISR, and the existing getSections/getHomePreview boundary. Story renders site_sections.story through ArticleMarkdown in a centred 680px column: anchored chapter headings, HTTPS images/captions and pull quotes. Its narrow heading reuses constellationTitle’s connector rule and display font. Empty/whitespace Story falls back to the About title and complete About body plus the starter message. The footer uses the shared /#home-contact destination. Existing section approval routes already invalidate /about; owner previews are outlined and uncached, while anonymous responses remain pre-rendered. No content/schema/contact-form mutation.
