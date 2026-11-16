@@ -9,7 +9,7 @@ async function signIn(page:Page,baseURL:string,role='owner'){const {cookie}=awai
 async function proposal(){
  await local('/__experience_seed',{});
  const summary='Experience set '+Math.random().toString(16).slice(2,10);
- const set=await local('/__seed',{summary,operations:[{op:'insert',table:'experience_bullets',key:added,fields:{item_id:item,text:'Draft new proof',public:true,sort:0}},{op:'update',table:'experience_items',key:item,fields:{title:'Draft fixture role'}},{op:'update',table:'experience_items',key:hidden,fields:{public:false}},{op:'delete',table:'experience_bullets',key:removed}]});
+ const set=await local('/__seed',{summary,operations:[{op:'insert',table:'experience_bullets',key:added,fields:{item_id:item,text:'Draft new proof',public:true,sort:0}},{op:'update',table:'experience_items',key:item,fields:{title:'Draft fixture role',show_on_journey:true}},{op:'update',table:'experience_items',key:hidden,fields:{public:false}},{op:'delete',table:'experience_bullets',key:removed}]});
  return {...set,summary};
 }
 async function enter(page:Page,baseURL:string,target='Preview on page'){

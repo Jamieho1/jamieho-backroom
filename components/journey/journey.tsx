@@ -18,6 +18,7 @@ import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
+import {ExperienceCurve,type ExperienceCurveHandle} from "./experience-curve";
 import {AboutConstellation,type AboutConstellationHandle} from "./about-constellation";
 import type {AboutPhoto} from "@/lib/home-content-schema";
 import { HeroArtwork } from "./hero-artwork";
@@ -41,7 +42,9 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
-  const chapters = useMemo(() => (mobile ? phoneChapters(all) : all), [all, mobile]);
+  const [phoneExperienceHeight,setPhoneExperienceHeight]=useState(0);
+  const chapters = useMemo(() => mobile ? phoneChapters(all).map(c=>c.kind==="section"&&c.experienceStops?.length
+    ? {...c,scroll:phoneExperienceHeight||Math.max(1,c.experienceStops.length*0.65),wipe:0}:c) : all, [all,mobile,phoneExperienceHeight]);
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -49,6 +52,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
+  const experienceCurve=useRef<ExperienceCurveHandle>(null);
+  const phoneExperience=useRef<HTMLDivElement>(null);
   const constellation=useRef<AboutConstellationHandle>(null);
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
@@ -89,6 +94,14 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     reduce.addEventListener("change", onChange);
     return () => { reduce.removeEventListener("change", onChange); scheme.removeEventListener("change", syncTheme); observer.disconnect(); phone.removeEventListener("change", syncPhone); };
   }, []);
+
+  // The phone's Experience chapter is real document travel over its measured content, not a pinned viewport.
+  useEffect(()=>{
+    const node=phoneExperience.current;if(!live||!mobile||!node)return;
+    const measure=()=>{const value=node.getBoundingClientRect().height/innerHeight;setPhoneExperienceHeight(old=>Math.abs(old-value)<.005?old:value);};
+    measure();const observer=new ResizeObserver(measure);observer.observe(node);window.addEventListener("resize",measure);
+    return ()=>{observer.disconnect();window.removeEventListener("resize",measure);};
+  },[live,mobile]);
 
   // TKT-76: download the clips whole, in chapter order, and swap each chapter from its still to its video as it lands.
   useEffect(() => {
@@ -141,7 +154,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0, lastNav = -1;
     // Contact jumps to the end of the monitor push-in; other chapters jump to their start.
-    const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
+    const yOf = (id: string) => id === "screen" ? st.end : mobile&&id==="experience" ? st.start+(lay.starts[chapters.findIndex(c=>c.id===id)]/lay.total)*(st.end-st.start)+1 : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
@@ -192,6 +205,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if(c.id === "about" && opacity > 0)constellation.current?.setProgress(at);
+          if(c.id === "experience" && opacity > 0)experienceCurve.current?.setProgress(at);
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
@@ -267,7 +281,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
-  }, [live, chapters, lay, navItems, base]);
+  }, [live, chapters, lay, navItems, base, mobile]);
 
   return (
     <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`} onClick={event => {
@@ -303,6 +317,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                   </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
+                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops}/> : null}
                 {c.id === "about" && c.panels?.[0] ? <AboutConstellation ref={constellation} panel={c.panels[0]} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)}/> : null}
                 {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
@@ -322,6 +337,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
             <div className="journey-progress" aria-hidden="true"><div ref={bar} /></div>
             {debug ? <div ref={hud} className="journey-hud" /> : null}
           </div>
+          {mobile?chapters.map((c,i)=>c.kind==="section"&&c.experienceStops?.length?<div key={c.id} ref={phoneExperience} className="journey-phone-experience journey-section-light" style={{top:`${lay.starts[i]*100}vh`}}><ExperienceCurve stops={c.experienceStops} vertical still/></div>:null):null}
         </div>
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
@@ -410,6 +426,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               <a className="journey-cta-link" href="/projects">All projects <span>→</span></a>
             </section>
           ) : null}
+          {c.kind === "section" && c.experienceStops?.length ? <ExperienceCurve stops={c.experienceStops} still/> : null}
           {c.id === "about" && c.panels?.[0] ? <AboutConstellation panel={c.panels[0]} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/> : null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>

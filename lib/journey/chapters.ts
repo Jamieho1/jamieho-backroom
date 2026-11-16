@@ -12,15 +12,15 @@ export const HOME_CHAPTERS: Chapter[] = [
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
     panels: [{ id: "hero", from: 0, to: 0.85, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
-  // About and Experience retain their text until the constellation/curve tickets.
+  // About binds the existing section text and public photo constellation.
   {
     id: "about", label: "About", nav: "About", kind: "section", tone: "light", scroll: 1.5,
     panels: [{ id: "about", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From Biomedical Engineering to production systems", body: PLACEHOLDER }],
   },
-  // Public CV roles, one per screen; the new curve is a separate ticket.
+  // Opted-in public CV stops and the fixed Projects hand-off bind in withContent.
   {
     id: "experience", label: "Experience", nav: "Experience", kind: "section", tone: "light", scroll: 1.4,
-    panels: [{ id: "r1", from: 0.1, to: 1, side: "left", look: "role", eyebrow: "Role", title: "Experience", body: PLACEHOLDER }],
+    panels: [], experienceStops: [],
   },
   // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
   { id: "projects", label: "Work", nav: "Work", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },

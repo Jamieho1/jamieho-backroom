@@ -31,3 +31,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · Canonical About anchor is #about with #pivot compatibility; My story/Articles/Resources are direct nav links, About/Experience old visuals retired · TKT-111 prompt
 
 - 2026-11-16 · About constellation: public centre-first photos capped at twelve; sparse centre/row, desktop ring, phone swipe row, finished static/reduced-motion layout · TKT-112 prompt
+
+- 2026-11-16 · Experience uses opted-in chronological stops (newest five plus Projects at most), a reversible pinned desktop curve, natural-flow phone cards and complete static fallbacks; art follows in TKT-115 · TKT-113 prompt

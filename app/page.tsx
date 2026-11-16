@@ -3,7 +3,7 @@ import { socialLinks } from "@/lib/social";
 import { Journey } from "@/components/journey/journey";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import { withContent } from "@/lib/journey/content";
-import {getAboutPhotos} from "@/lib/home-content";
+import {getAboutPhotos,getJourneyStops} from "@/lib/home-content";
 import { getSections } from "@/lib/sections";
 import { getPublicExperience } from "@/lib/experience";
 import { getProjectApps } from "@/lib/projects";
@@ -23,8 +23,8 @@ const MEDIA_BASE = (process.env.NEXT_PUBLIC_HOME_MEDIA_URL ?? "/home-media").rep
 
 export default async function Home() {
   const preview = await getHomePreview();
-  const [aboutPhotos, sections, experience, apps, latest, projects] = await Promise.all([getAboutPhotos(preview), getSections(preview), getPublicExperience(preview), getProjectApps(), getLatestMedia(preview), getPublicProjects(preview)]);
-  const chapters = withContent(HOME_CHAPTERS, { sections, experience, latest, projects, technologies: projectTechnologies(apps).map((t) => t.name) });
+  const [journeyStops, aboutPhotos, sections, experience, apps, latest, projects] = await Promise.all([getJourneyStops(preview), getAboutPhotos(preview), getSections(preview), getPublicExperience(preview), getProjectApps(), getLatestMedia(preview), getPublicProjects(preview)]);
+  const chapters = withContent(HOME_CHAPTERS, { sections, experience, journeyStops, latest, projects, technologies: projectTechnologies(apps).map((t) => t.name) });
   return <main className="journey-page">
     {/* Journey typefaces (polish pass): wide display, mono labels, clean body. React hoists these into <head>. */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />

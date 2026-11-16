@@ -90,6 +90,8 @@ export interface SectionChapter extends Base {
   toolkit?: { title: string; layers: { name: string; how: string; tools: string[] }[]; certs: { title: string; org: string; href?: string; badge?: string }[] };
   /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
   showcase?: ShowcaseItem[];
+  /** Public, opted-in chronological CV stops, followed by Projects. */
+  experienceStops?: import("./experience-curve").ExperienceStop[];
 }
 
 export interface ShowcaseItem {
