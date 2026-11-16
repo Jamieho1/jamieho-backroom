@@ -99,6 +99,13 @@ describe("journey timeline", () => {
     expect(displayOpacity(0)).toBe(1);
     expect(displayOpacity(0.05)).toBe(1);
     expect(displayOpacity(0.25)).toBe(0);
+    expect(displayOpacity(0.25, true)).toBe(1);
+    expect(displayOpacity(0.52, true)).toBe(0);
+    const room = HOME_CHAPTERS.find(c=>c.id==='room')!;
+    if (room.kind === 'video') {
+      expect(mapKeys(room.keys, 0.7)).toBeLessThan(1);
+      expect(mapKeys(room.keys, 1)).toBe(1);
+    }
   });
 
   it("reveals words one after another, all visible at full opacity", () => {

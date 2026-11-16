@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {guideSeries} from '@/lib/content-series';
 import {guideHref,type GuideCard} from '@/lib/guides';
 /** Public guide cards for /resources and /guides. Whole card is one link; toolkit links live on the guide page. */
 export function GuideShelf({guides,heading='Guides',showAll=false}:{guides:GuideCard[];heading?:string;showAll?:boolean}){
@@ -8,7 +9,7 @@ export function GuideShelf({guides,heading='Guides',showAll=false}:{guides:Guide
   {guides.length?<ul className="resource-grid guide-grid">{guides.map(g=><li key={g.id}><Link data-draft-changed={g.draftChanged||undefined} className="guide-card" href={guideHref(g.slug)} prefetch={false}>
    {/* eslint-disable-next-line @next/next/no-img-element */}
    {g.cover_url?<img src={g.cover_url} alt="" referrerPolicy="no-referrer" />:null}
-   <h3>{g.title}</h3>{g.summary?<p>{g.summary}</p>:null}
+   <span className="content-series-tag">{guideSeries(g)}</span><h3>{g.title}</h3>{g.summary?<p>{g.summary}</p>:null}
    <span className="guide-card-meta">{[g.notion_url?'Notion toolkit':'',g.doc_url?'Google Doc':''].filter(Boolean).join(' · ')||'Guide'}</span>
   </Link></li>)}</ul>:<p>No guides published yet.</p>}
  </section>;

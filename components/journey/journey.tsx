@@ -192,7 +192,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
         }
         const d = displays.current[i];
         if (d) {
-          const o = i === index ? displayOpacity(local) : 0;
+          const o = i === index ? displayOpacity(local, c.id === "room") : 0;
           d.style.opacity = String(o);
           d.style.transform = `translate3d(-50%, -50%, 0) scale(${1 + (1 - o) * 0.08})`;
           d.style.letterSpacing = `${0.02 + (1 - o) * 0.12}em`;
@@ -258,7 +258,11 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
   }, [live, chapters, lay, navItems, base, phoneStill]);
 
   return (
-    <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`}>
+    <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`} onClick={event => {
+      if (live && (event.target as Element).closest('[data-contact-jump]')) {
+        event.preventDefault(); skip.current();
+      }
+    }}>
       <JourneyNavigation ref={navigation} items={navItems} navRefs={navRefs} live={live} onJump={(id) => jump.current(id)} />
       {live ? (
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
@@ -499,10 +503,10 @@ function PanelBody({ p, heading, split = false, scheduleCall = false, disableLin
         <a key={a.href + a.label} className={a.platform ? `journey-brand journey-brand-${a.platform}` : "journey-cta-link"} href={a.href} target="_blank" rel="noopener noreferrer">
           {a.platform ? <BrandIcon platform={a.platform} size={20} /> : null}{a.label}{a.platform ? null : <span> ↗</span>}
         </a>
-      ))}{scheduleCall ? <button type="button" className="journey-brand journey-schedule" disabled title="Scheduling will be available soon">
+      ))}{scheduleCall ? <a className="journey-brand journey-schedule" href="#home-contact" data-contact-jump>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m3 0h2" /></svg>
         Schedule a call
-      </button> : null}</p>
+      </a> : null}</p>
     ) : null}
     {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}
   </>;

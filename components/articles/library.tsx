@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import {articleSeries} from '@/lib/content-series';
 import {useMemo,useState,type ReactNode,type UIEvent} from 'react';
 import {useViewer} from '@/components/viewer-provider';
 import {SignInButton} from '@/components/sign-in-button';
@@ -66,6 +67,7 @@ export function ArticleCardView({a}:{a:ArticleCard}){
    {a.cover_url?/* eslint-disable-next-line @next/next/no-img-element */<img className="article-card-cover" src={a.cover_url} alt="" loading="lazy" referrerPolicy="no-referrer" />:<div className="article-card-cover placeholder" aria-hidden="true">{CATEGORY_LABEL[a.category]}</div>}
   <div className="catalog-card-body article-card-body">
    <p className="article-meta">{articleDate(a.created_at)} · {CATEGORY_LABEL[a.category]}</p>
+   <span className="content-series-tag">{articleSeries(a)}</span>
    <h2>{a.title}</h2>
    {a.summary?<p>{a.summary}</p>:null}
   </div>

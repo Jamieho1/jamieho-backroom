@@ -42,7 +42,7 @@ test("navigation controls remain available in the floating bar", async ({ page }
   await page.goto('/'); await page.locator('.is-journey [data-menu=journey] summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Education',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
-  for(const name of ['Projects','Interview']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
+  for(const name of ['Projects','Interview Prep']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
   await expect(page.locator('.site-navigation:visible [data-menu=content] summary')).toBeVisible();
   await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

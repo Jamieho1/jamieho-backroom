@@ -44,7 +44,7 @@ export const HOME_CHAPTERS: Chapter[] = [
   { id: "to-room", label: "Contact", kind: "fade", color: "#050403", tone: "light", scroll: 0.4 },
   {
     id: "room", label: "Room", display: "Contact", kind: "video", src: "c7a", scroll: 1.4, motes: 0.3,
-    keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [0.5, 1], [1, 1]],
+    keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [1, 1]],
   },
   { id: "screen", label: "Contact", nav: "Contact", kind: "video", src: "c7b", scroll: 0.8, join: 0.08 },
 ];

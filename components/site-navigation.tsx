@@ -31,7 +31,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
           {items.map((item, k) => onJump ? <button type="button" key={item.id} ref={node => { if (navRefs) navRefs.current[k] = node; }} onClick={() => { onJump(item.id); closeMenu(); }}>{item.label}</button> : <Link key={item.id} prefetch={false} href={`${journey ? "" : "/"}#${item.id}`} onClick={closeMenu}>{item.label}</Link>)}
         </nav>}
       </NavigationMenu>
-      <Link href="/projects">Projects</Link><Link href="/interview">Interview</Link>
+      <Link href="/projects">Projects</Link><Link href="/interview">Interview Prep</Link>
       <NavigationMenu label="Content" group={menuGroup}>
         {closeMenu=><nav className="journey-chapter-list" aria-label="Content pages"><Link href="/articles" onClick={closeMenu}>Articles</Link><Link href="/resources" onClick={closeMenu}>Resources</Link></nav>}
       </NavigationMenu>

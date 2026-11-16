@@ -207,9 +207,9 @@ export function fadeCover(local: number, edge = 0.25): number {
   return Math.min(smoothstep(0, edge, local), 1 - smoothstep(1 - edge, 1, local));
 }
 
-/** Giant chapter word: in fully at the start, holds briefly, gone by ~18% of the chapter. */
-export function displayOpacity(local: number): number {
-  return 1 - smoothstep(0.06, 0.18, local);
+/** Giant chapter word: in fully at the start, holds briefly, gone by ~18% of the chapter (Contact holds until 28%, then fades by 52%). */
+export function displayOpacity(local: number, contact = false): number {
+  return 1 - smoothstep(contact ? 0.28 : 0.06, contact ? 0.52 : 0.18, local);
 }
 
 /** Per-word reveal (0..1) for word `i` of `n`, given the panel's overall opacity `o`. */

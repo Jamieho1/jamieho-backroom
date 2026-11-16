@@ -19,7 +19,7 @@ export function phoneChapters(chapters: Chapter[]): Chapter[] {
     if (c.kind !== "video") return c;
     if (c.src === "c7a") {
       return {
-        ...c, scroll: 0.7, keys: [[0, 1], [1, 1]],
+        ...c, scroll: 0.35, keys: [[0, 1], [1, 1]],
       };
     }
     if (c.src === "c7b") return { ...c, scroll: 0.6, join: 0.25 };

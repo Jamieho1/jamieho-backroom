@@ -1,6 +1,6 @@
-# Interview — TKT-118 through TKT-125
+# PassLoop — Interview Prep (TKT-118 through TKT-125)
 
-/interview is an additive, dark-only workspace. app/interview/layout.tsx renders InterviewShell with scoped --iv-* tokens and CSS; SiteHeader returns nothing only for /interview and its descendants. Existing root viewer/app providers and Google sign-in/sign-out controls are reused. Other site pages retain their top/floating navigation and theme settings.
+/interview is the PassLoop workspace, linked as Interview Prep from the site navigation. It remains dark-only. app/interview/layout.tsx renders InterviewShell with scoped --iv-* tokens and CSS; SiteHeader returns nothing only for /interview and its descendants. Existing root viewer/app providers and Google sign-in/sign-out controls are reused. Other site pages retain their top/floating navigation and theme settings.
 
 ## Routes and data
 

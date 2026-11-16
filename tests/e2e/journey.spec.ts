@@ -163,3 +163,10 @@ test("About photos follow scroll and inactive project links cannot intercept the
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('Schedule a call jumps directly to the Contact form',async({page})=>{
+ await page.goto('/');
+ const call=page.getByRole('link',{name:'Schedule a call',exact:true});
+ await expect(call).toHaveAttribute('href','#home-contact');await call.click();
+ await expect(page.getByRole('region',{name:'Contact',exact:true}).getByLabel('Name',{exact:true})).toBeVisible();
+});

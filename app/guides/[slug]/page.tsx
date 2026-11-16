@@ -6,7 +6,9 @@ import Link from 'next/link';
 import {ArticleMarkdown} from '@/components/articles/article-markdown';
 import {OnThisPage} from '@/components/articles/on-this-page';
 import {GuideToolkit} from '@/components/guides/shelf';
-import {getPublicGuide} from '@/lib/guides-public';
+import {getPublicGuide,getPublicGuides} from '@/lib/guides-public';
+import {GuidesShell} from '@/components/guides/library';
+import {guideSeries} from '@/lib/content-series';
 import {articleDate,articleSections} from '@/lib/articles';
 import {guideHref} from '@/lib/guides';
 import '../../articles.css';
@@ -20,11 +22,12 @@ export default async function GuidePage({params}:{params:Promise<{slug:string}>}
  let guide;
  try{guide=await getPublicGuide(slug,preview);}catch{return <main className="page"><p role="alert">Can&apos;t load this guide right now.</p><a href={guideHref(slug)}>Try again</a></main>;}
  if(!guide)notFound();
- return <><PagePreview preview={preview} page={guide.published?`/guides/${guide.slug}`:"/guides"}/><main className="page guide-page"><div className="article-layout">
+ const guides=await getPublicGuides(preview).catch(()=>[]);
+ return <><PagePreview preview={preview} page={guide.published?`/guides/${guide.slug}`:"/guides"}/><main className="app-page guides-page guide-page" data-app="resources"><div className="desktop-app-content app-page-content"><GuidesShell guides={guides} currentId={guide.id}><div className="article-layout">
   <article className="article-read" data-draft-changed={guide.draftChanged||undefined}>
    <p className="article-meta" id="overview"><Link href="/resources" prefetch={false}>Resources</Link> · <Link href="/guides" prefetch={false}>Guides</Link> · Updated {articleDate(guide.updated_at)}</p>
    {guide.draftChanged&&!guide.published?<p role="status">Unpublished in this preview</p>:null}
-   <h1>{guide.title}</h1>
+   <span className="content-series-tag">{guideSeries(guide)}</span><h1>{guide.title}</h1>
    {guide.summary?<p className="article-summary">{guide.summary}</p>:null}
    <GuideToolkit notion={guide.notion_url} doc={guide.doc_url} />
    {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -32,5 +35,5 @@ export default async function GuidePage({params}:{params:Promise<{slug:string}>}
    <ArticleMarkdown text={guide.body} />
   </article>
   <OnThisPage sections={articleSections(guide.body)} topId="overview" />
- </div></main></>;
+ </div></GuidesShell></div></main></>;
 }

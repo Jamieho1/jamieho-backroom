@@ -4,9 +4,9 @@ import { forwardRef, useImperativeHandle, useRef } from "react";
 import { mediaUrl } from "@/lib/journey/media";
 
 const PHOTOS = [
-  { file: "about-imperial-graduation.jpg", alt: "Jamie at Imperial College London's entrance on graduation day" },
-  { file: "about-jungfraujoch.jpg", alt: "Jamie in the snow at Jungfraujoch, Switzerland" },
   { file: "about-graduation-hall.jpg", alt: "Jamie holding his graduation certificate inside the ceremony hall" },
+  { file: "about-jungfraujoch.jpg", alt: "Jamie in the snow at Jungfraujoch, Switzerland" },
+  { file: "about-imperial-graduation.jpg", alt: "Jamie at Imperial College London's entrance on graduation day" },
 ];
 export interface AboutPhotosHandle { setProgress(local: number): void }
 

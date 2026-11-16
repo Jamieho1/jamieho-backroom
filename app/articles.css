@@ -149,3 +149,8 @@
 .articles-pinned > p, .articles-pin-signin p { margin: 0 8px; color: var(--secondary); font-size: 12px; }
 .articles-pinned .articles-list { border-top: 0; padding-top: 0; }
 .articles-pin-signin .btn { margin-top: 8px; font-size: 12px; }
+
+.content-series-tag { display: inline-flex; width: fit-content; padding: 4px 9px; border: 1px solid var(--border); border-radius: 999px; color: var(--heading); background: var(--bg-accent); font-size: 11px; font-weight: 600; line-height: 1.4; }
+.resources-guides-heading { font-size: 18px; margin: 0 0 18px; }
+.guides-page .guide-card { padding: 0; }
+.guides-page .guide-card img { margin: 0; border-radius: 0; }
