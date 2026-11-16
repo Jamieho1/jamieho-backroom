@@ -35,3 +35,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · Experience uses opted-in chronological stops (newest five plus Projects at most), a reversible pinned desktop curve, natural-flow phone cards and complete static fallbacks; art follows in TKT-115 · TKT-113 prompt
 
 - 2026-11-16 · /about is an ISR My story editorial page; empty Story uses the full public About copy, shared Markdown, and the existing Contact anchor/owner approval invalidation · TKT-114 prompt
+
+- 2026-11-16 · Experience uses the approved Storage background/whole mascot on the shared SVG guide; phones fetch only the portrait still and reduced motion/no JS use its midpoint · TKT-115 prompt

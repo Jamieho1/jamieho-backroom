@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {experienceLayout,experienceStops,experienceState,isPresent} from "@/lib/journey/experience-curve";
+import {experienceLayout,experienceStops,experienceState,isPresent,experiencePoint} from "@/lib/journey/experience-curve";
 import type {ExperienceRow} from "@/lib/experience";
 const row=(i:number):ExperienceRow=>({id:String(i),kind:"role",title:`Role ${i}`,org:`Org ${i}`,dates:`${2000+i} – present`,location:"",summary:"",public:true,sort:i,show_on_journey:true,journey_icon:"code",experience_bullets:Array.from({length:5},(_,b)=>({id:String(b),sort:b,text:`Bullet ${b}`,public:b!==1}))});
 describe("Experience curve",()=>{
@@ -28,4 +28,17 @@ describe("Experience curve",()=>{
   for(const local of [0,.2,.44,.68,.92,1]){const state=experienceState(local,4);expect(state.progress).toBeGreaterThanOrEqual(0);expect(state.progress).toBeLessThanOrEqual(1);expect(experienceState(local,4)).toEqual(state)}
   expect([.2,.44,.68,.92].map(p=>experienceState(p,4).current)).toEqual([0,1,2,3]);expect(experienceState(.44,4).progress).toBeCloseTo(1/3);
  });
+});
+
+it('mascot guide reaches every stop exactly, returns the same points in reverse, and remains finite for sparse data',()=>{
+ for(const count of [1,3,4,6]){
+  const {points}=experienceLayout(count);
+  for(const p of [...points,...points.toReversed()]){const at=experiencePoint(points,p.progress);expect(at.x).toBeCloseTo(p.x,6);expect(at.y).toBeCloseTo(p.y,6);}
+  expect(experiencePoint(points,.37)).toEqual(experiencePoint(points,.37));
+ }
+ expect(experiencePoint([],0)).toEqual({x:0,y:0});
+});
+
+it('pixel-rounded arrivals snap line, highlight and mascot together without hysteresis',()=>{
+ expect(experienceState(.9199,4)).toEqual({progress:1,current:3});expect(experienceState(.4401,4).progress).toBeCloseTo(1/3);expect(experienceState(.4399,4).current).toBe(1);
 });

@@ -317,7 +317,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                   </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
-                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops}/> : null}
+                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops} base={base}/> : null}
                 {c.id === "about" && c.panels?.[0] ? <AboutConstellation ref={constellation} panel={c.panels[0]} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)}/> : null}
                 {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
@@ -337,7 +337,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
             <div className="journey-progress" aria-hidden="true"><div ref={bar} /></div>
             {debug ? <div ref={hud} className="journey-hud" /> : null}
           </div>
-          {mobile?chapters.map((c,i)=>c.kind==="section"&&c.experienceStops?.length?<div key={c.id} ref={phoneExperience} className="journey-phone-experience journey-section-light" style={{top:`${lay.starts[i]*100}vh`}}><ExperienceCurve stops={c.experienceStops} vertical still/></div>:null):null}
+          {mobile?chapters.map((c,i)=>c.kind==="section"&&c.experienceStops?.length?<div key={c.id} ref={phoneExperience} className="journey-phone-experience journey-section-light" style={{top:`${lay.starts[i]*100}vh`}}><ExperienceCurve stops={c.experienceStops} base={base} vertical still/></div>:null):null}
         </div>
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
@@ -426,7 +426,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               <a className="journey-cta-link" href="/projects">All projects <span>→</span></a>
             </section>
           ) : null}
-          {c.kind === "section" && c.experienceStops?.length ? <ExperienceCurve stops={c.experienceStops} still/> : null}
+          {c.kind === "section" && c.experienceStops?.length ? <ExperienceCurve stops={c.experienceStops} base={base} still/> : null}
           {c.id === "about" && c.panels?.[0] ? <AboutConstellation panel={c.panels[0]} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/> : null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>

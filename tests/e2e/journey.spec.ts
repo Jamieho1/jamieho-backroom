@@ -176,3 +176,13 @@ test('reduced motion and no JavaScript retain canonical/legacy anchors without r
  const context=await browser.newContext({javaScriptEnabled:false,viewport:info.project.use.viewport});
  try{const still=await context.newPage();await still.goto('/#about');await expect(still.locator('.journey-stills #about')).toBeVisible();await expect(still.locator('#about #pivot')).toHaveCount(1);expect(await still.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}finally{await context.close();}
 });
+
+test('About text and photos stay on their own opaque section through chapter handovers',async({page})=>{
+ await page.goto('/#about');const about=page.locator('[data-chapter="about"]');await expect(about.locator('.journey-panel')).toBeVisible();
+ await expect(about).toHaveCSS('isolation','isolate');await expect(about).toHaveCSS('overflow','clip');await expect(about).toHaveCSS('background-color','rgb(246, 243, 238)');
+ // Model elevated descendants in a neighbouring chapter: their z-index must remain contained.
+ await page.evaluate(()=>{const hero=document.querySelector<HTMLElement>('.journey-hero-art');if(hero)hero.style.zIndex='999';});
+ await page.waitForTimeout(1800);
+ expect(await page.evaluate(()=>[200,350,500].map(y=>document.elementFromPoint(innerWidth-12,y)?.closest('[data-chapter]')?.getAttribute('data-chapter')))).toEqual(['about','about','about']);
+ const rectangle=await about.boundingBox();const title=await about.locator('.about-constellation-title').boundingBox();expect(title!.y).toBeGreaterThanOrEqual(rectangle!.y);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

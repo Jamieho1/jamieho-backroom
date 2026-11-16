@@ -28,3 +28,5 @@ Live site: upload every file in `public/home-media/` to the bucket root, then se
 2. Upload the changed files to the `home-media` bucket (same names, replace).
 3. Commit the manifest. Pages request `<file>?v=<hash>`, so browsers and the media service worker (`public/media-sw.js`)
    fetch the new file immediately and keep it cached for good.
+
+For an explicit subset of existing approved files, `node scripts/home-media/manifest.mjs experience-bg.webp experience-mascot.webp experience-phone.webp` merges their hashes without removing unrelated manifest entries. WebP is supported alongside MP4/JPG/PNG. The Experience files already exist in Storage; verify byte parity before versioning rather than re-uploading unchanged assets.

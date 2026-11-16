@@ -12,7 +12,7 @@ body:has(.journey-live) .site-header { display: none; }
 
 .journey-track { position: relative; }
 .journey-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
-.journey-chapter { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+.journey-chapter { position: absolute; inset: 0; opacity: 0; visibility: hidden; isolation:isolate; overflow:clip; }
 
 /* A 16:9 box that always covers the viewport (like object-fit: cover), so layered scenes and video share coordinates. */
 .journey-frame {
@@ -781,7 +781,7 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 .journey-anchor-alias { position: absolute; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; }
 
 /* TKT-112: editorial About header and bounded photo constellation. */
-.journey .about-constellation { opacity:1; visibility:inherit; --o:1; position:absolute; inset:100px clamp(20px,5vw,80px) 24px; z-index:3; width:auto; max-width:none; margin:0; padding:0; translate:none; transform:none; color:var(--s-ink); overflow-y:auto; overflow-x:clip; scrollbar-width:thin; }
+.journey .about-constellation { opacity:1; visibility:inherit; --o:1; position:absolute; inset:100px clamp(20px,5vw,80px) 24px; z-index:3; width:auto; max-width:none; margin:0; padding:0; translate:0 0; transform:none; color:var(--s-ink); overflow-y:auto; overflow-x:clip; scrollbar-width:thin; }
 .about-constellation-intro { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); align-items:center; gap:clamp(24px,5vw,80px); }
 .about-constellation-eyebrow { margin:0 0 10px; color:var(--s-accent); font:500 11px var(--j-mono); letter-spacing:.15em; text-transform:uppercase; }
 .journey .about-constellation-title { margin:0; font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif; font-stretch:condensed; font-size:clamp(44px,6.5vw,94px); font-weight:600; line-height:.93; letter-spacing:-.025em; text-transform:uppercase; text-wrap:balance; color:var(--s-ink); }
@@ -837,7 +837,7 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 /* Experience: one reversible desktop clock; ordinary document travel on phones. */
 .experience-curve { position:relative; isolation:isolate; color:var(--s-ink); width:100%; box-sizing:border-box; }
 .experience-art-layer { position:absolute; inset:0; z-index:-1; pointer-events:none; }
-.journey-chapter > .experience-curve { position:absolute; inset:100px 0 28px; width:auto; padding:12px clamp(20px,5vw,80px) 24px; overflow-y:auto; }
+.journey-chapter > .experience-curve { position:absolute; inset:0; width:auto; padding:112px clamp(20px,5vw,80px) 52px; overflow-y:auto; }
 .experience-heading { position:relative; margin:0 0 14px; }
 .experience-heading p { margin:0 0 10px; color:var(--s-accent); font:500 11px var(--j-mono); text-transform:uppercase; letter-spacing:.14em; }
 .experience-heading h2 { margin:0; font:600 clamp(32px,4vw,56px)/1.08 var(--j-display); letter-spacing:-.045em; }
@@ -846,7 +846,7 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 .experience-path path { stroke-width:1.2; vector-effect:non-scaling-stroke; }
 .experience-path-track { stroke:var(--s-line); }
 .experience-path-drawn { stroke:var(--s-accent); }
-.experience-stops { position:relative; list-style:none; padding:260px 0 0; margin:0; }
+.experience-stops { position:relative; list-style:none; padding:376px 0 0; margin:0; }
 .experience-stop-item { display:contents; }
 .experience-stop { position:absolute; left:var(--stop-x); top:var(--stop-y); transform:translate(-50%,-42px); display:flex; flex-direction:column; align-items:center; width:clamp(100px,12vw,160px); padding:0; border:0; background:none; color:var(--s-ink); font:500 12px/1.35 var(--j-body); cursor:pointer; }
 .experience-stop-ring { display:grid; place-items:center; width:84px; height:84px; border:1px solid var(--s-line); border-radius:50%; background:#f6f3ee; position:relative; }
@@ -895,4 +895,20 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
  .experience-curve .experience-stop { transform:none; left:calc(var(--stop-direction,1) * 8%); }
  .experience-curve .experience-mobile-segment { display:block; position:absolute; top:42px; width:100%; height:100%; fill:none; stroke:var(--s-accent); stroke-width:1.2; pointer-events:none; }
  .experience-curve .experience-card { margin:18px 0 48px; }
+}
+
+/* TKT-115: approved, hash-addressed art. Transform-only desktop movement, one phone image. */
+.experience-art-layer { overflow:hidden; background:#f6f3ee; }
+.experience-art-layer picture,.experience-art-layer img { display:block; width:100%; height:100%; }
+.experience-art-layer img { object-fit:cover; transform:scale(1.06); }
+.experience-art-layer::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgb(246 243 238 / .86),rgb(246 243 238 / .60) 52%,rgb(246 243 238 / .20)); }
+.experience-mascot { position:absolute; width:70px; height:140px; pointer-events:none; z-index:2; transform-origin:50% 100%; }
+.experience-mascot picture,.experience-mascot img { display:block; width:100%; height:100%; object-fit:contain; }
+.experience-stop { z-index:1; }
+.experience-stop:focus-visible { z-index:3; }
+@media(max-width:768px){
+ .experience-art-layer { position:relative; inset:auto; z-index:auto; width:100%; aspect-ratio:9/16; margin-bottom:28px; border-radius:12px; }
+ .experience-art-layer::after { display:none; }
+ .experience-art-layer img { transform:none!important; }
+ .experience-mascot { display:none; }
 }

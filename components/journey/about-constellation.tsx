@@ -39,7 +39,7 @@ export const AboutConstellation=forwardRef<AboutConstellationHandle,Props>(funct
    <div className="about-photo-print"><img src={mediaUrl(base,p.path)} alt={p.alt} loading="lazy" decoding="async"/><figcaption>{p.caption||p.alt}</figcaption></div>
   </figure>;
  }
- return <section className={`about-constellation ${still?'is-still journey-still-panel':'journey-panel'}`} aria-label={stripKeys(panel.title)} data-draft-changed={changed||panel.draftChanged||undefined}
+ return <section style={{translate:"0 0"}} className={`about-constellation ${still?'is-still journey-still-panel':'journey-panel'}`} aria-label={stripKeys(panel.title)} data-draft-changed={changed||panel.draftChanged||undefined}
   onPointerMove={event=>{if(event.pointerType!=='mouse')return;const rect=event.currentTarget.getBoundingClientRect();pointer.current={x:(event.clientX-rect.left)/rect.width*2-1,y:(event.clientY-rect.top)/rect.height*2-1};update.current();}}
   onPointerLeave={()=>{pointer.current={x:0,y:0};update.current();}}
   onWheel={event=>{const node=event.currentTarget;if((event.deltaY>0&&node.scrollTop+node.clientHeight<node.scrollHeight-1)||(event.deltaY<0&&node.scrollTop>0))event.stopPropagation();}}>

@@ -18,6 +18,7 @@ test.beforeAll(async()=>{
  const module={exports:{}};new Function('require','module','exports',ssr.outputFiles[0].text)(createRequire(process.cwd()+'/package.json'),module,module.exports);staticHtml=(module.exports as {html:string}).html;
 });
 async function mount(page:Page){
+ await page.route('**/fixture-media/**',r=>r.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="941" height="1672"><rect width="941" height="1672" fill="#c2d3dc"/></svg>'}));
  await page.goto('/privacy');await page.addStyleTag({content:css+'body > :not(#curve-fixture){display:none!important} body{margin:0}'});
  await page.evaluate(()=>{const root=document.createElement('div');root.id='curve-fixture';document.body.append(root)});
  await page.route('**/__curve.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));await page.addScriptTag({url:'/__curve.js'});
@@ -52,7 +53,7 @@ test('phone curve travels with the document and every card stays readable withou
 test('reduced motion keeps the complete line and every card visible',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/privacy');await page.addStyleTag({content:css+'body > :not(#curve-fixture){display:none!important}'});
  await page.evaluate(html=>{const root=document.createElement('div');root.id='curve-fixture';root.className='journey journey-section-light';root.innerHTML=html;document.body.append(root)},staticHtml);
- await expect(page.locator('.experience-card')).toHaveCount(4);for(const card of await page.locator('.experience-card').all())await expect(card).toBeVisible();await expect(page.locator('.experience-path-drawn')).toHaveCSS('stroke-dashoffset','0px');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await expect(page.locator('.experience-card')).toHaveCount(4);for(const card of await page.locator('.experience-card').all())await expect(card).toBeVisible();await expect(page.locator('.experience-path-drawn')).toHaveCSS('stroke-dashoffset','0px');const mascot=page.locator('.experience-mascot');const transform=await mascot.evaluate(el=>getComputedStyle(el).transform);await page.mouse.wheel(0,300);expect(await mascot.evaluate(el=>getComputedStyle(el).transform)).toBe(transform);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('no JavaScript leaves finished cards, line and native Work link usable',async({browser},info)=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:info.project.use.viewport});try{
@@ -60,4 +61,27 @@ test('no JavaScript leaves finished cards, line and native Work link usable',asy
   for(const button of await page.getByRole('button').all()){await button.focus();await expect(button).toBeFocused()}
   for(const card of await page.locator('.experience-card').all())await expect(card).toBeVisible();await page.getByRole('link',{name:'See the work ↓'}).click();await expect(page).toHaveURL(/#projects$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }finally{await context.close();}
+});
+
+test('mascot follows every reached stop in both directions and backdrop drift is reversible',async({page},info)=>{
+ test.skip(info.project.name!=='desktop','desktop moving layers');await mount(page);
+ const curve=page.locator('[data-chapter="experience"] .experience-curve');
+ for(const i of [0,1,2,3,2,1,0]){
+  await position(page,.2+i*.24);await expect(curve).toHaveAttribute('data-current',String(i));
+  await expect.poll(async()=>curve.evaluate((el,index)=>{
+   const sprite=el.querySelector('.experience-mascot')!.getBoundingClientRect(),ring=el.querySelectorAll('.experience-stop-ring')[index].getBoundingClientRect();
+   return Math.max(Math.abs(sprite.x+sprite.width/2-(ring.x+ring.width/2)),Math.abs(sprite.bottom-(ring.y+ring.height/2-44)));
+  },i)).toBeLessThan(2);
+ }
+ const background=curve.locator('.experience-art-layer img');const first=await background.evaluate(el=>getComputedStyle(el).transform);await position(page,.92);await expect(curve).toHaveAttribute('data-current','3');expect(await background.evaluate(el=>getComputedStyle(el).transform)).not.toBe(first);
+ await position(page,.2);await expect(curve).toHaveAttribute('data-current','0');await expect.poll(()=>background.evaluate(el=>getComputedStyle(el).transform)).toBe(first);
+ await expect(curve.locator('.experience-mascot img')).toHaveAttribute('src',/experience-mascot.webp\?v=/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.screenshot({path:info.outputPath('experience-art-desktop.png')});
+});
+test('phone downloads only the portrait Experience still and no moving layers or clips',async({page},info)=>{
+ test.skip(info.project.name!=='phone','phone asset budget');const requests:string[]=[];page.on('request',req=>{if(/experience-.*\.webp/.test(req.url()))requests.push(new URL(req.url()).pathname.split('/').pop()!)});await mount(page);
+ const curve=page.locator('.journey-phone-experience .experience-curve');await curve.locator('.experience-art-layer').scrollIntoViewIfNeeded();
+ await expect.poll(()=>curve.locator('.experience-art-layer img').evaluate((el:HTMLImageElement)=>el.currentSrc)).toMatch(/experience-phone.webp\?v=/);
+ await expect(curve.locator('.experience-mascot')).toBeHidden();await expect(curve.locator('.experience-art-layer img')).toHaveCSS('transform','none');
+ expect([...new Set(requests)]).toEqual(['experience-phone.webp']);await expect(page.locator('video[src]')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

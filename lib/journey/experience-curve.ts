@@ -36,13 +36,26 @@ export function experienceLayout(count:number, vertical=false, width=1000, rowHe
   let y=42;
   const points:CurvePoint[]=Array.from({length:n},(_,i)=>{
     const p={x:vertical?w/2+(i%2?-28:28):n===1?w/2:70+i*(w-140)/(n-1),
-      y:vertical?y:120+(i%2?52:-52),progress:n===1?0:i/(n-1)};
+      y:vertical?y:236+(i%2?52:-52),progress:n===1?0:i/(n-1)};
     y+=Math.max(140,rowHeights[i]??360);return p;
   });
-  return {width:w,height:vertical?y-42:260,points,path:curvePath(points,vertical)};
+  return {width:w,height:vertical?y-42:376,points,path:curvePath(points,vertical)};
 }
 /** Read each stop in turn; the drawn line reaches its circle before the card changes. */
 export function experienceState(local:number,count:number){
-  const progress=clamp01((local-.2)/.72);
-  return {progress,current:Math.min(Math.max(0,count-1),Math.floor(progress*Math.max(0,count-1)+1e-6))};
+  const raw=clamp01((local-.2)/.72),intervals=Math.max(0,count-1),nearest=Math.round(raw*intervals);
+  // Native scrolling is pixel-quantised: snap sub-pixel arrivals symmetrically in both directions.
+  const progress=intervals&&Math.abs(raw*intervals-nearest)<.002?nearest/intervals:raw;
+  return {progress,current:Math.min(intervals,Math.floor(progress*intervals+1e-6))};
 }
+
+/** Same cubic guide as the drawn line. Native SVG arc lengths refine travel in the live view. */
+export function experiencePoint(points:readonly CurvePoint[],progress:number):{x:number;y:number}{
+ if(!points.length)return {x:0,y:0};
+ if(points.length===1)return {x:points[0].x,y:points[0].y};
+ const scaled=clamp01(progress)*(points.length-1),i=Math.min(points.length-2,Math.floor(scaled)),t=scaled-i;
+ const a=points[i],b=points[i+1],m=(a.x+b.x)/2,u=1-t;
+ return {x:u*u*u*a.x+3*u*u*t*m+3*u*t*t*m+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*a.y+3*u*t*t*b.y+t*t*t*b.y};
+}
+export const EXPERIENCE_ART={background:"experience-bg.webp",mascot:"experience-mascot.webp",phone:"experience-phone.webp"} as const;
+export const MASCOT_LIFT=44;
