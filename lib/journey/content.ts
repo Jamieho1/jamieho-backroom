@@ -119,10 +119,10 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
         }
           break;
         case "creator:pitch": {
-          // Brand-coloured YouTube / Instagram buttons (icon + name), straight from the Contact section's links.
+          // Brand-coloured YouTube / Instagram / LinkedIn buttons (icon + name), straight from the Contact section's links.
           const socials = socialLinks(s.contact.body);
-          const actions = (["youtube", "instagram"] as const).flatMap((kind) =>
-            socials.filter((l) => l.kind === kind).map((l) => ({ label: kind === "youtube" ? "YouTube" : "Instagram", href: l.href, platform: kind })));
+          const actions = (["youtube", "instagram", "linkedin"] as const).flatMap((kind) =>
+            socials.filter((l) => l.kind === kind).map((l) => ({ label: SOCIAL_LABEL[kind], href: l.href, platform: kind })));
           if (plain(s.writing.body) || actions.length) panels.push(at({ title: s.writing.title.trim() || p.title, body: excerpt(s.writing.body), md: true, actions }));
           break;
         }

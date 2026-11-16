@@ -5,6 +5,15 @@ async function owner(page:Page,url:string){const {cookie}=await local('/__sessio
 const dialog=(page:Page)=>page.getByRole('dialog',{name:label,exact:true});
 async function open(page:Page,interview=false){if(interview&&page.viewportSize()!.width<=768)await page.getByRole('button',{name:'Open interview menu'}).click();await page.getByRole('button',{name:label,exact:true}).click();await expect(dialog(page)).toBeVisible();await expect(dialog(page).getByRole('combobox',{name:'Type',exact:true})).toBeFocused();}
 const fits=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+test('feedback close icon is centred and closes the dialog',async({page})=>{
+ await page.goto('/resources');await open(page);
+ const close=dialog(page).getByRole('button',{name:'Close feedback'});
+ const button=await close.boundingBox();const icon=await close.locator('svg').boundingBox();
+ expect(button).not.toBeNull();expect(icon).not.toBeNull();
+ expect(Math.abs(button!.x+button!.width/2-icon!.x-icon!.width/2)).toBeLessThan(1);
+ expect(Math.abs(button!.y+button!.height/2-icon!.y-icon!.height/2)).toBeLessThan(1);
+ await close.click();await expect(dialog(page)).toHaveCount(0);await fits(page);
+});
 test('site and Interview feedback reach owner Inbox with type/page; modal focus and phone layout work',async({page,browser,baseURL})=>{
  test.skip(!api,'Disposable API required');await local('/__feedback_reset',{});await page.goto('/resources?privateToken=omit#guides');await open(page);await expect(dialog(page).getByLabel('Page (optional)')).toHaveValue('/resources#guides');await page.keyboard.press('Escape');await expect(dialog(page)).toHaveCount(0);await expect(page.getByRole('button',{name:label,exact:true})).toBeFocused();
  await open(page);await dialog(page).getByRole('combobox',{name:'Type',exact:true}).selectOption('idea');await dialog(page).getByRole('textbox',{name:'Message',exact:true}).fill('Synthetic site idea');await dialog(page).getByRole('button',{name:'Send feedback',exact:true}).click();await expect(dialog(page).getByRole('status')).toHaveText('Thanks, your feedback is in.');await dialog(page).getByRole('button',{name:'Close feedback'}).click();

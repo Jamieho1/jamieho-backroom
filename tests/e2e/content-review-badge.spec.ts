@@ -22,9 +22,9 @@ async function mount(page:Page,role:string,count:number,floating=false){
 test('owner sees two drafts in top and floating bars without overflow or changed controls',async({page})=>{
  for(const floating of [false,true]){
   await mount(page,'owner',2,floating);const badge=page.getByRole('link',{name:'2 to review',exact:true});await expect(badge).toBeVisible();await expect(badge).toHaveAttribute('href','/manage/review');
-  await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
   const navigation=page.getByRole('navigation',{name:'Site',exact:true});
-  const links=[['Projects','/projects'],['Interview','/interview'],['Privacy','/privacy']] as const;
+  const links=[['Projects','/projects'],['Interview','/interview']] as const;
   await expect(navigation.locator(':scope > a')).toHaveText(links.map(([label])=>label));
   for(const [label,href] of links)await expect(navigation.getByRole('link',{name:label,exact:true})).toHaveAttribute('href',href);
   await page.keyboard.press('Escape');await navigation.locator('[data-menu=content] summary').click();await expect(page.getByRole('navigation',{name:'Content pages'}).getByRole('link')).toHaveText(['Articles','Resources']);await page.keyboard.press('Escape');
@@ -36,5 +36,5 @@ test('zero drafts shows nothing in both bars',async({page})=>{
  for(const floating of [false,true]){const calls=await mount(page,'owner',0,floating);await expect.poll(calls).toBeGreaterThan(0);await expect(page.locator('.site-review-badge')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
 });
 test('visitors and non-owners never show or request the badge',async({page})=>{
- for(const role of ['anonymous','member'])for(const floating of [false,true]){const calls=await mount(page,role,2,floating);await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();await expect(page.locator('.site-review-badge')).toHaveCount(0);expect(calls()).toBe(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
+ for(const role of ['anonymous','member'])for(const floating of [false,true]){const calls=await mount(page,role,2,floating);await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();await expect(page.locator('.site-review-badge')).toHaveCount(0);expect(calls()).toBe(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
 });

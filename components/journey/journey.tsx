@@ -136,7 +136,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0, lastNav = -1;
-    // Contact Us jumps to the end of the monitor push-in; other chapters jump to their start.
+    // Contact jumps to the end of the monitor push-in; other chapters jump to their start.
     const yOf = (id: string) => id === "screen" ? st.end : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 

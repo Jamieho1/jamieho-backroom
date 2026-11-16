@@ -180,3 +180,5 @@ Grilled, specced and ticketed the Interview sidebar workspace (Resources/Intervi
 
 
 2026-11-15 — Added SQL below Fundamental in Interview Skills, /interview/sql Soon page and original database icon. Nineteen-item rail retained; docs updated. Typecheck, five Interview unit tests, build/static assertions and 16 desktop/390px browser checks passed (four viewport skips). No schema/live change, commit or push; prior work preserved.
+
+2026-11-16 — Homepage polish: cyclic icon theme, shared social marks/colours and Creator LinkedIn, lower/smaller Latest heading, Contact naming and faster monitor arrival, Privacy retained in form, centred feedback SVG. Added two requested public GitHub projects unfeatured and updated Contact LinkedIn via API; verified live data only, frontend awaits Jamie’s push/review. No migration/dependency/private-content change. Typecheck, 1,031 unit/DB tests, production build/static checks passed; full desktop/390px browser suite 164 passed, 66 conditional skips, zero failures after updating the obsolete Privacy-link assertion. No separate synthetic integration rerun; final typecheck/diff checks passed. No commit/push/deployment.

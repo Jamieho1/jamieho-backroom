@@ -25,12 +25,14 @@ describe("journey content (TKT-77)", () => {
   it("separates the hero role from its description and reuses Creator social destinations", () => {
     const custom = { ...sections,
       hero: { key: "hero" as const, title: "Test Name", body: "Engineering role.\n\nA concise description." },
-      contact: { key: "contact" as const, title: "Contact", body: "[YouTube](https://youtube.com/@test) [Instagram](https://instagram.com/test)" },
+      contact: { key: "contact" as const, title: "Contact", body: "[YouTube](https://youtube.com/@test) [Instagram](https://instagram.com/test) [LinkedIn](https://linkedin.com/in/test)" },
     };
     const hero = panelsOf(withContent(HOME_CHAPTERS, { sections: custom, experience: [], technologies: [] }), "sky")[0];
     expect(hero.meta).toBe("Engineering role.");
     expect(hero.body).toBe("A concise description.");
-    expect(hero.actions?.map(a => a.platform)).toEqual(["youtube", "instagram"]);
+    expect(hero.actions?.map(a => a.platform)).toEqual(["youtube", "instagram", "linkedin"]);
+    const creator = panelsOf(withContent(HOME_CHAPTERS, { sections: custom, experience: [], technologies: [] }), "creator")[0];
+    expect(creator.actions).toEqual(hero.actions);
     expect(hero.cta).toBeUndefined();
   });
 
@@ -104,7 +106,7 @@ describe("journey content (TKT-77)", () => {
     const out = withContent(HOME_CHAPTERS, { sections: quiet, experience: [], technologies: [] });
     expect(out.some((c) => c.id === "creator")).toBe(false);
     expect(panelsOf(out, "room")).toEqual([]);
-    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact Us");
+    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact");
   });
 
   it("fills the showcase with featured public projects (max 4) and sizes its scroll; skips it with none", () => {

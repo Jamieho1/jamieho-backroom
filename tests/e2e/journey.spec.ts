@@ -79,13 +79,13 @@ test("section photos stay framed through hand-over instead of growing fullscreen
 
 test("journey ends with the contact form on the monitor instead of a desktop link", async ({ page }) => {
   await page.goto("/#home-contact");
-  const contact = page.getByRole("region", { name: "Contact Us", exact: true });
+  const contact = page.getByRole("region", { name: "Contact", exact: true });
   await expect(contact).toBeVisible();
   await expect(contact.getByLabel("Name", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Switch on the computer/ })).toHaveCount(0);
   await expect(page.getByText("At the desk", { exact: true })).toHaveCount(0);
   await page.locator(".is-journey [data-menu=journey] summary").click();
-  await expect(page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Contact Us/ })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Contact/ })).toBeVisible();
   await page.locator(".is-journey [data-menu=journey] summary").click();
   await contact.getByLabel("Name", { exact: true }).fill("Local form test");
   await contact.getByLabel("Email", { exact: true }).fill("visitor@example.test");
@@ -103,8 +103,8 @@ test("reduced motion keeps readable stills and the contact form", async ({ page 
   await page.goto("/");
   await expect(page.locator(".journey-stills")).toBeVisible();
   await expect(page.locator(".journey-start")).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Contact Us", exact: true }).getByLabel("Name", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Send a message", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Contact", exact: true }).getByLabel("Name", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Contact", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -122,7 +122,7 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   expect(clips).toEqual([]);
-  await expect(page.getByRole("region", { name: "Contact Us", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Contact", exact: true })).toBeVisible();
 });
 
 

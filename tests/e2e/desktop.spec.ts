@@ -51,7 +51,8 @@ test('Privacy, Articles and protected resources use plain pages with one shared 
  const resources=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
  await page.goto('/privacy');
  expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(resources);
- await page.getByRole('combobox',{name:'Colour mode'}).selectOption('dark');
+ await page.getByRole('button', { name: /^Colour mode:/ }).click();
+  await page.getByRole('button', { name: /^Colour mode:/ }).click();
  const privacyDark=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
  await page.goto('/resources');
  expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(privacyDark);

@@ -15,7 +15,7 @@ export function FeedbackDialog({dark=false,page,onClose,action=sendFeedback}:{da
  const id=useId();const ref=useRef<HTMLDialogElement>(null);
  useEffect(()=>{const node=ref.current;if(!node)return;node.showModal();node.querySelector<HTMLSelectElement>('select')?.focus();return()=>{if(node.open)node.close();};},[]);
  return <dialog ref={ref} className={'feedback-dialog'+(dark?' is-dark':'')} aria-labelledby={id+'-title'} aria-describedby={id+'-description'} onCancel={event=>{event.preventDefault();onClose();}} onClose={onClose} onClick={event=>{if(event.target!==event.currentTarget)return;const r=event.currentTarget.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)onClose();}}>
- <header><h2 id={id+'-title'}>Report a problem / Suggest an idea</h2><button type="button" className="feedback-close" aria-label="Close feedback" onClick={onClose}>×</button></header><p id={id+'-description'}>Help improve the site. No name or email is needed.</p><FeedbackForm page={page} action={action}/>
+ <header><h2 id={id+'-title'}>Report a problem / Suggest an idea</h2><button type="button" className="feedback-close" aria-label="Close feedback" onClick={onClose}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button></header><p id={id+'-description'}>Help improve the site. No name or email is needed.</p><FeedbackForm page={page} action={action}/>
  </dialog>;
 }
 export function FeedbackForm({page,action:send}:{page:string;action:FeedbackAction}){

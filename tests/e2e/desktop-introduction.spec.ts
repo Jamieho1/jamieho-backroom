@@ -6,7 +6,8 @@ test('homepage artwork and navigation work without WebGL', async ({ page }) => {
   await expect(page.locator('.journey-hero-art')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Jamie Ho', level: 1 })).toBeVisible();
   await expect(page.getByRole('button', { name: /desktop motion/ })).toHaveCount(0);
-  await page.getByRole('combobox', { name: 'Colour mode' }).selectOption('dark');
+  await page.getByRole('button', { name: /^Colour mode:/ }).click();
+  await page.getByRole('button', { name: /^Colour mode:/ }).click();
   await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
 });
 
@@ -16,7 +17,7 @@ test('without JavaScript the homepage retains its art, copy and working links', 
   await page.goto(baseURL!);
   await expect(page.locator('.journey-stills')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Jamie Ho', level: 1 })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Contact Us', exact: true }).getByLabel('Name', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Send a message', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Contact', exact: true }).getByLabel('Name', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Contact', exact: true })).toBeVisible();
   await context.close();
 });

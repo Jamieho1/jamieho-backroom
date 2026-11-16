@@ -29,8 +29,10 @@ test("a callback without a code comes back with a clear message", async ({ page 
   await expect(page.locator("main [role=alert]")).toHaveText(/Sign-in didn.t complete/);
 });
 
-test("the privacy policy is public and linked from the shared bar", async ({ page }) => {
-  await page.goto("/"); await page.getByRole("link", { name: "Privacy", exact: true }).click();
+test("the privacy policy is public and linked from Contact", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#home-contact");
+  await page.getByRole("region", { name: "Contact", exact: true }).getByRole("link", { name: "privacy policy", exact: true }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole("heading", { name: "Privacy policy" })).toBeVisible();
   for (const h of ["What is collected", "Why it is used", "Who processes it", "How long it is kept", "Your rights"]) await expect(page.getByRole("heading", { name: h })).toBeVisible();
@@ -60,7 +62,7 @@ test("the project page is public with the plain Resources layout", async ({ page
 test("the contact form checks fields and quietly drops bot submissions", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" }); // Validate the form independently of scroll-camera timing.
   await page.goto("/#home-contact");
-  const form = page.getByRole("region", { name: "Contact Us", exact: true });
+  const form = page.getByRole("region", { name: "Contact", exact: true });
   await form.getByRole("button", { name: "Send" }).click(); // the browser blocks it: every field is required
   await expect(form.locator(":invalid")).toHaveCount(5); // form + name, email, need, budget
   await expect(form.getByRole("alert")).toHaveCount(0);

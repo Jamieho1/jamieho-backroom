@@ -1,16 +1,16 @@
 # Current state
 
-Updated 2026-11-14. Jamie pushes and verifies production.
+Updated 2026-11-16. Jamie pushes and verifies production.
 
 - Deployment (checked 2026-11-14 via Vercel MCP): production is READY on cf9b3c3 (About photos), so everything listed below through 2026-11-13 is committed, pushed and deployed. Pins and Guides migrations are applied live.
 - About photos: the three about-*.jpg files are in the home-media bucket (verified 2026-11-14), so the deployed About strip has its images.
 
 - Home journey is /. /journey redirects home; retired /about redirects to /#pivot, /desktop to /resources. Legacy desktop app queries redirect to canonical app routes.
-- Shared arrival/floating/app navigation: Journey dropdown, Projects, Interview, Articles, Resources, Privacy, visible Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. Privacy/Projects/Articles/Notes/Practice/Resume & Stories use plain pages; only Settings retains window controls. Owner Settings/edit controls are available there.
+- Shared arrival/floating/app navigation: Journey dropdown, Projects, Interview, Content (Articles/Resources), icon-only Auto/Day/Night and gold sign-in/out buttons. Auto follows system preference; explicit overrides persist in jb.theme. Privacy/Projects/Articles/Notes/Practice/Resume & Stories use plain pages; only Settings retains window controls. Owner Settings/edit controls are available there.
 - Resources now lists only public Guides (TKT-118). Interview is an additive placeholder shell at /interview. Notes (/notes), Practice (/practices) and Resume & Stories (/behavioral) retain existing server/RLS access checks; membership-gate components remain available for future courses. Payment integration is not implemented.
 - Hero uses matching generated 1920×1080 day/night landscapes with extended sky and aligned larger characters. Yellow/white editable heading sits above them; existing phone portraits remain. No CSS colour grading/pale halo. Welcome/name sit closer to the characters; compact tagline and social buttons are raised toward the lower cloud bank over a soft local scrim; the large glass card is removed. Schedule a call remains disabled.
 - Reading cards behind About/Projects/Experience/Creator copy retain geometry. About keeps its original smaller heading, full-opacity paragraph and untruncated phone text; grade omitted only from journey display.
-- Contact Us ending removes desk copy/page-opening CTA. Monitor holds social logos and the existing contact form/action; static fallback included. Contact anchors navigate to the form.
+- Contact ending removes desk copy/page-opening CTA. Monitor holds social logos and the existing contact form/action; static fallback included. Contact anchors navigate to the form.
 - Cyterly uses the approved bundled image only when database screenshots are empty; preview contains the full screenshot without pan. Owner screenshots take precedence.
 - Live content previously verified: approved hero copy, About slash removal and supplied Contact social URLs. Direct database edits need ISR refresh/rebuild for cached public copy.
 - Canonical apps/auth/RLS/editors retained. Phones download no journey clips; desktop keeps room/monitor clips. No schema/migration/dependency/deployment change. Historical migration status and outstanding domain/subdomain SSO sign-offs remain unverified.
@@ -373,3 +373,11 @@ Files changed for this follow-up: lib/interview/navigation.ts, components/interv
 Added SQL immediately below Fundamental under Interview Skills, with its original coloured database icon and /interview/sql Soon placeholder. Nineteen destinations now use the existing independent rail scroll. Updated navigation/icon/placeholder route registration, existing taxonomy/browser assertions, current interview/architecture docs and MEMORY; prior uncommitted work preserved. No SQL editor, schema, dependency or live data change.
 
 Checks actually run: typecheck passed; targeted Interview unit tests 5 passed; production build and unchanged static assertions passed; desktop/390px Interview browser suite 16 passed, four intentional viewport skips, zero failures; git diff --check passed. Full unit/DB and unrelated browser suites were not rerun for this small navigation change. No migration, commit, push or deployment; Jamie pushes/reviews live.
+
+## Homepage polish (2026-11-16)
+
+Local: icon-only cyclic theme control with persisted/system Auto, blue keyboard focus and no mouse-click yellow outline; Privacy removed from shared navigation but retained in Contact form. Shared YouTube white-tile/red-play icon and Instagram gradient across hero/Creator/Contact; Creator adds LinkedIn. Desktop Latest panel lowered, Fresh off the desk smaller. Contact replaces Contact Us throughout navigation/room/form, duplicate form heading removed; ending scroll distance approximately halved. Feedback close is a centred SVG. No new dependencies, schema/migration or permission changes.
+
+Authorized live content: added public, unfeatured Legal Assistance Winnie and Deep Learning for 3D Image Segmentation projects after reviewing their public GitHub metadata/READMEs; no invented screenshots. Existing featured selection unchanged. Contact LinkedIn now uses Jamie’s supplied locale URL. Read-back confirmed both records/visibility and LinkedIn update. Public ISR content updates on normal revalidation or Jamie’s next deployment. No private content in Git, commit, push or deployment.
+
+Checks: typecheck passed; full unit/database suite 1,031 passed / 114 files; isolated credential-free production build and unchanged static assertions passed for /, /resources, /privacy, /projects, /articles. Full desktop/390px Playwright: 164 passed, 66 conditional integration/viewport skips, zero failures (230 total); no separate synthetic-account integration run for these presentation changes. Checks include mouse/keyboard theme cycle and persistence/system Auto, navigation/badge isolation, contact/privacy/reduced motion, centred feedback close and no sideways overflow. An obsolete top-bar Privacy assertion failed initially and was updated to the actual Contact policy link; full rerun passed. Final typecheck and git diff --check passed. Jamie pushes and reviews live.

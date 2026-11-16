@@ -10,9 +10,9 @@ export interface ScreenContactHandle { setOpacity(o: number): void }
 
 /** Shared by the monitor overlay and the readable reduced-motion/no-JS ending. */
 export function ContactContent({ socials, draftChanged = false }: { socials: SocialLink[]; draftChanged?: boolean }) {
-  return <section data-draft-changed={draftChanged || undefined} id="home-contact" className="journey-contact-window" aria-label="Contact Us" data-lenis-prevent>
+  return <section data-draft-changed={draftChanged || undefined} id="home-contact" className="journey-contact-window" aria-label="Contact" data-lenis-prevent>
     <header>
-      <h2>Contact Us</h2>
+      <h2>Contact</h2>
       <nav className="journey-contact-socials" aria-label="Contact social profiles">
         {(["youtube", "instagram", "linkedin"] as const).flatMap(kind => socials.filter(s => s.kind === kind).map(s => (
           <a key={kind} className={`journey-brand journey-brand-${kind}`} href={s.href} target="_blank" rel="noopener noreferrer">
@@ -21,7 +21,6 @@ export function ContactContent({ socials, draftChanged = false }: { socials: Soc
         )))}
       </nav>
     </header>
-    <h3>Send a message</h3>
     <ContactForm action={sendMessage} />
   </section>;
 }

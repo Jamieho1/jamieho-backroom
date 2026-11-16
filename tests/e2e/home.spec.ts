@@ -18,24 +18,33 @@ test("Resources shows only public Guides and Notes requires an account", async (
 
 test("Auto tracks the computer while explicit Day and Night choices persist", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" }); await page.goto("/");
-  const mode = page.getByRole("combobox", { name: "Colour mode" });
-  await expect(mode).toHaveValue("auto");
+  const mode = page.getByRole('button', { name: /^Colour mode:/ });
+  await expect(mode).toHaveAttribute("data-theme-mode", "auto");
   await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
-  await mode.selectOption('light'); await page.reload();
-  await expect(mode).toHaveValue('light'); expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('light');
-  await mode.selectOption('dark'); await page.reload(); await expect(mode).toHaveValue('dark');
-  await mode.selectOption('auto'); await page.emulateMedia({colorScheme:'light'});
+  await mode.click();
+  expect(await mode.evaluate(el => getComputedStyle(el).outlineStyle)).toBe('none');
+  await page.reload();
+  await expect(mode).toHaveAttribute('data-theme-mode','light'); expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('light');
+  await mode.click(); await page.reload(); await expect(mode).toHaveAttribute('data-theme-mode','dark');
+  await mode.click(); await page.emulateMedia({colorScheme:'light'});
   await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('0');
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBeUndefined();
+  await expect(mode).toHaveAttribute('data-theme-mode','auto');
+  await mode.focus(); await page.keyboard.press('Enter');
+  await expect(mode).toHaveAttribute('data-theme-mode','light');
+  await page.keyboard.press('Space');
+  await expect(mode).toHaveAttribute('data-theme-mode','dark');
+  await expect(page.locator('.site-navigation:visible').getByRole('link',{name:'Privacy',exact:true})).toHaveCount(0);
+  await expect(page.locator('.contact-form a[href="/privacy"]').first()).toBeAttached();
 });
 
 test("navigation controls remain available in the floating bar", async ({ page }) => {
   await page.goto('/'); await page.locator('.is-journey [data-menu=journey] summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Education',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
-  for(const name of ['Projects','Interview','Privacy']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
+  for(const name of ['Projects','Interview']) await expect(page.getByRole('link',{name,exact:true})).toBeVisible();
   await expect(page.locator('.site-navigation:visible [data-menu=content] summary')).toBeVisible();
-  await expect(page.getByRole('combobox',{name:'Colour mode'})).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 

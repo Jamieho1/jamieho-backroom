@@ -15,7 +15,7 @@ export function ContactForm({ action: send }: { action: Action }) {
   }
   const v = state?.values;
   return (
-    <form action={action} className="contact-form">
+    <form action={action} className="contact-form" aria-label="Contact">
       <div className="contact-row">
         <label className="field">
           <span>Name</span>

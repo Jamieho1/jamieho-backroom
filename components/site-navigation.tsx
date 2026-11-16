@@ -11,7 +11,7 @@ import { useViewer } from "./viewer-provider";
 export const JOURNEY_LINKS = [
   { id: "pivot", label: "Education" }, { id: "projects", label: "Work" },
   { id: "experience", label: "Experience" }, { id: "toolkit", label: "TechStack" },
-  { id: "creator", label: "Creator" }, { id: "screen", label: "Contact Us" },
+  { id: "creator", label: "Creator" }, { id: "screen", label: "Contact" },
 ];
 interface Props {
   items?: typeof JOURNEY_LINKS;
@@ -35,7 +35,6 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
       <NavigationMenu label="Content" group={menuGroup}>
         {closeMenu=><nav className="journey-chapter-list" aria-label="Content pages"><Link href="/articles" onClick={closeMenu}>Articles</Link><Link href="/resources" onClick={closeMenu}>Resources</Link></nav>}
       </NavigationMenu>
-      <Link href="/privacy">Privacy</Link>
     </nav>
     <div className="site-navigation-account">
       <FeedbackButton className="site-feedback-button"/>
