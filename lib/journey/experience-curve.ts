@@ -36,10 +36,10 @@ export function experienceLayout(count:number, vertical=false, width=1000, rowHe
   let y=42;
   const points:CurvePoint[]=Array.from({length:n},(_,i)=>{
     const p={x:vertical?w/2+(i%2?-28:28):n===1?w/2:70+i*(w-140)/(n-1),
-      y:vertical?y:236+(i%2?52:-52),progress:n===1?0:i/(n-1)};
+      y:vertical?y:174+(i%2?42:-42),progress:n===1?0:i/(n-1)};
     y+=Math.max(140,rowHeights[i]??360);return p;
   });
-  return {width:w,height:vertical?y-42:376,points,path:curvePath(points,vertical)};
+  return {width:w,height:vertical?y-42:300,points,path:curvePath(points,vertical)};
 }
 /** Read each stop in turn; the drawn line reaches its circle before the card changes. */
 export function experienceState(local:number,count:number){

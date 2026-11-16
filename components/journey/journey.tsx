@@ -418,6 +418,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt="" loading="lazy" /> : null}
                     <h2 className="journey-title">{it.name}</h2>
+                    {it.tags.length?<ul className="journey-chips">{it.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>:null}
                     {it.tagline ? <p className="journey-body">{it.tagline}</p> : null}
                     <a className="journey-cta-link" href={it.href}>Read the case study <span>→</span></a>
                   </li>

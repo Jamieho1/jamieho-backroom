@@ -29,13 +29,13 @@ export const ExperienceCurve=forwardRef<ExperienceCurveHandle,{stops:ExperienceS
  },[still,vertical]);
  useEffect(()=>{
   const node=root.current;if(!node)return;
-  const measure=()=>{const width=node.clientWidth;const heights=vertical?[...node.querySelectorAll<HTMLElement>(".experience-stop-item")].map(el=>el.getBoundingClientRect().height):[];
+  const measure=()=>{const width=node.clientWidth;if(board.current)node.style.setProperty("--experience-card-space",`${Math.max(120,node.clientHeight-board.current.offsetTop-place.height-28)}px`);const heights=vertical?[...node.querySelectorAll<HTMLElement>(".experience-stop-item")].map(el=>el.getBoundingClientRect().height):[];
    setGeometry(old=>old.width===width&&old.heights.join()===heights.join()?old:{width,heights});};
-  measure();const observer=new ResizeObserver(measure);observer.observe(node);node.querySelectorAll(".experience-stop-item").forEach(el=>observer.observe(el));return ()=>observer.disconnect();
- },[vertical,stops]);
+  measure();const observer=new ResizeObserver(measure);observer.observe(node);node.querySelectorAll(".experience-stop-item,.experience-heading").forEach(el=>observer.observe(el));return ()=>observer.disconnect();
+ },[vertical,stops,place.height]);
  return <section ref={root} className={`experience-curve${vertical?" experience-vertical":""}`} data-animated={animated} data-current={selected} aria-label="Experience journey"
   onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setFocused(null);}}
-  onWheel={event=>{const node=event.currentTarget;if((event.deltaY>0&&node.scrollTop+node.clientHeight<node.scrollHeight-1)||(event.deltaY<0&&node.scrollTop>0))event.stopPropagation();}}>
+  onWheel={event=>{const node=(event.target as Element).closest<HTMLElement>(".experience-card");if(node&&((event.deltaY>0&&node.scrollTop+node.clientHeight<node.scrollHeight-1)||(event.deltaY<0&&node.scrollTop>0)))event.stopPropagation();}}>
   <link rel="preload" as="image" href={mediaUrl(base,EXPERIENCE_ART.background)} media="(min-width:769px)" fetchPriority="low"/>
   <link rel="preload" as="image" href={mediaUrl(base,EXPERIENCE_ART.mascot)} media="(min-width:769px)" fetchPriority="low"/>
   <link rel="preload" as="image" href={mediaUrl(base,EXPERIENCE_ART.phone)} media="(max-width:768px)" fetchPriority="low"/>

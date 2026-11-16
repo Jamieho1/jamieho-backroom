@@ -1,33 +1,28 @@
 # Current state
 
-Current snapshot. Settled choices: [decisions.md](decisions.md).
+## Live data (read-only verified)
 
-## Live
+- All migrations through 20261116165138_home_v13_data.sql are applied; remote version 20261116171034. None pending.
+- All three TKT-110b starter sets are approved. Public content has three About photos, one centre and three journey stops. Story is empty, so My story uses its starter.
+- Featured public Work is exactly Cyterly AI and DataKind UK; DataKind UK has Volunteer.
 
-- Production READY on 2f4d437 (checked 2026-11-16). Jamie pushes; Vercel deploys.
-- Documentation retains active specs/current topics only; superseded planning uses git history.
-- All migrations through `20261116165138_home_v13_data.sql` (TKT-110) are applied live; remote version `20261116171034`. None pending.
-- Article pages are ISR daily (`revalidate = 86400`); Content Drafts approvals call `revalidatePath`. Direct DB edits need a save in the editor or a redeploy.
+## Current implementation
 
-## Site today
+- Home v1.3: Hello → About → Experience → Work → Techstack → Creator → Contact Us. About has its photo constellation and Read my story; /about is the themed ISR editorial page/starter.
+- Experience uses the approved versioned background/mascot and portrait phone still. Desktop heading/curve stay pinned below navigation; the smaller mascot leaves room for longer independently scrolling cards. Static Work retains project tags.
+- Shared bars: Journey, My story, Projects, Interview Prep, Articles, Resources, icon theme cycle, feedback/account/review controls. Privacy remains in Contact.
+- PassLoop retains public Practice/guides/template and private per-user progress/resume/answers; Notes requires sign-in. Legacy app routes still work. Resources lists Guides only.
+- Content Drafts retains owner-only approval/preview, photo slots and existing table scopes. Public pages stay static/ISR.
 
-- Home journey at `/`: Hello → About → Experience → Work → Techstack → Creator → Contact Us locally; About uses the constellation; Experience uses the public-stop curve and approved mascot art. `/about` now renders My story or its About-copy starter.
-- Working-tree top/floating bars: Journey · My story · Projects · Interview Prep · Articles · Resources. Privacy lives in the Contact form only. Icon-only Auto/Day/Night switch.
-- `/interview` is PassLoop: sidebar with Interview Skills (DSA, System Design, LLD, Fundamental, SQL), Role, Career (Resume, Behavioral, Project), Tools. Open to all; per-user flags, code, resume and STAR answers, own-rows RLS. Old `/notes`, `/practices`, `/behavioral` still work (deprecation pending Jamie).
-- Resources lists Guides only, in the Articles-style sidebar layout with series filters.
-- Content Drafts: `/manage/review` with page preview, owner badge, photo slots. Covers site_sections, CV, projects/articles/guides, notes/practice/behavioral and resume template. TKT-107/108 live photo-slot test verified: approved set, exactly one expected DataKind UK project-media URL, Storage PNG 3,254,783 bytes.
+## Release gate
 
-## Open work (in order)
+TKT-116 local gate passes: typecheck; 1,097 unit/database tests; standard and synthetic production builds; static assertions for all six required pages; full main browser suite 201 passed/75 conditional skips; full synthetic integration suite 66 passed. Coverage includes Home photo/journey/Story outlines, approval refreshes, exact featured Work/Volunteer, reduced-motion/no-JS / and /about, canonical/legacy anchors and account isolation. No migration, live writes or media uploads. Jamie pushes and reviews the final UI live before Done.
 
-1. TKT-110 schema is applied/verified; deployment and Jamie’s live review remain pending.
-2. TKT-110b: three live draft sets await Jamie’s separate approvals at /manage/review after TKT-110 deployment: About photos `23f1a988-4bcc-4a34-971e-f17144ebe77a`; journey stops `c0770745-b17b-4ec3-84d8-59b65d301427`; trimmed About `3ef88c4c-4cf2-4469-8078-43287d733c7e`. Last read-back: draft/unapproved; live content unchanged and Story blank. TKT-111–115 navigation, constellation, curve/art and My story are implemented locally. About’s production translation/layer overlap is fixed. TKT-115 typecheck, 1,096 unit/DB tests, build/static assertions and 67 browser cases pass (5 viewport skips); no migration/live writes. Jamie deploys/reviews live; next TKT-116 verification gate.
-3. Articles: TKT-117 (article + Resources image sizing) and the Articles/Resources redesign (to be grilled with Claude; earlier options rejected).
-4. PassLoop build-out.
-5. TKT-99 old editors redo (later).
+## Remaining work
 
-## Known gaps
-
-- Supabase leaked-password protection off (Google sign-in only; low risk). `record_signin` callable by signed-in users by design.
-- Domain/subdomain SSO sign-offs unverified.
-
-- Next.js reported a security-upgrade advisory before passing on retry; dependency review remains separate.
+- Jamie’s final deployment/live review of Home v1.3.
+- TKT-117 image sizing and the separately reviewed Articles/Resources redesign; About visual refinement after discussion.
+- PassLoop build-out; old editors/deprecation later.
+- Domain/subdomain SSO sign-offs remain unverified.
+- Supabase leaked-password protection is off (Google sign-in only); record_signin is intentionally API-callable.
+- The pinned Next.js build emitted a security-upgrade advisory; dependency review remains separate.

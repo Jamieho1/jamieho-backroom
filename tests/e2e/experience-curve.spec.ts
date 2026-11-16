@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 let bundle='',staticHtml='';
 const css=readFileSync('app/journey.css','utf8');
-const fixture=`const stops=Array.from({length:3},(_,i)=>({id:'stop-'+i,title:'Synthetic role '+i,org:'Example '+i,dates:i===2?'2024 – Present':String(2018+i),icon:['graduation-cap','neural-network','streams-plug'][i],present:i===2,draftChanged:i===1,bullets:Array.from({length:3},(_,j)=>({text:'Synthetic public proof '+i+'.'+j,draftChanged:i===1&&j===0}))})).concat([{id:'projects',title:'Projects',org:'',dates:'',icon:'rocket',present:false,project:true,bullets:[]}]);`;
+const fixture=`const stops=Array.from({length:3},(_,i)=>({id:'stop-'+i,title:'Synthetic role '+i,org:'Example '+i,dates:i===2?'2024 – Present':String(2018+i),icon:['graduation-cap','neural-network','streams-plug'][i],present:i===2,draftChanged:i===1,bullets:Array.from({length:3},(_,j)=>({text:'Synthetic public proof '+i+'.'+j+(typeof location!=='undefined'&&new URLSearchParams(location.search).has('long')?' Synthetic detail with engineering evidence.'.repeat(20):''),draftChanged:i===1&&j===0}))})).concat([{id:'projects',title:'Projects',org:'',dates:'',icon:'rocket',present:false,project:true,bullets:[]}]);`;
 const plugins:Plugin[]=[{name:'curve-isolation',setup(b){
  b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'fixture'}));
  b.onResolve({filter:/^\.\/navigation$/},()=>({path:'nav',namespace:'fixture'}));
@@ -17,9 +17,9 @@ test.beforeAll(async()=>{
  const ssr=await build({stdin:{contents:`import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';import {ExperienceCurve} from './components/journey/experience-curve';${fixture}export const html=renderToStaticMarkup(<ExperienceCurve stops={stops} still/>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'cjs',platform:'node',jsx:'automatic'});
  const module={exports:{}};new Function('require','module','exports',ssr.outputFiles[0].text)(createRequire(process.cwd()+'/package.json'),module,module.exports);staticHtml=(module.exports as {html:string}).html;
 });
-async function mount(page:Page){
+async function mount(page:Page,long=false){
  await page.route('**/fixture-media/**',r=>r.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="941" height="1672"><rect width="941" height="1672" fill="#c2d3dc"/></svg>'}));
- await page.goto('/privacy');await page.addStyleTag({content:css+'body > :not(#curve-fixture){display:none!important} body{margin:0}'});
+ await page.goto('/privacy'+(long?'?long=1':''));await page.addStyleTag({content:css+'body > :not(#curve-fixture){display:none!important} body{margin:0}'});
  await page.evaluate(()=>{const root=document.createElement('div');root.id='curve-fixture';document.body.append(root)});
  await page.route('**/__curve.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));await page.addScriptTag({url:'/__curve.js'});
  await expect(page.locator('.journey-live')).toBeAttached();await expect(page.locator('.journey-track')).toBeVisible();
@@ -84,4 +84,17 @@ test('phone downloads only the portrait Experience still and no moving layers or
  await expect.poll(()=>curve.locator('.experience-art-layer img').evaluate((el:HTMLImageElement)=>el.currentSrc)).toMatch(/experience-phone.webp\?v=/);
  await expect(curve.locator('.experience-mascot')).toBeHidden();await expect(curve.locator('.experience-art-layer img')).toHaveCSS('transform','none');
  expect([...new Set(requests)]).toEqual(['experience-phone.webp']);await expect(page.locator('video[src]')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('long cards scroll without lifting Experience under navigation or uncovering its background',async({page},info)=>{
+ test.skip(info.project.name!=='desktop','pinned desktop cards');await mount(page,true);await position(page,.21);
+ const curve=page.locator('[data-chapter="experience"] .experience-curve');await expect(curve).toHaveAttribute('data-current','0');
+ await expect(curve).toHaveAttribute('data-animated','true');const card=curve.locator('.experience-card:visible');
+ await expect.poll(()=>card.evaluate(el=>el.scrollHeight-el.clientHeight)).toBeGreaterThan(100);
+ const heading=curve.locator('.experience-heading');await expect.poll(async()=>(await heading.boundingBox())!.y).toBeCloseTo(112,0);const before=await heading.boundingBox(),background=await curve.locator('.experience-art-layer').boundingBox();
+ await card.hover();await page.mouse.wheel(0,150);await expect.poll(()=>card.evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+ expect((await heading.boundingBox())!.y).toBeCloseTo(before!.y,0);expect(await curve.evaluate(el=>el.scrollTop)).toBe(0);
+ expect(before!.y).toBeGreaterThanOrEqual(100);expect(background!.y+background!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height-1);
+ await expect(heading.locator('h2')).toHaveCSS('color','rgb(21, 17, 12)');await expect(curve.locator('.experience-mascot')).toHaveCSS('height','88px');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

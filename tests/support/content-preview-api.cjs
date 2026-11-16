@@ -53,6 +53,14 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         const proposal=JSON.parse(body); const r=await db.query('insert into public.content_changes(summary,operations,photo_slots) values ($1,$2,$3) returning id',[proposal.summary,JSON.stringify(proposal.operations),JSON.stringify(proposal.photo_slots??[])]);
         return send(res,200,r.rows[0]);
       }
+      if(url.pathname==='/__home_v13_seed'&&req.method==='POST'){
+        await db.exec("delete from public.about_photos; update public.projects set featured=false; update public.site_sections set title='My story',body='' where key='story'");
+        await db.exec("insert into public.about_photos(id,path,caption,alt,centre,public,sort) values ('00000000-0000-4000-8000-000000001601','gate-photo.jpg','Synthetic public caption','Synthetic public photo',true,true,0)");
+        await db.exec("insert into public.experience_items(id,title,org,dates,public,show_on_journey,journey_icon,sort) values ('00000000-0000-4000-8000-000000001602','Synthetic public role','Example organisation','2024 – Present',true,true,'code',0) on conflict(id) do update set title=excluded.title,show_on_journey=true");
+        await db.exec("insert into public.experience_bullets(id,item_id,text,public,sort) values ('00000000-0000-4000-8000-000000001603','00000000-0000-4000-8000-000000001602','Synthetic public proof',true,0) on conflict(id) do update set text=excluded.text");
+        await db.exec("insert into public.projects(id,slug,name,tags,public,featured,sort) values ('00000000-0000-4000-8000-000000001604','gate-cyterly','Cyterly AI','{}',true,true,0),('00000000-0000-4000-8000-000000001605','gate-datakind','DataKind UK','{Volunteer}',true,true,1) on conflict(id) do update set featured=true");
+        return send(res,200,{ok:true});
+      }
       if (url.pathname === '/__experience_seed' && req.method === 'POST') {
         const ids=['00000000-0000-4000-8000-000000000501','00000000-0000-4000-8000-000000000502'];
         await db.query('delete from public.experience_items where id=any($1::uuid[])',[ids]);
@@ -98,13 +106,13 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
-      if (!['messages','content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
+      if (!['about_photos','messages','content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
       const rows=await db.transaction(async tx=>{
         await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session?.user.id || '',role:session?'authenticated':'anon'})]);
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table.startsWith('interview_behavioral_')?['id','user_id','question_id','theme_id','published']:table==='user_resumes'?['user_id','revision']:table==='resume_templates'?['key']:table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem','user_id','mode','status']:table==='behavioral_answers'?['question_id']:['id'])) {
+        for (const col of (table.startsWith('interview_behavioral_')?['id','user_id','question_id','theme_id','published']:table==='user_resumes'?['user_id','revision']:table==='resume_templates'?['key']:table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='about_photos'?['id','public','centre']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem','user_id','mode','status']:table==='behavioral_answers'?['question_id']:['id'])) {
           const value=url.searchParams.get(col);
           if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(['operations','photo_slots'].includes(col)?'::jsonb':'')); }
         }
