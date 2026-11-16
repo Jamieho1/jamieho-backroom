@@ -12,7 +12,7 @@ Top and floating bars: Journey disclosure → My story (`/about`) → Projects �
 
 ## Rendering and motion
 
-One scroll owner: Lenis smooths native scrolling; ScrollTrigger reports progress; one animation loop draws chapters and text. Reverse scrolling retraces the same state. Section images do not grow fullscreen at hand-over. Decorative Three.js wireframes are limited to Work (torus) and Creator (helix); phones/reduced motion skip them. About and Experience retain readable text panels only: the old photo strip, Westminster still and timeline dots are not rendered. Their replacement constellation/curve layouts are separate tickets.
+One scroll owner: Lenis smooths native scrolling; ScrollTrigger reports progress; one animation loop draws chapters and text. Reverse scrolling retraces the same state. Section images do not grow fullscreen at hand-over. Decorative Three.js wireframes are limited to Work (torus) and Creator (helix); phones/reduced motion skip them. About uses the photo constellation described below. Experience retains readable text panels until its curve ticket. The old photo strip, Westminster still and timeline dots are not rendered.
 
 The hero uses matching 1920×1080 day/night landscape artwork with extended sky and consistent character scale, plus portrait variants on phones. Artwork covers the viewport; characters remain rigid, with a subtle moving light veil. Yellow Welcome and white name sit above the characters; compact tagline/social buttons sit in the lower clouds on a local radial scrim. Text remains HTML. The clickable glass scroll cue leads to About. Hero scroll length is 0.65 viewport heights; text holds through 85%. No opening video is downloaded.
 
@@ -26,6 +26,14 @@ At ≤768px, phone mode uses portrait hero artwork, c7a-last.jpg desk and c7b-la
 
 Journey media remains outside Git: ignored `public/home-media/` locally, public home-media Storage configured by NEXT_PUBLIC_HOME_MEDIA_URL live. Approved wallpaper WebPs are the limited tracked exception. `media-manifest.json` and `public/media-sw.js` provide hash-addressed caching; replacement assets require manifest regeneration/upload coordination. Raw media lives in sibling Media/.
 
-The three existing About photos and Experience artwork remain in Storage for later layouts; this ticket generates/uploads no media. `lib/home-content.ts` provides About-photo/journey-stop loaders with owner-only draft overlays. Story is a fixed section key; TKT-110b starter proposals await Jamie’s approval (current IDs/state in status.md).
+About photos are read from public about_photos through getAboutPhotos; Experience artwork remains in Storage for its later ticket. This work generates/uploads no media. `lib/home-content.ts` provides About-photo/journey-stop loaders with owner-only draft overlays. Story is a fixed section key; TKT-110b starter proposals await Jamie’s approval (current IDs/state in status.md).
 
 Owner preview uses verified Next Draft Mode and immutable snapshots before public filtering. Gold outlines follow canonical About/Experience/Work bindings; copied cookies confer no access. Public rendering remains static/ISR. Approve/Discard reuse the existing transaction and clear preview; normal editors and data ownership are unchanged.
+
+## About constellation
+
+`components/journey/about-constellation.tsx` renders in both the live engine and StillJourney. The database About title uses Barlow Condensed (system narrow fallbacks), uppercase except a lowercase italic connector between capitalised words. The existing first-paragraph binding supplies Markdown with links disabled. Read my story is a pill link to /about (still a redirect until TKT-114). No education metadata or personal copy is added in code.
+
+`lib/journey/constellation.ts` purely selects public photos, centre first then sort/UUID, capped at twelve. Without a marked centre the first ordered photo leads. Placement takes count and board dimensions: one centre, fewer than five a centre plus short row, five to twelve an even ring; tilt stays within ±6°. The board draws a faint circle and curved SVG connectors. Images use database alt/caption text and mediaUrl’s home-media manifest hashes; no personal photos enter Git. Changed preview photos/section retain gold markers.
+
+GSAP quick setters drift only the board transform with pointer and the existing reversible chapter progress; the component creates no new scroll clock. Motion is desktop/no-preference only and cleaned up on unmount/preference changes. At ≤768px, the centre sits above an internally swipeable print row with captions beneath; short viewports can scroll the About content before handing wheel travel back to the main journey. Each photo is keyboard-focusable; dark captions appear on desktop hover/focus, and are visible in touch/reduced-motion/no-JS views. Still rendering is the finished layout without drift.

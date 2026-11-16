@@ -2,7 +2,6 @@
 
 Last ~10 one-line entries (≤600 words). Drop the oldest when adding one. Details live in git history, specs and [docs/decisions.md](docs/decisions.md).
 
-- 2026-11-16 · Resources moved to Articles-style layout; Cyterly URL updated live.
 - 2026-11-16 · Nav "Interview Prep", workspace "PassLoop"; theme switch keeps scroll position (2f4d437 live).
 - 2026-11-16 · Articles/Resources design exploration rejected; redesign to be grilled.
 - 2026-11-16 · Docs split: status snapshot, decisions.md, trimmed MEMORY; changelogs removed.
@@ -12,3 +11,4 @@ Last ~10 one-line entries (≤600 words). Drop the oldest when adding one. Detai
 - 2026-11-16 · TKT-110 migration applied after Jamie’s approval (remote 20261116171034); live schema/RLS/helper hashes verified, existing content and Storage policies unchanged; starter drafts/frontend review pending.
 - 2026-11-16 · TKT-110b: three starter change sets created/read back as draft (About photos, journey stops, trimmed About); no live content changes, Story blank; Jamie approves after TKT-110 deployment.
 - 2026-11-16 · TKT-111 implements Home order, #about/#pivot compatibility, direct My story/Articles/Resources navigation and About/Experience visual retirements; typecheck, 1,055 unit/DB tests, build/static checks and 74 browser cases pass (2 viewport skips); deployment/live review pending.
+- 2026-11-16 · TKT-112 implements About title/story link, public photo constellation, GSAP board drift, phone swipe row and accessible static fallbacks; typecheck, 1,075 unit/DB tests, build/static and desktop/390px/no-JS browser checks pass; no migration/live content change, deployment/review pending.

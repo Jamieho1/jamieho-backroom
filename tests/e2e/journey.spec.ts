@@ -134,10 +134,10 @@ test("About text remains readable and inactive project links cannot intercept th
   await expect(about.locator(".journey-panel")).toBeVisible();
   await expect(about).not.toHaveAttribute("inert");
   await expect(page.locator('[data-chapter="sky"]')).toHaveAttribute("inert", "");
-  await expect(about.locator(".journey-md a")).toHaveCount(0);
+  await expect(about.locator(".about-constellation-body a")).toHaveCount(0);
   await expect(about.locator('.journey-about-photos')).toHaveCount(0);
   await page.waitForTimeout(1800);
-  const body = about.locator(".journey-md");
+  const body = about.locator(".about-constellation-body");
   if (await body.count()) {
     const intercepted = await body.evaluate(el => {
       const r = el.getBoundingClientRect();

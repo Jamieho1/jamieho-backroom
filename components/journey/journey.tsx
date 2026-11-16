@@ -18,6 +18,8 @@ import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
+import {AboutConstellation,type AboutConstellationHandle} from "./about-constellation";
+import type {AboutPhoto} from "@/lib/home-content-schema";
 import { HeroArtwork } from "./hero-artwork";
 import { JourneyNavigation } from "./navigation";
 import { registerMediaCache, shouldSkipVideo, startPreloader, type Preloader } from "./preloader";
@@ -35,7 +37,7 @@ import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/ass
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
 
-export function Journey({ chapters: all, base, socials = [], draftSections = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[] }) {
+export function Journey({ chapters: all, base, socials = [], draftSections = [], aboutPhotos = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[]; aboutPhotos?:AboutPhoto[] }) {
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
@@ -47,6 +49,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
+  const constellation=useRef<AboutConstellationHandle>(null);
   const stills = useRef<(HTMLImageElement | null)[]>([]);
   const showcases = useRef<(ShowcaseHandle | null)[]>([]);
   const toolkits = useRef<(ToolkitHandle | null)[]>([]);
@@ -188,6 +191,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
+          if(c.id === "about" && opacity > 0)constellation.current?.setProgress(at);
           if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
@@ -299,7 +303,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
                   </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
-                {(c.panels ?? []).map((p) => (
+                {c.id === "about" && c.panels?.[0] ? <AboutConstellation ref={constellation} panel={c.panels[0]} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)}/> : null}
+                {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
                     data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["about", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
                     {c.id === "sky" ? <HeroCopy p={p} split draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" split disableLinks={c.id === "about"} />}
@@ -319,7 +324,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
           </div>
         </div>
       ) : (
-        <StillJourney chapters={chapters} base={base} socials={socials} draftSections={draftSections} />
+        <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
       )}
     </div>
   );
@@ -357,7 +362,7 @@ function drawVideo(c: VideoChapter, v: HTMLVideoElement | null | undefined, el: 
 }
 
 /** No JavaScript, reduced motion or before hydration: every chapter as a sharp still with its text, in order. */
-export function StillJourney({ chapters, base, socials = [], draftSections = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[] }) {
+export function StillJourney({ chapters, base, socials = [], draftSections = [], aboutPhotos = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[]; aboutPhotos?:AboutPhoto[] }) {
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
@@ -405,7 +410,8 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [] 
               <a className="journey-cta-link" href="/projects">All projects <span>→</span></a>
             </section>
           ) : null}
-          {(c.panels ?? []).map((p) => (
+          {c.id === "about" && c.panels?.[0] ? <AboutConstellation panel={c.panels[0]} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/> : null}
+          {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
               {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "about"} />}
             </section>
