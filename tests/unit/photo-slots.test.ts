@@ -12,7 +12,7 @@ it('validates strict target/bucket/filename/path/caption and unique slot names',
 });
 it('reuses uploader type/5 MB rules and requires the exact expected filename',()=>{
  const file={name:'project.png',type:'image/png',size:5242880};expect(validatePhotoFile(file,slot)).toBeNull();
- expect(validatePhotoFile({...file,size:5242881},slot)).toContain('5 MB');expect(validatePhotoFile({...file,type:'image/svg+xml'},slot)).toContain('PNG');expect(validatePhotoFile({...file,name:'wrong.png'},slot)).toContain('exactly project.png');expect(validatePhotoFile({...file,type:'image/gif'},slot)).toContain('Project screenshots');
+ expect(validatePhotoFile({...file,size:5242881},slot)).toContain('5 MB');expect(validatePhotoFile({...file,type:'image/svg+xml'},slot)).toContain('PNG');expect(validatePhotoFile({...file,name:'wrong.png'},slot)).toContain('exactly project.png');expect(validatePhotoFile({...file,type:'image/gif'},slot)).toContain('Pictures');
 });
 it('appends resolved URLs to post-operation screenshots and never mutates live objects',async()=>{
  const row={id:key,slug:'example',name:'Example',tagline:'',body:'',tags:[],screenshots:['https://example.test/old.png'],url:'',public:true,featured:false,sort:100};const before=structuredClone(row);

@@ -30,7 +30,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
       continue;
     }
     if (operation.op === "delete") {
-      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "practice_stars" ? "(unstar problem)" : operation.table === "experience_bullets" ? "(delete bullet)" : "(unpublish; keep row)"});
+      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "practice_stars" ? "(unstar problem)" : operation.table === "experience_bullets" ? "(delete bullet)" : operation.table === "about_photos" ? "(delete photo)" : "(unpublish; keep row)"});
       continue;
     }
     for (const [field,value] of Object.entries(operation.fields)) {
@@ -43,6 +43,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
 }
 
 export interface HomePreview {
+  aboutPhotos?:import("@/lib/home-content-schema").AboutPhoto[];
   behavioral?:import('./behavioral-guides').BehavioralPreview;
   resumeTemplate?:import('@/lib/resume').ResumeTemplate;
   photoSlots?: import("./photo-slots").PhotoSlot[];

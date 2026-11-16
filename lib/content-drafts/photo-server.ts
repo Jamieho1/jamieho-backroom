@@ -2,6 +2,7 @@ import type {SupabaseClient} from '@supabase/supabase-js';
 import {IMAGE_MAX_BYTES} from '@/lib/article-images';
 import {parsePhotoSlots,photoUrl,PHOTO_TYPES,type PhotoSlot} from './photo-slots';
 import {validateOperations,type ContentOperation} from './allowlist';
+import {loadAboutPhotosPreview} from './about-photos';
 import {loadPublishingPreview} from './publishing-overlay';
 export function parsePhotoSet(operations:unknown,raw:unknown,id:string){
  const slots=parsePhotoSlots(raw,id);
@@ -9,19 +10,31 @@ export function parsePhotoSet(operations:unknown,raw:unknown,id:string){
  const parsed=validateOperations(operations);if(!parsed.ok)throw Error(parsed.message);
  return {operations:parsed.operations,slots};
 }
-/** Owner-gated callers only. Resolve append semantics against the post-operation project snapshot. */
+/** Owner-gated callers only. Resolve project appends and About-photo inserts against post-operation snapshots. */
 export async function withPhotoOperations(sb:SupabaseClient,operations:ContentOperation[],slots:PhotoSlot[]):Promise<ContentOperation[]>{
  if(!slots.length)return operations;
- let rows=(await loadPublishingPreview(sb,operations)).projects;
- if(!rows){const result=await sb.from('projects').select('*');if(result.error)throw Error('Could not load screenshot targets.');rows=result.data??[];}
+ const projectSlots=slots.filter(s=>s.bucket==='project-media');
+ let rows=projectSlots.length?(await loadPublishingPreview(sb,operations)).projects:[];
+ if(projectSlots.length&&!rows){const result=await sb.from('projects').select('*');if(result.error)throw Error('Could not load screenshot targets.');rows=result.data??[];}
  const extra:ContentOperation[]=[];
- for(const key of new Set(slots.map(s=>s.target.key))){
+ for(const key of new Set(projectSlots.map(s=>s.target.key))){
   const row=rows?.find(r=>r.id===key);if(!row)throw Error('Screenshot target project no longer exists.');
-  const targetSlots=slots.filter(s=>s.target.key===key);
+  const targetSlots=projectSlots.filter(s=>s.target.key===key);
   const screenshots=[...new Set([...row.screenshots,...targetSlots.flatMap(s=>s.path?[photoUrl(s.path)]:[])])];
   if(screenshots.length+targetSlots.filter(s=>s.path===null).length>6)throw Error('A project can have at most 6 screenshots.');
   const parsed=validateOperations([{table:'projects',op:'update',key,fields:{screenshots}}]);if(!parsed.ok)throw Error(parsed.message);extra.push(...parsed.operations);
  }
+ const homeTargets=new Set<string>();
+ for(const slot of slots){
+  if(slot.bucket!=='home-media')continue;
+  if(homeTargets.has(slot.target.key))throw Error('About photo slots must create distinct rows.');
+  homeTargets.add(slot.target.key);
+  if(slot.path){
+   const parsed=validateOperations([{op:'insert',table:'about_photos',key:slot.target.key,fields:{path:slot.path,caption:slot.caption,alt:slot.alt,sort:slot.sort,centre:slot.centre??false,public:slot.public??false}}]);
+   if(!parsed.ok)throw Error(parsed.message);extra.push(...parsed.operations);
+  }
+ }
+ await loadAboutPhotosPreview(sb,[...operations,...extra]);
  return [...operations,...extra];
 }
 export async function checkSlotObject(sb:SupabaseClient,slot:PhotoSlot){

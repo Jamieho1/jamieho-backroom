@@ -3,6 +3,7 @@ import {templateFields,templateOperation} from '@/lib/resume';
 import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
+import {photoFields,JOURNEY_ICONS} from "@/lib/home-content-schema";
 import { projectSchema } from "@/lib/portfolio-core";
 import { articleSchema } from "@/lib/articles";
 import { guideSchema } from "@/lib/guides";
@@ -15,7 +16,7 @@ const text = (max: number) => z.string().refine(value => !value.includes("\0"), 
 const cvText = (max: number) => z.string().refine(value => value.length <= max, `Text must be ${max} characters or fewer.`).refine(value => !value.includes("\0"), "Text cannot contain NUL.").transform(value => value.trim());
 const uuid = z.uuid().transform(value => value.toLowerCase());
 const sort = z.number().int().min(-2147483648).max(2147483647);
-const itemFields = { kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
+const itemFields = { show_on_journey:z.boolean(), journey_icon:z.enum(JOURNEY_ICONS), kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
 const bulletFields = { item_id: uuid, text: cvText(LIMITS.bullet).refine(value => !!value, "Give the bullet text."), sort, public: z.boolean() };
 const cvRoutes = ["/", "/journey", "/about", "/behavioral"] as const;
 export const publishingSchemas = {projects:projectSchema,articles:articleSchema,guides:guideSchema};
@@ -26,6 +27,7 @@ const articleFields=articleSchema.omit({id:true}).shape;
 const guideFields=guideSchema.omit({id:true}).shape;
 export const CONTENT_ALLOWLIST = {
   ...APP_ALLOWLIST,
+  about_photos:{key:uuid,fields:photoFields,operations:["insert","update","delete"] as const,routes:["/","/about","/journey"] as const},
   interview_behavioral_themes:{key:themeSchema.shape.id,fields:themeFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
   interview_behavioral_questions:{key:z.uuid(),fields:questionFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
   resume_templates:{key:z.literal('default'),fields:templateFields,operations:['update'] as const,routes:['/interview/resume'] as const},
@@ -41,6 +43,9 @@ export const CONTENT_ALLOWLIST = {
   experience_items: { key: uuid, fields: itemFields, operations: ["insert", "update"] as const, routes: cvRoutes },
   experience_bullets: { key: uuid, fields: bulletFields, operations: ["insert", "update", "delete"] as const, routes: cvRoutes },
 } as const;
+const photoInsert=z.object({op:z.literal('insert'),table:z.literal('about_photos'),key:uuid,fields:z.object(photoFields).partial().extend({path:photoFields.path,alt:photoFields.alt}).strict()}).strict();
+const photoUpdate=z.object({op:z.literal('update'),table:z.literal('about_photos'),key:uuid,fields:z.object(photoFields).partial().strict().refine(f=>Object.keys(f).length>0,'Choose at least one editable field.')}).strict();
+const photoDelete=z.object({op:z.literal('delete'),table:z.literal('about_photos'),key:uuid,fields:z.object({}).strict().default({})}).strict();
 const section = CONTENT_ALLOWLIST.site_sections;
 const sectionOperation = z.object({
   op: z.literal(section.operations[0], { error: "Only update operations are supported for site_sections." }),
@@ -87,7 +92,7 @@ const publishingOperations={projects:publishingOperation("projects"),articles:pu
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
-  const schema = typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
+  const schema = op?.table==='about_photos'?(op.op==='insert'?photoInsert:op.op==='delete'?photoDelete:photoUpdate):typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
     : op?.table === "experience_items" ? op.op === "insert" ? itemInsert : itemUpdate
     : op?.table === "experience_bullets" ? op.op === "insert" ? bulletInsert : op.op === "delete" ? bulletDelete : bulletUpdate
     : null;

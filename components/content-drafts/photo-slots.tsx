@@ -23,7 +23,7 @@ function SlotUpload({id,slot,disabled,onBusy}:{id:string;slot:PhotoSlot;disabled
  }
  return <section className="draft-photo-slot" aria-label={`Photo slot ${slot.slot}`} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void pick([...e.dataTransfer.files]);}}>
   <p>{slot.caption}</p><code>{slot.expected_filename}</code>
-  {slot.path?<img src={photoUrl(slot.path)} alt={slot.caption}/>:<p className="small">Drop the matching file here. PNG, JPG or WebP · up to 5 MB.</p>}
+  {slot.path?<img src={photoUrl(slot.path,slot.bucket)} alt={slot.bucket==='home-media'?slot.alt:slot.caption}/>:<p className="small">Drop the matching file here. PNG, JPG or WebP · up to 5 MB.</p>}
   <button type="button" disabled={disabled||busy} onClick={()=>input.current?.click()}>{busy?'Uploading…':slot.path?'Replace photo':'Choose photo'}</button>
   <input ref={input} type="file" hidden accept={PHOTO_TYPES.join(',')} aria-label={`Upload ${slot.expected_filename}`} onChange={e=>void pick([...e.target.files??[]])}/>
   {message?<p role="status">{message}</p>:null}

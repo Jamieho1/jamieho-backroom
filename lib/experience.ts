@@ -34,6 +34,8 @@ export const LIMITS = { title: 160, org: 160, dates: 80, location: 80, summary: 
 export const emptyItem = (): Item => ({ kind: "role", title: "", org: "", dates: "", location: "", summary: "", public: false, bullets: [] });
 
 export interface ExperienceRow {
+  show_on_journey?: boolean;
+  journey_icon?: (typeof import("./home-content-schema").JOURNEY_ICONS)[number];
   draftChanged?: boolean;
   id: string;
   kind: Kind;

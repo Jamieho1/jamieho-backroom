@@ -6,7 +6,7 @@ Snapshot only (≤400 words). Replace lines when facts change; no dated logs —
 
 - Production READY on 2f4d437 (checked 2026-11-16). Jamie pushes; Vercel deploys.
 - Documentation retains active specs/current topics only; superseded planning uses git history.
-- All migrations through `20261115212120_interview_public_access` are applied live. None pending.
+- All migrations through `20261116165138_home_v13_data.sql` (TKT-110) are applied live; remote version `20261116171034`. None pending.
 - Article pages are ISR daily (`revalidate = 86400`); Content Drafts approvals call `revalidatePath`. Direct DB edits need a save in the editor or a redeploy.
 
 ## Site today
@@ -19,10 +19,11 @@ Snapshot only (≤400 words). Replace lines when facts change; no dated logs —
 
 ## Open work (in order)
 
-1. Home v1.3: TKT-110 → 116 (data migration, order/nav, About constellation, Experience journey, mascot, My story).
-2. Articles: TKT-117 (article + Resources image sizing) and the Articles/Resources redesign (to be grilled with Claude; earlier options rejected).
-3. PassLoop build-out.
-4. TKT-99 old editors redo (later).
+1. TKT-110 schema is applied/verified; code deployment and Jamie’s live review remain pending. Prior local typecheck, 1,052 unit/DB tests, build/static checks passed. Homepage layout and strip are unchanged.
+2. TKT-110b: three live draft sets await Jamie’s separate approvals at /manage/review after TKT-110 deployment: About photos `23f1a988-4bcc-4a34-971e-f17144ebe77a`; journey stops `c0770745-b17b-4ec3-84d8-59b65d301427`; trimmed About `3ef88c4c-4cf2-4469-8078-43287d733c7e`. Read-back confirms draft status/empty approval metadata; live sections/CV unchanged, photos empty and Story blank. Next: TKT-111–116.
+3. Articles: TKT-117 (article + Resources image sizing) and the Articles/Resources redesign (to be grilled with Claude; earlier options rejected).
+4. PassLoop build-out.
+5. TKT-99 old editors redo (later).
 
 ## Known gaps
 

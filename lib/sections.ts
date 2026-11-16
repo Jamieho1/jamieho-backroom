@@ -7,7 +7,7 @@ import { overlaySections } from "@/lib/content-drafts/overlay";
 import type { HomePreview } from "@/lib/content-drafts/types";
 import { readSupabaseEnv } from "@/lib/env";
 
-export const SECTION_KEYS = ["hero", "now", "about", "interests", "technology", "writing", "contact"] as const;
+export const SECTION_KEYS = ["hero", "now", "about", "interests", "technology", "writing", "contact", "story"] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
 export interface Section {
   key: SectionKey;
@@ -27,6 +27,7 @@ export const FALLBACK_SECTIONS: Record<SectionKey, Section> = {
   technology: { key: "technology", title: "Technology", body: "" },
   writing: { key: "writing", title: "Writing & videos", body: "*Add links to your YouTube channel, articles or talks here.*" },
   contact: { key: "contact", title: "Contact", body: "*Say how people can reach you for work.*" },
+  story: {key:"story", title:"My story", body:""},
 };
 
 export function isSectionKey(k: unknown): k is SectionKey {

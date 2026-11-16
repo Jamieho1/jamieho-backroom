@@ -25,3 +25,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · Claude plans, specs and reviews; ChatGPT executes everything (code, migrations after "apply it", live content drafts, tests) from Claude's prompts · Jamie
 - 2026-11-16 · Photo-slot live test: Jamie uploads/previews/approves; agent prepares local files and verifies live read-only after confirmation · Prompts - Small fixes.md
 - 2026-11-16 · Superseded planning and handoff documents are deleted; use git history instead of keeping archive copies · Docs cleanup prompt
+
+- 2026-11-16 · Home photo slots create hidden/non-centre rows unless explicitly marked public/centre; centre uniqueness includes hidden rows · TKT-110 data contract

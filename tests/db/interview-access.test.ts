@@ -13,13 +13,13 @@ beforeAll(async()=>{
   await db.query("insert into private.settings(key,value) values('owner_email',$1)",[owner.email]);
   for(const u of [owner,reader])await addUser(db,u);
   await db.exec("insert into public.notes(id,title,body) values('synthetic-note','Synthetic','Synthetic private note'); insert into public.behavioral_stories(title) values('Synthetic private story'); insert into public.behavioral_answers(question_id,outline) values('g-intro','Synthetic private outline'); insert into public.experience_items(title) values('Synthetic hidden role')");
-  before=(await db.query("select jsonb_build_object('notes',(select jsonb_agg(n) from public.notes n),'stories',(select jsonb_agg(s) from public.behavioral_stories s),'answers',(select jsonb_agg(a) from public.behavioral_answers a),'cv',(select jsonb_agg(i) from public.experience_items i)) snapshot")).rows;
+  before=(await db.query("select jsonb_build_object('notes',(select jsonb_agg(n) from public.notes n),'stories',(select jsonb_agg(s) from public.behavioral_stories s),'answers',(select jsonb_agg(a) from public.behavioral_answers a),'cv',(select jsonb_agg(to_jsonb(i)-array['show_on_journey','journey_icon']) from public.experience_items i)) snapshot")).rows;
  }});
 });
 afterAll(async()=>{await db.close();});
 it('opens exactly the three registry entries; no content is changed or removed',async()=>{
  expect((await db.query("select id,visibility from public.apps where id in ('notes','practice','behavioral') order by id")).rows).toEqual(['behavioral','notes','practice'].map(id=>({id,visibility:'public'})));
- expect((await db.query("select jsonb_build_object('notes',(select jsonb_agg(n) from public.notes n),'stories',(select jsonb_agg(s) from public.behavioral_stories s),'answers',(select jsonb_agg(a) from public.behavioral_answers a),'cv',(select jsonb_agg(i) from public.experience_items i)) snapshot")).rows).toEqual(before);
+ expect((await db.query("select jsonb_build_object('notes',(select jsonb_agg(n) from public.notes n),'stories',(select jsonb_agg(s) from public.behavioral_stories s),'answers',(select jsonb_agg(a) from public.behavioral_answers a),'cv',(select jsonb_agg(to_jsonb(i)-array['show_on_journey','journey_icon']) from public.experience_items i)) snapshot")).rows).toEqual(before);
 });
 it('an uninvited account reads Notes; anon reads none even through the Data API',async()=>{
  expect(await as(db,{role:'anon'},q=>q('select body from public.notes'))).toEqual([]);

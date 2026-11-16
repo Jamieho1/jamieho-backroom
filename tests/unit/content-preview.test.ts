@@ -61,3 +61,14 @@ it('private app snapshots load only for the verified owner; stale and invalid me
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
  for(const role of ['anonymous','member']){rows.mockClear();m.viewer.mockResolvedValue({role,id:'other'});expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();}
 });
+
+it('About photo snapshots are owner-gated, immutable and fail closed on invalid targets',async()=>{
+ const live={id,path:'fixture.png',alt:'Fixture',caption:'Live caption',sort:1,centre:false,public:true};
+ m.single.mockResolvedValue({data:{id,summary:'Photo edit',status:'draft',operations:[{op:'update',table:'about_photos',key:id,fields:{caption:'Proposed caption'}}],photo_slots:[]},error:null});
+ const rows=vi.fn().mockResolvedValue({data:[live],error:null});
+ m.from.mockImplementation((table:string)=>table==='about_photos'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ expect((await getHomePreview())?.aboutPhotos?.[0]).toMatchObject({caption:'Proposed caption',draftChanged:true});expect(live.caption).toBe('Live caption');
+ rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
+ rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
+ for(const role of ['anonymous','member']){rows.mockClear();m.viewer.mockResolvedValue({role,id:'other'});expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();}
+});
