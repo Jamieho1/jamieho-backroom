@@ -121,6 +121,9 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
       ? { url: wallpaper, fit: "portrait", fill: dark ? DESKTOP_PORTRAIT.nightTop : DESKTOP_PORTRAIT.dayTop }
       : { url: mediaUrl(base, f), fit: "cover" };
   }, [mobile, dark, wallpaper, base]);
+  // Artwork changes must not restart Lenis or replay the initial chapter hash.
+  const phoneStillRef = useRef(phoneStill);
+  useEffect(() => { phoneStillRef.current = phoneStill; }, [phoneStill]);
 
   useEffect(() => {
     if (!live || !track.current) return;
@@ -175,7 +178,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
-        if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base, phoneStill(c.src));
+        if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base, phoneStillRef.current(c.src));
         if (c.kind === "section") {
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
@@ -255,7 +258,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [] 
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
-  }, [live, chapters, lay, navItems, base, phoneStill]);
+  }, [live, chapters, lay, navItems, base]);
 
   return (
     <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`} onClick={event => {

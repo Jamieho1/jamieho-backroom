@@ -117,3 +117,23 @@ test('Content groups Articles and Resources with hover, click and keyboard in to
  await page.getByRole('navigation',{name:'Content pages'}).getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);
  await expect(page.locator('.site-navigation:visible [data-menu=content]')).not.toHaveAttribute('open','');
 });
+
+// A chapter hash can remain after the logo scrolls back to the clouds.
+test('colour mode changes preserve the clouds after returning from an Education deep link',async({page})=>{
+ await page.goto('/#pivot');
+ const navigation=page.locator('.site-navigation.is-journey');
+ await expect(navigation).toHaveAttribute('data-floating','true');
+ await navigation.getByRole('link',{name:'Jamie Ho — back to the top'}).click();
+ await expect(navigation).toHaveAttribute('data-floating','false');
+ await expect.poll(()=>page.evaluate(()=>scrollY)).toBeLessThan(3);
+ const mode=page.getByRole('button',{name:/^Colour mode:/});
+ for(const state of ['light','dark','auto']){
+  await mode.click();await expect(mode).toHaveAttribute('data-theme-mode',state);
+  await page.waitForTimeout(500);
+  await expect(navigation).toHaveAttribute('data-floating','false');
+  expect(await page.evaluate(()=>scrollY)).toBeLessThan(3);
+ }
+ await page.emulateMedia({colorScheme:'dark'});await page.waitForTimeout(500);
+ await expect(navigation).toHaveAttribute('data-floating','false');
+ expect(await page.evaluate(()=>scrollY)).toBeLessThan(3);
+});
