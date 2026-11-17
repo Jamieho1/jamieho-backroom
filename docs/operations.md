@@ -43,7 +43,7 @@ Home v1.3 exports: about_photos joins export-tables.json, using existing id-orde
 
 ## Dial rollout and verification
 
-Home polish 7 prepares `20261117183223_project_highlights.sql`; it is NOT applied live. Obtain Jamie's “apply it” before application. Deploy the new review/allowlist code before approving the highlights proposal. Public project reads tolerate the absent column during rollout. Jamie pushes and verifies live.
+Home polish 7 migration `20261117183223_project_highlights.sql` is applied live with Jamie’s explicit approval on 2026-11-17 (remote version `20261117220033`). Deploy the new review/allowlist code before approving the highlights proposal. Public project reads tolerate the absent column during rollout. Jamie pushes and verifies live.
 
 Keep the disposable Content Preview API running from the synthetic build through the integration suite: replacing its in-memory database after building leaves ISR output from a different fixture state. Start from a clean disposable .next directory after replacing/resetting the adapter; otherwise old prerendered fixture values can survive a build. Build and run the app against the same loopback URL/database, using dummy public configuration only.
 

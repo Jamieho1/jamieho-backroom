@@ -373,19 +373,28 @@ Done when: browser tests at desktop scroll through every step forwards/backwards
 
 ---
 
-## Home polish 8 — "What I build" (replaces Techstack)
+## Home polish 8 — "What I build" (replaces Techstack) + button motion
 
 ```
 You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/journey.md and docs/content-drafts.md first and follow them (Jamie pushes; update docs/ + MEMORY.md + docs/decisions.md after). Runs after Home polish 7.
 
-Approved design: the "WHAT I BUILD" section in "Personal Website/Media/Previews/home-dial-build-work.html". Replace the Techstack chapter (stacked cards and cert badges) with it, placed right after the dial and before Creator:
-1. Desktop: pinned; scroll advances 01→05 (counter "0N / 05"), the active row expands (description + chips), and the right panel draws that item's diagram (inline SVG, stroke-dashoffset). Clicking a row jumps to it. Phones ≤900 px: accordion, diagram under the open row, diagrams pan inside their panel (no page sideways scroll). Reduced motion: all open and drawn.
-2. Five items with the exact titles, descriptions, chips, captions and diagrams from the mockup: 01 AI engineering; 02 Production event systems ("Example design": devices/apps → gateway → Kafka → stream consumers → MongoDB, failure bin DLQ with replay, analytics fan-out, Grafana + Prometheus alerts); 03 Cloud architecture ("Reference design", with the two AWS certification badges); 04 Full-stack (languages row first: Java, Python, TypeScript, SQL, Go; "How this website is built"); 05 Machine learning & computer vision (ETL lane plus the Segment Anything (SAM) → masks lane, KOLN3D and DataKind notes).
-3. Content: titles, descriptions, chips and captions are editable content (reuse the existing technology site section or a small new table, allowlisted in Content Drafts). Diagrams are code (one SVG component per item, data-driven nodes/edges so they can be edited in one place). Migrate the existing Toolkit content into the new shape; keep certifications.
-4. CTA row "Have a project in mind?" + "Start a conversation →" linking to the Contact form anchor.
-5. Retire the old Techstack/toolkit components, CSS, tests and any images they alone used.
+Approved design: the "WHAT I BUILD" section and the button/chip hover behaviour in "Personal Website/Media/Previews/home-dial-build-work.html" (latest version). Replace the Techstack chapter (stacked cards and cert badges) with it, right after the dial and before Creator. Match the mockup exactly — titles, descriptions, chips, captions and diagrams:
+01 AI engineering — Agentic RAG diagram (orchestrator, router, hybrid retrieval, reranker, relevance grader with query-rewrite loop, MCP server tools, LLM generation, guardrails + RAGAS eval, memory).
+02 Production event systems — "Example design" (devices/apps → gateway → Kafka → stream consumers → MongoDB; failure bin DLQ with replay; analytics fan-out; Grafana + Prometheus alerts).
+03 Cloud architecture — "Reference design" incl. KMS encryption and the access lane (Corporate SSO → IAM Identity Center → IAM roles, least privilege); the two certification badge tiles sit in the diagram's bottom-left and link to Credly in a new tab: Solutions Architect – Professional → CREDLY_SA_PRO_URL, Machine Learning – Specialty → CREDLY_ML_SPEC_URL (Jamie supplies; if missing, ask him — never guess).
+04 Full-stack & delivery — microservices runtime lane + delivery lane (Git → Jenkins CI → SonarQube → Xray CVE scan → container registry → Kubernetes); languages row first.
+05 Machine learning & computer vision — ETL lane + Segment Anything (SAM) → masks lane, no employer/organisation names.
+CONFIDENTIALITY: never name any CRM or employer system in this section (no Salesforce, Wealthbox, Single Event API, Normalizer, reconciliation ID). Add a unit test that fails if those strings appear in the What I build content or diagram components.
 
-Done when: browser tests at desktop step through 01–05 by scrolling, each diagram renders with no label overlaps (bounding-box check per diagram), CTA reaches Contact; 390 px accordion and reduced-motion pass with no page sideways scroll; migration (if any) has policy tests and waits for "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
+1. Behaviour: desktop pinned, scroll advances 01→05 ("0N / 05"), active row expands, diagram draws (inline SVG, stroke-dashoffset); click a row to jump. Phones ≤900 px: accordion, diagrams pan inside their panel (no page sideways scroll). Reduced motion: all open and drawn.
+2. Chips (here and on the dial's project tags): hover/focus turns them gold (border, text, faint fill, 150 ms); they are not links and show no pointer cursor.
+3. Button motion with the existing GSAP (quickTo / timelines): "Start a conversation →", "Read my story", "Case study →", "Visit ↗", "All projects →" and other primary pill buttons site-wide — magnetic pull (≤8 px, ≤12 px for Start a conversation), gold fill sweeping in from the left with text turning navy, arrow slides out and back in, scale 1.03, smooth return; keyboard focus shows the end state; Start a conversation is the strongest (larger pill, gold outline pulsing once every few seconds while in view). Reduced motion: colour change only. Put this in one reusable component/hook.
+4. Content: titles, descriptions, chips and captions are editable content (reuse the technology site section or a small new table, allowlisted in Content Drafts); diagrams are data-driven SVG components (nodes/edges in one place). Migrate the old Toolkit content; certification names + Credly URLs stored as content.
+5. CTA "Have a project in mind?" + "Start a conversation →" to the Contact form anchor.
+6. Retire the old Techstack/toolkit components, CSS, tests and any images only they used.
+7. Content Drafts set (live, summary + operations only; Jamie approves): Global Relay CV bullets — remove employer system and CRM names. Proposed text (Jamie may edit before approving): bullet 1 "Own three production services on Kafka, processing GBs of events a day for regulated financial firms."; bullet 3 "Built a Python MCP server giving our internal AI agent controlled access to business systems." Leave bullet 2 unchanged unless Jamie says otherwise.
+
+Done when: browser tests step through 01–05 by scrolling, each diagram has no label overlaps (bounding-box check), badge links open Credly, chips change colour on hover and are not interactive, button hover/focus end states render, CTA reaches Contact; 390 px and reduced-motion pass with no page sideways scroll; confidentiality test passes; any migration has policy tests and waits for "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
 ```
 
 ---
