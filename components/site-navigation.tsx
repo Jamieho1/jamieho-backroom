@@ -3,13 +3,13 @@ import Link from "next/link";
 import {FeedbackButton} from "./feedback-button";
 import { forwardRef, useEffect, useRef, useId, type ReactNode, type MutableRefObject } from "react";
 import { ContentReviewBadge } from "./content-drafts/review-badge";
-import { AppMark } from "./desktop-icons";
+import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 import { SignInButton } from "./sign-in-button";
 import { useViewer } from "./viewer-provider";
 
 export const JOURNEY_LINKS = [
-  { id: "about", label: "About" }, { id: "experience", label: "Experience" },
+  { id: "about", label: "Background" }, { id: "experience", label: "Experience" },
   { id: "projects", label: "Work" }, { id: "toolkit", label: "Techstack" },
   { id: "creator", label: "Creator" }, { id: "screen", label: "Contact Us" },
 ];
@@ -23,16 +23,19 @@ interface Props {
 export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNavigation({ items = JOURNEY_LINKS, onJump, navRefs, journey = false, embedded = false }, ref) {
   const { viewer, configured } = useViewer();
   const menuGroup = useId();
+  const pathname = usePathname() ?? "";
+  const navLink=(label:string,href:string,close:()=>void)=><Link href={href} onClick={close} aria-current={pathname===href||pathname.startsWith(href+"/")?"page":undefined}>{label}</Link>;
   return <header role="banner" ref={ref} className={`site-navigation${journey ? " is-journey" : ""}${embedded ? " is-embedded" : ""}`} data-floating="false">
-    <Link href={journey ? "#sky" : "/"} className="site-navigation-logo" aria-label="Jamie Ho — back to the top" onClick={event => { if (onJump) { event.preventDefault(); onJump("sky"); } }}><AppMark /></Link>
+    <Link href={journey ? "#sky" : "/"} className="site-navigation-logo" aria-label="Jamie Ho — back to the top" onClick={event => { if (onJump) { event.preventDefault(); onJump("sky"); } }}><img src="/brand/jh-mark.svg" width="28" height="28" alt=""/></Link>
     <nav className="site-navigation-links" aria-label="Site">
       <NavigationMenu label="Journey" group={menuGroup}>
         {closeMenu=><nav className="journey-chapter-list" aria-label="Journey chapters">
           {items.map((item, k) => onJump ? <button type="button" key={item.id} ref={node => { if (navRefs) navRefs.current[k] = node; }} onClick={() => { onJump(item.id); closeMenu(); }}>{item.label}</button> : <Link key={item.id} prefetch={false} href={`${journey ? "" : "/"}#${item.id}`} onClick={closeMenu}>{item.label}</Link>)}
         </nav>}
       </NavigationMenu>
-      <Link href="/about">My story</Link><Link href="/projects">Projects</Link><Link href="/interview">Interview Prep</Link>
-      <Link href="/articles">Articles</Link><Link href="/resources">Resources</Link>
+      <NavigationMenu label="My story" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="My story pages">{navLink("About","/about",close)}{navLink("Projects","/projects",close)}</nav>}</NavigationMenu>
+      <NavigationMenu label="Content" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="Content pages">{navLink("Articles","/articles",close)}{navLink("Resources","/resources",close)}</nav>}</NavigationMenu>
+      <Link href="/interview" aria-current={pathname.startsWith("/interview")?"page":undefined}>Interview Prep</Link>
     </nav>
     <div className="site-navigation-account">
       <FeedbackButton className="site-feedback-button"/>

@@ -19,7 +19,7 @@ it('has the complete section taxonomy, 17 DSA topics and class design in LLD wit
  for(const topic of TOPICS){const {container,unmount}=render(<InterviewIcon name={topic.id}/>);expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.7');expect(container.querySelector('svg')?.getAttribute('fill')).toBe('none');expect(container.querySelector('path')?.getAttribute('d')).toBeTruthy();unmount();}
 });
 it('renders links and active navigation while persisting both independent collapse states',async()=>{
- const {unmount}=render(<InterviewShell><h1>Fixture</h1></InterviewShell>);expect(screen.getByRole('link',{name:'PassLoop — home'}).textContent).toContain('PassLoop');expect(screen.getByRole('link',{name:'Data Structures & Algorithms'}).getAttribute('aria-current')).toBe('page');
+ const {unmount}=render(<InterviewShell><h1>Fixture</h1></InterviewShell>);expect(screen.getByRole('link',{name:'PassLoop — home'}).querySelector('.iv-brand-mark')?.getAttribute('src')).toBe('/brand/passloop-mark.svg');expect(screen.getByRole('link',{name:'Data Structures & Algorithms'}).getAttribute('aria-current')).toBe('page');
  fireEvent.click(screen.getByRole('button',{name:'Collapse section rail'}));fireEvent.click(screen.getByRole('button',{name:'Collapse topics'}));
  expect(localStorage.getItem(INTERVIEW_STORAGE.rail)).toBe('true');expect(localStorage.getItem(INTERVIEW_STORAGE.topics)).toBe('true');unmount();render(<InterviewShell><h1>Fixture</h1></InterviewShell>);
  await waitFor(()=>expect(document.querySelector('.iv-shell')?.getAttribute('data-rail-collapsed')).toBe('true'));expect(document.querySelector<HTMLButtonElement>('.iv-expand-topics')!).toBeTruthy();

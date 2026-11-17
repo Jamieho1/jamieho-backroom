@@ -238,3 +238,77 @@ Run the full verification for Home v1.3 and fix only genuine defects you find (n
 - /#about, /#pivot, /about, Journey dropdown and the My story link all behave as specified.
 Update docs/journey.md, docs/architecture.md, docs/status.md and MEMORY.md to the final state, and list every check with its actual result. Then stop: Jamie pushes and reviews live.
 ```
+
+---
+
+## About polish 1 — Photos: two uni-activity About photos + one DataKind UK screenshot (Content Drafts photo slots)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/content-drafts.md (photo slots, About photos) first. No code change in this step.
+
+Jamie has attached three photos:
+- the Google Developer Student Clubs "DevFest on Campus 2023" group photo (JPG) → About photo
+- IMG_4362.HEIC → About photo
+- IMG_5308.HEIC → DataKind UK project screenshot (NOT an About photo)
+
+1. Save the originals unchanged: About ones in "Personal Website/Media/Uploads/2026-11-17-about-uni-activities/", IMG_5308 in "Personal Website/Media/Uploads/2026-11-17-datakind-uk-screenshot-2/" (outside the repo, never Git).
+2. Web copies beside each original: JPG, longest side 1600 px, under 1 MB, EXIF/GPS stripped, orientation applied, no cropping. Names: about-gdsc-devfest-2023.jpg; about-<short-literal-subject>.jpg for IMG_4362; datakind-uk-2.jpg for IMG_5308. Show Jamie the names.
+3. Create two live Content Drafts sets (summary + photo_slots only; never set status/approval fields; read each back as draft):
+   a. "About photos: two university activities" — two home-media About-photo slots, sort 3 and 4, public, not centre. Caption/alt short and literal (DevFest: "Google Developer Student Clubs · DevFest on Campus 2023"); never invent roles or claims.
+   b. "DataKind UK: second screenshot" — one project-media slot appending to projects.screenshots of slug datakind-uk (keeps datakind-uk-1.png first).
+4. Tell Jamie: open /manage/review, drop each file into its slot, preview, approve. After he approves, verify read-only: about_photos has five public rows; DataKind UK has two screenshots in order. Report.
+Add one MEMORY.md line.
+```
+
+---
+
+## About polish 2 — Background preview ONLY (standalone HTML, no website change)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md and docs/journey.md first. Do NOT change any repo file in this step.
+
+Goal: show Jamie what the About background will look like before touching the site. Build ONE self-contained HTML file at "Personal Website/Media/Previews/about-background-preview.html" (outside the repo). Inline CSS/JS; GSAP from a CDN is fine for the preview. Recreate the current About section faithfully: eyebrow ABOUT, heading "FROM BIOENGINEERING to AI ENGINEERING" in the same narrow display face and sizes, the About paragraph, the "Read my story" pill, warm off-white background, and the photo constellation with FIVE photos (the three current About photos from the public home-media URLs and the two new web copies from Media/Uploads/2026-11-17-about-uni-activities/ by relative path; Imperial graduation in the centre). Use the eyebrow BACKGROUND (renamed from About).
+
+Add the two background layers:
+A. Orbit rings: replace the single tiny circle with 2–3 concentric rings centred on the centre photo — inner ring solid hairline, outer rings dotted — sized so the ring is clearly larger than the centre photo and the side photos sit on/near the outer ring. About 12–18% ink opacity. Keep the thin curved connector lines.
+B. Story line: ONE continuous ink line in the empty areas only (never behind the heading, paragraph, button or photos): starts bottom-left as a small DNA double helix, flows into a circuit trace (right angles + solder dots), ends as a small neural-network cluster (5–8 nodes) on the right. ~6–10% opacity, 1–1.5 px stroke, same ink colour as the text. Draws itself once (stroke-dashoffset) when the section scrolls into view, then holds still.
+
+Controls at the top of the preview (not part of the design): toggles A on/off, B on/off, opacity slider for each, desktop/390 px width switch, reduced-motion switch (shows line fully drawn), replay draw button. Day theme only.
+
+Then stop and send Jamie the file path. Report what you built; no checks claimed for the website.
+```
+
+---
+
+## About polish 3 — Apply the approved background (only after Jamie approves the preview)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md first, and follow them (Jamie pushes; update docs/ + MEMORY.md after).
+
+Jamie approved "Personal Website/Media/Previews/about-background-preview.html" with these settings: <PASTE JAMIE'S CHOSEN TOGGLES/OPACITIES OR CHANGES>. Port exactly that into the homepage About section (components/journey/about-constellation.tsx, lib/journey/constellation.ts, app/journey.css):
+- Rings replace the current single circle; ring radii come from the pure layout function (unit-tested for 1, 4, 5, 12 photos) so photos sit on the outer ring.
+- Story line as inline SVG behind content, outside text/photo areas at every breakpoint; draws once on entering About (GSAP, transform/stroke only), reversible with scroll not required.
+- Phones (≤768 px): rings scaled to the centre photo; story line simplified or hidden if it would overlap text — never behind words. Reduced motion / no JS: line fully drawn, no drift.
+- No new dependencies, no images, no data/schema change. Night theme: use the existing ink token so it stays faint.
+Done when: unit tests for ring layout pass; browser tests at desktop and 390 px show no overlap with heading/paragraph/button (bounding-box check), no sideways scroll, reduced-motion finished state; typecheck, suite, build and static assertions pass; docs/journey.md, docs/status.md, MEMORY.md updated. Report checks actually run.
+```
+
+---
+
+## Home polish 4 — Navigation regroup, "Background" label, JH favicon, PassLoop logo, Work screenshot carousel
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/journey.md, docs/architecture.md and docs/interview.md first and follow them (Jamie pushes; update docs/ + MEMORY.md after). No schema or live data change.
+
+Jamie has attached two logo images: the JH monogram (white "JH" between < > on navy) and the PassLoop logo (white infinity loop + green check, wordmark "Pass" white / "Loop" green, on navy).
+
+1. Brand files: save the originals unchanged in "Personal Website/Media/Brand/" (outside the repo). Recreate both as clean, hand-built SVGs that match the images (flat shapes, no raster tracing noise): jh-mark.svg, passloop-mark.svg (loop + check only) and passloop-wordmark.svg. These are Jamie's own public brand marks, so the SVGs may be committed in the repo (e.g. public/brand/). Note the exception in docs/security.md.
+2. Favicon: the site tab uses the JH mark on navy (Next app/icon.svg + apple-icon PNG 180×180 and a 32×32 fallback). Make sure it reads at 16 px. /interview pages use the PassLoop mark as their tab icon instead (route-level icon metadata).
+2b. Top-bar logo button (shared and floating bars, left end): replace the yellow terminal icon with the JH mark, same button size and home link, readable in light/dark/Auto.
+3. PassLoop logo: in the /interview rail, the brand shows passloop-mark + wordmark when expanded and the mark only when collapsed; keep the home link, tooltip and document titles. Dark theme only, as today.
+4. Homepage section rename: the About section is now called "Background" — eyebrow text, Journey dropdown label, chapter label and static fallback. Keep the anchors #about and #pivot working and add #background as an alias. The heading text from the database is unchanged.
+5. Top bar and floating bar, in this order: Journey ▾ (unchanged list, About renamed Background) · My story ▾ (About → /about, Projects → /projects) · Content ▾ (Articles → /articles, Resources → /resources) · Interview Prep (→ /interview). Reuse the existing Journey dropdown component/behaviour (hover + click, keyboard, Escape, SVG chevron) for both new dropdowns; feedback, theme, review badge and sign-in controls unchanged. Phone menu gets the same grouping. Active-page highlighting still works for /about, /projects, /articles, /resources.
+6. Work section: when a featured project has more than one screenshot, show them as a horizontal carousel (swipe/drag on touch, arrow buttons + dots on desktop, scroll-snap, keyboard arrows) instead of the current vertical pan. One screenshot = static image as now. Same carousel on /projects/[slug] if it currently pans vertically. Transform/scroll-snap only; no new dependency; reduced motion = no animated slide.
+
+Done when: top-bar logo button shows JH; favicon shows JH on / and PassLoop on /interview (check generated <link rel="icon"> tags); rail shows the PassLoop logo expanded/collapsed; nav order/dropdowns work by mouse, keyboard and on a 390 px phone with no overflow; #background, #about and #pivot all land on the section; DataKind UK's two screenshots scroll left↔right in Work at desktop and 390 px; typecheck, full suite, build, static assertions and browser tests pass (update tests that assumed the old nav); docs/journey.md, docs/architecture.md, docs/interview.md, docs/status.md, MEMORY.md updated. Report checks actually run.
+```

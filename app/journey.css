@@ -921,3 +921,5 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
  background-color:#f6f3ee;
  background-image:radial-gradient(ellipse at 16% 78%,rgb(220 184 126 / .25),transparent 58%),radial-gradient(ellipse at 86% 34%,rgb(151 180 201 / .24),transparent 56%),radial-gradient(ellipse at 52% 94%,rgb(255 255 255 / .9),transparent 66%);
 }
+
+.journey-showcase-shots > img {height:100%;min-height:0;object-fit:contain;transform:none;}

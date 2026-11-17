@@ -44,7 +44,7 @@ export const AboutConstellation=forwardRef<AboutConstellationHandle,Props>(funct
   onPointerLeave={()=>{pointer.current={x:0,y:0};update.current();}}
   onWheel={event=>{const node=event.currentTarget;if((event.deltaY>0&&node.scrollTop+node.clientHeight<node.scrollHeight-1)||(event.deltaY<0&&node.scrollTop>0))event.stopPropagation();}}>
   <div className="about-constellation-intro">
-   <div><p className="about-constellation-eyebrow">About</p><h2 className="about-constellation-title">{constellationTitle(stripKeys(panel.title)).map((part,i)=><span key={i}>{i>0?' ':''}{part.connector?<em>{part.word}</em>:part.word}</span>)}</h2>
+   <div><p className="about-constellation-eyebrow">Background</p><h2 className="about-constellation-title">{constellationTitle(stripKeys(panel.title)).map((part,i)=><span key={i}>{i>0?' ':''}{part.connector?<em>{part.word}</em>:part.word}</span>)}</h2>
    <a className="about-story-link" href="/about">Read my story <span aria-hidden="true">↗</span></a></div>
    {panel.body?<div className="about-constellation-body"><Markdown text={panel.body} disableLinks/></div>:null}
   </div>

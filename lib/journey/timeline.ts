@@ -239,7 +239,7 @@ export function stillDrift(local: number, amp = 0.06): number {
 }
 
 /** Preserve legacy About links without maintaining a second chapter. */
-export const canonicalChapterId = (id: string): string => id === "pivot" ? "about" : id;
+export const canonicalChapterId = (id: string): string => id === "pivot" || id === "background" ? "about" : id;
 
 /**
  * Where the chapter menu lands for a chapter (global progress). Video chapters start at their first frame; a solid

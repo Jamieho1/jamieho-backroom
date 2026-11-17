@@ -43,3 +43,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-17 · About uses a quiet gold/blue CSS atmosphere; browser Back from another page returns Home to clouds while explicit chapter links remain supported; university changes go through owner review · Jamie
 
 - 2026-11-17 · Activating an Experience stop scrolls the existing desktop clock to the role so mascot, path and card stay synchronized; phones/static views retain natural flow · Jamie
+
+- 2026-11-17 · About polish photo slots await owner upload/approval; orbit/story-line design remains an external preview only; Background aliases, grouped nav, public JH/PassLoop marks and horizontal Work screenshots are approved code scope · Jamie’s three polish prompts

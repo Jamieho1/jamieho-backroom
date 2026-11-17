@@ -2,19 +2,19 @@
 
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import type { ShowcaseItem } from "@/lib/journey/timeline";
-import { itemOpacity, shotState, showcaseState } from "@/lib/journey/showcase";
+import {ScreenshotCarousel} from "@/components/screenshot-carousel";
+import { itemOpacity, showcaseState } from "@/lib/journey/showcase";
 
 export interface ShowcaseHandle { setProgress(local: number): void }
 
 /**
  * TKT-87: the pinned projects showcase. Left: the current project's number, name, tagline, tags and a link to its
- * case study. Right: a browser frame whose screenshots cross-fade as you scroll (a tall full-page shot pans down).
+ * case study. Right: a browser frame with native horizontal screenshot carousels; a single shot stays still.
  * Bottom-left: one line per project; the current one fills. Driven by the journey's single rAF loop.
  */
 export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(function Showcase({ items }, ref) {
   const texts = useRef<(HTMLDivElement | null)[]>([]);
   const frames = useRef<(HTMLDivElement | null)[]>([]);
-  const shots = useRef<(HTMLImageElement | null)[][]>([]);
   const lines = useRef<(HTMLSpanElement | null)[]>([]);
   const count = useRef<HTMLSpanElement>(null);
   const n = items.length;
@@ -32,17 +32,7 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
         }
         const frame = frames.current[k];
         if (frame) { frame.style.opacity = k === s.index ? "1" : "0"; frame.style.visibility = k === s.index ? "visible" : "hidden"; }
-        if (k !== s.index) return;
-        const imgs = shots.current[k] ?? [];
-        const { shot, mix, pan } = shotState(s.within, imgs.length);
-        imgs.forEach((img, j) => {
-          if (!img) return;
-          img.style.opacity = j === shot ? String(1 - mix) : j === shot + 1 ? String(mix) : "0";
-          // A full-page screenshot (much taller than the frame) slides up as if someone scrolls the site.
-          const box = img.parentElement;
-          const tall = img.dataset.fit !== "contain" && box && img.naturalWidth ? img.naturalHeight / img.naturalWidth - box.clientHeight / box.clientWidth : 0;
-          img.style.transform = tall > 0.15 && j === shot ? `translate3d(0, ${(-pan * 100 * (1 - (box!.clientHeight / box!.clientWidth) / (img.naturalHeight / img.naturalWidth))).toFixed(2)}%, 0)` : "";
-        });
+        if (frame) frame.inert = k !== s.index;
       });
       lines.current.forEach((l, k) => { if (l) l.style.transform = `scaleX(${s.lines[k].toFixed(3)})`; });
       if (count.current) count.current.textContent = String(s.index + 1).padStart(2, "0");
@@ -70,15 +60,12 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
           <a className="journey-showcase-all" href="/projects">All projects <span>→</span></a>
         </div>
       </div>
-      <div className="journey-showcase-frame" aria-hidden="true">
+      <div className="journey-showcase-frame">
         <div className="journey-showcase-bar"><i /><i /><i /></div>
         <div className="journey-showcase-screen">
           {items.map((it, k) => (
-            <div key={it.slug} ref={(el) => { frames.current[k] = el; }} className="journey-showcase-shots" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
-              {it.shots.length ? it.shots.map((src, j) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} data-fit={it.slug === "cyterly" ? "contain" : undefined} ref={(el) => { (shots.current[k] ??= [])[j] = el; }} src={src} alt="" loading="lazy" style={{ opacity: j ? 0 : 1 }} />
-              )) : <div className="journey-showcase-blank"><span>{it.name}</span></div>}
+            <div key={it.slug} ref={(el) => { frames.current[k] = el; }} inert={k!==0} className="journey-showcase-shots" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
+              {it.shots.length>1 ? <ScreenshotCarousel shots={it.shots} name={it.name}/> : it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt={`Screenshot of ${it.name}`} loading="lazy"/> : <div className="journey-showcase-blank"><span>{it.name}</span></div>}
             </div>
           ))}
         </div>

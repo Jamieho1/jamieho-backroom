@@ -13,6 +13,7 @@ import { LineShape, type LineShapeHandle } from "./line-shape";
 import { lineState } from "@/lib/journey/lines";
 import { ScreenContact, ContactContent, type ScreenContactHandle } from "./screen-contact";
 import type { SocialLink } from "@/lib/social";
+import {ScreenshotCarousel} from "@/components/screenshot-carousel";
 import { Showcase, type ShowcaseHandle } from "./showcase";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
@@ -436,7 +437,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
         <li key={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
-          {c.id === "about" ? <span id="pivot" className="journey-anchor-alias" aria-hidden="true" /> : null}
+          {c.id === "about" ? <><span id="background" className="journey-anchor-alias" aria-hidden="true"/><span id="pivot" className="journey-anchor-alias" aria-hidden="true" /></> : null}
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mediaUrl(base, `${c.src}-${c.id === "sky" ? "first" : "last"}.jpg`)} alt="" loading={c.id === "sky" ? "eager" : "lazy"} />
@@ -468,7 +469,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
                 {c.showcase.map((it) => (
                   <li data-draft-changed={it.draftChanged||undefined} key={it.slug}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt="" loading="lazy" /> : null}
+                    {it.shots.length>1 ? <ScreenshotCarousel shots={it.shots} name={it.name}/> : it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt="" loading="lazy" /> : null}
                     <h2 className="journey-title">{it.name}</h2>
                     {it.tags.length?<ul className="journey-chips">{it.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>:null}
                     {it.tagline ? <p className="journey-body">{it.tagline}</p> : null}

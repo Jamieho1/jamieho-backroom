@@ -53,7 +53,11 @@
  .iv-shell[data-topics-collapsed="true"] .iv-topics {display:none;}
  .iv-shell[data-rail-collapsed="true"] .iv-rail-label,.iv-shell[data-rail-collapsed="true"] .iv-group h2 {display:none;}
  .iv-shell[data-rail-collapsed="true"] :is(.iv-section-link) {justify-content:center;padding:6px 0;}
- .iv-shell[data-rail-collapsed="true"] .iv-brand {display:none;}
+ .iv-shell[data-rail-collapsed="true"] .iv-brand-wordmark {display:none;}
+ .iv-shell[data-rail-collapsed="true"] .iv-brand {display:flex;flex:0 0 26px;min-width:0;}
+ .iv-shell[data-rail-collapsed="true"] .iv-brand-mark {width:26px;}
+ .iv-shell[data-rail-collapsed="true"] .iv-rail-toggle {width:24px;min-width:24px;padding:2px;}
+ .iv-shell[data-rail-collapsed="true"] .iv-brand-row {gap:2px;}
  .iv-shell[data-rail-collapsed="true"] .iv-brand-row {justify-content:center;}
  .iv-topic-collapse,.iv-expand-topics {height:32px;min-height:32px;padding:4px 8px;}
  .iv-topic-collapse {width:32px;}
@@ -159,3 +163,5 @@ body:has(.iv-shell) {background:#0e131c;}
  .iv-sections .iv-group {margin-bottom:6px;}
  .iv-sections .iv-group h2 {margin-top:8px;margin-bottom:4px;}
 }
+
+.iv-brand-mark,.iv-brand-wordmark {display:block;object-fit:contain;}

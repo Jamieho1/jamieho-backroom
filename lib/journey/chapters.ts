@@ -14,7 +14,7 @@ export const HOME_CHAPTERS: Chapter[] = [
   },
   // About binds the existing section text and public photo constellation.
   {
-    id: "about", label: "About", nav: "About", kind: "section", tone: "light", scroll: 1.5,
+    id: "about", label: "Background", nav: "Background", kind: "section", tone: "light", scroll: 1.5,
     panels: [{ id: "about", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From Biomedical Engineering to production systems", body: PLACEHOLDER }],
   },
   // Opted-in public CV stops and the fixed Projects hand-off bind in withContent.

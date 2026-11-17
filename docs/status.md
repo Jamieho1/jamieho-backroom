@@ -1,31 +1,23 @@
 # Current state
 
-## Live data (read-only verified)
+## Live data
 
-- All migrations through 20261116165138_home_v13_data.sql are applied; remote version 20261116171034. None pending.
-- All three TKT-110b starter sets are approved. Public content has three About photos, one centre and three journey stops. Story is empty, so My story uses its starter.
-- Featured public Work is exactly Cyterly AI and DataKind UK; DataKind UK has Volunteer.
+All migrations through 20261116165138_home_v13_data.sql are applied (remote 20261116171034). None pending. TKT-110b starter sets are approved; public About has three photos, one centre. Featured Work is Cyterly AI and DataKind UK.
+
+About polish 1 prepared unchanged originals and stripped/oriented, uncropped 1600px JPEGs outside Git. Two upload sets remain draft: About university activities (3197e5d2-c515-454c-9354-7cf0de76abab, two slots) and DataKind second screenshot (4bdf7587-8deb-479b-91b4-8d9ba57463bf, one slot). Jamie uploads/previews/approves at /manage/review; five public About photos and two ordered DataKind screenshots cannot be confirmed before approval. University wording/activity set 5f1aaffe-2424-4d3d-beb9-d0419e9b1835 was separately prepared for owner review.
 
 ## Current implementation
 
-- Home v1.3: Hello → About → Experience → Work → Techstack → Creator → Contact Us. About has its photo constellation and Read my story; /about is the themed ISR editorial page/starter.
-- About has a subtle gold/blue CSS background, also echoed on My story. Returning with browser Back from a same-tab site link opens the clouds; explicit chapter links still work.
-- Experience uses the approved versioned background/mascot and portrait phone still. Desktop heading/curve stay pinned below navigation; the smaller mascot leaves room for longer independently scrolling cards. Clicking/activating a role scrolls to its stop, synchronizing mascot/path/card. Static Work retains project tags.
-- Shared bars: Journey, My story, Projects, Interview Prep, Articles, Resources, icon theme cycle, feedback/account/review controls. Privacy remains in Contact.
-- PassLoop retains public Practice/guides/template and private per-user progress/resume/answers; Notes requires sign-in. Legacy app routes still work. Resources lists Guides only.
-- Content Drafts retains owner-only approval/preview, photo slots and existing table scopes. Public pages stay static/ISR.
+Home order: Hello → Background (#about, aliases #background/#pivot) → Experience → Work → Techstack → Creator → Contact. Browser Back returns to clouds. Experience role activation synchronizes scroll/mascot/path/card; long cards scroll independently.
 
-## Release gate
+Home polish 4: Journey, My story (About/Projects), Content (Articles/Resources), Interview Prep; existing feedback/theme/account/review controls retained. Shared JH logo and favicon; PassLoop mark/wordmark and route favicon. Work uses horizontal multi-image carousels in desktop/static/phone rendering; single images stay still. Case-study galleries were already static and remain unchanged.
 
-Current role-selection checks pass: typecheck; 15 focused Experience unit tests; production build; six-page static assertions; Home/Experience browsers 30 passed/six viewport skips. Clicks and keyboard activation reach each stop forward/backward with aligned mascot/card. Phones, reduced motion/no JS and Back-to-clouds remain covered. The preceding background/navigation gate passed all 1,097 unit/database tests and 57 browser cases (one skip); the full suite was not rerun for role selection. TKT-116 remains the latest synthetic integration gate (66 passes).
+About polish 2 is preview-only: Media/Previews/about-background-preview.html has five photos, configurable orbit rings/story line, matching embedded display font, 390px/reduced-motion controls. No orbit/story-line design has been ported to the website; Jamie chooses settings first.
 
-University qualification/society changes are saved in pending Content Drafts set 5f1aaffe-2424-4d3d-beb9-d0419e9b1835 (three operations). Jamie approves via /manage/review; live CV is unchanged. No migration or upload. Jamie pushes and reviews the final UI live before Done.
+PassLoop and Content Drafts retain their existing access, preview, editor and isolation rules; public pages remain static/ISR. Photos/source logos stay outside Git; only approved public brand SVGs/favicon derivatives enter Git.
 
-## Remaining work
+## Verification and next steps
 
-- Jamie’s final deployment/live review of Home v1.3.
-- TKT-117 image sizing and the separately reviewed Articles/Resources redesign.
-- PassLoop build-out; old editors/deprecation later.
-- Domain/subdomain SSO sign-offs remain unverified.
-- Supabase leaked-password protection is off (Google sign-in only); record_signin is intentionally API-callable.
-- The pinned Next.js build emitted a security-upgrade advisory; dependency review remains separate.
+Typecheck, all 1,098 unit/database tests, production build, six-page static assertions, main browsers 210 passed/76 conditional skips, synthetic integration 66 passed. Synthetic production build passed on retry after the existing pinned Next security advisory. External preview: five images load; desktop/390px have no horizontal overflow. No migration, publication or upload by the agent.
+
+Jamie commits/pushes and reviews live. Remaining: photo-slot approvals/read-only verification, background preview decision, TKT-117 and Articles/Resources redesign, PassLoop build-out, domain/SSO sign-offs and separate Next dependency advisory review.

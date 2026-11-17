@@ -11,6 +11,7 @@ const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.tri
 
 export const metadata: Metadata = {
   title: "Jamie Ho",
+  icons: { icon: [{url:"/icon.svg",type:"image/svg+xml"},{url:"/brand/jh-icon-32.png",sizes:"32x32",type:"image/png"}], apple:[{url:"/apple-icon.png",sizes:"180x180",type:"image/png"}] },
   description: "Software engineer in London: distributed systems, cloud and AI engineering.",
   // Google Search Console ownership check (set the token in Vercel; no code change needed).
   ...(googleVerification ? { verification: { google: googleVerification } } : {}),

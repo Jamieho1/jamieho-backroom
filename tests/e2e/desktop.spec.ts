@@ -27,11 +27,11 @@ test('legacy desktop links preserve account-only Notes and public Practice/Behav
 test('Resources and Articles use client navigation without replacing the document',async({page})=>{
  await page.goto('/resources');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
 
- await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Articles',exact:true}).click();
+ await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Articles',exact:true}).click();
  await expect(page).toHaveURL(/\/articles$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
 
- await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Resources',exact:true}).click();
+ await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Resources',exact:true}).click();
  await expect(page).toHaveURL(/\/resources$/);
  expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
 });

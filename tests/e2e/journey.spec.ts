@@ -44,10 +44,10 @@ test("Journey dropdown navigates, keeps the floating controls and returns to the
   await page.locator(".is-journey [data-menu=journey] summary").click();
   const nav = page.getByRole("navigation", { name: "Journey chapters" });
   await expect(nav.getByRole("button", { name: /Hello/ })).toHaveCount(0);
-  await expect(nav.getByRole("button", { name: /About/ })).toBeVisible();
+  await expect(nav.getByRole("button", { name: /Background/ })).toBeVisible();
 
   await expect(nav.getByRole("button", { name: /Techstack/ })).toBeAttached();
-  await nav.getByRole("button", { name: /About/ }).click();
+  await nav.getByRole("button", { name: /Background/ }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
   await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
   await page.getByRole("link", { name: "Jamie Ho — back to the top" }).click();
@@ -69,7 +69,7 @@ test("About remains readable without the retired photos, timeline or fullscreen 
   await page.goto("/");
   const about = page.locator('[data-chapter="about"]');
   await page.locator(".is-journey [data-menu=journey] summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /About/ }).click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Background/ }).click();
   await expect(about.locator(".journey-panel")).toBeVisible();
   await page.mouse.wheel(0, 600);
   await page.waitForTimeout(600);
@@ -129,7 +129,7 @@ test("phone keeps all sections usable with no sideways overflow or video downloa
 test("About text remains readable and inactive project links cannot intercept the biography", async ({ page }) => {
   await page.goto("/");
   await page.locator(".is-journey [data-menu=journey] summary").click();
-  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "About", exact: true }).click();
+  await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "Background", exact: true }).click();
   const about = page.locator('[data-chapter="about"]');
   await expect(about.locator(".journey-panel")).toBeVisible();
   await expect(about).not.toHaveAttribute("inert");
@@ -161,9 +161,9 @@ test('Schedule a call jumps directly to the Contact form',async({page})=>{
  await expect(page.getByRole('region',{name:'Contact',exact:true}).getByLabel('Name',{exact:true})).toBeVisible();
 });
 
-for(const anchor of ['about','pivot'])test(`${anchor} hash lands on canonical About, including hash changes`,async({page})=>{
+for(const anchor of ['background','about','pivot'])test(`${anchor} hash lands on canonical About, including hash changes`,async({page})=>{
  await page.goto('/#'+anchor);const about=page.locator('[data-chapter="about"] .journey-panel');await expect(about).toBeVisible();
- const nav=page.locator('.site-navigation.is-journey');await expect(nav.getByRole('link',{name:'My story',exact:true})).toBeVisible();
+ const nav=page.locator('.site-navigation.is-journey');await expect(nav.locator('[data-menu="my story"] summary')).toBeVisible();
  await nav.getByRole('link',{name:'Jamie Ho — back to the top'}).click();await expect(nav).toHaveAttribute('data-floating','false');
  await page.evaluate(()=>{location.hash='sky'});await page.evaluate(hash=>{location.hash=hash},anchor);await expect(about).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
