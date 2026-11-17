@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "title": "What I build",
+  "description": "If you need one of these built, this is what I know and use in production.",
+  "items": [
+    {
+      "title": "AI engineering",
+      "description": "Agents, retrieval and tool access with evaluation and guardrails.",
+      "chips": [
+        "LangGraph",
+        "LangChain",
+        "RAG",
+        "MCP",
+        "HuggingFace",
+        "RAGAS",
+        "Qdrant"
+      ],
+      "languages": [],
+      "caption": "Agentic RAG: the agent plans, retrieves, checks its own evidence and calls tools through an MCP server.",
+      "diagramTitle": "Agentic RAG"
+    },
+    {
+      "title": "Production event systems",
+      "description": "Event-driven pipelines that survive retries, bad messages and traffic spikes.",
+      "chips": [
+        "Kafka",
+        "MongoDB",
+        "Java",
+        "Spring Boot",
+        "Grafana",
+        "Prometheus",
+        "Docker",
+        "Kubernetes"
+      ],
+      "languages": [],
+      "caption": "Bad messages park in a failure bin instead of blocking the stream; consumers write idempotently, so replays are safe.",
+      "diagramTitle": "Example design"
+    },
+    {
+      "title": "Cloud architecture",
+      "description": "Designing for availability and cost on AWS.",
+      "chips": [
+        "AWS",
+        "IAM",
+        "KMS",
+        "Docker",
+        "Kubernetes",
+        "CI/CD",
+        "Airflow"
+      ],
+      "languages": [],
+      "caption": "",
+      "diagramTitle": "Reference design"
+    },
+    {
+      "title": "Full-stack & delivery",
+      "description": "Products end to end, from schema to interface.",
+      "chips": [
+        "React",
+        "Next.js",
+        "FastAPI",
+        "Spring Boot",
+        "PostgreSQL",
+        "MongoDB",
+        "Kafka",
+        "Kubernetes",
+        "Jenkins",
+        "SonarQube",
+        "Xray",
+        "Playwright"
+      ],
+      "languages": [
+        "Java",
+        "Python",
+        "TypeScript",
+        "SQL",
+        "Go"
+      ],
+      "caption": "",
+      "diagramTitle": "Microservices"
+    },
+    {
+      "title": "Machine learning & computer vision",
+      "description": "Data pipelines, models and computer vision, from raw data to evaluation.",
+      "chips": [
+        "Python",
+        "Pandas",
+        "NumPy",
+        "Airflow",
+        "AWS",
+        "HuggingFace",
+        "Computer vision",
+        "Segment Anything (SAM)"
+      ],
+      "languages": [],
+      "caption": "",
+      "diagramTitle": "Data to evaluation"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "AWS Certified Solutions Architect – Professional",
+      "url": ""
+    },
+    {
+      "title": "AWS Certified Machine Learning – Specialty",
+      "url": ""
+    }
+  ],
+  "ctaTitle": "Have a project in mind?",
+  "ctaLabel": "Start a conversation"
+}

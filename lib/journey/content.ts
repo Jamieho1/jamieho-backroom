@@ -4,7 +4,7 @@ import type { Item } from "@/lib/experience";
 import type { Section, SectionKey } from "@/lib/sections";
 import type { LatestMedia } from "@/lib/articles-public";
 import { type Project } from "@/lib/portfolio-core";
-import { certBadge, firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
+import {parseBuild} from "./build";
 import { parseRotator, rotatorText } from "./motion";
 import { articleHref, youtubeId } from "@/lib/articles";
 import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
@@ -48,23 +48,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
   const education = content.experience.find((i) => i.kind === "education");
 
   return chapters.map((c) => {
-    if (c.kind === "section" && c.toolkit) {
-      // Layers from the Technology section's "## layer" blocks; without any, one layer of the projects' tags.
-      let layers = parseToolkit(s.technology.body);
-      const tags = [...new Set([...content.technologies, ...(content.projects ?? []).filter((p) => p.public).flatMap((p) => p.tags)])];
-      if (!layers.length && tags.length) layers = [{ name: "Stack", how: plain(excerpt(s.technology.body, 160)), tools: tags.slice(0, 12) }];
-      // Badges: one per public bullet of a certificate entry (e.g. "AWS" → its two certifications), else the entry itself.
-      const certs = content.experience.filter((i) => i.kind === "certificate" && i.public !== false && i.title.trim()).flatMap((i) => {
-        const shown = i.bullets.filter((b) => b.public && b.text.trim());
-        return shown.length
-          ? shown.map((b) => ({ title: b.text.replace(/\[[^\]]*\]\(https:[^)]*\)/g, "").replace(/https:\/\/\S+/g, "").replace(/\s+/g, " ").trim(), org: i.org.trim() || i.title.trim(), href: firstHttps(b.text) ?? firstHttps(i.summary) }))
-          : [{ title: i.title.trim(), org: i.org.trim(), href: firstHttps(i.summary) }];
-      });
-      for (const cert of certs) { const badge = certBadge(cert.title, cert.org); if (badge) Object.assign(cert, { badge }); }
-      if (!layers.length) return { ...c, toolkit: { ...c.toolkit, layers: [], certs: [] } };
-      const scroll = toolkitScroll(layers.length, certs.length);
-      return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), toolkit: { title: s.technology.title.trim() || c.toolkit.title, layers, certs } };
-    }
+    if(c.kind==="section"&&c.build){const build=parseBuild(s.technology.body);const title=s.technology.title.trim();return {...c,scroll:5.6,wipe:0,build:{...build,title:title&&!/^(Toolkit|Techstack)$/i.test(title)?title:build.title}};}
     const panels: Panel[] = [];
     for (const p of c.panels ?? []) {
       const at = (patch: Partial<Panel>): Panel => ({ ...p, ...patch });
@@ -117,5 +101,5 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
     }
     if(c.kind==="section"&&c.dial){const dial=dialData(content.journeyStops??[],content.projects??[]);return {...c,panels,dial,scroll:dialCount(dial)*1.35,wipe:0};}
     return { ...c, panels };
-  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || !!c.dial || (c.toolkit?.layers.length ?? 0) > 0); // an empty section is skipped entirely
+  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || !!c.dial || !!c.build); // an empty section is skipped entirely
 }

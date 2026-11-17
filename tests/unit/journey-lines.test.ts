@@ -27,7 +27,7 @@ describe("line shapes (TKT-95)", () => {
     expect([...lerpInto(new Float32Array(3), a, b, 0.5)]).toEqual([1, 2, -1]);
   });
 
-  it("keeps Creator's helix while the dial and Toolkit own their visuals",()=>{
+  it("keeps Creator's helix while the dial and capability diagrams own their visuals",()=>{
     expect(SHAPE_BY_CHAPTER).toEqual({creator:'helix'});
     for(const id of ['about','pivot','experience','projects','toolkit'])expect(lineState([{id,kind:'section'}],0,.5)).toMatchObject({shape:null,opacity:0});
     expect(lineState([{id:'creator',kind:'section'}],0,.5)).toMatchObject({shape:'helix',opacity:1});

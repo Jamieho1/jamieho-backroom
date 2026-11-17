@@ -9,7 +9,7 @@ it('starter uses About title and both full paragraphs, with the shared contact d
  const view=render(<Story about={about} story={story}/>);
  expect(view.getByRole('heading',{level:1}).textContent?.trim()).toBe(about.title);expect(view.container.querySelector('h1 em')?.textContent?.trim()).toBe('to');
  for(const text of ['First synthetic paragraph.','Second synthetic paragraph.','More of the story is on its way.'])expect(view.getByText(text)).toBeTruthy();
- expect(view.getByRole('link',{name:'Get in touch'}).getAttribute('href')).toBe('/#home-contact');
+ expect(view.getByRole('link',{name:'Get in touch'}).getAttribute('href')).toBe('/#home-contact');expect(view.getByRole('link',{name:'Get in touch'}).className).not.toContain('primary-strong');
 });
 it('story reuses safe chapter headings, captioned HTTPS images and pull quotes',()=>{
  const view=render(<Story about={about} story={{...story,body:'## Learning\nA synthetic chapter.\n\n![Synthetic photo caption](https://example.test/photo.png)\n\n> A synthetic pull quote.\n\n<script>bad()</script>'}} changed/>);

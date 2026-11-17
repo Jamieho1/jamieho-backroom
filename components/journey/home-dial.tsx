@@ -1,4 +1,5 @@
 "use client";
+import {PrimaryPill} from "@/components/primary-pill";
 import {forwardRef,useImperativeHandle,useRef,useState,type CSSProperties} from 'react';
 import {Markdown} from '@/components/markdown';
 import {ScreenshotCarousel,type ScreenshotCarouselHandle} from '@/components/screenshot-carousel';
@@ -32,11 +33,11 @@ export const HomeDial=forwardRef<HomeDialHandle,Props>(function HomeDial({data,p
  function copy(i:number){const step=steps[i];return <>
   <p className="dial-eyebrow">{step.kind==='background'?'Background':step.kind==='experience'?'Experience':'Selected Work'}</p>
   <h2>{constellationTitle(step.title).map((t,n)=><span key={n} className={t.connector?'dial-connector':undefined}>{t.word}{' '}</span>)}</h2>
-  {step.kind==='background'?<><div className="dial-prose"><Markdown text={panel.body??''} disableLinks/></div><a className="dial-link" href="/about">Read my story <span aria-hidden="true">↗</span></a></>:step.kind==='experience'?<><p className="dial-org">{step.entry.org}</p><p className="dial-meta">{[step.entry.dates,step.entry.location].filter(Boolean).join(' · ')}</p><ul className="dial-points">{(step.entry.experience_bullets??[]).map(b=><li key={b.id} data-draft-changed={b.draftChanged||undefined}><Markdown text={b.text}/></li>)}</ul></>:<>
+  {step.kind==='background'?<><div className="dial-prose"><Markdown text={panel.body??''} disableLinks/></div><PrimaryPill className="dial-link" href="/about">Read my story</PrimaryPill></>:step.kind==='experience'?<><p className="dial-org">{step.entry.org}</p><p className="dial-meta">{[step.entry.dates,step.entry.location].filter(Boolean).join(' · ')}</p><ul className="dial-points">{(step.entry.experience_bullets??[]).map(b=><li key={b.id} data-draft-changed={b.draftChanged||undefined}><Markdown text={b.text}/></li>)}</ul></>:<>
    <p className="dial-tagline">{step.project.tagline}</p>{step.project.highlights?.length?<ul className="dial-points">{step.project.highlights.slice(0,3).map(line=><li key={line}>{line}</li>)}</ul>:null}
-   <ul className="dial-tags">{step.project.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>
+   <ul className="dial-tags">{step.project.tags.map(tag=><li key={tag} tabIndex={0}>{tag}</li>)}</ul>
    <p className="dial-capabilities">{capabilityLinks(step.project.tags).map(label=><a key={label} href="#toolkit">→ {label}</a>)}</p>
-   <div className="dial-links">{step.project.url?<a className="dial-link" href={step.project.url} target="_blank" rel="noopener noreferrer">Visit ↗</a>:null}<a className="dial-link" href={projectHref(step.project.slug)}>Case study →</a></div>{i===steps.length-1?<a className="dial-all" href="/projects">All projects →</a>:null}
+   <div className="dial-links">{step.project.url?<PrimaryPill className="dial-link" href={step.project.url} target="_blank" rel="noopener noreferrer">Visit</PrimaryPill>:null}<PrimaryPill className="dial-link" href={projectHref(step.project.slug)}>Case study</PrimaryPill></div>{i===steps.length-1?<PrimaryPill className="dial-all" href="/projects">All projects</PrimaryPill>:null}
   </>}
  </>;}
  const marked=(i:number)=>steps[i].kind==='background'?changed:steps[i].kind==='experience'?steps[i].entry.draftChanged:steps[i].project.draftChanged;

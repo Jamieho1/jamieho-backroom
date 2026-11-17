@@ -15,9 +15,10 @@ import { ScreenContact, ContactContent, type ScreenContactHandle } from "./scree
 import type { SocialLink } from "@/lib/social";
 import { HomeDial, type HomeDialHandle } from "./home-dial";
 import {dialAnchorStep,dialCount} from "@/lib/journey/dial";
-import { Toolkit, type ToolkitHandle } from "./toolkit";
+import {WhatIBuild,type BuildHandle} from "./what-i-build";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
+import {PrimaryPill} from "@/components/primary-pill";
 import { BrandIcon } from "./brand-icon";
 import type {AboutPhoto} from "@/lib/home-content-schema";
 import { HeroArtwork } from "./hero-artwork";
@@ -43,7 +44,9 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
   const [compactDial,setCompactDial]=useState(false);
   const [dialHeight,setDialHeight]=useState(0);
-  const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0}:c),[all,mobile,compactDial,dialHeight]);
+  const [buildHeight,setBuildHeight]=useState(0);
+  const compactBuild=useRef<HTMLDivElement>(null);
+  const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0}:compactDial&&c.kind==="section"&&c.build?{...c,scroll:buildHeight||3,wipe:0}:c),[all,mobile,compactDial,dialHeight,buildHeight]);
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -55,7 +58,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const compact=useRef<HTMLDivElement>(null);
   const seekDial=useRef<(chapter:number,local:number)=>void>(()=>{});
   const stills = useRef<(HTMLImageElement | null)[]>([]);
-  const toolkits = useRef<(ToolkitHandle | null)[]>([]);
+  const builds = useRef<(BuildHandle | null)[]>([]);
   const dots = useRef<(HTMLOListElement | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
@@ -67,6 +70,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const hud = useRef<HTMLDivElement>(null);
   const cue = useRef<HTMLAnchorElement>(null);
   const jump = useRef<(id: string) => void>(() => {});
+  const navigationIntent=useRef<string|null>(null);
+  const initialHashHandled=useRef(false);
   const skip = useRef<() => void>(() => {});
   const lenisRef = useRef<Lenis | null>(null);
   const navigation = useRef<HTMLElement>(null);
@@ -133,6 +138,15 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     return()=>{observer.disconnect();window.removeEventListener("resize",measure);};
   },[live,compactDial]);
 
+  useEffect(()=>{
+    const node=compactBuild.current;if(!live||!compactDial||!node)return;
+    const measure=()=>{const height=node.getBoundingClientRect().height/innerHeight;setBuildHeight(old=>Math.abs(old-height)<.005?old:height);};
+    // Wait for the accordion height transition to settle, avoiding a scroll-engine rebuild on every animation frame.
+    let pending:ReturnType<typeof setTimeout>;const schedule=()=>{clearTimeout(pending);pending=setTimeout(measure,90);};
+    measure();const observer=new ResizeObserver(schedule);observer.observe(node);window.addEventListener("resize",schedule);
+    return()=>{clearTimeout(pending);observer.disconnect();window.removeEventListener("resize",schedule);};
+  },[live,compactDial]);
+
   // TKT-76: download the clips whole, in chapter order, and swap each chapter from its still to its video as it lands.
   useEffect(() => {
     if (!live) return;
@@ -187,6 +201,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     const dialIndex=chapters.findIndex(c=>c.kind==="section"&&c.dial);
     const yOf=(id:string)=>{
       if(id==="screen")return st.end;
+      if(compactDial&&id==="toolkit"){const index=chapters.findIndex(c=>c.id==="toolkit");if(index>=0)return st.start+lay.starts[index]*innerHeight+2;}
       const c=chapters[dialIndex];
       if(compactDial&&c?.kind==="section"&&c.dial&&["about","background","pivot","experience","projects","work"].includes(id)){
         const step=dialAnchorStep(id,c.dial),node=compact.current?.querySelector<HTMLElement>(`[data-dial-step="${step}"]`);
@@ -195,11 +210,11 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       }
       return st.start+(st.end-st.start)*landingOf(chapters,id,lay)+1;
     };
-    jump.current=(id)=>lenis.scrollTo(yOf(id),{duration:1.2,easing:t=>1-Math.pow(1-t,3)});
-    seekDial.current=(index,local)=>{const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
+    jump.current=(id)=>{navigationIntent.current=id;lenis.scrollTo(yOf(id),{duration:1.2,easing:t=>1-Math.pow(1-t,3)});};
+    seekDial.current=(index,local)=>{navigationIntent.current=null;const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
-    skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
+    skip.current = () => { navigationIntent.current="screen";lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
     const followHash = () => {
       if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
       else if (window.location.hash) {
@@ -208,11 +223,19 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       }
     };
     resetSky.current = () => {
+      navigationIntent.current="sky";
       lenis.scrollTo(0, {immediate:true, force:true});
       target = shown = 0;
     };
-    if (returningToSky.current) resetSky.current();
-    else followHash();
+    // Resize/accordion measurements rebuild this clock. Resume the explicit destination,
+    // never replay a stale arrival hash after the visitor has navigated or scrolled elsewhere.
+    if (returningToSky.current) {initialHashHandled.current=true;resetSky.current();}
+    else if(navigationIntent.current==="screen")skip.current();
+    else if(navigationIntent.current)jump.current(navigationIntent.current);
+    else if(!initialHashHandled.current){initialHashHandled.current=true;followHash();}
+    const clearIntent=()=>{navigationIntent.current=null;};
+    const keyScroll=(event:KeyboardEvent)=>{if(["ArrowUp","ArrowDown","PageUp","PageDown","Home","End"," "].includes(event.key))clearIntent();};
+    window.addEventListener("wheel",clearIntent,{passive:true});window.addEventListener("touchstart",clearIntent,{passive:true});window.addEventListener("keydown",keyScroll);
     window.addEventListener("hashchange", followHash);
 
     // Word spans per panel, cached once.
@@ -251,7 +274,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if(c.dial && opacity > 0)dial.current?.setProgress(at);
-          if (opacity > 0) { toolkits.current[i]?.setProgress(at); }
+          if (opacity > 0) { builds.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
             // Timeline: light the dot of the entry being read (the last one whose window has started).
@@ -323,6 +346,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     raf = requestAnimationFrame(draw);
     return () => {
       window.removeEventListener("hashchange", followHash);
+      window.removeEventListener("wheel",clearIntent);window.removeEventListener("touchstart",clearIntent);window.removeEventListener("keydown",keyScroll);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       resetSky.current = () => window.scrollTo({top:0, behavior:"instant"});
       seekDial.current=()=>{};
@@ -348,8 +372,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                     <video ref={(el) => { videos.current[i] = el; }} className="journey-video" muted playsInline preload="none"
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
-                ) : c.kind === "section" && c.toolkit?.layers.length ? (
-                  <Toolkit ref={(h) => { toolkits.current[i] = h; }} data={c.toolkit} />
+                ) : c.kind === "section" && c.build ? (
+                  !compactDial?<WhatIBuild ref={(h) => { builds.current[i] = h; }} data={c.build} onSeek={local=>seekDial.current(i,local)}/>:null
                 ) : c.kind === "section" && c.still ? (
                   <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -382,6 +406,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
             {debug ? <div ref={hud} className="journey-hud" /> : null}
           </div>
           {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.dial?<div key={c.id} ref={compact} className="journey-compact-dial" style={{top:`${lay.starts[i]*100}vh`}}><HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/></div>:null):null}
+          {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.build?<div key={c.id} ref={compactBuild} className="journey-compact-build" data-draft-changed={draftChapterChanged(c.id,draftSections)||undefined} style={{top:`${lay.starts[i]*100}vh`}}><WhatIBuild data={c.build} accordion/></div>:null):null}
         </div>
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
@@ -438,21 +463,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               <img src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
             </figure>
           ) : null}
-          {c.kind === "section" && c.toolkit?.layers.length ? (
-            <section className="journey-still-toolkit" aria-label={c.toolkit.title}>
-              <p className="journey-eyebrow">{c.toolkit.title}</p>
-              {c.toolkit.layers.map((l) => (
-                <div key={l.name}>
-                  <h2 className="journey-title">{l.name}</h2>
-                  {l.how ? <p className="journey-body">{l.how}</p> : null}
-                  {l.tools.length ? <ul className="journey-chips">{l.tools.map((t) => <li key={t}>{t}</li>)}</ul> : null}
-                </div>
-              ))}
-              {c.toolkit.certs.length ? <ul className="journey-points">{c.toolkit.certs.map((x) => (
-                <li key={x.title}>{/* eslint-disable-next-line @next/next/no-img-element */}{x.badge ? <img className="journey-toolkit-badge-img" src={x.badge} alt="" width={56} height={56} /> : null}{x.href ? <a href={x.href} target="_blank" rel="noopener noreferrer">{x.title}</a> : x.title}{x.org ? ` · ${x.org}` : ""}</li>
-              ))}</ul> : null}
-            </section>
-          ) : null}
+          {c.kind==="section"&&c.build?<WhatIBuild data={c.build} still/>:null}
           {c.kind==="section"&&c.dial?<HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/>:null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
@@ -562,6 +573,6 @@ function PanelBody({ p, heading, split = false, scheduleCall = false, disableLin
         Schedule a call
       </a> : null}</p>
     ) : null}
-    {p.cta ? <a className="journey-cta-link" href={p.cta.href}>{p.cta.label} <span>→</span></a> : null}
+    {p.cta ? <PrimaryPill href={p.cta.href}>{p.cta.label}</PrimaryPill> : null}
   </>;
 }

@@ -1,3 +1,4 @@
+import {PrimaryPill} from "@/components/primary-pill";
 /**
  * Portfolio views (Home v1.1, TKT-83): the /projects list and a project's case-study page. Pure presentation (no
  * data fetching), so the pages stay pre-rendered and the views can be exercised with fixtures in e2e.
@@ -47,7 +48,7 @@ export function ProjectDetail({ p }: { p: Project }) {
         {p.tags.length ? <ul className="tags" aria-label="Built with">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul> : null}
         <p className="project-visit">
           {p.url
-            ? <a className="btn" href={p.url} target="_blank" rel="noopener noreferrer">Visit website{host ? ` · ${host}` : ""} ↗</a>
+            ? <PrimaryPill href={p.url} target="_blank" rel="noopener noreferrer">Visit website{host ? ` · ${host}` : ""}</PrimaryPill>
             : <span className="btn ghost" aria-disabled="true">Website coming soon</span>}
         </p>
       </header>

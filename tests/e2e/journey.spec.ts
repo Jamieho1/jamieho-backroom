@@ -164,7 +164,7 @@ test('Schedule a call jumps directly to the Contact form',async({page})=>{
 for(const anchor of ['background','about','pivot'])test(`${anchor} hash lands on canonical About, including hash changes`,async({page})=>{
  await page.goto('/#'+anchor);const about=page.locator('.home-dial:visible [data-dial-step="0"]');await expect(about).toBeVisible();
  const nav=page.locator('.site-navigation.is-journey');await expect(nav.locator('[data-menu="my story"] summary')).toBeVisible();
- await nav.getByRole('link',{name:'Jamie Ho — back to the top'}).click();await expect(nav).toHaveAttribute('data-floating','false');
+ await nav.getByRole('link',{name:'Jamie Ho — back to the top'}).click();if(test.info().project.name==='phone'){const viewport=page.viewportSize()!;await page.setViewportSize({...viewport,height:viewport.height+24});}await expect(nav).toHaveAttribute('data-floating','false');
  await page.evaluate(()=>{location.hash='sky'});await page.evaluate(hash=>{location.hash=hash},anchor);await expect(about).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

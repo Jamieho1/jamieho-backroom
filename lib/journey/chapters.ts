@@ -1,3 +1,4 @@
+import {DEFAULT_BUILD} from "./build";
 /** Home v1.3: Hello → About → Experience → Work → Techstack → Creator → Contact Us.
  * Placeholder copy is replaced by withContent; personal content remains in the database.
  * Room footage passes its generated dissolve quickly through the existing camera keys.
@@ -14,8 +15,8 @@ export const HOME_CHAPTERS: Chapter[] = [
   },
   {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,
     panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
-  // Toolkit (TKT-88): the one layered scene. An exploded architecture stack, then the certification badges.
-  { id: "toolkit", label: "Techstack", nav: "What I build", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Techstack", layers: [], certs: [] } },
+  // What I build: five capabilities; one existing journey scroll clock.
+  { id: "toolkit", label: "What I build", nav: "What I build", kind: "section", tone: "dark", scroll: 5.6, build: DEFAULT_BUILD },
   // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
   {
     id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6,

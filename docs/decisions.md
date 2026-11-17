@@ -51,3 +51,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-17 · JH/PassLoop geometry must be auto-traced from original images with <2% thresholded-mask difference; expanded branding fits beside its control and the 92px collapsed rail stacks mark/expand without overlap · Home polish 6
 - 2026-11-17 · Home polish 7 supersedes About polish 3, the Experience curve/mascot and standalone Work: one navy editorial dial, all public opted-in jobs/featured projects, compact/static stacks at ≤900px; highlights are explicit owner-approved data; Storage art deletion waits for replacement deployment · approved dial prompt
 - 2026-11-17 · Jamie approved the project-highlights migration only; content proposals remain drafts and Storage retirement waits for replacement deployment · Jamie
+
+- 2026-11-17 · Home polish 8 replaces Toolkit with the approved five-capability What I build scene; editable copy/empty Credly URLs reuse Technology, SVG geometry stays in code, primary links share bounded/reduced-motion-safe GSAP effects, and CV bullet edits remain owner-reviewed drafts · approved prompt

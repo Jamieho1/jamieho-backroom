@@ -1,23 +1,23 @@
 # Current state
 
-## Live data and pending rollout
-
-`20261117183223_project_highlights.sql` is applied live with Jamie’s explicit approval (remote `20261117220033`). No pending migration for Home polish 7.
-
-Read-only verification confirms five public About photos, two DataKind screenshots, and approved About-photo/DataKind/university proposals. Featured Work remains Cyterly AI and DataKind UK.
-
-Two new sets await Jamie at /manage/review: caption `478f314b-52dd-46b1-8202-5130a894d305`; exact mockup highlights `37b47db8-2872-4b2d-a5bd-c9c5b25e553a`. Both contain summary/operations only and remain drafts. Deploy new review code before approving highlights.
-
 ## Implementation
 
-Home polish 7 replaces Background, Experience and Work with one navy editorial dial: database photos/jobs/projects, rotating rings, coordinates, caption leaders, dynamic index, drawn icons and scrubbed screenshot frames. All featured public projects extend it. Text/visual/anchor/dot navigation shares the existing scroll clock; no new dependency. At ≤900px and reduced-motion/no-JS it stacks naturally with native screenshot rows. Background/Experience/Work anchors are retained. Journey labels include What I build and Contact; Home polish 8 is not built.
+Home polish 8 replaces the old Techstack/Toolkit scene with the approved five-capability What I build section after the editorial dial and before Creator. It includes mockup copy, data-driven inline SVG diagrams, reversible desktop scroll steps/row navigation, a 0N / 05 counter, ≤900px measured accordion, internally panning diagrams and fully open/drawn reduced-motion/no-JS views. Layout measurements preserve explicit navigation destinations, including phone back-to-top jumps.
 
-Old curve/mascot/standalone Work/constellation code, replaced tests, manifest entries and local Experience-art files are removed. Three Storage objects remain pending deletion **after replacement deployment**, to preserve compatibility with previously deployed code. Full file/object inventory: handoff report. Existing brand marks, surrounding journey, editors and owner-only preview boundaries remain.
+Capability and dial chips have gold hover/focus styling without link semantics. Shared GSAP primary links provide bounded magnetic movement, gold sweep/navy text, arrow animation, focus end states and a stronger pulsing conversation CTA to Contact. Old Toolkit code/styles/tests and its two local badge images are retired. No migration, policy, editor or public caching change is required.
 
-## Verification and next steps
+## Live content and rollout
 
-Typecheck, 1,073 unit/database tests, production builds, six-page static assertions and diff checks pass. Full main browser suite: 207 passed / 81 conditional skips. Separate owner/member/visitor integrations: all 66 passed on a clean build with the same fixture database. Some builds required an unchanged retry after the existing Next security advisory; no dependency change.
+Two summary/operations-only sets remain drafts at /manage/review:
+- Technology copy with empty Credly URLs: `84c50b3d-2c18-4efd-90ac-cc18281ef9da`.
+- Global Relay bullets 1/3 only: `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07`; bullet 2 is untouched.
 
-Live verification: exact helper hashes, validation/default/constraint, function permissions and unchanged RLS/policies confirmed; content/draft fingerprints match before/after and there are no new security findings. Existing application suites above were not rerun for this unchanged SQL application.
+Live sections/experience/bullet fingerprints match before/after. Jamie deploys the new reader before approving Technology, then supplies actual Credly URLs; empty tiles are non-clickable. No content approval by the agent.
 
-Jamie commits/pushes and verifies live; then retire the three Storage objects after checking deployed references. No push or content approval by the agent.
+`20261117183223_project_highlights.sql` remains applied live as remote `20261117220033`. Prior caption/highlight proposals `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` await Jamie. The three previously retired Experience Storage objects still await replacement deployment before deletion.
+
+## Verification
+
+Typecheck, 1,072 unit/database tests, production build, six-page static assertions and diff checks pass. Full main browser run: 214 passed / 88 conditional skips. Existing owner/member/visitor integration suite: 66 passed; new capability-preview/isolation cases: 2 passed. Both production and synthetic builds passed after unchanged retries for the existing Next advisory; no dependency change. An existing feedback test now waits for its asynchronous focus effect rather than racing it.
+
+Jamie commits/pushes and verifies live; no push by the agent. Home polish 8 awaits live verification.

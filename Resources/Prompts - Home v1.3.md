@@ -381,7 +381,7 @@ You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, do
 Approved design: the "WHAT I BUILD" section and the button/chip hover behaviour in "Personal Website/Media/Previews/home-dial-build-work.html" (latest version). Replace the Techstack chapter (stacked cards and cert badges) with it, right after the dial and before Creator. Match the mockup exactly — titles, descriptions, chips, captions and diagrams:
 01 AI engineering — Agentic RAG diagram (orchestrator, router, hybrid retrieval, reranker, relevance grader with query-rewrite loop, MCP server tools, LLM generation, guardrails + RAGAS eval, memory).
 02 Production event systems — "Example design" (devices/apps → gateway → Kafka → stream consumers → MongoDB; failure bin DLQ with replay; analytics fan-out; Grafana + Prometheus alerts).
-03 Cloud architecture — "Reference design" incl. KMS encryption and the access lane (Corporate SSO → IAM Identity Center → IAM roles, least privilege); the two certification badge tiles sit in the diagram's bottom-left and link to Credly in a new tab: Solutions Architect – Professional → CREDLY_SA_PRO_URL, Machine Learning – Specialty → CREDLY_ML_SPEC_URL (Jamie supplies; if missing, ask him — never guess).
+03 Cloud architecture — "Reference design" incl. KMS encryption and the access lane (Corporate SSO → IAM Identity Center → IAM roles, least privilege); the two certification badge tiles sit in the diagram's bottom-left and link to Credly in a new tab: Solutions Architect – Professional → CREDLY_SA_PRO_URL, Machine Learning – Specialty → CREDLY_ML_SPEC_URL (stored as editable content; if a URL is empty the badge renders as a plain, non-clickable tile — never guess a URL; Jamie adds them later through Content Drafts).
 04 Full-stack & delivery — microservices runtime lane + delivery lane (Git → Jenkins CI → SonarQube → Xray CVE scan → container registry → Kubernetes); languages row first.
 05 Machine learning & computer vision — ETL lane + Segment Anything (SAM) → masks lane, no employer/organisation names.
 CONFIDENTIALITY: never name any CRM or employer system in this section (no Salesforce, Wealthbox, Single Event API, Normalizer, reconciliation ID). Add a unit test that fails if those strings appear in the What I build content or diagram components.
@@ -394,7 +394,7 @@ CONFIDENTIALITY: never name any CRM or employer system in this section (no Sales
 6. Retire the old Techstack/toolkit components, CSS, tests and any images only they used.
 7. Content Drafts set (live, summary + operations only; Jamie approves): Global Relay CV bullets — remove employer system and CRM names. Proposed text (Jamie may edit before approving): bullet 1 "Own three production services on Kafka, processing GBs of events a day for regulated financial firms."; bullet 3 "Built a Python MCP server giving our internal AI agent controlled access to business systems." Leave bullet 2 unchanged unless Jamie says otherwise.
 
-Done when: browser tests step through 01–05 by scrolling, each diagram has no label overlaps (bounding-box check), badge links open Credly, chips change colour on hover and are not interactive, button hover/focus end states render, CTA reaches Contact; 390 px and reduced-motion pass with no page sideways scroll; confidentiality test passes; any migration has policy tests and waits for "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
+Done when: browser tests step through 01–05 by scrolling, each diagram has no label overlaps (bounding-box check), badge links open Credly when a URL is set (and render non-clickable when empty), chips change colour on hover and are not interactive, button hover/focus end states render, CTA reaches Contact; 390 px and reduced-motion pass with no page sideways scroll; confidentiality test passes; any migration has policy tests and waits for "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
 ```
 
 ---
@@ -409,4 +409,12 @@ Goal: remove images and media that are no longer used or are duplicated, across 
 2. Produce a table: path · size · referenced by (or "unused") · duplicate of · proposed action (keep / delete / move). Rules: keep originals Jamie uploaded under Media/Uploads/ and Media/Brand/ unless a byte-identical copy exists elsewhere; never delete something referenced by live data; old London journey clips/stills, retired Desktop art and anything only referenced by retired features are candidates.
 3. Delete in Git (public/ and committed assets) directly — Git history keeps them. For the local Media folder and Supabase Storage, show Jamie the table and wait for his "delete" before removing them (these deletions are not recoverable). Organise what remains in Media/ into: Brand/, Uploads/<date-subject>/, Previews/ and a short Media/README.md describing the layout.
 4. Update the media manifest/service worker and docs (journey.md, operations.md), add one MEMORY.md line. Typecheck, build, static assertions and the Home browser tests must still pass. Report totals freed per location.
+```
+
+---
+
+## Credly links (after Home polish 8; do with Media cleanup)
+
+```
+Read AGENTS.md and docs/content-drafts.md. Create one live Content Drafts set "Certification Credly links" (summary + operations only) setting the Credly URLs for the two certifications in the What I build content: Solutions Architect – Professional → <SA_PRO_URL>; Machine Learning – Specialty → <ML_SPEC_URL>. https-only. Tell Jamie to approve, then verify read-only that both badges link correctly. One MEMORY.md line.
 ```

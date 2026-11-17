@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./primary-pill.css";
+import "./what-i-build.css";
 import "./desktop.css";
 import { SiteHeader } from "@/components/site-header";
 import { DesktopAppsProvider } from "@/components/desktop-apps-provider";

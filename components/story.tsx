@@ -1,3 +1,4 @@
+import {PrimaryPill} from "@/components/primary-pill";
 import {ArticleMarkdown} from "@/components/articles/article-markdown";
 import {constellationTitle} from "@/lib/journey/background-photos";
 import {CONTACT_HREF} from "@/lib/journey/content";
@@ -11,6 +12,6 @@ export function Story({about,story,changed=false}:{about:Section;story:Section;c
   <header className="story-heading"><p>My story</p><h1>{constellationTitle(title).map((part,i)=>part.connector?<em key={i}>{part.word} </em>:<span key={i}>{part.word} </span>)}</h1></header>
   <div className="story-md"><ArticleMarkdown text={starter?about.body:story.body}/></div>
   {starter?<p className="story-coming">More of the story is on its way.</p>:null}
-  <footer className="story-footer"><a href={CONTACT_HREF}>Get in touch <span aria-hidden="true">→</span></a></footer>
+  <footer className="story-footer"><PrimaryPill href={CONTACT_HREF}>Get in touch</PrimaryPill></footer>
  </article>;
 }

@@ -116,34 +116,8 @@ describe("journey content (TKT-77)", () => {
     const chapter=out.find(c=>c.id==="about");expect(chapter?.kind==="section"&&chapter.dial).toEqual({experiences:[row],projects:[project]});expect(out.some(c=>c.id==="projects"||c.id==="experience")).toBe(false);
   });
 
-  it("builds the Toolkit from '## layer' blocks plus public certificate badges, or falls back to project tags", () => {
-    const tech = { ...sections, technology: { key: "technology" as const, title: "Toolkit", body: "## Cloud\nAWS at work.\n- AWS, SQS\n## AI\n- LLMs" } };
-    const experience = [
-      item({ kind: "certificate", title: "AWS SA Pro", org: "AWS", summary: "[Credly](https://www.credly.com/badges/1)" }),
-      item({ kind: "certificate", title: "Hidden cert", public: false }),
-    ];
-    const tk = withContent(HOME_CHAPTERS, { sections: tech, experience, technologies: [] }).find((c) => c.id === "toolkit")!;
-    expect(tk.kind === "section" && tk.toolkit).toEqual({
-      title: "Toolkit",
-      layers: [{ name: "Cloud", how: "AWS at work.", tools: ["AWS", "SQS"] }, { name: "AI", how: "", tools: ["LLMs"] }],
-      certs: [{ title: "AWS SA Pro", org: "AWS", href: "https://www.credly.com/badges/1" }],
-    });
-    expect(tk.scroll).toBeCloseTo(0.5 + 2 * 0.7 + 0.6);
-    const fallback = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: ["Next.js", "Supabase"] }).find((c) => c.id === "toolkit")!;
-    expect(fallback.kind === "section" && fallback.toolkit?.layers).toEqual([{ name: "Stack", how: "", tools: ["Next.js", "Supabase"] }]);
-    expect(withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [] }).some((c) => c.id === "toolkit")).toBe(false);
-  });
-
-  it("turns a certificate entry's public bullets into one badge each (e.g. AWS)", () => {
-    const tech = { ...sections, technology: { key: "technology" as const, title: "Toolkit", body: "## AI\n- LLMs" } };
-    const aws = item({ kind: "certificate", title: "AWS", org: "", summary: "", bullets: [
-      { text: "AWS Machine Learning Specialty", public: true }, { text: "Hidden one", public: false },
-      { text: "AWS Solutions Architect Professional [Credly](https://www.credly.com/badges/2)", public: true },
-    ] });
-    const tk = withContent(HOME_CHAPTERS, { sections: tech, experience: [aws], technologies: [] }).find((c) => c.id === "toolkit")!;
-    expect(tk.kind === "section" && tk.toolkit?.certs).toEqual([
-      { title: "AWS Machine Learning Specialty", org: "AWS", href: undefined, badge: expect.stringMatching(/aws-ml-specialty/) },
-      { title: "AWS Solutions Architect Professional", org: "AWS", href: "https://www.credly.com/badges/2", badge: expect.stringMatching(/aws-sa-pro/) },
-    ]);
+  it("binds the editable Technology section to What I build while safely retiring legacy layers",()=>{
+    const chapter=withContent(HOME_CHAPTERS,{sections,experience:[],technologies:[]}).find(c=>c.id==="toolkit");
+    expect(chapter?.kind==="section"&&chapter.build?.items).toHaveLength(5);
   });
 });

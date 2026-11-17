@@ -4,9 +4,9 @@
 
 ## Chapters and navigation
 
-Hello → one Background/Experience/Selected Work dial → Techstack → Creator → black join → room → monitor Contact. The later “What I build” redesign is not implemented; only its navigation label changes. The Journey dropdown is Background, Experience, Work, What I build, Creator, Contact. My story (About/Projects), Content (Articles/Resources), Interview Prep and existing account/theme/feedback/review controls remain unchanged.
+Hello → one Background/Experience/Selected Work dial → What I build → Creator → black join → room → monitor Contact. What I build replaces the former Techstack scene. The Journey dropdown is Background, Experience, Work, What I build, Creator, Contact. My story (About/Projects), Content (Articles/Resources), Interview Prep and existing account/theme/feedback/review controls remain unchanged.
 
-`#background`, `#about`, `#pivot` reach dial step zero; `#experience` the first opted-in entry; `#work`, `#projects` the first featured project. Dial index buttons and screenshot dots seek the same parent clock. Compact and native still anchors clear the navigation. Contact aliases `#home-contact`, `#screen`, `#desk` reach the monitor form. Schedule a call skips directly there. Browser Back from another same-tab page returns to clouds; explicit incoming chapter links still work. Theme changes preserve scroll instead of replaying hashes.
+`#background`, `#about`, `#pivot` reach dial step zero; `#experience` the first opted-in entry; `#work`, `#projects` the first featured project. Dial index buttons and screenshot dots seek the same parent clock. Compact and native still anchors clear the navigation. Contact aliases `#home-contact`, `#screen`, `#desk` reach the monitor form. Schedule a call skips directly there. Browser Back from another same-tab page returns to clouds; explicit incoming chapter links still work. Theme changes preserve scroll instead of replaying hashes. Layout measurements preserve the latest explicit navigation destination; manual wheel/touch/scroll-key input clears it, so a stale arrival hash cannot interrupt a later logo/Contact jump.
 
 ## Dial
 
@@ -22,9 +22,21 @@ Shared `ScreenshotCarousel` uses macOS traffic lights and the first image’s ra
 
 One Lenis/ScrollTrigger/rAF owner drives desktop progress. At ≤900px the dial becomes measured natural-flow stacked steps inside the journey track; other chapters retain their existing phone rules. Reduced-motion/no-JS views use the same complete stacked content, native screenshot swipe rows/dots, fully drawn icons and native anchors. Long desktop copy can scroll internally; inactive cards and visuals are inert. Dynamic 3–8-stop fixtures cover matching text/visual/index, reverse motion, anchors, screenshot scrubbing, bounded columns and compact layouts.
 
+## What I build
+
+`components/journey/what-i-build.tsx` replaces the old Toolkit stack after the dial and before Creator, retaining `#toolkit`. The five approved mockup capabilities are AI engineering, Production event systems, Cloud architecture, Full-stack & delivery, and Machine learning & computer vision. Diagram geometry, labels, nodes and edges live together in `lib/journey/build-diagrams.json`; React renders trusted SVG data without owner-supplied HTML. The mockup descriptions/chips/captions are in `build-content.json`, validated by `build.ts`.
+
+Desktop uses the existing parent scroll clock over 5.6 viewport heights, five reversible steps, a 0N / 05 counter, exclusive expanding rows and staggered SVG stroke draws. Row clicks seek that same clock. At ≤900px the measured natural-flow accordion replaces the pin; measurement waits for height transitions to settle and chapter links clear the navigation; SVGs pan inside their panels. Reduced motion/no-JS shows all rows and fully drawn diagrams. The CTA goes directly to the Contact form. Text clears the floating navigation; diagram label bounds are browser-tested.
+
+Technology `site_sections.title/body` owns editable copy. Body is version-1 JSON: title/description, exactly five items (title, description, languages, chips, diagramTitle, caption), two certifications (title, url), ctaTitle/ctaLabel. A meaningful section title takes precedence. Legacy Markdown uses the approved safe defaults until Jamie approves its conversion; previous content remains in the approval audit. Certification URLs default empty and only HTTPS credly.com/www.credly.com URLs produce new-tab links; empty values produce plain tiles. No inferred CV URLs. Titles/descriptions/chips/captions and credential names/URLs preview through the existing owner-only Technology overlay.
+
+`components/primary-pill.tsx` supplies shared GSAP quickTo/timeline motion for primary links on Home, My story, project and guide pages: bounded 8px pull (12px strong CTA), 1.03 scale, gold sweep/navy text, arrow exit/re-entry and smooth return. Keyboard focus shows the final state; reduced motion permits colour changes only. The strong conversation CTA pulses its gold outline only in view. Social branding, navigation/account controls and form actions keep their existing behaviour. Capability and dial-project chips remain text, with 150ms gold hover/focus styling and a default cursor.
+
+The retired Toolkit component/parser/styles/tests and its two exclusively used local badge WebPs are removed. No schema, public loader, editor, bucket or policy change is needed.
+
 ## Unchanged surrounding chapters
 
-The full-viewport day/night hero artwork, rigid subtle animation, HTML Welcome/name, social buttons and glass scroll cue remain. Hero travel is 0.65 viewport heights. Techstack retains its existing exploded layers/public certificates. Creator keeps the helix, compact pitch, latest-media cards and equal-width branded social links. Room/monitor footage and Contact form preserve their timings, validation, honeypot, rate limiting, Inbox, email alerts and privacy link. At ≤768px those video chapters use approved stills without clip downloads.
+The full-viewport day/night hero artwork, rigid subtle animation, HTML Welcome/name, social buttons and glass scroll cue remain. Hero travel is 0.65 viewport heights. Creator keeps the helix, compact pitch, latest-media cards and equal-width branded social links. Room/monitor footage and Contact form preserve their timings, validation, honeypot, rate limiting, Inbox, email alerts and privacy link. At ≤768px those video chapters use approved stills without clip downloads.
 
 ## Media and rollout
 
