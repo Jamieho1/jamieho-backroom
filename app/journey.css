@@ -915,3 +915,9 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 
 /* Pinned Experience keeps its heading/backdrop fixed; only an unusually long card scrolls. */
 .experience-curve[data-animated="true"] .experience-card { max-height:var(--experience-card-space,200px); overflow:auto; scrollbar-width:thin; overscroll-behavior-y:contain; }
+
+/* About has its own calm atmosphere, below the HTML text and photo constellation. */
+.journey-chapter[data-chapter="about"], .journey-stills > #about {
+ background-color:#f6f3ee;
+ background-image:radial-gradient(ellipse at 16% 78%,rgb(220 184 126 / .25),transparent 58%),radial-gradient(ellipse at 86% 34%,rgb(151 180 201 / .24),transparent 56%),radial-gradient(ellipse at 52% 94%,rgb(255 255 255 / .9),transparent 66%);
+}

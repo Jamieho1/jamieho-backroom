@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {experienceLayout,experienceStops,experienceState,isPresent,experiencePoint} from "@/lib/journey/experience-curve";
+import {experienceLayout,experienceStops,experienceState,experienceStopLocal,isPresent,experiencePoint} from "@/lib/journey/experience-curve";
 import type {ExperienceRow} from "@/lib/experience";
 const row=(i:number):ExperienceRow=>({id:String(i),kind:"role",title:`Role ${i}`,org:`Org ${i}`,dates:`${2000+i} – present`,location:"",summary:"",public:true,sort:i,show_on_journey:true,journey_icon:"code",experience_bullets:Array.from({length:5},(_,b)=>({id:String(b),sort:b,text:`Bullet ${b}`,public:b!==1}))});
 describe("Experience curve",()=>{
@@ -41,4 +41,10 @@ it('mascot guide reaches every stop exactly, returns the same points in reverse,
 
 it('pixel-rounded arrivals snap line, highlight and mascot together without hysteresis',()=>{
  expect(experienceState(.9199,4)).toEqual({progress:1,current:3});expect(experienceState(.4401,4).progress).toBeCloseTo(1/3);expect(experienceState(.4399,4).current).toBe(1);
+});
+
+it('each selectable stop maps back to its scroll-driven state',()=>{
+ for(const count of [1,2,3,4,6])for(let i=0;i<count;i++){
+  expect(experienceState(experienceStopLocal(i,count),count).current).toBe(i);
+ }
 });

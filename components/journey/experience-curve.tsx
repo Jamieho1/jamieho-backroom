@@ -5,7 +5,7 @@ import {mediaUrl} from "@/lib/journey/media";
 import {ExperienceIcon} from "./experience-icon";
 
 export interface ExperienceCurveHandle {setProgress(local:number):void}
-export const ExperienceCurve=forwardRef<ExperienceCurveHandle,{stops:ExperienceStop[];still?:boolean;vertical?:boolean;base?:string}>(function ExperienceCurve({stops,still=false,vertical=false,base="/home-media"},ref){
+export const ExperienceCurve=forwardRef<ExperienceCurveHandle,{stops:ExperienceStop[];still?:boolean;vertical?:boolean;base?:string;onSelectStop?:(index:number)=>void}>(function ExperienceCurve({stops,still=false,vertical=false,base="/home-media",onSelectStop},ref){
  const uid=useId(),root=useRef<HTMLElement>(null),line=useRef<SVGPathElement>(null),sprite=useRef<HTMLDivElement>(null),backdrop=useRef<HTMLImageElement>(null),board=useRef<HTMLDivElement>(null);
  const [animated,setAnimated]=useState(false),[current,setCurrent]=useState(0),[focused,setFocused]=useState<number|null>(null);
  const [geometry,setGeometry]=useState<{width:number;heights:number[]}>({width:1000,heights:[]});
@@ -52,7 +52,7 @@ export const ExperienceCurve=forwardRef<ExperienceCurveHandle,{stops:ExperienceS
     {stops.map((stop,i)=><li key={stop.id} className="experience-stop-item" style={{"--stop-x":`${place.points[i].x/place.width*100}%`,"--stop-y":`${place.points[i].y}px`,"--stop-direction":i%2?-1:1} as React.CSSProperties}>
      {i<stops.length-1?<svg className="experience-mobile-segment" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d={i%2?"M 42 0 C 42 50 58 50 58 100":"M 58 0 C 58 50 42 50 42 100"}/></svg>:null}
      <button className="experience-stop" data-active={!animated||i===selected} data-present={stop.present} aria-label={stop.project?"Projects":`${stop.org||stop.title}, ${stop.dates}`} aria-current={animated&&i===selected?"step":undefined} aria-controls={`${uid}-card-${i}`}
-      onFocus={()=>setFocused(i)} onClick={()=>setCurrent(i)}>
+      onFocus={()=>setFocused(i)} onClick={()=>{if(animated&&onSelectStop){setFocused(null);onSelectStop(i);}else setCurrent(i);}}>
       <span className="experience-stop-ring"><ExperienceIcon name={stop.icon}/></span><span className="experience-stop-label">{stop.project?"Projects":stop.org||stop.title}</span>
      </button>
      <article id={`${uid}-card-${i}`} className="experience-card" data-active={i===selected} data-draft-changed={stop.draftChanged||undefined} hidden={animated&&i!==selected} aria-label={stop.project?"Projects":stop.title}>

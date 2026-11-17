@@ -98,3 +98,20 @@ test('long cards scroll without lifting Experience under navigation or uncoverin
  await expect(heading.locator('h2')).toHaveCSS('color','rgb(21, 17, 12)');await expect(curve.locator('.experience-mascot')).toHaveCSS('height','88px');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+
+test('activating a role scrolls to its stop and brings the mascot and card together',async({page},info)=>{
+ test.skip(info.project.name!=='desktop','phones retain natural document flow');await mount(page);await position(page,.21);
+ const curve=page.locator('[data-chapter="experience"] .experience-curve');await expect(curve).toHaveAttribute('data-animated','true');
+ const buttons=curve.getByRole('button'),line=curve.locator('.experience-path-drawn');
+ for(const i of [2,0,3,1]){
+  if(i===1){await buttons.nth(i).focus();await page.keyboard.press('Enter');}else await buttons.nth(i).click();
+  await expect.poll(()=>page.evaluate(()=>scrollY/innerHeight)).toBeCloseTo(.65+3.4*(.2+.72*i/3),2);
+  await expect.poll(()=>line.evaluate(el=>Number((el as SVGElement).style.strokeDashoffset))).toBeCloseTo(1-i/3,3);
+  await expect(curve).toHaveAttribute('data-current',String(i));
+  const foot=await curve.locator('.experience-mascot').boundingBox(),ring=await buttons.nth(i).locator('.experience-stop-ring').boundingBox();
+  expect(foot!.x+foot!.width/2).toBeCloseTo(ring!.x+ring!.width/2,0);
+  expect(foot!.y+foot!.height+44).toBeCloseTo(ring!.y+ring!.height/2,0);
+  await expect(curve.locator('.experience-card:visible').getByRole('heading')).toHaveText(i===3?'Projects':'Synthetic role '+i);
+ }
+});

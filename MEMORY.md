@@ -1,9 +1,5 @@
-# Recent work
+Last ~10 one-line entries (≤600 words). Details live in git history and docs/.
 
-Last ~10 one-line entries (≤600 words). Drop the oldest when adding one. Details live in git history, specs and [docs/decisions.md](docs/decisions.md).
-
-- 2026-11-16 · Deleted 32 superseded planning/archive files without replacement copies; retained active specs, contracts and asset manifest. References cleaned; no application, migration or live data change.
-- 2026-11-16 · TKT-110 data foundation prepared: About photos, journey flags/icons, Story, owner draft overlays/home-media slots and export coverage; 20261116165138_home_v13_data.sql NOT applied live; typecheck, 1,052 tests, build/static checks pass.
 - 2026-11-16 · TKT-110 migration applied after Jamie’s approval (remote 20261116171034); live schema/RLS/helper hashes verified, existing content and Storage policies unchanged; starter drafts/frontend review pending.
 - 2026-11-16 · TKT-110b: three starter change sets created/read back as draft (About photos, journey stops, trimmed About); no live content changes, Story blank; Jamie approves after TKT-110 deployment.
 - 2026-11-16 · TKT-111 implements Home order, #about/#pivot compatibility, direct My story/Articles/Resources navigation and About/Experience visual retirements; typecheck, 1,055 unit/DB tests, build/static checks and 74 browser cases pass (2 viewport skips); deployment/live review pending.
@@ -12,3 +8,5 @@ Last ~10 one-line entries (≤600 words). Drop the oldest when adding one. Detai
 - 2026-11-16 · TKT-114 replaces /about redirect with themed ISR My story/starter, captioned Markdown/pull quotes, shared Contact link and owner preview; typecheck, 1,093 unit/DB tests, build/static assertions and 59 browser cases pass (1 viewport skip), including real local approval/ISR; no migration/live changes, deployment/review pending.
 - 2026-11-16 · TKT-115 adds verified/hash-versioned Experience art, whole-mascot SVG-guide motion, phone-only still and static midpoint; fixes About production CSS translation/layer overlap; typecheck, 1,096 unit/DB tests, build/static assertions and 67 browser cases pass (5 viewport skips); no migration/live writes; Next build upgrade advisory noted, deployment/review pending.
 - 2026-11-16 · TKT-116 fixes Experience header/background/long-card spacing, shrinks mascot and restores static Work tags; starter sets approved and featured projects verified read-only; typecheck, 1,097 unit/DB tests, two builds/static assertions, full browsers 201 pass/75 skips and all 66 integration cases pass; no migration/live writes, Jamie deploys/reviews.
+- 2026-11-17 · Added About atmosphere and homepage Back-to-clouds handling; university qualification/activities saved as pending draft 5f1aaffe-2424-4d3d-beb9-d0419e9b1835; no live CV update or migration; typecheck, 1,097 unit/DB tests, build/static and 57 browser cases pass (one viewport skip).
+- 2026-11-17 · Experience role activation now seeks the existing journey clock so mascot/path/card arrive together; typecheck, 15 unit tests, build/static and 30 browser cases pass (six viewport skips); no migration/live writes or push.

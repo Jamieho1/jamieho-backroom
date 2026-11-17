@@ -39,3 +39,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-16 · Experience uses the approved Storage background/whole mascot on the shared SVG guide; phones fetch only the portrait still and reduced motion/no JS use its midpoint · TKT-115 prompt
 
 - 2026-11-16 · Desktop Experience pins header/curve/art, reduces mascot height to 88px and scrolls only long cards; About background redesign remains a separate review · Jamie / TKT-116
+
+- 2026-11-17 · About uses a quiet gold/blue CSS atmosphere; browser Back from another page returns Home to clouds while explicit chapter links remain supported; university changes go through owner review · Jamie
+
+- 2026-11-17 · Activating an Experience stop scrolls the existing desktop clock to the role so mascot, path and card stay synchronized; phones/static views retain natural flow · Jamie

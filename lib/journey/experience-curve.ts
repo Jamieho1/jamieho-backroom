@@ -41,9 +41,14 @@ export function experienceLayout(count:number, vertical=false, width=1000, rowHe
   });
   return {width:w,height:vertical?y-42:300,points,path:curvePath(points,vertical)};
 }
+const TRAVEL_START=.2, TRAVEL_LENGTH=.72;
+/** Inverse of the scroll-driven stop positions, shared by click and keyboard activation. */
+export function experienceStopLocal(index:number,count:number){
+ return TRAVEL_START+TRAVEL_LENGTH*clamp01(index/Math.max(1,count-1));
+}
 /** Read each stop in turn; the drawn line reaches its circle before the card changes. */
 export function experienceState(local:number,count:number){
-  const raw=clamp01((local-.2)/.72),intervals=Math.max(0,count-1),nearest=Math.round(raw*intervals);
+  const raw=clamp01((local-TRAVEL_START)/TRAVEL_LENGTH),intervals=Math.max(0,count-1),nearest=Math.round(raw*intervals);
   // Native scrolling is pixel-quantised: snap sub-pixel arrivals symmetrically in both directions.
   const progress=intervals&&Math.abs(raw*intervals-nearest)<.002?nearest/intervals:raw;
   return {progress,current:Math.min(intervals,Math.floor(progress*intervals+1e-6))};

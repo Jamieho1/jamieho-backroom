@@ -20,3 +20,5 @@
 .story-footer { margin-top:48px; padding-top:28px; border-top:1px solid var(--border); font:600 18px/1.5 var(--f-body); }
 .story-footer a { display:inline-flex; align-items:center; gap:12px; min-height:44px; }
 @media(max-width:768px){ .story-scroll { padding:28px 20px 64px; } .story-md { font-size:16px; line-height:1.8; } .story-heading { padding-bottom:24px; margin-bottom:26px; } }
+
+.story-page { background-image:radial-gradient(ellipse at 0% 15%,rgb(184 151 96 / .12),transparent 55%),radial-gradient(ellipse at 100% 75%,rgb(111 148 179 / .12),transparent 60%); }

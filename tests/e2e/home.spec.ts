@@ -130,3 +130,14 @@ test('colour mode changes preserve the clouds after returning from an Education 
  await expect(navigation).toHaveAttribute('data-floating','false');
  expect(await page.evaluate(()=>scrollY)).toBeLessThan(3);
 });
+
+test("Back from another page returns to clouds instead of restoring Contact", async ({ page }) => {
+  await page.goto('/#home-contact');
+  await expect(page.getByRole('heading',{name:'Contact',exact:true}).last()).toBeVisible();
+  await page.locator('.site-navigation:visible').getByRole('link',{name:'Resources',exact:true}).click();
+  await expect(page).toHaveURL(/\/resources$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBeLessThan(5);
+  await expect(page.locator('[data-chapter="sky"]')).not.toHaveAttribute('inert','');
+});

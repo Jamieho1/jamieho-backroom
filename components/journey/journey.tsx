@@ -18,6 +18,7 @@ import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
+import {experienceStopLocal} from "@/lib/journey/experience-curve";
 import {ExperienceCurve,type ExperienceCurveHandle} from "./experience-curve";
 import {AboutConstellation,type AboutConstellationHandle} from "./about-constellation";
 import type {AboutPhoto} from "@/lib/home-content-schema";
@@ -52,6 +53,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
+  const jumpExperienceStop=useRef<(index:number)=>void>(()=>{});
   const experienceCurve=useRef<ExperienceCurveHandle>(null);
   const phoneExperience=useRef<HTMLDivElement>(null);
   const constellation=useRef<AboutConstellationHandle>(null);
@@ -76,6 +78,38 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const preloader = useRef<Preloader | null>(null);
   const [live, setLive] = useState(false);
   const [debug, setDebug] = useState(false);
+
+  const returningToSky = useRef(false);
+  const resetSky = useRef(() => window.scrollTo({top:0, behavior:"instant"}));
+
+  // Mark only this history entry when leaving Home; explicit incoming chapter links stay intact.
+  useEffect(() => {
+    const returnToSky = () => {
+      if (!history.state?.journeyReturnToSky) return;
+      const state = {...history.state};
+      delete state.journeyReturnToSky;
+      history.replaceState(state, "", location.pathname + location.search);
+      returningToSky.current = true;
+      resetSky.current();
+      // App Router restores its saved scroll after mounting the incoming page.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        resetSky.current();
+        returningToSky.current = false;
+      }));
+    };
+    const leave = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href]');
+      if (!anchor || anchor.target || anchor.hasAttribute('download')) return;
+      const url = new URL(anchor.href, location.href);
+      if (url.origin === location.origin && url.pathname !== location.pathname)
+        history.replaceState({...history.state, journeyReturnToSky:true}, "");
+    };
+    returnToSky();
+    document.addEventListener("click", leave, true);
+    window.addEventListener("pageshow", returnToSky);
+    return () => {document.removeEventListener("click", leave, true);window.removeEventListener("pageshow", returnToSky);};
+  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -157,6 +191,17 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     const yOf = (id: string) => id === "screen" ? st.end : mobile&&id==="experience" ? st.start+(lay.starts[chapters.findIndex(c=>c.id===id)]/lay.total)*(st.end-st.start)+1 : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
     jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
 
+    jumpExperienceStop.current = (stop) => {
+      const i = chapters.findIndex(c => c.id === "experience");
+      const chapter = chapters[i];
+      if (chapter?.kind !== "section" || !chapter.experienceStops?.length) return;
+      const local = experienceStopLocal(stop, chapter.experienceStops.length);
+      const progress = (lay.starts[i] + chapter.scroll * local) / lay.total;
+      lenis.scrollTo(st.start + (st.end-st.start) * progress, {
+        duration:1.2, easing:t=>1-Math.pow(1-t,3),
+      });
+    };
+
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
     skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
     const followHash = () => {
@@ -166,7 +211,12 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
         if (chapters.some(c => c.id === id)) jump.current(id);
       }
     };
-    followHash();
+    resetSky.current = () => {
+      lenis.scrollTo(0, {immediate:true, force:true});
+      target = shown = 0;
+    };
+    if (returningToSky.current) resetSky.current();
+    else followHash();
     window.addEventListener("hashchange", followHash);
 
     // Word spans per panel, cached once.
@@ -279,6 +329,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     return () => {
       window.removeEventListener("hashchange", followHash);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
+      resetSky.current = () => window.scrollTo({top:0, behavior:"instant"});
+      jumpExperienceStop.current = () => {};
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
   }, [live, chapters, lay, navItems, base, mobile]);
@@ -317,7 +369,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                   </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
-                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops} base={base}/> : null}
+                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops} base={base} onSelectStop={index=>jumpExperienceStop.current(index)}/> : null}
                 {c.id === "about" && c.panels?.[0] ? <AboutConstellation ref={constellation} panel={c.panels[0]} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)}/> : null}
                 {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
