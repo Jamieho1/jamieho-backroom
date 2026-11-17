@@ -1,3 +1,4 @@
+import {dialAnchorLocal} from "./dial";
 /**
  * Home v1 journey (TKT-74): pure scroll maths. One scroll position drives the whole journey; these functions turn it
  * into "which chapter, how far through it, and which video time / panel state". No DOM, so it is unit-tested.
@@ -88,22 +89,10 @@ export interface SectionChapter extends Base {
   timeline?: boolean;
   /** TKT-88: the exploded architecture stack (layers from the Technology section, badges from certificates). */
   toolkit?: { title: string; layers: { name: string; how: string; tools: string[] }[]; certs: { title: string; org: string; href?: string; badge?: string }[] };
-  /** TKT-87: the pinned projects showcase (featured projects, filled from the database). */
-  showcase?: ShowcaseItem[];
-  /** Public, opted-in chronological CV stops, followed by Projects. */
-  experienceStops?: import("./experience-curve").ExperienceStop[];
+  /** One reversible Background → Experience → Work dial. */
+  dial?: import("./dial").DialData;
 }
 
-export interface ShowcaseItem {
-  draftChanged?:boolean;
-  slug: string;
-  name: string;
-  tagline: string;
-  tags: string[];
-  /** The project's own page (the case study), never the website directly. */
-  href: string;
-  shots: string[];
-}
 export interface FadeChapter extends Base {
   kind: "fade";
   /** Colour the screen passes through between the previous and next chapter (BMW-style white-out or black). */
@@ -230,7 +219,7 @@ export function ctaOpacity(local: number, at = 0.82): number {
 export const SECTION_WIPE = 0.14;
 /** How far (0..1 of the screen height) a section still sits below its resting place while it wipes in. */
 export function wipeOffset(local: number, wipe = SECTION_WIPE): number {
-  return 1 - smoothstep(0, wipe, local);
+  return wipe<=0 ? 0 : 1 - smoothstep(0, wipe, local);
 }
 
 /** Light parallax for a section's framed still: drifts from +amp to -amp (fraction of its height) over the section. */
@@ -239,13 +228,17 @@ export function stillDrift(local: number, amp = 0.06): number {
 }
 
 /** Preserve legacy About links without maintaining a second chapter. */
-export const canonicalChapterId = (id: string): string => id === "pivot" || id === "background" ? "about" : id;
+export const canonicalChapterId = (id: string): string => id === "pivot" || id === "background" ? "about" : id === "work" ? "projects" : id;
 
 /**
  * Where the chapter menu lands for a chapter (global progress). Video chapters start at their first frame; a solid
  * section lands just after its wipe, once its first panel is readable, so a menu jump never shows a blank screen.
  */
 export function landingOf(chapters: readonly Chapter[], id: string, lay = layout(chapters)): number {
+  const dialIndex=chapters.findIndex(c=>c.kind==="section"&&c.dial);
+  if (dialIndex>=0 && ["about","background","pivot","experience","projects","work"].includes(id)) {
+    const c=chapters[dialIndex];if(c.kind==="section"&&c.dial)return (lay.starts[dialIndex]+c.scroll*dialAnchorLocal(id,c.dial))/lay.total;
+  }
   const i = chapters.findIndex((c) => c.id === canonicalChapterId(id));
   if (i < 0 || !lay.total) return 0;
   const c = chapters[i];

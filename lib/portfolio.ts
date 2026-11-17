@@ -7,7 +7,7 @@ import type {HomePreview} from "./content-drafts/types";
 import { createClient } from "@supabase/supabase-js";
 import { readSupabaseEnv } from "@/lib/env";
 import { projectScreenshots } from "./project-art";
-import { PROJECT_SELECT, sortProjects, type Project } from "./portfolio-core";
+import { sortProjects, type Project } from "./portfolio-core";
 export * from "./portfolio-core";
 
 function publicClient() {
@@ -20,7 +20,7 @@ export async function getPublicProjects(preview?:HomePreview|null): Promise<Proj
   if(preview?.publishing?.projects)return sortProjects(preview.publishing.projects.filter(p=>p.public)).map(p=>({...p,screenshots:projectScreenshots(p.slug,p.screenshots)}));
   const sb = publicClient();
   if (!sb) return [];
-  const { data, error } = await sb.from("projects").select(PROJECT_SELECT).eq("public", true);
+  const { data, error } = await sb.from("projects").select("*").eq("public", true);
   if (error) throw new Error("Projects unavailable");
   return sortProjects((data ?? []) as Project[]).map(p => ({ ...p, screenshots: projectScreenshots(p.slug, p.screenshots) }));
 }
@@ -29,7 +29,7 @@ export async function getPublicProject(slug: string,preview?:HomePreview|null): 
   if(preview?.publishing?.projects){const p=preview.publishing.projects.find(p=>p.slug===slug&&(p.public||p.draftChanged));return p?{...p,screenshots:projectScreenshots(p.slug,p.screenshots)}:null;}
   const sb = publicClient();
   if (!sb) return null;
-  const { data, error } = await sb.from("projects").select(PROJECT_SELECT).eq("slug", slug).eq("public", true).maybeSingle();
+  const { data, error } = await sb.from("projects").select("*").eq("slug", slug).eq("public", true).maybeSingle();
   if (error) throw new Error("Projects unavailable");
   return data ? { ...data as Project, screenshots: projectScreenshots(data.slug, data.screenshots) } : null;
 }

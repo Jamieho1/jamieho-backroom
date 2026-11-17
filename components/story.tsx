@@ -1,5 +1,5 @@
 import {ArticleMarkdown} from "@/components/articles/article-markdown";
-import {constellationTitle} from "@/lib/journey/constellation";
+import {constellationTitle} from "@/lib/journey/background-photos";
 import {CONTACT_HREF} from "@/lib/journey/content";
 import type {Section} from "@/lib/sections";
 

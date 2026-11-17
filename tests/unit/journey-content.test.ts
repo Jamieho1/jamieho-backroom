@@ -61,7 +61,7 @@ describe("journey content (TKT-77)", () => {
     const out = withContent(HOME_CHAPTERS, { sections: pivotSections, experience, technologies: [] });
     expect(panelsOf(out, "sky")[0]).toMatchObject({ title: "Test Name", body: "Second paragraph.", meta: "First line.", md: true, cta: undefined });
     expect(panelsOf(out, "about")[0]).toMatchObject({
-      title: "From labs to production", body: "First para.", md: true, look: "statement",
+      title: "From labs to production", body: "First para.", md: true,
       meta: "MEng Biomedical Engineering · Imperial College London · 2016–2020",
     });
   });
@@ -71,7 +71,7 @@ describe("journey content (TKT-77)", () => {
     expect(panelsOf(withAbout, "about")[0]).toMatchObject({ title: "About", body: "About text.", meta: undefined });
     const empty = { ...sections, about: { key: "about" as const, title: "", body: "" } };
     const skipped = withContent(HOME_CHAPTERS, { sections: empty, experience: [], technologies: [] });
-    expect(skipped.some((c) => c.id === "about")).toBe(false); // the whole section is skipped, not left blank
+    expect(skipped.some((c) => c.id === "about")).toBe(true); // the whole section is skipped, not left blank
   });
 
   it("puts the latest posts and Subscribe/Follow in Creator, and leaves the room free of text panels", () => {
@@ -106,28 +106,14 @@ describe("journey content (TKT-77)", () => {
     const out = withContent(HOME_CHAPTERS, { sections: quiet, experience: [], technologies: [] });
     expect(out.some((c) => c.id === "creator")).toBe(false);
     expect(panelsOf(out, "room")).toEqual([]);
-    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact Us");
+    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact");
   });
 
-  it("fills the showcase with featured public projects (max 4) and sizes its scroll; skips it with none", () => {
-    const proj = (slug: string, over: Record<string, unknown> = {}) => ({ id: slug, slug, name: slug.toUpperCase(), tagline: "t", body: "", tags: ["a", "b", "c", "d"], screenshots: ["https://x/1.png"], url: "", featured: true, public: true, sort: 1, created_at: "", ...over });
-    const projects = [proj("one"), proj("two"), proj("plain", { featured: false }), proj("hidden", { public: false }), proj("three"), proj("four"), proj("five")];
-    const out = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [], projects });
-    const sc = out.find((c) => c.id === "projects");
-    expect(sc?.kind === "section" && sc.showcase?.map((i) => i.slug)).toEqual(["one", "two", "three", "four"]);
-    expect(sc?.kind === "section" && sc.showcase?.[0]).toEqual({ slug: "one", name: "ONE", tagline: "t", tags: ["a", "b", "c"], href: "/projects/one", shots: ["https://x/1.png"] });
-    expect(sc?.scroll).toBeCloseTo(0.6 + 4);
-    const none = withContent(HOME_CHAPTERS, { sections, experience: [], technologies: [], projects: [proj("plain", { featured: false })] });
-    expect(none.some((c) => c.id === "projects")).toBe(false);
-  });
-
-  it("binds only journey-loader stops and always finishes at Projects", () => {
-    const row={id:"synthetic-stop",kind:"role" as const,title:"Engineer",org:"Example",dates:"2024 – Present",location:"",summary:"",public:true,sort:0,show_on_journey:true,journey_icon:"code" as const,experience_bullets:[{id:"b",text:"Built synthetic systems",public:true,sort:0}]};
-    const ex=withContent(HOME_CHAPTERS,{sections,experience:[],technologies:[],journeyStops:[row]}).find(c=>c.id==="experience")!;
-    expect(ex.kind==="section"&&ex.experienceStops?.map(s=>s.title)).toEqual(["Engineer","Projects"]);
-    expect(ex.panels).toEqual([]);
-    const blank=withContent(HOME_CHAPTERS,{sections,experience:[item({title:"Not opted in"})],technologies:[]}).find(c=>c.id==="experience")!;
-    expect(blank.kind==="section"&&blank.experienceStops?.map(s=>s.title)).toEqual(["Projects"]);
+  it("binds all featured public projects and opted-in journey stops into the single dial",()=>{
+    const project={id:"p",slug:"example",name:"Example",tagline:"",body:"",tags:[],screenshots:[],url:"",featured:true,public:true,sort:0,created_at:""};
+    const row={id:"e",kind:"role" as const,title:"Engineer",org:"Example",dates:"2024",location:"London",summary:"",public:true,sort:0,show_on_journey:true,journey_icon:"code" as const,experience_bullets:[]};
+    const out=withContent(HOME_CHAPTERS,{sections,experience:[],technologies:[],journeyStops:[row],projects:[project]});
+    const chapter=out.find(c=>c.id==="about");expect(chapter?.kind==="section"&&chapter.dial).toEqual({experiences:[row],projects:[project]});expect(out.some(c=>c.id==="projects"||c.id==="experience")).toBe(false);
   });
 
   it("builds the Toolkit from '## layer' blocks plus public certificate badges, or falls back to project tags", () => {

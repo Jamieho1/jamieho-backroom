@@ -53,7 +53,7 @@ test("Journey dropdown returns from Resources to the requested homepage section"
   await page.locator('.site-navigation [data-menu=journey] summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('link',{name:'Background',exact:true}).click();
   await expect(page).toHaveURL(/\/#about$/);
-  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
+  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
 });
 
 test('Journey opens on hover and click, and the floating bar remains centred', async ({page}, info) => {
@@ -97,7 +97,7 @@ test('grouped navigation retains order, active pages and floating controls',asyn
  await page.goto('/resources');const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
  await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story','Content']);await expect(nav.locator(':scope > a')).toHaveText(['Interview Prep']);
  await nav.locator('[data-menu=content] summary').click();await expect(nav.getByRole('link',{name:'Resources',exact:true})).toHaveAttribute('aria-current','page');await page.keyboard.press('Escape');
- await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Background','Experience','Work','Techstack','Creator','Contact Us']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
+ await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Background','Experience','Work','What I build','Creator','Contact']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
  const floating=page.locator('.site-navigation.is-journey');await expect(floating).toHaveAttribute('data-floating','true');await floating.locator('[data-menu=content] summary').click();await floating.getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 

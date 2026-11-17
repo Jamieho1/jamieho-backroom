@@ -13,14 +13,12 @@ import { LineShape, type LineShapeHandle } from "./line-shape";
 import { lineState } from "@/lib/journey/lines";
 import { ScreenContact, ContactContent, type ScreenContactHandle } from "./screen-contact";
 import type { SocialLink } from "@/lib/social";
-import { Showcase, StaticShowcase, type ShowcaseHandle } from "./showcase";
+import { HomeDial, type HomeDialHandle } from "./home-dial";
+import {dialAnchorStep,dialCount} from "@/lib/journey/dial";
 import { Toolkit, type ToolkitHandle } from "./toolkit";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import { BrandIcon } from "./brand-icon";
-import {experienceStopLocal} from "@/lib/journey/experience-curve";
-import {ExperienceCurve,type ExperienceCurveHandle} from "./experience-curve";
-import {AboutConstellation,type AboutConstellationHandle} from "./about-constellation";
 import type {AboutPhoto} from "@/lib/home-content-schema";
 import { HeroArtwork } from "./hero-artwork";
 import { JourneyNavigation } from "./navigation";
@@ -43,10 +41,9 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
   // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
-  const [phoneExperienceHeight,setPhoneExperienceHeight]=useState(0);
-  const [phoneWorkHeight,setPhoneWorkHeight]=useState(0);
-  const chapters = useMemo(() => mobile ? phoneChapters(all).map(c=>c.kind==="section"&&c.experienceStops?.length
-    ? {...c,scroll:phoneExperienceHeight||Math.max(1,c.experienceStops.length*0.65),wipe:0}:c.kind==="section"&&c.showcase?.length?{...c,scroll:phoneWorkHeight||Math.max(1,c.showcase.length*.8),wipe:0}:c) : all, [all,mobile,phoneExperienceHeight,phoneWorkHeight]);
+  const [compactDial,setCompactDial]=useState(false);
+  const [dialHeight,setDialHeight]=useState(0);
+  const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0}:c),[all,mobile,compactDial,dialHeight]);
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -54,14 +51,10 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const displays = useRef<(HTMLElement | null)[]>([]);
   const panels = useRef<Map<string, HTMLElement>>(new Map());
-  const jumpExperienceStop=useRef<(index:number)=>void>(()=>{});
-  const experienceCurve=useRef<ExperienceCurveHandle>(null);
-  const phoneExperience=useRef<HTMLDivElement>(null);
-  const phoneWork=useRef<HTMLDivElement>(null);
-  const seekShowcase=useRef<(chapter:number,local:number)=>void>(()=>{});
-  const constellation=useRef<AboutConstellationHandle>(null);
+  const dial=useRef<HomeDialHandle>(null);
+  const compact=useRef<HTMLDivElement>(null);
+  const seekDial=useRef<(chapter:number,local:number)=>void>(()=>{});
   const stills = useRef<(HTMLImageElement | null)[]>([]);
-  const showcases = useRef<(ShowcaseHandle | null)[]>([]);
   const toolkits = useRef<(ToolkitHandle | null)[]>([]);
   const dots = useRef<(HTMLOListElement | null)[]>([]);
   const vignette = useRef<HTMLDivElement>(null);
@@ -119,6 +112,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     const phone = window.matchMedia(PHONE_QUERY);
     const syncPhone = () => setMobile(phone.matches);
     syncPhone(); phone.addEventListener("change", syncPhone);
+    const dialQuery=window.matchMedia("(max-width:900px)");const syncDial=()=>setCompactDial(dialQuery.matches);syncDial();dialQuery.addEventListener("change",syncDial);
     const scheme = window.matchMedia("(prefers-color-scheme: dark)");
     const syncTheme = () => setDark(document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && scheme.matches));
     syncTheme();
@@ -129,23 +123,15 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     setLive(!reduce.matches);
     const onChange = () => setLive(!reduce.matches);
     reduce.addEventListener("change", onChange);
-    return () => { reduce.removeEventListener("change", onChange); scheme.removeEventListener("change", syncTheme); observer.disconnect(); phone.removeEventListener("change", syncPhone); };
+    return () => { reduce.removeEventListener("change", onChange); scheme.removeEventListener("change", syncTheme); observer.disconnect(); phone.removeEventListener("change", syncPhone);dialQuery.removeEventListener("change",syncDial); };
   }, []);
 
-  // The phone's Experience chapter is real document travel over its measured content, not a pinned viewport.
   useEffect(()=>{
-    const node=phoneExperience.current;if(!live||!mobile||!node)return;
-    const measure=()=>{const value=node.getBoundingClientRect().height/innerHeight;setPhoneExperienceHeight(old=>Math.abs(old-value)<.005?old:value);};
-    measure();const observer=new ResizeObserver(measure);observer.observe(node);window.addEventListener("resize",measure);
-    return ()=>{observer.disconnect();window.removeEventListener("resize",measure);};
-  },[live,mobile]);
-
-  useEffect(()=>{
-    const node=phoneWork.current;if(!live||!mobile||!node)return;
-    const measure=()=>{const value=node.getBoundingClientRect().height/innerHeight;setPhoneWorkHeight(old=>Math.abs(old-value)<.005?old:value);};
+    const node=compact.current;if(!live||!compactDial||!node)return;
+    const measure=()=>{const value=node.getBoundingClientRect().height/innerHeight;setDialHeight(old=>Math.abs(old-value)<.005?old:value);};
     measure();const observer=new ResizeObserver(measure);observer.observe(node);window.addEventListener("resize",measure);
     return()=>{observer.disconnect();window.removeEventListener("resize",measure);};
-  },[live,mobile]);
+  },[live,compactDial]);
 
   // TKT-76: download the clips whole, in chapter order, and swap each chapter from its still to its video as it lands.
   useEffect(() => {
@@ -198,24 +184,19 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0, lastNav = -1;
     // Contact jumps to the end of the monitor push-in; other chapters jump to their start.
-    const yOf = (id: string) => id === "screen" ? st.end : mobile&&(id==="experience"||id==="projects") ? st.start+(lay.starts[chapters.findIndex(c=>c.id===id)]/lay.total)*(st.end-st.start)+1 : st.start + (st.end - st.start) * landingOf(chapters, id, lay) + 1;
-    jump.current = (id) => lenis.scrollTo(yOf(id), { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) });
-
-    jumpExperienceStop.current = (stop) => {
-      const i = chapters.findIndex(c => c.id === "experience");
-      const chapter = chapters[i];
-      if (chapter?.kind !== "section" || !chapter.experienceStops?.length) return;
-      const local = experienceStopLocal(stop, chapter.experienceStops.length);
-      const progress = (lay.starts[i] + chapter.scroll * local) / lay.total;
-      lenis.scrollTo(st.start + (st.end-st.start) * progress, {
-        duration:1.2, easing:t=>1-Math.pow(1-t,3),
-      });
+    const dialIndex=chapters.findIndex(c=>c.kind==="section"&&c.dial);
+    const yOf=(id:string)=>{
+      if(id==="screen")return st.end;
+      const c=chapters[dialIndex];
+      if(compactDial&&c?.kind==="section"&&c.dial&&["about","background","pivot","experience","projects","work"].includes(id)){
+        const step=dialAnchorStep(id,c.dial),node=compact.current?.querySelector<HTMLElement>(`[data-dial-step="${step}"]`);
+        const start=st.start+lay.starts[dialIndex]*innerHeight;
+        return Math.max(start+2,start+(node?.offsetTop??0)-(navigation.current?.getBoundingClientRect().bottom??100)-24);
+      }
+      return st.start+(st.end-st.start)*landingOf(chapters,id,lay)+1;
     };
-
-    seekShowcase.current=(index,local)=>{
-      const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;
-      lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});
-    };
+    jump.current=(id)=>lenis.scrollTo(yOf(id),{duration:1.2,easing:t=>1-Math.pow(1-t,3)});
+    seekDial.current=(index,local)=>{const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
 
     // Straight to the switched-off computer for /journey#desk links (no forced tour).
     skip.current = () => { lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
@@ -223,7 +204,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
       else if (window.location.hash) {
         const id = canonicalChapterId(window.location.hash.slice(1));
-        if (chapters.some(c => c.id === id)) jump.current(id);
+        if (chapters.some(c => c.id === id) || ["experience","projects"].includes(id)&&dialIndex>=0) jump.current(id);
       }
     };
     resetSky.current = () => {
@@ -269,9 +250,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
-          if(c.id === "about" && opacity > 0)constellation.current?.setProgress(at);
-          if(c.id === "experience" && opacity > 0)experienceCurve.current?.setProgress(at);
-          if (opacity > 0) { showcases.current[i]?.setProgress(at); toolkits.current[i]?.setProgress(at); }
+          if(c.dial && opacity > 0)dial.current?.setProgress(at);
+          if (opacity > 0) { toolkits.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
             // Timeline: light the dot of the entry being read (the last one whose window has started).
@@ -345,10 +325,10 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       window.removeEventListener("hashchange", followHash);
       cancelAnimationFrame(raf); st.kill(); gsap.ticker.remove(tick); lenis.destroy();
       resetSky.current = () => window.scrollTo({top:0, behavior:"instant"});
-      jumpExperienceStop.current = () => {};seekShowcase.current=()=>{};
+      seekDial.current=()=>{};
       lenisRef.current = null; jump.current = () => {}; skip.current = () => {};
     };
-  }, [live, chapters, lay, navItems, base, mobile]);
+  }, [live, chapters, lay, navItems, base, mobile, compactDial]);
 
   return (
     <div className={`journey${live ? " journey-live" : ""}${mobile ? " journey-phone" : ""}`} onClick={event => {
@@ -370,8 +350,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                   </div>
                 ) : c.kind === "section" && c.toolkit?.layers.length ? (
                   <Toolkit ref={(h) => { toolkits.current[i] = h; }} data={c.toolkit} />
-                ) : c.kind === "section" && c.showcase?.length ? (
-                  !mobile ? <Showcase ref={(h) => { showcases.current[i] = h; }} items={c.showcase} onSeek={local=>seekShowcase.current(i,local)}/> : null
                 ) : c.kind === "section" && c.still ? (
                   <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -384,8 +362,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                   </ol>
                 ) : null}
                 {c.display ? <p ref={(el) => { displays.current[i] = el; }} className="journey-display" aria-hidden="true">{c.display}</p> : null}
-                {c.kind === "section" && c.experienceStops?.length && !mobile ? <ExperienceCurve ref={experienceCurve} stops={c.experienceStops} base={base} onSelectStop={index=>jumpExperienceStop.current(index)}/> : null}
-                {c.id === "about" && c.panels?.[0] ? <AboutConstellation ref={constellation} panel={c.panels[0]} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)}/> : null}
+                {c.kind==="section"&&c.dial&&!compactDial?<HomeDial ref={dial} data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} changed={draftChapterChanged(c.id,draftSections)} onSeek={local=>seekDial.current(i,local)}/>:null}
                 {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
                   <section key={p.id} ref={(el) => { if (el) panels.current.set(`${c.id}:${p.id}`, el); }}
                     data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-panel journey-panel-${p.side ?? "left"}${p.look ? ` journey-look-${p.look}` : ""}${["about", "experience", "creator"].includes(c.id) && p.side !== "right" ? " journey-reading-card" : ""}`} aria-label={stripKeys(p.title)}>
@@ -404,8 +381,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
             <div className="journey-progress" aria-hidden="true"><div ref={bar} /></div>
             {debug ? <div ref={hud} className="journey-hud" /> : null}
           </div>
-          {mobile?chapters.map((c,i)=>c.kind==="section"&&c.experienceStops?.length?<div key={c.id} ref={phoneExperience} className="journey-phone-experience journey-section-light" style={{top:`${lay.starts[i]*100}vh`}}><ExperienceCurve stops={c.experienceStops} base={base} vertical still/></div>:null):null}
-          {mobile?chapters.map((c,i)=>c.kind==="section"&&c.showcase?.length?<div key={c.id} ref={phoneWork} className="journey-phone-work journey-section-dark" style={{top:`${lay.starts[i]*100}vh`}}><StaticShowcase items={c.showcase}/></div>:null):null}
+          {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.dial?<div key={c.id} ref={compact} className="journey-compact-dial" style={{top:`${lay.starts[i]*100}vh`}}><HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/></div>:null):null}
         </div>
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
@@ -477,11 +453,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               ))}</ul> : null}
             </section>
           ) : null}
-          {c.kind === "section" && c.showcase?.length ? (
-            <StaticShowcase items={c.showcase}/>
-          ) : null}
-          {c.kind === "section" && c.experienceStops?.length ? <ExperienceCurve stops={c.experienceStops} base={base} still/> : null}
-          {c.id === "about" && c.panels?.[0] ? <AboutConstellation panel={c.panels[0]} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/> : null}
+          {c.kind==="section"&&c.dial?<HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/>:null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
               {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "about"} />}

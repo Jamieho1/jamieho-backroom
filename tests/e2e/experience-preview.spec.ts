@@ -22,8 +22,8 @@ test.describe('real Experience/CV draft previews',()=>{
  test.beforeEach(async({page})=>{await page.route(/\/home-media\/.*\.mp4/,r=>r.abort());});
  test('mixed draft overlays Home and CV, with outlines, hidden filtering and discard',async({page,baseURL},testInfo)=>{
   await page.emulateMedia({reducedMotion:'reduce'});const set=await enter(page,baseURL!);
-  const experience=page.locator('.journey-stills #experience');await experience.scrollIntoViewIfNeeded();
-  const panel=experience.locator('[data-draft-changed="true"]').filter({has:page.getByRole('heading',{name:'Draft fixture role',exact:true})});await expect(panel).toBeVisible();
+  const experience=page.locator('.journey-stills #about .dial-stacked');await experience.scrollIntoViewIfNeeded();
+  const panel=experience.locator('.dial-stack-step[data-draft-changed="true"]').filter({has:page.getByRole('heading',{name:'Draft fixture role',exact:true})});await expect(panel).toBeVisible();
   await expect(experience.locator('li[data-draft-changed="true"]')).toContainText('Draft new proof');await expect(experience).not.toContainText('Hide fixture role');await expect(experience).not.toContainText('Delete fixture proof');
   expect(await page.content()).not.toContain('Private fixture proof');await page.screenshot({path:testInfo.outputPath('home-preview.png')});
   await page.getByRole('link',{name:'Preview CV',exact:true}).click();await expect(page).toHaveURL(/\/behavioral$/);
@@ -39,7 +39,7 @@ test.describe('real Experience/CV draft previews',()=>{
   const set=await enter(page,baseURL!,'Preview CV');await expect(page.getByRole('region',{name:'CV',exact:true})).toContainText('Draft fixture role');
   await page.getByRole('button',{name:'Approve',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);await expect(page.locator('[data-draft-changed="true"]')).toHaveCount(0);
   const state=await local('/__state');const saved=state.sets.find((s:{id:string})=>s.id===set.id);expect(saved.status).toBe('approved');expect(saved.previous.find((p:{key:string})=>p.key===removed).values.text).toBe('Delete fixture proof');expect(state.items.find((i:{id:string})=>i.id===hidden).public).toBe(false);expect(state.bullets.some((b:{id:string})=>b.id===removed)).toBe(false);
-  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await expect(page.locator('.journey-stills #experience')).toContainText('Draft fixture role');await expect(page.locator('.journey-stills #experience')).toContainText('Draft new proof');
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await expect(page.locator('.journey-stills #about .dial-stacked')).toContainText('Draft fixture role');await expect(page.locator('.journey-stills #about .dial-stacked')).toContainText('Draft new proof');
  });
  test('copied cookies expose no Experience drafts on Home or CV to visitors and members',async({page,browser,baseURL})=>{
   const set=await enter(page,baseURL!,'Preview CV');const cookies=(await page.context().cookies()).filter(c=>['jb.content-preview','__prerender_bypass'].includes(c.name));

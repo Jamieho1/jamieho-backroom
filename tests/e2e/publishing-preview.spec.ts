@@ -16,7 +16,7 @@ test.describe('real publishing previews',()=>{
   expect((await page.reload())?.headers()['cache-control']).toContain('no-store');
   const copied=(await page.context().cookies()).filter(c=>['jb.content-preview','__prerender_bypass'].includes(c.name));const guest=await browser.newContext({viewport:page.viewportSize()!});
   try{await guest.addCookies(copied);const visitor=await guest.newPage();expect((await visitor.goto(baseURL+'/projects/datakind-fixture'))?.status()).toBe(404);expect(await visitor.content()).not.toContain('DataKind UK fixture');}finally{await guest.close();}
-  await page.emulateMedia({reducedMotion:'reduce'});await page.goto(baseURL+'/');const work=page.locator('.journey-still-showcase li').filter({hasText:'DataKind UK fixture'});await work.scrollIntoViewIfNeeded();await expect(work).toHaveAttribute('data-draft-changed','true');await page.screenshot({path:info.outputPath('project-work.png')});
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto(baseURL+'/');const work=page.locator('.dial-stack-step:has(.dial-tags)').filter({hasText:'DataKind UK fixture'});await work.scrollIntoViewIfNeeded();await expect(work).toHaveAttribute('data-draft-changed','true');await page.screenshot({path:info.outputPath('project-work.png')});
   await page.getByRole('button',{name:'Approve',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);
   expect((await local('/__state')).sets.find((s:{id:string})=>s.id===proposal.id).status).toBe('approved');await page.goto('/projects/datakind-fixture');await expect(page.getByRole('heading',{name:'DataKind UK fixture',exact:true})).toBeVisible();await expect(page.locator('[data-draft-changed="true"]')).toHaveCount(0);
  });

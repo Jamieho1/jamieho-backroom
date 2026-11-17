@@ -47,9 +47,3 @@ describe("journey media", () => {
     }
   });
 });
-
-it('versions the three approved Experience assets with their verified content hashes',()=>{
- for(const [file,v,bytes] of [['experience-bg.webp','6f0fd1cf',118238],['experience-mascot.webp','424749fa',134712],['experience-phone.webp','ab1c243d',121254]] as const){
-  expect(MEDIA_MANIFEST[file]).toEqual({v,bytes});expect(mediaUrl('/home-media',file)).toBe(`/home-media/${file}?v=${v}`);
- }
-});

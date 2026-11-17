@@ -1,22 +1,9 @@
-/**
- * TKT-77: fill the journey's placeholder panels with the site's existing content (no new content store, nothing
- * personal in git). Mapping agreed 2026-11-04:
- * - Sky: `hero` section, with no desktop shortcut.
- * - About: `about` title as the statement, its first paragraph, and the first public education entry.
- * - Projects (v1.1): featured public projects (max 4) in the pinned showcase.
- * - Experience: opted-in public journey stops, oldest first, then Projects.
- * - Creator (v1.1): `writing` pitch + Subscribe/Follow from `contact` links; latest YouTube / Instagram / article.
- * - Room/monitor: no text panels; the shared contact form uses Contact social links.
- * - Toolkit (v1.1): `technology` "## layer" blocks (fallback: project tags) + public certificate entries as badges.
- * Empty sections and missing entries simply drop their panel.
- */
-import {experienceStops} from "./experience-curve";
+import {dialData,dialCount} from "./dial";
 import type {ExperienceRow} from "@/lib/experience";
 import type { Item } from "@/lib/experience";
 import type { Section, SectionKey } from "@/lib/sections";
 import type { LatestMedia } from "@/lib/articles-public";
-import { featuredProjects, projectHref, type Project } from "@/lib/portfolio-core";
-import { SHOWCASE_WIPE, showcaseScroll } from "./showcase";
+import { type Project } from "@/lib/portfolio-core";
 import { certBadge, firstHttps, parseToolkit, toolkitScroll } from "./toolkit";
 import { parseRotator, rotatorText } from "./motion";
 import { articleHref, youtubeId } from "@/lib/articles";
@@ -60,12 +47,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
   const s = content.sections;
   const education = content.experience.find((i) => i.kind === "education");
 
-  const featured = featuredProjects(content.projects ?? []);
   return chapters.map((c) => {
-    if (c.id === "experience" && c.kind === "section") {
-      const stops=experienceStops(content.journeyStops??[]);
-      return {...c,scroll:Math.max(2.4,stops.length*.85),wipe:.12,panels:[],experienceStops:stops};
-    }
     if (c.kind === "section" && c.toolkit) {
       // Layers from the Technology section's "## layer" blocks; without any, one layer of the projects' tags.
       let layers = parseToolkit(s.technology.body);
@@ -82,14 +64,6 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
       if (!layers.length) return { ...c, toolkit: { ...c.toolkit, layers: [], certs: [] } };
       const scroll = toolkitScroll(layers.length, certs.length);
       return { ...c, scroll, wipe: Math.min(0.2, 0.25 / scroll), toolkit: { title: s.technology.title.trim() || c.toolkit.title, layers, certs } };
-    }
-    if (c.kind === "section" && c.showcase) {
-      // The showcase grows one screen of scroll per featured project; with none, the section is skipped below.
-      const scroll = showcaseScroll(featured.length);
-      return {
-        ...c, scroll, wipe: SHOWCASE_WIPE / scroll,
-        showcase: featured.map((p) => ({ draftChanged:p.draftChanged, slug: p.slug, name: p.name, tagline: p.tagline, tags: p.tags.slice(0, 3), href: projectHref(p.slug), shots: p.screenshots })),
-      };
     }
     const panels: Panel[] = [];
     for (const p of c.panels ?? []) {
@@ -141,6 +115,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           panels.push(p);
       }
     }
+    if(c.kind==="section"&&c.dial){const dial=dialData(content.journeyStops??[],content.projects??[]);return {...c,panels,dial,scroll:dialCount(dial)*1.35,wipe:0};}
     return { ...c, panels };
-  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || (c.showcase?.length ?? 0) > 0 || (c.experienceStops?.length ?? 0) > 0 || (c.toolkit?.layers.length ?? 0) > 0); // an empty section is skipped entirely
+  }).filter((c) => c.kind !== "section" || (c.panels?.length ?? 0) > 0 || !!c.dial || (c.toolkit?.layers.length ?? 0) > 0); // an empty section is skipped entirely
 }

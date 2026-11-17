@@ -11,7 +11,7 @@ export const JourneyNavigation = forwardRef<HTMLElement, Props>(function Journey
     sync(); window.addEventListener("scroll", sync, { passive: true });
     return () => window.removeEventListener("scroll", sync);
   }, [live]);
-  return <SiteNavigation journey items={items.map(({ c }) => ({ id: c.id, label: JOURNEY_LINKS.find(item => item.id === c.id)?.label ?? c.nav! }))} navRefs={navRefs} onJump={live ? onJump : undefined} ref={node => {
+  return <SiteNavigation journey items={items.flatMap(({c})=>c.kind==="section"&&c.dial?[{id:"about",label:"Background"},...(c.dial.experiences.length?[{id:"experience",label:"Experience"}]:[]),...(c.dial.projects.length?[{id:"projects",label:"Work"}]:[])]:[{id:c.id,label:JOURNEY_LINKS.find(item=>item.id===c.id)?.label??c.nav!}])} navRefs={navRefs} onJump={live ? onJump : undefined} ref={node => {
     local.current = node; if (typeof ref === "function") ref(node); else if (ref) ref.current = node;
   }} />;
 });

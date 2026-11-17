@@ -29,7 +29,7 @@ test("editorial introduction keeps full-background framing and the scroll cue op
   });
   expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();
-  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
+  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
 });
 
@@ -46,10 +46,10 @@ test("Journey dropdown navigates, keeps the floating controls and returns to the
   await expect(nav.getByRole("button", { name: /Hello/ })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: /Background/ })).toBeVisible();
 
-  await expect(nav.getByRole("button", { name: /Techstack/ })).toBeAttached();
+  await expect(nav.getByRole("button", { name: /What I build/ })).toBeAttached();
   await nav.getByRole("button", { name: /Background/ }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
-  await expect(page.locator('[data-chapter="about"] .journey-panel')).toBeVisible();
+  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
   await page.getByRole("link", { name: "Jamie Ho — back to the top" }).click();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "false");
   await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(4);
@@ -70,7 +70,7 @@ test("About remains readable without the retired photos, timeline or fullscreen 
   const about = page.locator('[data-chapter="about"]');
   await page.locator(".is-journey [data-menu=journey] summary").click();
   await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Background/ }).click();
-  await expect(about.locator(".journey-panel")).toBeVisible();
+  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
   await page.mouse.wheel(0, 600);
   await page.waitForTimeout(600);
   await expect(page.locator('[data-grow]')).toHaveCount(0);
@@ -131,13 +131,13 @@ test("About text remains readable and inactive project links cannot intercept th
   await page.locator(".is-journey [data-menu=journey] summary").click();
   await page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: "Background", exact: true }).click();
   const about = page.locator('[data-chapter="about"]');
-  await expect(about.locator(".journey-panel")).toBeVisible();
+  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
   await expect(about).not.toHaveAttribute("inert");
   await expect(page.locator('[data-chapter="sky"]')).toHaveAttribute("inert", "");
-  await expect(about.locator(".about-constellation-body a")).toHaveCount(0);
+  await expect(about.locator(".dial-prose a")).toHaveCount(0);
   await expect(about.locator('.journey-about-photos')).toHaveCount(0);
   await page.waitForTimeout(1800);
-  const body = about.locator(".about-constellation-body");
+  const body = page.locator(".home-dial:visible .dial-prose");
   if (await body.count()) {
     const intercepted = await body.evaluate(el => {
       const r = el.getBoundingClientRect();
@@ -162,7 +162,7 @@ test('Schedule a call jumps directly to the Contact form',async({page})=>{
 });
 
 for(const anchor of ['background','about','pivot'])test(`${anchor} hash lands on canonical About, including hash changes`,async({page})=>{
- await page.goto('/#'+anchor);const about=page.locator('[data-chapter="about"] .journey-panel');await expect(about).toBeVisible();
+ await page.goto('/#'+anchor);const about=page.locator('.home-dial:visible [data-dial-step="0"]');await expect(about).toBeVisible();
  const nav=page.locator('.site-navigation.is-journey');await expect(nav.locator('[data-menu="my story"] summary')).toBeVisible();
  await nav.getByRole('link',{name:'Jamie Ho — back to the top'}).click();await expect(nav).toHaveAttribute('data-floating','false');
  await page.evaluate(()=>{location.hash='sky'});await page.evaluate(hash=>{location.hash=hash},anchor);await expect(about).toBeVisible();
@@ -178,11 +178,11 @@ test('reduced motion and no JavaScript retain canonical/legacy anchors without r
 });
 
 test('About text and photos stay on their own opaque section through chapter handovers',async({page})=>{
- await page.goto('/#about');const about=page.locator('[data-chapter="about"]');await expect(about.locator('.journey-panel')).toBeVisible();
- await expect(about).toHaveCSS('isolation','isolate');await expect(about).toHaveCSS('overflow','clip');await expect(about).toHaveCSS('background-color','rgb(246, 243, 238)');
+ await page.goto('/#about');const about=page.locator('[data-chapter="about"]');await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
+ await expect(about).toHaveCSS('isolation','isolate');await expect(about).toHaveCSS('overflow','clip');await expect(about).toHaveCSS('background-color','rgb(27, 35, 51)');
  // Model elevated descendants in a neighbouring chapter: their z-index must remain contained.
  await page.evaluate(()=>{const hero=document.querySelector<HTMLElement>('.journey-hero-art');if(hero)hero.style.zIndex='999';});
  await page.waitForTimeout(1800);
- expect(await page.evaluate(()=>[200,350,500].map(y=>document.elementFromPoint(innerWidth-12,y)?.closest('[data-chapter]')?.getAttribute('data-chapter')))).toEqual(['about','about','about']);
- const rectangle=await about.boundingBox();const title=await about.locator('.about-constellation-title').boundingBox();expect(title!.y).toBeGreaterThanOrEqual(rectangle!.y);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ expect(await page.locator('.home-dial:visible').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(27, 35, 51)');
+ const rectangle=await about.boundingBox();const title=await page.locator('.home-dial:visible h2').first().boundingBox();expect(title!.y).toBeGreaterThanOrEqual(rectangle!.y);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

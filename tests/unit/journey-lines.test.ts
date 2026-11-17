@@ -27,14 +27,9 @@ describe("line shapes (TKT-95)", () => {
     expect([...lerpInto(new Float32Array(3), a, b, 0.5)]).toEqual([1, 2, -1]);
   });
 
-  it("keeps only Work and Creator shapes; About/Experience have no geometry", () => {
-    expect(SHAPE_BY_CHAPTER).toEqual({projects:'torus',creator:'helix'});
-    for(const id of ['about','pivot','experience'])expect(lineState([{id,kind:'section'}],0,.5)).toMatchObject({shape:null,opacity:0});
-    expect(lineState(chapters,2,0)).toMatchObject({shape:'torus',from:'torus',opacity:0});
-    expect(lineState(chapters,2,.5).opacity).toBe(1);
-    expect(lineState(chapters,3,.5)).toMatchObject({shape:null,opacity:0});
-    expect(lineState(chapters,4,.1).from).toBe('helix');
-    const adjacent=[{id:'projects',kind:'section'},{id:'creator',kind:'section'}];
-    const mid=lineState(adjacent,1,.15);expect(mid.from).toBe('torus');expect(mid.shape).toBe('helix');expect(mid.morph).toBeGreaterThan(0);expect(mid.morph).toBeLessThan(1);
+  it("keeps Creator's helix while the dial and Toolkit own their visuals",()=>{
+    expect(SHAPE_BY_CHAPTER).toEqual({creator:'helix'});
+    for(const id of ['about','pivot','experience','projects','toolkit'])expect(lineState([{id,kind:'section'}],0,.5)).toMatchObject({shape:null,opacity:0});
+    expect(lineState([{id:'creator',kind:'section'}],0,.5)).toMatchObject({shape:'helix',opacity:1});
   });
 });

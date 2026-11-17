@@ -13,6 +13,7 @@ export interface Project {
   body: string;
   tags: string[];
   screenshots: string[];
+  highlights?: string[];
   url: string;
   featured: boolean;
   public: boolean;
@@ -57,6 +58,7 @@ export const projectSchema = z.object({
   tags: z.array(z.string().trim().min(1).max(PROJECT_LIMITS.tag)).max(PROJECT_LIMITS.tags),
   screenshots: z.array(z.string().refine(https)).max(PROJECT_LIMITS.screenshots),
   url: z.string().trim().refine((s) => s === "" || https(s)),
+  highlights: z.array(z.string().trim().min(1).refine(s=>!s.includes("\0")&&Array.from(s).length<=400)).max(3).optional(),
   featured: z.boolean(),
   public: z.boolean(),
   sort: z.number().int().min(-1000).max(1000),

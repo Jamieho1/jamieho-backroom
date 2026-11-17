@@ -350,3 +350,54 @@ You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, do
 
 Done when: the overlay diff for the JH and PassLoop marks is reported and under target; favicons and the top-bar button show the traced JH mark; browser tests at desktop check the expanded brand row shows the whole logo (bounding box inside the rail, no overlap with the collapse button) and the collapsed mark and expand button don't intersect; 390 px drawer unchanged; typecheck, suite, build and static assertions pass; docs/interview.md, docs/status.md, MEMORY.md updated. Report checks actually run.
 ```
+
+---
+
+## Home polish 7 — Dial: Background → Experience → Selected Work (replaces About polish 3, the Work section, the curve and the mascot)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/journey.md and docs/content-drafts.md first and follow them (Jamie pushes; update docs/ + MEMORY.md + docs/decisions.md after). About polish 3 is cancelled.
+
+Approved design: "Personal Website/Media/Previews/home-dial-build-work.html" (the dial part, from the BACKGROUND eyebrow through the DataKind UK stop). Open it, scroll it at desktop and 390 px, and match it closely. Build it as ONE pinned homepage chapter replacing the current Background (About), Experience and Work chapters:
+1. Look: navy ink editorial, off-white text, gold accents, film grain, fading dot grid, outlined "JAMIE HO" watermark behind the dial (never behind text), 30% rings with ticks, coordinate label, gold tags on leader lines, left index rail, divider, corner metadata "LONDON · HONG KONG" and "SECTION 02 / …". CSS + inline SVG only; no new dependencies (use the existing GSAP ScrollTrigger + Lenis setup for pinning/scrub).
+2. Step 0 Background: heading/paragraph/Read my story left; photo constellation right (About photos loader, centre photo, others on the ring, tags from captions).
+3. Experience stops from the journey-stops loader (Content Drafts editable): side photos slide out and fade, eyebrow EXPERIENCE, dial rotates per stop, centre = graduation photo for the education entry and the existing built-in line icons (drawn on scroll) for the others, text card with org/title/dates · location/up to 3 public bullets, gold index node, per-stop coordinates (Imperial 51.4988° N · 0.1749° W, Hong Kong 22.3193° N · 114.1694° E, London 51.5072° N · 0.1276° W), pulsing ring for a "present" entry.
+4. Selected Work stops = the featured projects from the projects table (Content Drafts editable), in their sort order; eyebrow SELECTED WORK. Centre = the browser-window frame (macOS traffic lights #FF5F57 #FEBC2B #28C840; the frame's content area takes the screenshot's own aspect ratio so there are no empty bands — trim Cyterly's bundled image border if the bands are baked in; about 30% larger than in the mockup so it fills the inner ring). Multiple screenshots scroll left → right with the page scroll (scrubbed, dots as indicator). Text card: name, tagline, up to 3 short lines (add an optional "highlights" text list to projects via a migration if needed, allowlisted in Content Drafts — never derive from body automatically), status line if present, tags, capability links (e.g. "→ 01 AI engineering"), Visit ↗ (if url) and Case study →. "All projects →" after the last project. Index rail lists every stop, so new jobs and projects extend it automatically (layout tested for 3–8 stops).
+5. Phones ≤900 px and reduced motion / no JS: no pinning, stacked steps fully drawn, swipeable screenshot carousel with dots; no sideways scroll.
+6. Anchors: #background/#about/#pivot → step 0, #experience → first job stop, #work/#projects → first project stop. Journey dropdown: Background, Experience, Work, What I build, Creator, Contact.
+7. Retire completely: the old Work showcase chapter, the Experience curve/stop layout, the walking mascot, mascot background and phone still (code, CSS, tests, media-manifest entries) and the old single-circle constellation. Delete the mascot art: Storage objects experience-bg.webp, experience-mascot.webp, experience-phone.webp in home-media (list first, confirm unreferenced, then delete) and the local folder "Personal Website/Media/Experience-art/".
+8. Content Drafts (live sets, summary + operations only; Jamie approves): About photo about-ufl-participant.jpg caption → "Imperial College Investment Society · Investment pitch at The Shard"; and, if you add highlights, Cyterly AI highlights exactly as in the mockup and DataKind UK's one line from the mockup.
+
+Done when: browser tests at desktop scroll through every step forwards/backwards with correct text, centre visual and gold index node; DataKind screenshots advance with scroll; no text overlaps the dial (bounding boxes); anchors land correctly; 390 px and reduced-motion layouts pass with no sideways scroll; grep shows no references to removed files; migration (if any) has policy tests and is NOT applied until Jamie says "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run and every deleted file/object.
+```
+
+---
+
+## Home polish 8 — "What I build" (replaces Techstack)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/journey.md and docs/content-drafts.md first and follow them (Jamie pushes; update docs/ + MEMORY.md + docs/decisions.md after). Runs after Home polish 7.
+
+Approved design: the "WHAT I BUILD" section in "Personal Website/Media/Previews/home-dial-build-work.html". Replace the Techstack chapter (stacked cards and cert badges) with it, placed right after the dial and before Creator:
+1. Desktop: pinned; scroll advances 01→05 (counter "0N / 05"), the active row expands (description + chips), and the right panel draws that item's diagram (inline SVG, stroke-dashoffset). Clicking a row jumps to it. Phones ≤900 px: accordion, diagram under the open row, diagrams pan inside their panel (no page sideways scroll). Reduced motion: all open and drawn.
+2. Five items with the exact titles, descriptions, chips, captions and diagrams from the mockup: 01 AI engineering; 02 Production event systems ("Example design": devices/apps → gateway → Kafka → stream consumers → MongoDB, failure bin DLQ with replay, analytics fan-out, Grafana + Prometheus alerts); 03 Cloud architecture ("Reference design", with the two AWS certification badges); 04 Full-stack (languages row first: Java, Python, TypeScript, SQL, Go; "How this website is built"); 05 Machine learning & computer vision (ETL lane plus the Segment Anything (SAM) → masks lane, KOLN3D and DataKind notes).
+3. Content: titles, descriptions, chips and captions are editable content (reuse the existing technology site section or a small new table, allowlisted in Content Drafts). Diagrams are code (one SVG component per item, data-driven nodes/edges so they can be edited in one place). Migrate the existing Toolkit content into the new shape; keep certifications.
+4. CTA row "Have a project in mind?" + "Start a conversation →" linking to the Contact form anchor.
+5. Retire the old Techstack/toolkit components, CSS, tests and any images they alone used.
+
+Done when: browser tests at desktop step through 01–05 by scrolling, each diagram renders with no label overlaps (bounding-box check per diagram), CTA reaches Contact; 390 px accordion and reduced-motion pass with no page sideways scroll; migration (if any) has policy tests and waits for "apply it"; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
+```
+
+---
+
+## Media cleanup — remove unused and duplicate images (after Home polish 7)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md first.
+
+Goal: remove images and media that are no longer used or are duplicated, across three places: the repo's public/ folder (and any other committed assets), the local "Personal Website/Media/" folder (not in Git), and Supabase Storage buckets (home-media, project-media, article-images).
+1. Inventory every file with size. Find references: grep the repo (code, CSS, docs, media manifest, service worker), and read the live tables that store image paths/URLs (about_photos, projects.screenshots, articles/guides bodies and covers, site_sections bodies, content_changes photo_slots for approved sets). Detect duplicates by content hash.
+2. Produce a table: path · size · referenced by (or "unused") · duplicate of · proposed action (keep / delete / move). Rules: keep originals Jamie uploaded under Media/Uploads/ and Media/Brand/ unless a byte-identical copy exists elsewhere; never delete something referenced by live data; old London journey clips/stills, retired Desktop art and anything only referenced by retired features are candidates.
+3. Delete in Git (public/ and committed assets) directly — Git history keeps them. For the local Media folder and Supabase Storage, show Jamie the table and wait for his "delete" before removing them (these deletions are not recoverable). Organise what remains in Media/ into: Brand/, Uploads/<date-subject>/, Previews/ and a short Media/README.md describing the layout.
+4. Update the media manifest/service worker and docs (journey.md, operations.md), add one MEMORY.md line. Typecheck, build, static assertions and the Home browser tests must still pass. Report totals freed per location.
+```

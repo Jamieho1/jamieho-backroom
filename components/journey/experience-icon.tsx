@@ -1,4 +1,5 @@
-import type { JourneyIconName } from "@/lib/journey/experience-curve";
+import type { JOURNEY_ICONS } from "@/lib/home-content-schema";
+type JourneyIconName = typeof JOURNEY_ICONS[number];
 /** Original built-in icons: one 24px grid and one rounded stroke throughout. */
 export function ExperienceIcon({name}:{name:JourneyIconName}){
  const paths:Record<JourneyIconName,React.ReactNode>={

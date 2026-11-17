@@ -84,8 +84,8 @@ describe("journey timeline", () => {
   });
 
   it("orders the v1.1 journey: video only at the two ends", () => {
-    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "experience", "projects", "toolkit", "creator", "to-room", "c7a", "c7b"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Background", "Experience", "Work", "Techstack", "Creator", "Contact Us"]);
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "toolkit", "creator", "to-room", "c7a", "c7b"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Background", "What I build", "Creator", "Contact"]);
   });
 
   it("fades the contact screen in over the end of the push-in", () => {
@@ -132,6 +132,6 @@ describe("journey timeline", () => {
 it('canonical About and legacy pivot land at the same readable position',()=>{
  expect(canonicalChapterId('pivot')).toBe('about');expect(canonicalChapterId('about')).toBe('about');
  expect(landingOf(HOME_CHAPTERS,'pivot')).toBe(landingOf(HOME_CHAPTERS,'about'));
- const experience=HOME_CHAPTERS.find(c=>c.id==='experience');
+ const experience=HOME_CHAPTERS.find(c=>c.id==='about');
  expect(experience).not.toHaveProperty('still');expect(experience).not.toHaveProperty('timeline');
 });

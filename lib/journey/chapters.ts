@@ -12,20 +12,10 @@ export const HOME_CHAPTERS: Chapter[] = [
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
     panels: [{ id: "hero", from: 0, to: 0.85, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
-  // About binds the existing section text and public photo constellation.
-  {
-    id: "about", label: "Background", nav: "Background", kind: "section", tone: "light", scroll: 1.5,
-    panels: [{ id: "about", from: 0.1, to: 1, side: "left", look: "statement", eyebrow: "About", title: "From Biomedical Engineering to production systems", body: PLACEHOLDER }],
-  },
-  // Opted-in public CV stops and the fixed Projects hand-off bind in withContent.
-  {
-    id: "experience", label: "Experience", nav: "Experience", kind: "section", tone: "light", scroll: 1.4,
-    panels: [], experienceStops: [],
-  },
-  // Selected work (TKT-87): featured projects in a pinned showcase. Filled (and sized) from the database.
-  { id: "projects", label: "Work", nav: "Work", kind: "section", tone: "dark", scroll: 1.6, showcase: [] },
+  {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,
+    panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
   // Toolkit (TKT-88): the one layered scene. An exploded architecture stack, then the certification badges.
-  { id: "toolkit", label: "Techstack", nav: "Techstack", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Techstack", layers: [], certs: [] } },
+  { id: "toolkit", label: "Techstack", nav: "What I build", kind: "section", tone: "dark", scroll: 2, toolkit: { title: "Techstack", layers: [], certs: [] } },
   // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
   {
     id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6,
@@ -40,5 +30,5 @@ export const HOME_CHAPTERS: Chapter[] = [
     id: "room", label: "Room", display: "Contact", kind: "video", src: "c7a", scroll: 1.4, motes: 0.3,
     keys: [[0, 0], [0.24, 0.44], [0.27, 0.54], [1, 1]],
   },
-  { id: "screen", label: "Contact Us", nav: "Contact Us", kind: "video", src: "c7b", scroll: 0.8, join: 0.08 },
+  { id: "screen", label: "Contact Us", nav: "Contact", kind: "video", src: "c7b", scroll: 0.8, join: 0.08 },
 ];

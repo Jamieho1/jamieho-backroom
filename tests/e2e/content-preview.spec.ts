@@ -53,7 +53,7 @@ test.describe('real owner preview and session isolation',()=>{
   const cookie=(await page.context().cookies()).find(c=>c.name===previewCookie);expect(cookie?.httpOnly).toBe(true);
   expect(await page.evaluate(()=>document.cookie.includes('jb.content-preview'))).toBe(false);
   await page.locator('.is-journey [data-menu=journey] summary').click();await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Background',exact:true}).click();
-  const about=page.locator('[data-chapter="about"] .journey-panel');await expect(about.getByRole('heading',{name:set.about,exact:true})).toBeVisible();await expect(about).toHaveAttribute('data-draft-changed','true');
+  const about=page.locator('.home-dial:visible [data-dial-step="0"]');await expect(about.getByRole('heading',{name:set.about,exact:true})).toBeVisible();await expect(about).toHaveAttribute('data-draft-changed','true');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:'Back to list',exact:true}).click();await expect(page).toHaveURL(/\/manage\/review$/);
   expect((await page.context().cookies()).some(c=>c.name===previewCookie)).toBe(false);

@@ -23,7 +23,7 @@ test.describe('real owner app draft previews',()=>{
   await page.getByRole('link',{name:'Preview Resume & Stories',exact:true}).click();await expect(page.getByRole('article',{name:'Selected question'})).toContainText('Draft fixture outline');await page.getByText('Story library (1)',{exact:true}).click();await page.getByRole('button',{name:'Draft fixture story',exact:true}).click();await expect(page.getByRole('region',{name:'STAR stories'})).toContainText('Draft fixture situation');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:info.outputPath('app-preview.png')});
   await page.getByRole('button',{name:'Discard',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);expect((await local('/__state')).sets.find((s:{id:string})=>s.id===set.id).status).toBe('discarded');
-  await page.goto('/notes');await expect(page.locator('.notes-main')).toContainText('Live fixture note');
+  await page.goto('/interview/dsa/notes/fixture-note');await expect(page.locator('.notes-main')).toContainText('Live fixture note');
  });
  test('Approve applies every app operation and clears preview cookies',async({page,baseURL})=>{
   const set=await enter(page,baseURL!);await page.getByRole('button',{name:'Approve',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);await expect(page.locator('.notes-main')).toContainText('Draft fixture note');await expect(page.locator('[data-draft-changed="true"]')).toHaveCount(0);

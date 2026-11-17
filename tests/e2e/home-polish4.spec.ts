@@ -2,46 +2,16 @@ import {test,expect} from '@playwright/test';
 import {build,type Plugin} from 'esbuild';
 import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
-const css=readFileSync('app/journey.css','utf8');let bundle='',detailHtml='';
-const plugins:Plugin[]=[{name:'polish-journey',setup(b){
- b.onResolve({filter:/^\.\/navigation$/},()=>({path:'nav',namespace:'polish'}));b.onResolve({filter:/^\.\/screen-contact$/},()=>({path:'contact',namespace:'polish'}));b.onResolve({filter:/^\.\/(motes|line-shape)$/},()=>({path:'decor',namespace:'polish'}));
- b.onLoad({filter:/.*/,namespace:'polish'},args=>({resolveDir:process.cwd(),loader:'tsx',contents:args.path==='nav'?`import React,{forwardRef} from 'react';export const JourneyNavigation=forwardRef(()=>null);`:args.path==='contact'?`import React,{forwardRef} from 'react';export const ScreenContact=forwardRef(()=>null);export const ContactContent=()=>null;`:`import React,{forwardRef} from 'react';export const Motes=forwardRef(()=>null);export const LineShape=forwardRef(()=>null);`}));
-}}];
-test.beforeAll(async()=>{const out=await build({stdin:{contents:`import React from 'react';import {createRoot} from 'react-dom/client';import {Journey} from './components/journey/journey';const shot=color=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200"><rect width="1600" height="1200" fill="'+color+'"/></svg>');const chapters=[{id:'sky',kind:'section',tone:'light',scroll:.65,panels:[{id:'hero',title:'Synthetic hello',from:0,to:1}]},{id:'projects',label:'Work',nav:'Work',kind:'section',tone:'dark',scroll:2.6,showcase:[{slug:'cyterly',name:'Cyterly AI',tagline:'Synthetic public screenshot fixture',tags:['AI'],href:'/projects/cyterly',shots:['/project-art/cyterly-action-plan-f356cf5e1908.webp']},{slug:'datakind-uk',name:'DataKind UK',tagline:'Synthetic carousel fixture',tags:['Volunteer'],href:'/projects/datakind-uk',shots:[shot('#5899b5'),shot('#ad7b57')]}]}];createRoot(document.getElementById('polish-fixture')).render(<Journey chapters={chapters} base="/fixture-media"/>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env':'{"NODE_ENV":"production"}'},plugins});bundle=out.outputFiles[0].text;
+let detailHtml='';
+test.beforeAll(async()=>{
  const result=await build({stdin:{contents:`import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';import {ProjectDetail} from './components/portfolio/views';const p={id:'synthetic',slug:'cyterly',name:'Cyterly AI',tagline:'Synthetic project',body:'',tags:[],screenshots:['/project-art/cyterly-action-plan-f356cf5e1908.webp'],url:'',public:true,featured:true,sort:0,created_at:''};export const html=renderToStaticMarkup(<ProjectDetail p={p}/>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'cjs',platform:'node',jsx:'automatic',plugins:[{name:'detail-static',setup(b){b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'detail'}));b.onResolve({filter:/^\.\/manage-link$/},()=>({path:'manage',namespace:'detail'}));b.onLoad({filter:/.*/,namespace:'detail'},args=>({loader:'tsx',resolveDir:process.cwd(),contents:args.path==='link'?`import React from 'react';export default function Link({children,prefetch,...props}){return <a {...props}>{children}</a>}`:`export function ProjectManageLink(){return null}`}));}}]});
  const module={exports:{}};new Function('require','module','exports',result.outputFiles[0].text)(createRequire(process.cwd()+'/package.json'),module,module.exports);detailHtml=(module.exports as {html:string}).html;
 });
-
-async function mountWork(page:import('@playwright/test').Page){
- await page.goto('/privacy');await page.addStyleTag({content:css+'body > :not(#polish-fixture){display:none!important} body{margin:0}'});await page.evaluate(()=>{const el=document.createElement('div');el.id='polish-fixture';document.body.append(el)});await page.route('**/__polish.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));await page.addScriptTag({url:'/__polish.js'});await expect(page.locator('.journey-live')).toBeAttached();
-}
-async function workPosition(page:import('@playwright/test').Page,project:number,within:number){await page.evaluate(({project,within})=>scrollTo(0,(.65+.6+project+within)*innerHeight),{project,within});}
 async function fits(carousel:import('@playwright/test').Locator){
  const track=carousel.locator('.screenshot-carousel-track'),img=track.locator('img').first();await expect(img).toBeVisible();await expect.poll(()=>img.evaluate((el:HTMLImageElement)=>el.naturalWidth)).toBeGreaterThan(0);
  const box=await track.boundingBox(),picture=await img.boundingBox();expect(Math.abs(box!.width-picture!.width)).toBeLessThan(1);expect(Math.abs(box!.height-picture!.height)).toBeLessThan(1);const ratio=await img.evaluate((el:HTMLImageElement)=>el.naturalWidth/el.naturalHeight);expect(box!.width/box!.height).toBeCloseTo(ratio,2);await expect(img).toHaveCSS('object-fit','cover');
 }
 async function lights(carousel:import('@playwright/test').Locator){const dots=carousel.locator('.browser-traffic-lights i');for(const [i,color] of ['rgb(255, 95, 87)','rgb(254, 188, 43)','rgb(40, 200, 64)'].entries())await expect(dots.nth(i)).toHaveCSS('background-color',color);}
-
-test('Work scrubs DataKind screenshots down and up; dots seek the same clock',async({page},info)=>{
- test.skip(info.project.name!=='desktop','phone Work is natural document flow');await mountWork(page);
- const carousel=page.locator('[data-chapter="projects"]').getByRole('region',{name:'DataKind UK screenshots'}),track=carousel.locator('.screenshot-carousel-track');
- await workPosition(page,1,.12);await expect(carousel).toBeVisible();await expect.poll(()=>track.evaluate(el=>el.scrollLeft)).toBeLessThan(2);
- await workPosition(page,1,.88);await expect.poll(()=>track.evaluate(el=>el.scrollLeft/el.clientWidth)).toBeGreaterThan(.99);await expect(carousel.getByRole('button',{name:'Show DataKind UK screenshot 2'})).toHaveAttribute('aria-current','true');
- await workPosition(page,1,.12);await expect.poll(()=>track.evaluate(el=>el.scrollLeft)).toBeLessThan(2);await fits(carousel);await lights(carousel);
- await carousel.getByRole('button',{name:'Show DataKind UK screenshot 2'}).click();await expect.poll(()=>track.evaluate(el=>el.scrollLeft/el.clientWidth)).toBeGreaterThan(.99);await expect.poll(()=>page.evaluate(()=>scrollY/innerHeight)).toBeCloseTo(.65+.6+1+.88,2);
- await workPosition(page,0,.5);const cyterly=page.locator('[data-chapter="projects"]').getByRole('region',{name:'Cyterly AI screenshots'});await fits(cyterly);await lights(cyterly);expect((await cyterly.boundingBox())!.height).toBeLessThan(page.viewportSize()!.height*.67);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
-
-test('phone Work flows naturally with swipeable image-sized frames and no scrub',async({page},info)=>{
- test.skip(info.project.name!=='phone','phone document flow');await mountWork(page);const work=page.locator('.journey-phone-work');await work.scrollIntoViewIfNeeded();
- for(const name of ['Cyterly AI','DataKind UK']){const carousel=work.getByRole('region',{name:name+' screenshots'});await carousel.scrollIntoViewIfNeeded();await fits(carousel);await lights(carousel);await expect(carousel).not.toHaveAttribute('data-scrub','true');}
- const carousel=work.getByRole('region',{name:'DataKind UK screenshots'}),track=carousel.locator('.screenshot-carousel-track');await track.hover();await page.mouse.wheel(650,0);await expect.poll(()=>track.evaluate(el=>el.scrollLeft/el.clientWidth)).toBeGreaterThan(.99);const before=(await work.boundingBox())!.y;await page.evaluate(()=>scrollBy(0,80));expect((await work.boundingBox())!.y).toBeCloseTo(before-80,0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
-
-test('reduced-motion Work keeps native rows and dots without scrubbing',async({page})=>{
- await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/privacy');await page.addStyleTag({content:css+'body > :not(#polish-fixture){display:none!important}'});await page.evaluate(()=>{const el=document.createElement('div');el.id='polish-fixture';document.body.append(el)});await page.route('**/__polish.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));await page.addScriptTag({url:'/__polish.js'});
- const carousel=page.locator('#projects').getByRole('region',{name:'DataKind UK screenshots'});await carousel.scrollIntoViewIfNeeded();await fits(carousel);await carousel.getByRole('button',{name:'Show DataKind UK screenshot 2'}).click();const track=carousel.locator('.screenshot-carousel-track');await expect.poll(()=>track.evaluate(el=>el.scrollLeft/el.clientWidth)).toBeGreaterThan(.99);await expect(carousel).not.toHaveAttribute('data-scrub','true');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-});
 
 test('public brand icons, grouped navigation and PassLoop rail use the approved marks',async({page},info)=>{
  await page.goto('/');await expect(page.locator('.site-navigation:visible .site-navigation-logo img')).toHaveAttribute('src','/brand/jh-mark.svg');await expect(page.locator('link[rel="icon"][href*="icon.svg"]')).toHaveAttribute('href',/\/icon.svg/);await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('sizes','180x180');
