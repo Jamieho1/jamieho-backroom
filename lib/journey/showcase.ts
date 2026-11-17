@@ -1,7 +1,6 @@
 /**
  * Home v1.1 projects showcase (TKT-87): pure scroll maths for the pinned section. After a short intro, each featured
- * project gets an equal slice of the section's scroll; inside its slice the screenshots cross-fade (and a tall,
- * full-page screenshot pans down), and one line per project fills to show how many are left.
+ * project gets an equal slice of the section's scroll; inside its slice screenshots travel horizontally, and one line per project fills to show how many are left.
  */
 import { clamp01, smoothstep } from "./timeline";
 
@@ -41,14 +40,10 @@ export function itemOpacity(state: ShowcaseState, k: number, n: number, edge = 0
   return Math.min(fadeIn, fadeOut);
 }
 
-/**
- * The screenshot stack inside one project's slice: which shot is on top, its cross-fade, and how far a tall shot
- * has panned (0 = top, 1 = bottom). Each shot holds most of its share, then fades into the next.
- */
-export function shotState(within: number, m: number, fade = 0.25): { shot: number; mix: number; pan: number } {
-  if (m <= 1) return { shot: 0, mix: 0, pan: clamp01(within) };
-  const t = clamp01(within) * m;
-  const shot = Math.min(m - 1, Math.floor(t));
-  const f = t - shot;
-  return { shot, mix: shot === m - 1 ? 0 : smoothstep(1 - fade, 1, f), pan: f };
+/** Hold the first/last screenshot briefly; all intermediate travel is reversible and linear. */
+export function screenshotOffset(within:number,count:number){return count<2?0:clamp01((within-.12)/.76);}
+export function screenshotWithin(index:number,count:number){return count<2?.5:.12+.76*clamp01(index/(count-1));}
+/** Inverse of the project clock, used by clickable position dots. */
+export function showcaseShotLocal(project:number,shot:number,shots:number,projects:number){
+ return (SHOWCASE_INTRO+project+screenshotWithin(shot,shots))/showcaseScroll(projects);
 }

@@ -38,3 +38,5 @@
 .project-shot-url { display: flex; gap: 8px; margin-top: 10px; }
 .project-shot-url input { flex: 1; min-width: 0; font: 14px/1.5 var(--f-body); color: var(--ink); background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
 .project-sort input { max-width: 140px; }
+
+.project-frame {background:none;border:0;border-radius:0;box-shadow:none;}

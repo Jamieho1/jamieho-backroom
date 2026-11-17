@@ -2,22 +2,24 @@
 
 ## Live data
 
-All migrations through 20261116165138_home_v13_data.sql are applied (remote 20261116171034). None pending. TKT-110b starter sets are approved; public About has three photos, one centre. Featured Work is Cyterly AI and DataKind UK.
+Migrations through 20261116165138_home_v13_data.sql are applied (remote 20261116171034); none pending. TKT-110b starter sets are approved. Last public verification: three About photos, one centre; featured Work is Cyterly AI and DataKind UK.
 
-About polish 1 prepared unchanged originals and stripped/oriented, uncropped 1600px JPEGs outside Git. Two upload sets remain draft: About university activities (3197e5d2-c515-454c-9354-7cf0de76abab, two slots) and DataKind second screenshot (4bdf7587-8deb-479b-91b4-8d9ba57463bf, one slot). Jamie uploads/previews/approves at /manage/review; five public About photos and two ordered DataKind screenshots cannot be confirmed before approval. University wording/activity set 5f1aaffe-2424-4d3d-beb9-d0419e9b1835 was separately prepared for owner review.
+Photo upload sets await Jamie: About activities 3197e5d2-c515-454c-9354-7cf0de76abab (two slots), DataKind screenshot 4bdf7587-8deb-479b-91b4-8d9ba57463bf (one slot). Originals and stripped 1600px JPEGs are outside Git in Media/Uploads. Jamie uploads/previews/approves at /manage/review, then counts/order need read-only verification. University wording/activity proposal: 5f1aaffe-2424-4d3d-beb9-d0419e9b1835.
 
-## Current implementation
+## Implementation
 
-Home order: Hello → Background (#about, aliases #background/#pivot) → Experience → Work → Techstack → Creator → Contact. Browser Back returns to clouds. Experience role activation synchronizes scroll/mascot/path/card; long cards scroll independently.
+Home: Hello → Background (#about, aliases #background/#pivot) → Experience → Work → Techstack → Creator → Contact. Back returns to clouds. Experience role activation synchronizes scroll/mascot/path/card.
 
-Home polish 4: Journey, My story (About/Projects), Content (Articles/Resources), Interview Prep; existing feedback/theme/account/review controls retained. Shared JH logo and favicon; PassLoop mark/wordmark and route favicon. Work uses horizontal multi-image carousels in desktop/static/phone rendering; single images stay still. Case-study galleries were already static and remain unchanged.
+Shared bars: Journey, My story (About/Projects), Content (Articles/Resources), Interview Prep; existing theme/feedback/account/review controls. Desktop Work scrubs screenshots sideways; dots seek its clock. Phone Work is natural-flow; static/reduced-motion rows swipe. Image-sized browser frames and traffic lights apply to Work/project heroes. Cyterly’s CSS letterboxing is fixed without editing its pixels.
 
-About polish 2 is preview-only: Media/Previews/about-background-preview.html has five photos, configurable orbit rings/story line, matching embedded display font, 390px/reduced-motion controls. No orbit/story-line design has been ported to the website; Jamie chooses settings first.
+Home polish 6 replaces redrawn branding with original-image auto-traces and regenerated favicons. JH stays wide/centred at 70% inner button width. Expanded PassLoop scales beside its reserved collapse control; a 92px collapsed rail stacks mark/expand. Stored preferences, tooltips and phone drawer behavior remain intact.
 
-PassLoop and Content Drafts retain their existing access, preview, editor and isolation rules; public pages remain static/ISR. Photos/source logos stay outside Git; only approved public brand SVGs/favicon derivatives enter Git.
+Fidelity at original resolution against thresholded foreground masks: JH 0.735%, PassLoop mark 1.330%, wordmark 1.488%. Source hashes verified; overlays, measurements and trace script are in Media/Brand. Temporary Potrace tooling adds no runtime dependency; no manual path edits.
+
+Background decorations remain preview-only in Media/Previews/about-background-preview.html. PassLoop/Content Drafts ownership, preview boundaries and static/ISR rules remain unchanged.
 
 ## Verification and next steps
 
-Typecheck, all 1,098 unit/database tests, production build, six-page static assertions, main browsers 210 passed/76 conditional skips, synthetic integration 66 passed. Synthetic production build passed on retry after the existing pinned Next security advisory. External preview: five images load; desktop/390px have no horizontal overflow. No migration, publication or upload by the agent.
+Home polish 6: typecheck, 1,099 unit/database tests, production build, six-page static assertions and full browsers 216 passed/78 conditional skips. Tests prove logo bounds, no overlap, preference/tooltips and 390px drawer behavior. Synthetic integrations were not rerun for this asset/CSS change; Home polish 5’s latest gate passed all 66.
 
-Jamie commits/pushes and reviews live. Remaining: photo-slot approvals/read-only verification, background preview decision, TKT-117 and Articles/Resources redesign, PassLoop build-out, domain/SSO sign-offs and separate Next dependency advisory review.
+No schema/live data change or push. Jamie commits/pushes and reviews live. Remaining: photo approvals, background decision, TKT-117/content-library redesign, PassLoop build-out, domain/SSO and separate pinned Next advisory review.

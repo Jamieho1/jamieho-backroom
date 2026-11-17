@@ -280,17 +280,21 @@ Then stop and send Jamie the file path. Report what you built; no checks claimed
 
 ---
 
-## About polish 3 — Apply the approved background (only after Jamie approves the preview)
+## About polish 3 — Background section: rings + a real background (preview v2, then apply)
 
 ```
-You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md first, and follow them (Jamie pushes; update docs/ + MEMORY.md after).
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md first and follow them (Jamie pushes; update docs/ + MEMORY.md after). Two phases; STOP between them.
 
-Jamie approved "Personal Website/Media/Previews/about-background-preview.html" with these settings: <PASTE JAMIE'S CHOSEN TOGGLES/OPACITIES OR CHANGES>. Port exactly that into the homepage About section (components/journey/about-constellation.tsx, lib/journey/constellation.ts, app/journey.css):
-- Rings replace the current single circle; ring radii come from the pure layout function (unit-tested for 1, 4, 5, 12 photos) so photos sit on the outer ring.
-- Story line as inline SVG behind content, outside text/photo areas at every breakpoint; draws once on entering About (GSAP, transform/stroke only), reversible with scroll not required.
-- Phones (≤768 px): rings scaled to the centre photo; story line simplified or hidden if it would overlap text — never behind words. Reduced motion / no JS: line fully drawn, no drift.
-- No new dependencies, no images, no data/schema change. Night theme: use the existing ink token so it stays faint.
-Done when: unit tests for ring layout pass; browser tests at desktop and 390 px show no overlap with heading/paragraph/button (bounding-box check), no sideways scroll, reduced-motion finished state; typecheck, suite, build and static assertions pass; docs/journey.md, docs/status.md, MEMORY.md updated. Report checks actually run.
+The Background section sits between two illustrated sky scenes (hero clouds and the Experience cloud-to-London art), so it must contrast with them: no sky blues or cloud gradients. Jamie's decisions from the first preview: orbit rings ON at 30% opacity; story line REMOVED. His main problem: the section background is flat off-white and looks unfinished.
+
+PHASE 1 — preview v2 (no repo change). Update "Personal Website/Media/Previews/about-background-preview.html" (keep the faithful Background section with the 5 live photos and rings at 30%; delete the story line and its controls). Add a "Background" preset switcher:
+- P1 Linen: flat warm cream (≈#F1E9DC), slightly deeper at the edges (soft vignette), no sky colours.
+- P2 Warm sand + glow: sand base (≈#EFE6D6) with two large blurred colour fields — soft gold behind the heading, soft terracotta/rose behind the photo constellation (no sky blue) — drifting very slowly (transform only; still under reduced motion).
+- P3 Ink editorial: deep navy (the top-bar navy) with light text, photos as white prints, rings in light ink, gold accent on the eyebrow and button.
+Independent overlay toggles usable with any preset: fine film grain (SVG noise, 3–6%), faint dot grid fading to the edges, a huge outlined watermark word "BACKGROUND" behind the photos (≈4% opacity, never behind the paragraph).
+Show the sections above and below (the hero cloud bottom edge and the start of Experience) as plain bands so Jamie can judge the transitions. Desktop / 390 px / reduced-motion switches as before. Keep text contrast ≥ 4.5:1 in every preset (show the measured ratio in the control panel). Then STOP and send Jamie the path.
+
+PHASE 2 — only after Jamie replies with his pick ("P_ + overlays"). Port exactly that into the homepage Background section and /about (same background family, quieter): rings at 30% from the pure layout function (unit-tested for 1, 4, 5, 12 photos) replacing the single circle; chosen preset and overlays as CSS/inline SVG only (no images, no new dependencies); night theme gets a matching dark variant; seamless transitions into the hero above and Experience below; reduced motion = no drift. Done when: browser tests at desktop and 390 px show no overlap of decorations with heading/paragraph/button, no sideways scroll, contrast checks pass; typecheck, suite, build and static assertions pass; docs/journey.md, docs/status.md, MEMORY.md updated. Report checks actually run.
 ```
 
 ---
@@ -311,4 +315,38 @@ Jamie has attached two logo images: the JH monogram (white "JH" between < > on n
 6. Work section: when a featured project has more than one screenshot, show them as a horizontal carousel (swipe/drag on touch, arrow buttons + dots on desktop, scroll-snap, keyboard arrows) instead of the current vertical pan. One screenshot = static image as now. Same carousel on /projects/[slug] if it currently pans vertically. Transform/scroll-snap only; no new dependency; reduced motion = no animated slide.
 
 Done when: top-bar logo button shows JH; favicon shows JH on / and PassLoop on /interview (check generated <link rel="icon"> tags); rail shows the PassLoop logo expanded/collapsed; nav order/dropdowns work by mouse, keyboard and on a 390 px phone with no overflow; #background, #about and #pivot all land on the section; DataKind UK's two screenshots scroll left↔right in Work at desktop and 390 px; typecheck, full suite, build, static assertions and browser tests pass (update tests that assumed the old nav); docs/journey.md, docs/architecture.md, docs/interview.md, docs/status.md, MEMORY.md updated. Report checks actually run.
+```
+
+---
+
+## Home polish 5 — Work screenshots: scroll-driven sideways, frame fits the image, real traffic lights
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/journey.md first and follow them (Jamie pushes; update docs/ + MEMORY.md after). Follows Home polish 4. No schema or live data change.
+
+Jamie's feedback on the Work section's browser-window screenshot frame:
+1. Scroll drives it. While the Work chapter is pinned, the page's vertical scroll moves a multi-screenshot project's images left → right (scrubbed, reversible on scroll up), the same way the old vertical pan was scroll-driven. Clicking must not be required. Keep the dots as a position indicator (and clickable as a shortcut); remove or de-emphasise the arrow buttons on desktop. Single-screenshot projects stay static. Phones (≤768 px, no pinning): native horizontal swipe with scroll-snap and dots. Reduced motion / no JS: images in a swipeable row, no scrubbing.
+2. Frame fits the image — no empty bands. Today Cyterly AI shows navy bands above and below the app, and DataKind UK shows dark bands left and right. The frame's content area must take the screenshot's own aspect ratio (read natural width/height on load, with a stored/assumed aspect fallback so there is no layout shift), so the image fills it edge to edge with object-fit: cover and nothing cropped meaningfully. When a project's screenshots share an aspect ratio (DataKind UK's two do), the frame stays that size while sliding. If they differ, size to the first image and contain the rest. First check whether Cyterly's bands are CSS letterboxing or baked into the bundled image; if baked in, trim the uniform border from that approved bundled asset (keep the original pixels otherwise) and note it in docs/journey.md. Cap the frame height to the viewport so it never overflows; keep it centred.
+3. Window controls: the three dots top-left become macOS traffic lights — red #FF5F57, yellow #FEBC2B, green #28C840 — with a subtle darker ring, in light and dark themes.
+Apply 2 and 3 everywhere this window frame is used (homepage Work and /projects/[slug] if it uses the same frame).
+
+Done when: browser tests at desktop show DataKind UK moving from image 1 to image 2 purely by scrolling down, and back on scroll up; frame bounding box matches the image box (no bands) for Cyterly AI and DataKind UK at desktop and 390 px; traffic lights render in all three colours; no sideways page scroll; reduced-motion state passes; typecheck, full suite, build and static assertions pass; docs/journey.md, docs/status.md, MEMORY.md updated. Report checks actually run.
+```
+
+---
+
+## Home polish 6 — Logos from the originals, PassLoop rail spacing
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md and docs/interview.md first and follow them (Jamie pushes; update docs/ + MEMORY.md after). Follows Home polish 4/5. No schema or live data change.
+
+1. Logos must come from Jamie's originals, not redrawn. The current JH SVG changed the shape (e.g. the gap to the right of the H is gone). Replace jh-mark.svg and the PassLoop SVGs with versions generated from the original images saved in "Personal Website/Media/Brand/":
+   - Crop tightly to the mark, threshold the white (and the PassLoop green) shapes off the navy background, and auto-trace them (potrace or equivalent, already-installed tool or a dev-only one-off; no new runtime dependency) so the geometry is the original's. No manual redrawing or "cleaning up" of shapes; keep every gap and angle.
+   - Prove fidelity: render the traced SVG at the original's size, overlay it on the original mark and report the pixel difference (target < 2% of mark pixels). Save the overlay PNG next to the originals for Jamie.
+   - If the original is too low-resolution to trace cleanly, stop and ask Jamie for a larger original instead of guessing.
+   - Regenerate the favicons (JH for the site, PassLoop mark for /interview) and the top-bar logo button from the traced files. In the round top-bar button the JH mark is wide, so size it by width (about 70% of the button's inner width), centred, not squeezed.
+2. PassLoop rail, expanded: the wordmark is currently cut off ("PassLoo") by the collapse button. Lay the brand row out so the full PassLoop logo always shows: logo and collapse button side by side with a fixed gap, the logo scaled to the space left (never clipped or overlapped).
+3. PassLoop rail, collapsed: the mark and the expand button currently overlap. Make the collapsed rail slightly wider (Jamie is fine with that) and stack them: the PassLoop mark on top, fully visible, and the expand button below it (or on the rail's outer edge), never covering the mark. Keep the stored collapse preference, tooltips, keyboard focus and the phone drawer unchanged.
+
+Done when: the overlay diff for the JH and PassLoop marks is reported and under target; favicons and the top-bar button show the traced JH mark; browser tests at desktop check the expanded brand row shows the whole logo (bounding box inside the rail, no overlap with the collapse button) and the collapsed mark and expand button don't intersect; 390 px drawer unchanged; typecheck, suite, build and static assertions pass; docs/interview.md, docs/status.md, MEMORY.md updated. Report checks actually run.
 ```

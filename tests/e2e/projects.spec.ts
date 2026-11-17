@@ -64,7 +64,7 @@ test("a project with a website offers Visit website in a new tab", async ({ page
   const visit = page.getByRole("link", { name: /Visit website · example\.com/ });
   await expect(visit).toHaveAttribute("href", "https://www.example.com/app");
   await expect(visit).toHaveAttribute("target", "_blank");
-  await expect(page.getByRole("img", { name: "Screenshot of Site example" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Site example screenshot 1 of 1" })).toBeVisible();
 });
 
 test("no projects yet shows the empty state, and an unknown slug is a 404", async ({ page }) => {

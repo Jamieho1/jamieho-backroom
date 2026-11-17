@@ -45,3 +45,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-17 · Activating an Experience stop scrolls the existing desktop clock to the role so mascot, path and card stay synchronized; phones/static views retain natural flow · Jamie
 
 - 2026-11-17 · About polish photo slots await owner upload/approval; orbit/story-line design remains an external preview only; Background aliases, grouped nav, public JH/PassLoop marks and horizontal Work screenshots are approved code scope · Jamie’s three polish prompts
+
+- 2026-11-17 · Desktop Work screenshots scrub sideways from the existing scroll clock; dots seek it, phone Work stays unpinned, and shared browser frames fit the first image with macOS traffic lights; Cyterly’s asset has no baked border and remains unchanged · Home polish 5
+
+- 2026-11-17 · JH/PassLoop geometry must be auto-traced from original images with <2% thresholded-mask difference; expanded branding fits beside its control and the 92px collapsed rail stacks mark/expand without overlap · Home polish 6

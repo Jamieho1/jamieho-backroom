@@ -3,6 +3,8 @@
  * data fetching), so the pages stay pre-rendered and the views can be exercised with fixtures in e2e.
  */
 import Link from "next/link";
+import {ScreenshotCarousel} from "@/components/screenshot-carousel";
+import {screenshotAspect} from "@/lib/screenshot-geometry";
 import { Markdown } from "@/components/markdown";
 import { projectHref, siteHost, type Project } from "@/lib/portfolio-core";
 import { ProjectManageLink } from "./manage-link";
@@ -50,11 +52,7 @@ export function ProjectDetail({ p }: { p: Project }) {
         </p>
       </header>
       {hero ? (
-        <figure className="project-frame">
-          <span className="win-bar" aria-hidden="true"><i /><i /><i /></span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={hero} alt={`Screenshot of ${p.name}`} />
-        </figure>
+        <div className="project-frame"><ScreenshotCarousel shots={[hero]} name={p.name} aspect={screenshotAspect(p.slug)}/></div>
       ) : null}
       {p.body.trim() ? <div className="project-body"><Markdown text={p.body} /></div> : null}
       {rest.length ? (

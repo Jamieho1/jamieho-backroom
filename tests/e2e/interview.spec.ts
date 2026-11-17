@@ -26,8 +26,7 @@ test('desktop collapse modes persist, tooltips work on hover/focus and keyboard 
  await expect(page.locator('.iv-brand-mark')).toBeVisible();await expect(page.locator('.iv-brand-wordmark')).toBeHidden();
  const expandRail=await page.getByRole('button',{name:'Expand section rail'}).boundingBox();
  const dashboardIcon=await page.getByRole('link',{name:'Dashboard',exact:true}).locator('.iv-icon').boundingBox();
- expect(expandRail!.x).toBeGreaterThan((await page.locator('.iv-brand-mark').boundingBox())!.x);
- expect(Math.abs(centerY(expandRail!)-centerY(topicCollapse!))).toBeLessThan(1);
+ const collapsedMark=await page.locator('.iv-brand-mark').boundingBox();expect(expandRail!.y).toBeGreaterThanOrEqual(collapsedMark!.y+collapsedMark!.height+7);expect(Math.abs(expandRail!.x+expandRail!.width/2-collapsedMark!.x-collapsedMark!.width/2)).toBeLessThan(1);
  const railLine=await page.locator('.iv-group').first().boundingBox();
  const contentLine=await page.locator('.iv-content-toolbar').evaluate(el=>{const style=getComputedStyle(el,'::after');return el.getBoundingClientRect().top+parseFloat(style.top);});
  expect(Math.abs(contentLine-railLine!.y)).toBeLessThan(1);

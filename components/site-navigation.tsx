@@ -26,7 +26,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
   const pathname = usePathname() ?? "";
   const navLink=(label:string,href:string,close:()=>void)=><Link href={href} onClick={close} aria-current={pathname===href||pathname.startsWith(href+"/")?"page":undefined}>{label}</Link>;
   return <header role="banner" ref={ref} className={`site-navigation${journey ? " is-journey" : ""}${embedded ? " is-embedded" : ""}`} data-floating="false">
-    <Link href={journey ? "#sky" : "/"} className="site-navigation-logo" aria-label="Jamie Ho — back to the top" onClick={event => { if (onJump) { event.preventDefault(); onJump("sky"); } }}><img src="/brand/jh-mark.svg" width="28" height="28" alt=""/></Link>
+    <Link href={journey ? "#sky" : "/"} className="site-navigation-logo" aria-label="Jamie Ho — back to the top" onClick={event => { if (onJump) { event.preventDefault(); onJump("sky"); } }}><img src="/brand/jh-mark.svg" width="412" height="220" alt=""/></Link>
     <nav className="site-navigation-links" aria-label="Site">
       <NavigationMenu label="Journey" group={menuGroup}>
         {closeMenu=><nav className="journey-chapter-list" aria-label="Journey chapters">

@@ -8,7 +8,7 @@ Public /, /about, /resources, /privacy, /projects and /articles must remain pre-
 
 CV/resume, notes, saved code, attempts, private imports and provider secrets stay outside Git. New resume entries/bullets start hidden. Use own-words practice content; no copied LeetCode text/scraping. No runtime AI or server-side execution of user code.
 
-Jamie’s public JH and PassLoop brand marks are an explicit Git exception: hand-built SVGs in public/brand, route icon SVGs and generated 180px/32px favicon PNGs. Unchanged source logo images remain outside Git in Media/Brand; this exception does not include personal photos.
+Jamie’s public JH and PassLoop brand marks are an explicit Git exception: original-image auto-traced SVGs in public/brand, route icon SVGs and generated 180px/32px favicon PNGs. Unchanged source logo images remain outside Git in Media/Brand; this exception does not include personal photos.
 
 Approved illustrated public wallpaper in public/desktop-art/ and editable public introduction copy in lib/desktop-introduction.ts are explicit exceptions. This does not authorize private content or arbitrary journey media in Git.
 

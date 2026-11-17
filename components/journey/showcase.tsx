@@ -2,22 +2,24 @@
 
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import type { ShowcaseItem } from "@/lib/journey/timeline";
-import {ScreenshotCarousel} from "@/components/screenshot-carousel";
-import { itemOpacity, showcaseState } from "@/lib/journey/showcase";
+import {ScreenshotCarousel,type ScreenshotCarouselHandle} from "@/components/screenshot-carousel";
+import {screenshotAspect} from "@/lib/screenshot-geometry";
+import { itemOpacity, showcaseState, screenshotOffset, showcaseShotLocal } from "@/lib/journey/showcase";
 
 export interface ShowcaseHandle { setProgress(local: number): void }
 
 /**
  * TKT-87: the pinned projects showcase. Left: the current project's number, name, tagline, tags and a link to its
- * case study. Right: a browser frame with native horizontal screenshot carousels; a single shot stays still.
+ * case study. Right: a browser frame with reversible scroll-driven screenshot carousels; a single shot stays still.
  * Bottom-left: one line per project; the current one fills. Driven by the journey's single rAF loop.
  */
-export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(function Showcase({ items }, ref) {
+export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[];onSeek?:(local:number)=>void }>(function Showcase({ items,onSeek }, ref) {
   const texts = useRef<(HTMLDivElement | null)[]>([]);
   const frames = useRef<(HTMLDivElement | null)[]>([]);
   const lines = useRef<(HTMLSpanElement | null)[]>([]);
   const count = useRef<HTMLSpanElement>(null);
   const n = items.length;
+  const carousels=useRef<(ScreenshotCarouselHandle|null)[]>([]);
 
   useImperativeHandle(ref, () => ({
     setProgress(local) {
@@ -32,7 +34,8 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
         }
         const frame = frames.current[k];
         if (frame) { frame.style.opacity = k === s.index ? "1" : "0"; frame.style.visibility = k === s.index ? "visible" : "hidden"; }
-        if (frame) frame.inert = k !== s.index;
+        if (frame) {frame.inert = k !== s.index;frame.style.display=k===s.index?"block":"none";}
+        if(k===s.index)carousels.current[k]?.setProgress(screenshotOffset(s.within,item.shots.length));
       });
       lines.current.forEach((l, k) => { if (l) l.style.transform = `scaleX(${s.lines[k].toFixed(3)})`; });
       if (count.current) count.current.textContent = String(s.index + 1).padStart(2, "0");
@@ -61,15 +64,20 @@ export const Showcase = forwardRef<ShowcaseHandle, { items: ShowcaseItem[] }>(fu
         </div>
       </div>
       <div className="journey-showcase-frame">
-        <div className="journey-showcase-bar"><i /><i /><i /></div>
-        <div className="journey-showcase-screen">
           {items.map((it, k) => (
-            <div key={it.slug} ref={(el) => { frames.current[k] = el; }} inert={k!==0} className="journey-showcase-shots" style={{ opacity: k ? 0 : 1, visibility: k ? "hidden" : "visible" }}>
-              {it.shots.length>1 ? <ScreenshotCarousel shots={it.shots} name={it.name}/> : it.shots[0] ? <img src={it.shots[0]} data-fit={it.slug === "cyterly" ? "contain" : undefined} alt={`Screenshot of ${it.name}`} loading="lazy"/> : <div className="journey-showcase-blank"><span>{it.name}</span></div>}
+            <div key={it.slug} ref={(el) => { frames.current[k] = el; }} inert={k!==0} className="journey-showcase-shots" style={{display:k?"none":"block",opacity:k?0:1,visibility:k?"hidden":"visible"}}>
+              {it.shots.length ? <ScreenshotCarousel ref={node=>{carousels.current[k]=node;}} shots={it.shots} name={it.name} aspect={screenshotAspect(it.slug)} scrub onSelect={shot=>onSeek?.(showcaseShotLocal(k,shot,it.shots.length,n))}/> : <div className="journey-showcase-blank"><span>{it.name}</span></div>}
             </div>
           ))}
-        </div>
       </div>
     </div>
   );
 });
+
+
+export function StaticShowcase({items}:{items:ShowcaseItem[]}){
+ return <section className="journey-still-showcase" aria-label="Selected work"><p className="journey-eyebrow">Selected work</p><ul>{items.map(it=><li data-draft-changed={it.draftChanged||undefined} key={it.slug}>
+  {it.shots.length?<ScreenshotCarousel shots={it.shots} name={it.name} aspect={screenshotAspect(it.slug)}/>:null}<h2 className="journey-title">{it.name}</h2>
+  {it.tags.length?<ul className="journey-chips" aria-label="Built with">{it.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>:null}{it.tagline?<p className="journey-body">{it.tagline}</p>:null}<a className="journey-cta-link" href={it.href}>Read the case study <span>→</span></a>
+ </li>)}</ul><a className="journey-cta-link" href="/projects">All projects <span>→</span></a></section>;
+}

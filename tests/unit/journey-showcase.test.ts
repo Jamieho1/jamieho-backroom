@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { itemOpacity, shotState, showcaseScroll, showcaseState, SHOWCASE_INTRO } from "@/lib/journey/showcase";
+import { itemOpacity, screenshotOffset, screenshotWithin, showcaseShotLocal, showcaseScroll, showcaseState, SHOWCASE_INTRO } from "@/lib/journey/showcase";
 
 describe("projects showcase (TKT-87)", () => {
   it("gives each project one screen of scroll after a short intro", () => {
@@ -30,11 +30,14 @@ describe("projects showcase (TKT-87)", () => {
     expect(itemOpacity(at(2, 1), 2, 3)).toBe(1);
   });
 
-  it("cross-fades screenshots and pans a single tall one", () => {
-    expect(shotState(0.3, 1)).toEqual({ shot: 0, mix: 0, pan: 0.3 });
-    expect(shotState(0.1, 2)).toMatchObject({ shot: 0, mix: 0 });
-    expect(shotState(0.49, 2).mix).toBeGreaterThan(0.5);
-    expect(shotState(0.75, 2)).toMatchObject({ shot: 1, mix: 0 });
-    expect(shotState(1, 3).shot).toBe(2);
+  it("scrubs screenshots reversibly while single-image projects remain still",()=>{
+    expect(screenshotOffset(.1,2)).toBe(0);expect(screenshotOffset(.88,2)).toBe(1);expect(screenshotOffset(.5,2)).toBeCloseTo(.5);
+    for(const within of [0,.2,.5,.8,1])expect(screenshotOffset(within,1)).toBe(0);
+    for(const count of [2,3,6])for(let i=0;i<count;i++)expect(screenshotOffset(screenshotWithin(i,count),count)).toBeCloseTo(i/(count-1));
+  });
+  it("dot shortcuts target the matching project and screenshot on the shared clock",()=>{
+    for(const projects of [1,2,4])for(let p=0;p<projects;p++)for(const shot of [0,1]){
+      const state=showcaseState(showcaseShotLocal(p,shot,2,projects),projects);expect(state.index).toBe(p);expect(screenshotOffset(state.within,2)).toBeCloseTo(shot);
+    }
   });
 });

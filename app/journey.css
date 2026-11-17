@@ -923,3 +923,12 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 }
 
 .journey-showcase-shots > img {height:100%;min-height:0;object-fit:contain;transform:none;}
+
+/* The first image determines each Work window; the window is never a fixed-ratio letterbox. */
+.journey-showcase-frame {display:grid;align-items:center;width:100%;height:auto;max-height:none;aspect-ratio:auto;justify-self:center;background:none;border:0;border-radius:0;box-shadow:none;}
+.journey-showcase-shots {position:relative;inset:auto;grid-area:1/1;width:100%;transition:none;}
+.journey-showcase .browser-frame {--frame-limit:66svh;}
+.journey-phone-work {position:absolute;left:0;right:0;z-index:5;padding:116px 20px 40px;box-sizing:border-box;background:#131b27;color:#edf2f8;--s-ink:#edf2f8;--s-soft:#bbc9da;--s-line:#526377;--s-accent:#f2c779;}
+.journey-phone-work .journey-still-showcase > ul {display:block;}
+.journey-phone-work .journey-still-showcase > ul > li {margin-bottom:36px;}
+.journey-phone-work .browser-frame,.journey-still-showcase .browser-frame {margin-bottom:18px;}
