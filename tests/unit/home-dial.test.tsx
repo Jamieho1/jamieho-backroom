@@ -1,6 +1,8 @@
 import {it,expect} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {HomeDial} from '@/components/journey/home-dial';
+import {ExperienceIcon} from '@/components/journey/experience-icon';
+import {JOURNEY_ICONS} from '@/lib/home-content-schema';
 import {dialData,dialCount,dialLocal,dialTime,dialShotProgress,dialAnchorLocal,coordinates} from '@/lib/journey/dial';
 import {landingOf,layout,wipeOffset} from '@/lib/journey/timeline';
 const project=(i:number)=>({id:String(i),name:'Project '+i,slug:'project-'+i,tagline:'Synthetic work',body:'Body must not become highlights',tags:['Volunteer'],screenshots:['https://example.test/shot.png'],url:'',public:true,featured:true,sort:i,created_at:''});
@@ -12,3 +14,15 @@ it('renders natural, outlined static steps with optional highlights, no body ext
 it('holds complete first/last states and has no zero-wipe singularity',()=>{expect(dialTime(0,6)).toBe(0);expect(dialTime(1,6)).toBe(5);expect(wipeOffset(0,0)).toBe(0);});
 
 it('scrubs the final project through its last image without fading away its copy',()=>{expect(dialShotProgress(dialLocal(5,6,-.25),5,6)).toBe(0);expect(dialShotProgress(dialLocal(5,6,.25),5,6)).toBe(1);expect(dialTime(dialLocal(5,6,.25),6)).toBe(5);});
+
+it('every built-in icon normalises all shapes to pathLength 1 and neural-network is the supplied 3-3-2 network',()=>{
+ for(const name of JOURNEY_ICONS){const html=renderToStaticMarkup(<ExperienceIcon name={name}/>);const shapes=html.match(/<(path|circle|rect|line)\b[^>]*>/g)??[];expect(shapes.length,name).toBeGreaterThan(0);for(const tag of shapes)expect(tag,name).toContain('pathLength="1"');expect(html).toContain('stroke="currentColor"');}
+ const html=renderToStaticMarkup(<ExperienceIcon name="neural-network"/>);expect(html).toContain('viewBox="0 0 96 96"');expect(html.match(/<path\b/g)).toHaveLength(15);expect(html.match(/<circle\b/g)).toHaveLength(8);expect(html.indexOf('class="edges"')).toBeLessThan(html.indexOf('class="nodes"'));expect(html).not.toContain('metadata');
+});
+it('ghost layer exists only in the pinned dial; the static dial lists captions as tags above prints',()=>{
+ const photos=Array.from({length:5},(_,i)=>({id:'p'+i,path:'p'+i+'.png',caption:'Caption '+i,alt:'Alt '+i,sort:i,centre:i===0,public:true}));
+ const html=renderToStaticMarkup(<HomeDial still data={dialData([entry],[project(0)])} panel={{id:'about',from:0,to:1,title:'Title',body:'Body'}} photos={photos} base="/m"/>);
+ expect(html).not.toContain('dial-orbit');expect(html).toContain('dial-side-photos');expect(html.match(/class="dial-tag"/g)!.length).toBeGreaterThanOrEqual(5);expect(html).not.toContain('<figcaption');
+ const live=renderToStaticMarkup(<HomeDial data={dialData([entry],[project(0)])} panel={{id:'about',from:0,to:1,title:'Title',body:'Body'}} photos={photos} base="/m"/>);
+ expect(live.match(/dial-orbit-photo/g)).toHaveLength(4);expect(live).toContain('dial-photo-centre');
+});

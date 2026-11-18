@@ -16,9 +16,9 @@ it('public photos sort centre first then sort and never leak hidden rows or muta
  expect(publicAboutPhotos(rows).map(r=>r.id)).toEqual(['a','c','b']);expect(rows).toEqual(before);
  expect((await getAboutPhotos({id:set,summary:'Preview',operations:[],aboutPhotos:rows})).map(r=>r.id)).toEqual(['a','c','b']);
 });
-it('journey stops sort oldest first, tie by sort, filter hidden/off rows and limit public bullets to three',async()=>{
- const rows=[item('new','2024 – Present'),item('early','Sep 2020 – 2024'),item('older','Jan 2020 – 2022'),item('tie','2024',-1),{...item('hidden','2018'),public:false},{...item('off','2017'),show_on_journey:false},item('undated','',7)];const before=structuredClone(rows);
- const stops=publicJourneyStops(rows);expect(stops.map(r=>r.id)).toEqual(['older','early','tie','new','undated']);expect(stops[0].experience_bullets?.map(b=>b.id)).toEqual(['4','3','2']);expect(rows).toEqual(before);
+it('journey stops order by sort ascending (not dates), tie by id, filter hidden/off rows and limit public bullets to three',async()=>{
+ const rows=[item('new','2024 – Present',2),item('early','Sep 2020 – 2024',0),item('older','Jan 2020 – 2022',1),item('tie','2024',1),{...item('hidden','2018'),public:false},{...item('off','2017'),show_on_journey:false},item('undated','',7)];const before=structuredClone(rows);
+ const stops=publicJourneyStops(rows);expect(stops.map(r=>r.id)).toEqual(['early','older','tie','new','undated']);expect(stops[0].experience_bullets?.map(b=>b.id)).toEqual(['4','3','2']);expect(rows).toEqual(before);
  expect(await getJourneyStops({id:set,summary:'Preview',operations:[],experience:rows})).toEqual(stops);
 });
 it('strict photo and journey/story drafts overlay without changing live snapshots',()=>{
@@ -41,4 +41,10 @@ it('home-media slots block until filled and produce a new preview photo with exa
  expect(validatePhotoFile({name:'wrong.png',type:'image/png',size:50},ready[0])).toContain('exactly');
  for(const changes of [{alt:''},{sort:1.5},{bucket:'project-media'},{path:'other.png'},{target:{table:'profiles',key,field:'path'}}])expect(()=>parsePhotoSlots([{...raw,...changes}],set)).toThrow();
  await expect(withPhotoOperations(sb,[],[...ready,{...ready[0],slot:'another'}])).rejects.toThrow(/distinct/);
+});
+
+it('dial stops follow the experience stop order set through sort: Imperial, Global Relay, KOLN3D',()=>{
+ const named=(id:string,org:string,dates:string,sort:number)=>({...item(id,dates,sort),org});
+ const rows=[named('koln','KOLN3D','Jun 2023 – Sep 2023',30),named('gr','Global Relay','Sep 2024 – Present',20),named('imperial','Imperial College London','Oct 2020 – Jun 2024',10)];
+ expect(publicJourneyStops(rows).map(r=>r.org)).toEqual(['Imperial College London','Global Relay','KOLN3D']);
 });

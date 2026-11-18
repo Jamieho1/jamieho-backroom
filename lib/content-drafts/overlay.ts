@@ -11,7 +11,7 @@ export function overlaySections(live: Record<SectionKey, Section>, operations: C
 /** Match the existing journey bindings; do not create chapters for currently undisplayed fields. */
 export function draftChapterChanged(chapter: string, sections: readonly SectionKey[]): boolean {
   const bindings: Record<string, readonly SectionKey[]> = {
-    sky: ["hero", "contact"], about: ["about"], pivot: ["about"], toolkit: ["technology"], creator: ["writing", "contact"], screen: ["contact"],
+    sky: ["hero", "contact"], about: ["about"], pivot: ["about"], toolkit: ["technology"], cta: ["technology"], creator: ["writing", "contact"], screen: ["contact"],
   };
   return (bindings[chapter] ?? []).some(key => sections.includes(key));
 }

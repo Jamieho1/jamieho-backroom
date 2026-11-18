@@ -662,17 +662,24 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 .dial-rings .dial-gold-dot {fill:var(--dial-gold);stroke:none;}
 .dial-coordinate {position:absolute;top:5%;left:15%;right:15%;text-align:center;color:#f3eee680;font:400 9px/1.5 var(--j-mono);letter-spacing:.1em;}
 .dial-centre {position:absolute;inset:0;display:grid;place-items:center;}
-.dial-photos {position:absolute;inset:0;}
-.dial-print {position:relative;width:100%;margin:0;padding:6px;background:var(--dial-paper);box-shadow:0 12px 30px #0003;}
-.dial-print img {display:block;width:100%;height:auto;object-fit:contain;}
-.dial-print figcaption {position:absolute;left:50%;top:calc(100% + 16px);max-width:220px;width:max-content;transform:translateX(-50%);color:var(--dial-gold);font:400 9px/1.6 var(--j-mono);text-transform:uppercase;letter-spacing:.04em;}
-.dial-print figcaption::before {content:'';position:absolute;left:50%;top:-16px;height:12px;width:1px;background:#e8c46a99;}
-.dial-print-centre {position:absolute;left:50%;top:50%;width:32%;transform:translate(-50%,-50%);z-index:2;}
-.dial-orbit-photo {position:absolute;left:var(--px);top:var(--py);width:18%;transform:translate(calc(-50% + var(--photo-exit)*90px),calc(-50% - var(--photo-exit)*60px)) rotate(var(--tilt));opacity:calc(1 - var(--photo-exit));}
+/* Square constellation layer sized by the dial's height; cqw units keep prints and tags proportional to the ring. */
+.dial-const {position:absolute;top:0;left:50%;height:100%;aspect-ratio:1;transform:translateX(-50%);container-type:inline-size;display:grid;place-items:center;pointer-events:none;}
+.dial-photo-item {position:absolute;width:17.8%;}
+.dial-photo-item::before {content:'';position:absolute;left:50%;bottom:100%;height:2.2cqw;width:1px;background:#e8c46a99;opacity:var(--tag-o,1);}
+.dial-photo-centre {left:50%;top:50%;width:30%;transform:translate(-50%,-50%);z-index:2;}
+.dial-print {position:relative;width:100%;margin:0;padding:.6cqw;background:var(--dial-paper);box-shadow:0 12px 30px #0003;}
+.dial-print img {display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;}
+.dial-tag {position:absolute;left:50%;bottom:calc(100% + 2.6cqw);width:calc(100% + 4cqw);transform:translateX(-50%);margin:0;text-align:center;color:var(--dial-gold);font:400 clamp(7px,1.2cqw,11px)/1.5 var(--j-mono);text-transform:uppercase;letter-spacing:.04em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;opacity:var(--tag-o,1);}
+.dial-photo-centre .dial-tag {width:100%;}
+.dial-photo-centre::before {opacity:1;}
+.dial-orbit {z-index:1;visibility:visible;}
+.dial-orbit-photo {transform:translate(-50%,-50%);opacity:var(--orbit-o,1);filter:saturate(calc(1 - var(--ghost,0)*.55));}
+.dial-orbit-photo .dial-print {transform:rotate(var(--tilt,0deg));}
+.dial-side-photo .dial-print {transform:rotate(var(--tilt,0deg));}
 
 .dial-icon {width:24%;padding:8%;box-sizing:content-box;border:1px solid #e8c46a55;border-radius:50%;color:var(--dial-gold);}
 .dial-icon svg {display:block;width:100%;overflow:visible;}
-.dial-icon svg :is(path,rect,circle) {stroke-dasharray:100;stroke-dashoffset:calc(var(--icon-draw,0)*100);}
+.dial-icon svg :is(path,rect,circle,line) {stroke-dasharray:1 3;stroke-dashoffset:0;}
 .dial-icon.is-present {box-shadow:0 0 0 12px #e8c46a09;animation:dial-pulse 3s ease-in-out infinite;}
 @keyframes dial-pulse {50%{box-shadow:0 0 0 20px #e8c46a03;}}
 .dial-browser {position:relative;width:52%;max-width:585px;--frame-limit:calc(100svh - 260px);}
@@ -683,13 +690,16 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 .journey-stills > #about {display:block;padding:0;background:#1b2333;}
 .dial-stacked {position:relative;padding:100px clamp(20px,6vw,80px) 40px;}
 .dial-stack-step {position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;max-width:1200px;margin:0 auto;padding:50px 0 80px;scroll-margin-top:140px;border-bottom:1px solid #f3eee626;}
-.dial-stack-visual {position:relative;min-width:0;min-height:400px;display:grid;place-items:center;}
-.dial-stack-visual .dial-photos {position:relative;width:100%;height:400px;}
-.dial-stack-visual .dial-print-centre {width:40%;}
+.dial-stack-visual {position:relative;min-width:0;min-height:400px;display:grid;place-items:center;container-type:inline-size;}
+.dial-stack-visual>.dial-photo-centre {margin-top:12cqw;}
+.dial-stack-visual .dial-photos {width:100%;container-type:inline-size;display:grid;justify-items:center;padding-top:12cqw;}
+.dial-stack-visual .dial-photo-item {position:relative;width:100%;}
+.dial-stack-visual .dial-photo-centre {width:56%;left:auto;top:auto;transform:none;}
+.dial-side-photos {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15cqw 8cqw;width:100%;padding-top:15cqw;}
 .dial-stack-visual .dial-browser {width:100%;--frame-limit:75vh;}
 @media (max-width:1100px) and (min-width:901px) {.dial-pinned{grid-template-columns:115px minmax(250px,300px) minmax(0,1fr);gap:16px;padding-left:24px;padding-right:24px;}.dial-index button{font-size:9px;gap:8px;}.dial-prose,.dial-points,.dial-tagline{font-size:13px;}.home-dial h2{font-size:36px;}}
-@media(max-width:900px) {.dial-stack-step{display:flex;flex-direction:column;gap:30px;padding:32px 0 55px;align-items:stretch;}.dial-stacked{padding:110px 24px 40px;}.dial-stack-visual{min-height:0;}.dial-stack-visual .dial-photos{height:360px;}.dial-stack-visual .dial-print-centre{width:42%;}.dial-print img,.dial-orbit-photo img{max-height:180px;}.dial-orbit-photo{width:22%;}.dial-print figcaption{font-size:8px;max-width:130px;}.dial-stack-visual>.dial-print-centre{position:relative;left:auto;top:auto;transform:none;margin:auto;}.home-dial h2{font-size:40px;}.dial-stack-visual .dial-browser{width:100%;}.dial-stack-visual .dial-icon{width:70px;}.dial-capabilities{font-size:11px;}}
-@media(prefers-reduced-motion:reduce){.home-dial *{animation:none!important;}.dial-icon svg :is(path,rect,circle){stroke-dashoffset:0;}}
+@media(max-width:900px) {.dial-stack-step{display:flex;flex-direction:column;gap:30px;padding:32px 0 55px;align-items:stretch;}.dial-stacked{padding:110px 24px 40px;}.dial-stack-visual{min-height:0;}.home-dial h2{font-size:40px;}.dial-stack-visual .dial-browser{width:100%;}.dial-stack-visual .dial-icon{width:70px;}.dial-capabilities{font-size:11px;}}
+@media(prefers-reduced-motion:reduce){.home-dial *{animation:none!important;}.dial-icon svg :is(path,rect,circle,line){stroke-dashoffset:0!important;opacity:1!important;transform:none!important;}}
 
 .journey-chapter[data-chapter="about"]{background:#1b2333;}
 

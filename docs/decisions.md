@@ -56,4 +56,8 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 
 - 2026-11-18 · Fit complete capability SVGs in both desktop axes, place Cloud certifications below its tags, retain reusable editors/gates, and require explicit “delete” for the reviewed external Media/Storage cleanup plan after deployment · Jamie’s diagram fixes and Media cleanup prompt
 
+- 2026-11-18 · Dial Experience stops are ordered by experience_items.sort (ascending), not dates; the order changes only through an approved Content Drafts set · Home polish 9
+
+- 2026-11-18 · The contact CTA is its own full-width banner section after What I build, not part of its pinned scene, with no supporting line until Jamie approves one · Home polish 9
+
 - 2026-11-18 · Jamie explicitly approved the reviewed delete/move plan; local cleanup is complete, and Storage removal waits for deployment/API access without requiring repeat approval · Jamie: delete

@@ -2,20 +2,20 @@
 
 ## Implementation
 
-What I build now contains complete AI Engineering and Cloud Architecture diagrams at wide/short desktop sizes. SVG viewports fit both axes, Cloud outer geometry has padding, and its two certification tiles sit in the left column below the tags. Phones/static layouts retain internal diagram panning; long left copy can scroll on short desktops.
+Home polish 9 (local, unpushed): the Background step restores the mockup constellation (centre print plus four ring prints, gold tags above each on short leaders, wrapped/clamped, no overlaps). Four ghost prints stay dimmed at the ring edge through Experience stops and vanish before Selected Work. Centre line icons draw edges then nodes on a scrubbed GSAP timeline that reverses; neural-network is the supplied 3-3-2 icon. Stops order by `experience_items.sort`. “Have a project in mind?” is its own banner chapter after What I build with a roughly 2x strong pill and no supporting line.
 
-Three unused tracked desktop WebPs and twelve retired Home/London/entry/room/photo-orbit implementation/test/CSS files are removed. Reusable owner editors, membership gates, active desktop art/runtime and dynamic social icons remain. The retained media manifest and home-media-v2 worker exclude retired cloud/London/mobile clips; phones preload no videos. The generator refreshes retained keys without rediscovering archived files.
+Earlier: What I build holds complete diagrams at wide/short desktop sizes; Cloud certification tiles sit below the tags. Retired Home/London/room/photo-orbit files and three WebPs are removed; the home-media-v2 worker retains only the nine manifest files and phones preload no videos.
 
-## Cleanup approval and rollout
+## Pending for Jamie
 
-The reviewed inventory and execution results are outside Git in `../Media/Previews/media-cleanup-2026-11-18/`. Jamie approved “delete”. Removed 10 ignored repo files (5,335,929 bytes) and 17 Media files (64,239,089 bytes); moved 21 retained originals into Brand/Uploads with matching hashes. Earlier tracked cleanup removed three WebPs (1,223,166 bytes) and twelve retired source/test/CSS files (69,187 bytes). All nine retained runtime media files remain present.
+Draft set `9b27d9e7-c440-44c7-85ce-73c7c5f4d47e` (“Experience stop order”: Imperial 10, Global Relay 20, KOLN3D 30; read back as draft) needs approval at /manage/review before the live order is Imperial → Global Relay → KOLN3D. Technology set `84c50b3d-2c18-4efd-90ac-cc18281ef9da`, CV bullets set `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07`, and caption/highlight sets `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` remain drafts. Credly URLs await Jamie. No migration for Polish 9; project-highlights stays applied as remote `20261117220033`.
 
-Storage remains unchanged: 23 objects / 18,723,440 bytes are approved for deletion, but the deployed worker still lacks home-media-v2 and the retained-file allowlist. Deploy cleanup code first and recheck live references/hashes. Available Supabase MCP tools have no Storage removal API; do not delete catalogue rows through SQL or inspect secrets. Approval persists for this exact plan.
+## Cleanup
 
-Technology set `84c50b3d-2c18-4efd-90ac-cc18281ef9da` and CV bullets 1/3 set `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07` remain drafts. Credly URLs await Jamie. Prior caption/highlight proposals `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` await Jamie. Project-highlights migration remains applied as remote `20261117220033`; no new migration or live content/policy change.
+Reviewed inventory and results are outside Git in `../Media/Previews/media-cleanup-2026-11-18/`. Local deletion/moves are done. Storage keeps 23 objects (18,723,440 bytes) approved for deletion until the cleanup worker is deployed; the Supabase MCP has no Storage removal API. No repeat approval needed for that plan.
 
-## Verification
+## Verification (Polish 9)
 
-After approved local deletion: typecheck, 1,064 unit/database tests, production build, six-page static assertions and diff checks pass. Home/dial/diagram/story/smoke browser suite at desktop/390px: 78 passed / 18 conditional skips. All 27 deleted paths are absent, 21 moved originals match their recorded SHA-256, and nine retained runtime files are present. The broader 215-pass/89-skip browser run preceded deletion; owner-preview integrations were not rerun.
+In an isolated secret-free copy (repo node_modules are macOS binaries and cannot run here): typecheck, full unit/database suite (1,068 tests), production build and static assertion pass; `git diff --check` clean. Playwright could not run because no Chromium is installed on this machine, so the new overlap, ghost, icon-scrub and banner browser tests and CSS layout are unrun and unseen. Jamie should run `npm run test:e2e` and review visually.
 
-Jamie commits/pushes and verifies live. No push by the agent; live review and Storage cleanup remain pending.
+Jamie commits/pushes and verifies live.

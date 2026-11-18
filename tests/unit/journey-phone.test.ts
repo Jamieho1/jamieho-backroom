@@ -21,5 +21,5 @@ describe("phone mode (TKT-96)", () => {
 });
 
 it('phone preserves the complete Home v1.3 chapter order',()=>{
- expect(phoneChapters(HOME_CHAPTERS).map(c=>c.id)).toEqual(['sky','about','toolkit','creator','to-room','room','screen']);
+ expect(phoneChapters(HOME_CHAPTERS).map(c=>c.id)).toEqual(['sky','about','toolkit','cta','creator','to-room','room','screen']);
 });

@@ -16,6 +16,7 @@ import type { SocialLink } from "@/lib/social";
 import { HomeDial, type HomeDialHandle } from "./home-dial";
 import {dialAnchorStep,dialCount} from "@/lib/journey/dial";
 import {WhatIBuild,type BuildHandle} from "./what-i-build";
+import {CtaBanner} from "./cta-banner";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import {PrimaryPill} from "@/components/primary-pill";
@@ -365,7 +366,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
-              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} inert>
+              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} inert>
                 {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
@@ -380,6 +381,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
                     <img ref={(el) => { stills.current[i] = el; }} src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
                   </figure>
                 ) : null}
+                {c.kind === "section" && c.cta ? <CtaBanner title={c.cta.title} label={c.cta.label} /> : null}
                 {c.kind === "section" && c.timeline && (c.panels?.length ?? 0) > 1 ? (
                   <ol ref={(el) => { dots.current[i] = el; }} className="journey-timeline" aria-hidden="true">
                     {(c.panels ?? []).map((p) => <li key={p.id}><span>{p.eyebrow}</span></li>)}
@@ -451,7 +453,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
+        <li key={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
           {c.id === "about" ? <><span id="background" className="journey-anchor-alias" aria-hidden="true"/><span id="pivot" className="journey-anchor-alias" aria-hidden="true" /></> : null}
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
@@ -464,6 +466,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
             </figure>
           ) : null}
           {c.kind==="section"&&c.build?<WhatIBuild data={c.build} still/>:null}
+          {c.kind==="section"&&c.cta?<CtaBanner title={c.cta.title} label={c.cta.label}/>:null}
           {c.kind==="section"&&c.dial?<HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/>:null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>

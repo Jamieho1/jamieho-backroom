@@ -17,6 +17,8 @@ export const HOME_CHAPTERS: Chapter[] = [
     panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
   // What I build: five capabilities; one existing journey scroll clock.
   { id: "toolkit", label: "What I build", nav: "What I build", kind: "section", tone: "dark", scroll: 5.6, build: DEFAULT_BUILD },
+  // Own full-width contact banner after What I build, outside its pinned area.
+  { id: "cta", label: "Start a conversation", kind: "section", tone: "dark", scroll: 0.9, wipe: 0, cta: { title: DEFAULT_BUILD.ctaTitle, label: DEFAULT_BUILD.ctaLabel } },
   // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
   {
     id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6,
