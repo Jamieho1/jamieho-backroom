@@ -53,3 +53,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-17 · Jamie approved the project-highlights migration only; content proposals remain drafts and Storage retirement waits for replacement deployment · Jamie
 
 - 2026-11-17 · Home polish 8 replaces Toolkit with the approved five-capability What I build scene; editable copy/empty Credly URLs reuse Technology, SVG geometry stays in code, primary links share bounded/reduced-motion-safe GSAP effects, and CV bullet edits remain owner-reviewed drafts · approved prompt
+
+- 2026-11-18 · Fit complete capability SVGs in both desktop axes, place Cloud certifications below its tags, retain reusable editors/gates, and require explicit “delete” for the reviewed external Media/Storage cleanup plan after deployment · Jamie’s diagram fixes and Media cleanup prompt
+
+- 2026-11-18 · Jamie explicitly approved the reviewed delete/move plan; local cleanup is complete, and Storage removal waits for deployment/API access without requiring repeat approval · Jamie: delete

@@ -1,6 +1,7 @@
+import {readFileSync} from "node:fs";
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
-import { MEDIA_MANIFEST, mediaUrl, preloadOrder, startProgress, stillFor } from "@/lib/journey/media";
+import { MEDIA_MANIFEST, mediaUrl, preloadOrder, stillFor } from "@/lib/journey/media";
 
 const manifest = { "a-desktop.mp4": { v: "11111111", bytes: 100 }, "b-desktop.mp4": { v: "22222222", bytes: 300 } };
 
@@ -12,23 +13,15 @@ describe("journey media", () => {
 
   it("downloads clips in chapter order (the monitor push-in is the last chapter), once each", () => {
     const order = preloadOrder(HOME_CHAPTERS, "desktop").map((i) => i.src);
-    expect(order).toEqual(["c1", "c7a", "c7b"]); // v1.1: video only at the two ends
-    expect(preloadOrder(HOME_CHAPTERS, "mobile")[0].file).toBe("c1-mobile.mp4");
+    expect(order).toEqual(["c7a", "c7b"]); // Only retained room and contact footage; the hero is image based.
+    expect(preloadOrder(HOME_CHAPTERS, "mobile")).toEqual([]);
   });
 
   it("moves the computer clip to the front for a /journey#desk link", () => {
     const order = preloadOrder(HOME_CHAPTERS, "desktop", "c7b").map((i) => i.src);
     expect(order[0]).toBe("c7b");
     expect(order.filter((s) => s === "c7b")).toHaveLength(1);
-    expect(order).toHaveLength(3);
-  });
-
-  it("rings real bytes of the hero clip only", () => {
-    const items = [{ src: "a", file: "a-desktop.mp4", bytes: 100 }, { src: "b", file: "b-desktop.mp4", bytes: 300 }];
-    expect(startProgress(items, {})).toBe(0);
-    expect(startProgress(items, { a: 50, b: 300 })).toBe(0.5);
-    expect(startProgress(items, { a: 500 })).toBe(1);
-    expect(startProgress([], {})).toBe(0);
+    expect(order).toHaveLength(2);
   });
 
   it("picks the still that matches where the visitor is in the chapter", () => {
@@ -42,8 +35,8 @@ describe("journey media", () => {
       expect(MEDIA_MANIFEST[`${i.src}-first.jpg`], i.src).toBeTruthy();
       expect(MEDIA_MANIFEST[`${i.src}-last.jpg`], i.src).toBeTruthy();
     }
-    for (const f of ["still-imperial.jpg", "still-westminster.jpg"]) {
-      expect(MEDIA_MANIFEST[f], f).toBeTruthy();
-    }
+    for(const file of ["c1-desktop.mp4","c1-first.jpg","c1-last.jpg","c1-mobile.mp4","still-imperial.jpg","still-westminster.jpg","c7a-mobile.mp4","c7b-mobile.mp4"])expect(MEDIA_MANIFEST[file]).toBeUndefined();
   });
 });
+
+it("keeps the service-worker allowlist identical to the retained manifest",()=>{const worker=readFileSync("public/media-sw.js","utf8");const match=/const MEDIA_FILES = new Set\((\[.*?\])\);/.exec(worker);expect(match).toBeTruthy();expect(JSON.parse(match![1]).sort()).toEqual(Object.keys(MEDIA_MANIFEST).sort());expect(worker).toContain('home-media-v2');});

@@ -25,21 +25,13 @@ export interface PreloadItem { src: string; file: string; bytes: number }
  * meets next is always the one arriving. `first` moves one clip to the front (a /journey#desk link).
  */
 export function preloadOrder(chapters: Chapter[], variant: Variant, first?: string, manifest: Manifest = MEDIA_MANIFEST): PreloadItem[] {
-  const srcs = [...new Set(chapters.flatMap((c) => (c.kind === "video" ? [c.src] : [])))];
+  if(variant==="mobile")return []; // Phones use stills and never request encoded clips.
+  const srcs = [...new Set(chapters.flatMap((c) => (c.kind === "video" && c.id !== "sky" ? [c.src] : [])))];
   if (first && srcs.includes(first)) srcs.splice(srcs.indexOf(first), 1), srcs.unshift(first);
   return srcs.map((src) => {
     const file = clipFile(src, variant);
     return { src, file, bytes: manifest[file]?.bytes ?? 0 };
   });
-}
-
-/** The start ring: real bytes of the first clip, the hero the visitor scrubs right after "Enter" (v1.1). */
-export function startProgress(items: PreloadItem[], loaded: Record<string, number>): number {
-  const head = items.slice(0, 1);
-  const total = head.reduce((s, i) => s + i.bytes, 0);
-  if (!total) return 0;
-  const got = head.reduce((s, i) => s + Math.min(loaded[i.src] ?? 0, i.bytes), 0);
-  return Math.min(1, got / total);
 }
 
 /** Before its clip has downloaded, a chapter shows its approved still: the first frame early on, the last later. */

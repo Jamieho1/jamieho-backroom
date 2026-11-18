@@ -2,22 +2,20 @@
 
 ## Implementation
 
-Home polish 8 replaces the old Techstack/Toolkit scene with the approved five-capability What I build section after the editorial dial and before Creator. It includes mockup copy, data-driven inline SVG diagrams, reversible desktop scroll steps/row navigation, a 0N / 05 counter, ≤900px measured accordion, internally panning diagrams and fully open/drawn reduced-motion/no-JS views. Layout measurements preserve explicit navigation destinations, including phone back-to-top jumps.
+What I build now contains complete AI Engineering and Cloud Architecture diagrams at wide/short desktop sizes. SVG viewports fit both axes, Cloud outer geometry has padding, and its two certification tiles sit in the left column below the tags. Phones/static layouts retain internal diagram panning; long left copy can scroll on short desktops.
 
-Capability and dial chips have gold hover/focus styling without link semantics. Shared GSAP primary links provide bounded magnetic movement, gold sweep/navy text, arrow animation, focus end states and a stronger pulsing conversation CTA to Contact. Old Toolkit code/styles/tests and its two local badge images are retired. No migration, policy, editor or public caching change is required.
+Three unused tracked desktop WebPs and twelve retired Home/London/entry/room/photo-orbit implementation/test/CSS files are removed. Reusable owner editors, membership gates, active desktop art/runtime and dynamic social icons remain. The retained media manifest and home-media-v2 worker exclude retired cloud/London/mobile clips; phones preload no videos. The generator refreshes retained keys without rediscovering archived files.
 
-## Live content and rollout
+## Cleanup approval and rollout
 
-Two summary/operations-only sets remain drafts at /manage/review:
-- Technology copy with empty Credly URLs: `84c50b3d-2c18-4efd-90ac-cc18281ef9da`.
-- Global Relay bullets 1/3 only: `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07`; bullet 2 is untouched.
+The reviewed inventory and execution results are outside Git in `../Media/Previews/media-cleanup-2026-11-18/`. Jamie approved “delete”. Removed 10 ignored repo files (5,335,929 bytes) and 17 Media files (64,239,089 bytes); moved 21 retained originals into Brand/Uploads with matching hashes. Earlier tracked cleanup removed three WebPs (1,223,166 bytes) and twelve retired source/test/CSS files (69,187 bytes). All nine retained runtime media files remain present.
 
-Live sections/experience/bullet fingerprints match before/after. Jamie deploys the new reader before approving Technology, then supplies actual Credly URLs; empty tiles are non-clickable. No content approval by the agent.
+Storage remains unchanged: 23 objects / 18,723,440 bytes are approved for deletion, but the deployed worker still lacks home-media-v2 and the retained-file allowlist. Deploy cleanup code first and recheck live references/hashes. Available Supabase MCP tools have no Storage removal API; do not delete catalogue rows through SQL or inspect secrets. Approval persists for this exact plan.
 
-`20261117183223_project_highlights.sql` remains applied live as remote `20261117220033`. Prior caption/highlight proposals `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` await Jamie. The three previously retired Experience Storage objects still await replacement deployment before deletion.
+Technology set `84c50b3d-2c18-4efd-90ac-cc18281ef9da` and CV bullets 1/3 set `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07` remain drafts. Credly URLs await Jamie. Prior caption/highlight proposals `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` await Jamie. Project-highlights migration remains applied as remote `20261117220033`; no new migration or live content/policy change.
 
 ## Verification
 
-Typecheck, 1,072 unit/database tests, production build, six-page static assertions and diff checks pass. Full main browser run: 214 passed / 88 conditional skips. Existing owner/member/visitor integration suite: 66 passed; new capability-preview/isolation cases: 2 passed. Both production and synthetic builds passed after unchanged retries for the existing Next advisory; no dependency change. An existing feedback test now waits for its asynchronous focus effect rather than racing it.
+After approved local deletion: typecheck, 1,064 unit/database tests, production build, six-page static assertions and diff checks pass. Home/dial/diagram/story/smoke browser suite at desktop/390px: 78 passed / 18 conditional skips. All 27 deleted paths are absent, 21 moved originals match their recorded SHA-256, and nine retained runtime files are present. The broader 215-pass/89-skip browser run preceded deletion; owner-preview integrations were not rerun.
 
-Jamie commits/pushes and verifies live; no push by the agent. Home polish 8 awaits live verification.
+Jamie commits/pushes and verifies live. No push by the agent; live review and Storage cleanup remain pending.

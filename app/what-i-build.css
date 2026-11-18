@@ -2,8 +2,8 @@
 /* ===== WHAT I BUILD ===== */
 
 .wib-grid{position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(243,238,230,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(243,238,230,.04) 1px,transparent 1px);background-size:56px 56px}
-.wib-grain{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.06;mix-blend-mode:screen}
-.wib-track{position:relative}
+
+
 .wib-stage{position:relative;z-index:2;padding:64px 16px 24px}
 .wib-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .wib-head h2{font-size:clamp(44px,12vw,72px)}
@@ -29,9 +29,9 @@
 .langs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px}
 .lb{font:10px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--tag);margin-right:6px}
 .chip.l{font-size:11.5px;padding:5px 9px;color:var(--ink);border-color:rgba(232,196,106,.5)}
-.creds{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:14px 0 0}
-.badge{display:inline-flex;align-items:center;gap:9px;padding:6px 12px;border:1px solid rgba(232,196,106,.6);border-radius:6px;font:11px/1.3 var(--mono);letter-spacing:.03em;color:var(--ink)}
-.badge::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--bold)}
+
+
+
 .diag{margin:16px 0 0;display:flex;flex-direction:column;min-width:0;padding:14px 16px 12px;border:1px solid rgba(243,238,230,.16);border-radius:14px;background:rgba(6,10,18,.5);background-image:linear-gradient(rgba(243,238,230,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(243,238,230,.03) 1px,transparent 1px);background-size:24px 24px}
 .diag-h{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font:10.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--meta)}
 .diag-h b{font-weight:400;color:var(--tag)}
@@ -62,7 +62,7 @@
 .diag.on .f{opacity:1;transition:opacity .55s calc(var(--i)*45ms)}
 .wib-cta{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;padding:48px 16px 72px;border-top:1px solid rgba(243,238,230,.14)}
 .wib-cta h3{margin:0;font:700 clamp(30px,8vw,48px)/1 var(--cond);text-transform:uppercase;letter-spacing:.005em}
-.wib-cta .btn{margin-top:0}
+
 @media (min-width:901px){
  .dscroll>svg{min-width:520px}
  .wib-stage{padding-left:clamp(32px,4vw,64px);padding-right:clamp(32px,4vw,64px)}
@@ -91,8 +91,8 @@
 .chip{transition:border-color .15s,color .15s,background-color .15s;cursor:default}
 .chip:hover,.chip.l:hover,.chip.vol:hover{border-color:var(--bold);color:var(--bold);background-color:rgba(232,196,106,.09)}
 
-/* credential tiles (inside diagram) */
-.creds-fo{display:flex;flex-direction:column;gap:10px}
+/* Credential tiles below the Cloud tags. */
+.build-credentials{display:flex;flex-direction:column;gap:10px}
 .cred{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid rgba(243,238,230,.38);border-radius:10px;background:rgba(16,23,37,.85);color:#F3EEE6;text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s}
 .cred svg{flex:none}
 .cred span{display:block;min-width:0}
@@ -118,3 +118,9 @@
 @media(min-width:901px) and (prefers-reduced-motion:no-preference){.wib:not(.wib-still) .wib-body{flex:1;min-height:0;height:auto;margin-top:20px;}.wib .wi-t{font-size:clamp(21px,2.1vw,30px);}.wib .wi-h{padding:9px 0;}.wib .wib-stage{padding-bottom:20px;}.wib .wib-cta{flex-shrink:0;}.wib .wib-cta .primary-pill{font-size:15px;}.wib .wib-cta .primary-arrow{width:36px;height:36px;}}
 
 .wib .wib-head h2,.wib .wib-cta h3{color:#F3EEE6;}.wib-still .wib-count{display:none;}
+
+/* Fit the complete SVG viewport, rather than vertically centring an oversized image in a clipped flex row. */
+.wib .diag{box-sizing:border-box;}.wib .diag-h,.wib .diag-c,.wib .dhint{flex-shrink:0;}.wib .dscroll{align-items:flex-start;}.wib .dscroll>svg[viewBox]{flex-shrink:0;max-height:none;aspect-ratio:var(--diagram-ratio);}
+.wib .build-credentials{margin-top:14px;gap:8px;}.wib .cred{padding:8px 10px;gap:8px;}.wib .cred b{font-size:10px;overflow-wrap:anywhere;}.wib .cred svg{width:25px;height:25px;}
+@media(min-width:901px) and (prefers-reduced-motion:no-preference){.wib:not(.wib-still) .wi.open .diag{height:100%;}.wib:not(.wib-still) .dscroll{flex:1 1 0;overflow:hidden;}.wib:not(.wib-still) .dscroll>svg[viewBox]{width:100%;height:100%;min-width:0;max-height:100%;aspect-ratio:auto;}.wib:not(.wib-still) .wi.open .wi-ci{max-height:calc(100svh - 440px);overflow-y:auto;scrollbar-width:thin;}}
+@media(max-width:900px),(prefers-reduced-motion:reduce){.wib .dscroll{flex:none;overflow-x:auto;}.wib .dscroll>svg[viewBox]{height:auto;min-width:680px;max-height:none;}.wib .build-credentials{max-width:420px;}}

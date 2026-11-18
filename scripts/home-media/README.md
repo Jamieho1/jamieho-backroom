@@ -1,32 +1,11 @@
-# Home journey media (TKT-75)
+# Active Home media pipeline
 
-Media never goes into git. Raw clips live in `~/Documents/Developer/Personal Website/Media/Final-Media/`; encoded
-files go to `public/home-media/` (gitignored) for local dev, and to the public Supabase Storage bucket `home-media`
-for the live site (migration `20261104120000_home_media.sql`; owner-only writes).
+Only `c7a` (room arrival) and `c7b` (monitor/contact push-in) use video. Each has a desktop MP4 and first/last JPEG posters. Phones use the last posters and never download videos. The cloud hero uses approved artwork from the desktop asset registry; old London/Imperial/bridge clips are retired.
 
-| id | source clip | chapter |
-|---|---|---|
-| c1 | Cloud scene 1 (crop `crop=1365:768,`) | sky |
-| c2 | C2 Cloud → Imperial entrance | descent |
-| c3a | C3a Forecourt → revolving door | imperial |
-| c3b | C3b Revolving door → library window | atrium |
-| c5a | C5a Riverside → approaching the bridge | westminster |
-| c5b | C5b Approach → under the bridge | arch |
-| c7a | Into the room → in front of the desk | room |
-| c7b | C7b Desk → close on the monitor | desk |
+Raw room clips live under `Personal Website/Media/Uploads/2026-11-18-room-source-clips/`; retained still references are in `Media/Uploads/2026-11-18-room-source-stills/`. Encoded files stay in ignored `public/home-media/` for local development and public `home-media` Storage for deployment. Personal originals never enter Git.
 
-Each id produces `<id>-desktop.mp4`, `<id>-mobile.mp4`, `<id>-first.jpg`, `<id>-last.jpg` (`encode.sh`).
-The library scene uses `lib-plate.jpg` (wide plate from S3a/S3b/S3c, props and window frame removed) and
-`lib-props.png` (notebook + cup cut-out from S3b), built once with OpenCV from the stills.
+1. `scripts/home-media/encode.sh "<raw clip.mp4>" c7a` (or c7b) produces a desktop MP4 and two posters; no unused mobile encoding.
+2. `node scripts/home-media/manifest.mjs` refreshes only retained manifest entries, rather than rediscovering retired files still awaiting deletion. Explicit filename arguments merge newly approved assets.
+3. The generator updates the manifest and service-worker filename allowlist together. Upload only changed retained files through the existing owner-only Storage uploader, and commit those two code files. Do not upload the entire archive.
 
-Live site: upload every file in `public/home-media/` to the bucket root, then set the Vercel env var
-`NEXT_PUBLIC_HOME_MEDIA_URL=https://<project-ref>.supabase.co/storage/v1/object/public/home-media` and redeploy.
-
-## After encoding or replacing any file (TKT-76)
-
-1. `node scripts/home-media/manifest.mjs` — re-hashes everything in `public/home-media/` into `lib/journey/media-manifest.json`.
-2. Upload the changed files to the `home-media` bucket (same names, replace).
-3. Commit the manifest. Pages request `<file>?v=<hash>`, so browsers and the media service worker (`public/media-sw.js`)
-   fetch the new file immediately and keep it cached for good.
-
-For an explicit subset of existing approved files, `node scripts/home-media/manifest.mjs experience-bg.webp experience-mascot.webp experience-phone.webp` merges their hashes without removing unrelated manifest entries. WebP is supported alongside MP4/JPG/PNG. The Experience files already exist in Storage; verify byte parity before versioning rather than re-uploading unchanged assets.
+`media-sw.js` uses cache namespace `home-media-v2`; activation removes the old namespace and retired filenames are no longer cached. Public assets remain content-versioned. New media needs reference/retention review before upload. Jamie approved the external audit plan; local deletions/moves are complete. Storage removals remain pending cleanup-code deployment and authenticated Storage API access.

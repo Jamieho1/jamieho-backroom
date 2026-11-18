@@ -152,7 +152,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     if (!live) return;
     registerMediaCache();
     const variant = mobile ? "mobile" : "desktop";
-    const items = preloadOrder(chapters.filter(c => c.id !== "sky"), variant, ["#desk", "#screen", "#home-contact"].includes(window.location.hash) ? "c7b" : undefined);
+    const items = preloadOrder(chapters, variant, ["#desk", "#screen", "#home-contact"].includes(window.location.hash) ? "c7b" : undefined);
     if (mobile || shouldSkipVideo()) return; // phones: stills only, nothing to download
     preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
       progress() {},

@@ -4,7 +4,9 @@
  * goes straight to the network untouched. URLs change whenever a file's content changes, so cached copies never
  * go stale; older versions of the same file are deleted when a new one is stored.
  */
-const CACHE = "home-media-v1";
+const CACHE = "home-media-v2";
+// Kept in sync with lib/journey/media-manifest.json; retired files pass through without caching.
+const MEDIA_FILES = new Set(["about-graduation-hall.jpg", "about-imperial-graduation.jpg", "about-jungfraujoch.jpg", "c7a-desktop.mp4", "c7a-first.jpg", "c7a-last.jpg", "c7b-desktop.mp4", "c7b-first.jpg", "c7b-last.jpg"]);
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
@@ -19,6 +21,7 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET" || req.headers.has("range")) return;
   const url = new URL(req.url);
   if (!url.pathname.includes("/home-media/") || !url.searchParams.has("v")) return;
+  if (!MEDIA_FILES.has(decodeURIComponent(url.pathname.split("/home-media/").pop()))) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const hit = await cache.match(req);
