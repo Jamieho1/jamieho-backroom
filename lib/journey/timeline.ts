@@ -85,6 +85,8 @@ export interface SectionChapter extends Base {
   still?: { file: string; side: "left" | "right" };
   /** Fraction of the section's scroll used to wipe it in (default 0.14). */
   wipe?: number;
+  /** Wipe travels 1:1 with scroll (no easing), so the section moves like ordinary page content. */
+  linear?: boolean;
   /** TKT-85: show one timeline dot per panel (the current one lit), labelled with each panel's eyebrow. */
   timeline?: boolean;
   /** TKT-88: the exploded architecture stack (layers from the Technology section, badges from certificates). */
@@ -220,8 +222,8 @@ export function ctaOpacity(local: number, at = 0.82): number {
 
 export const SECTION_WIPE = 0.14;
 /** How far (0..1 of the screen height) a section still sits below its resting place while it wipes in. */
-export function wipeOffset(local: number, wipe = SECTION_WIPE): number {
-  return wipe<=0 ? 0 : 1 - smoothstep(0, wipe, local);
+export function wipeOffset(local: number, wipe = SECTION_WIPE, linear = false): number {
+  return wipe<=0 ? 0 : linear ? 1 - clamp01(local / wipe) : 1 - smoothstep(0, wipe, local);
 }
 
 /** Light parallax for a section's framed still: drifts from +amp to -amp (fraction of its height) over the section. */

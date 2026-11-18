@@ -135,3 +135,17 @@ it('canonical About and legacy pivot land at the same readable position',()=>{
  const experience=HOME_CHAPTERS.find(c=>c.id==='about');
  expect(experience).not.toHaveProperty('still');expect(experience).not.toHaveProperty('timeline');
 });
+
+describe("flow-like linear wipes", () => {
+  it("linear wipe travels 1:1 with scroll and eases nothing; contact banner and Creator use it without any hold", () => {
+    expect(wipeOffset(0, 1, true)).toBe(1);
+    expect(wipeOffset(0.25, 1, true)).toBeCloseTo(0.75);
+    expect(wipeOffset(1, 1, true)).toBe(0);
+    const cta = HOME_CHAPTERS.find((c) => c.id === "cta")!, creator = HOME_CHAPTERS.find((c) => c.id === "creator")!;
+    if (cta.kind !== "section" || creator.kind !== "section") throw new Error("sections expected");
+    expect(cta.linear && creator.linear).toBe(true);
+    expect(cta.wipe).toBe(1);
+    expect(cta.scroll * 100).toBeCloseTo(48); // banner height (48vh) equals its scroll length: no pinned hold
+    expect((creator.wipe ?? 0) * creator.scroll).toBeCloseTo(1); // Creator rises one viewport height over the same distance of scroll
+  });
+});

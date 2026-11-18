@@ -2,7 +2,7 @@
 
 ## Implementation
 
-Home polish 9 (local, unpushed): the Background step restores the mockup constellation (centre print plus four ring prints, gold tags above each on short leaders, wrapped/clamped, no overlaps). Four ghost prints stay dimmed at the ring edge through Experience stops and vanish before Selected Work. Centre line icons draw edges then nodes on a scrubbed GSAP timeline that reverses; neural-network is the supplied 3-3-2 icon. Stops order by `experience_items.sort`. “Have a project in mind?” is its own banner chapter after What I build with a roughly 2x strong pill and no supporting line.
+Home polish 9 (local, unpushed): the Background step restores the mockup constellation (centre print plus four ring prints, gold tags above each on short leaders, wrapped/clamped, no overlaps). Four ghost prints stay dimmed at the ring edge through Experience stops and vanish before Selected Work. Centre line icons draw edges then nodes on a scrubbed GSAP timeline that reverses; neural-network is the supplied 3-3-2 icon. Stops order by `experience_items.sort`. “Have a project in mind?” is its own half-height (48vh) band after What I build that rises 1:1 with scroll, with Creator rising directly beneath it; ~1.4x strong pill, no supporting line, no pinned hold.
 
 Earlier: What I build holds complete diagrams at wide/short desktop sizes; Cloud certification tiles sit below the tags. Retired Home/London/room/photo-orbit files and three WebPs are removed; the home-media-v2 worker retains only the nine manifest files and phones preload no videos.
 

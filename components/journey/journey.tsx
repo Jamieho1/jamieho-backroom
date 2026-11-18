@@ -254,7 +254,8 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       const { index, local } = locate(chapters, shown, lay);
       const active = chapters[index];
       // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
-      const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe) : 0;
+      const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe, active.linear) : 0;
+      const isCta = (ch?: Chapter) => ch?.kind === "section" && !!ch.cta;
       const activeGrow = 0;
       if (navigation.current) navigation.current.dataset.floating = index > 0 ? "true" : "false";
       chapters.forEach((c, i) => {
@@ -265,13 +266,17 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
         if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : 1;
         else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 : joinOpacity(active, local) < 1)) opacity = 1;
         else if (active.kind === "fade" && i === index + 1 && local >= 0.5) opacity = 1;
+        // The half-height banner floats over What I build, and Creator rises beneath the still-moving banner.
+        if (isCta(active) && i === index - 1) opacity = 1;
+        if (isCta(chapters[index - 1]) && wipeIn > 0 && i === index - 2) opacity = 1;
         el.inert = i !== index;
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
         if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base, phoneStillRef.current(c.src));
         if (c.kind === "section") {
-          el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
+          el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : isCta(c) && i === index - 1 && wipeIn > 0 ? `translate3d(0, ${((wipeIn - 1) * window.innerHeight).toFixed(1)}px, 0)` : "";
+          if (c.cta) el.style.setProperty("--cta-in", at.toFixed(3));
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if(c.dial && opacity > 0)dial.current?.setProgress(at);
