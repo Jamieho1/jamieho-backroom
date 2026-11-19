@@ -11,7 +11,7 @@ test.describe('real publishing previews',()=>{
  test('new featured project previews on list, detail and Work and publishes without rebuilding',async({page,baseURL,browser},info)=>{
   const proposal=await set([{table:'projects',op:'insert',key:'00000000-0000-4000-8000-000000000704',fields:{slug:'datakind-fixture',name:'DataKind UK fixture',tagline:'Illustrative test project',featured:true,public:true,sort:-1}}]);
   await enter(page,baseURL!,proposal);await expect(page).toHaveURL(/\/projects$/);
-  const card=page.locator('.project-tile').filter({hasText:'DataKind UK fixture'});await expect(card).toHaveAttribute('data-draft-changed','true');await expect(card).toContainText('Featured');await card.click();
+  const card=page.locator('.pj-fcard').filter({hasText:'DataKind UK fixture'});await expect(card).toHaveAttribute('data-draft-changed','true');await expect(card).toContainText('FEATURED');await card.getByRole('link',{name:/Case study/}).click();
   await expect(page).toHaveURL(/\/projects\/datakind-fixture$/);await expect(page.locator('.project-read')).toHaveAttribute('data-draft-changed','true');await expect(page.getByRole('heading',{name:'DataKind UK fixture',exact:true})).toBeVisible();
   expect((await page.reload())?.headers()['cache-control']).toContain('no-store');
   const copied=(await page.context().cookies()).filter(c=>['jb.content-preview','__prerender_bypass'].includes(c.name));const guest=await browser.newContext({viewport:page.viewportSize()!});
@@ -34,7 +34,7 @@ test.describe('real publishing previews',()=>{
   await page.context().clearCookies();expect((await page.goto('/projects/'+proposal.live.project))?.status()).toBe(404);expect((await page.goto('/projects/renamed-fixture-project'))?.status()).toBe(200);await expect(page.getByRole('heading',{name:'Renamed fixture project',exact:true})).toBeVisible();
  });
  test('delete proposals hide cards and approval only unpublishes all three retained rows',async({page,baseURL})=>{
-  const proposal=await set([{table:'projects',op:'delete',key:ids.project},{table:'articles',op:'delete',key:ids.article},{table:'guides',op:'delete',key:ids.guide}]);await enter(page,baseURL!,proposal);await expect(page.locator('.project-tile').filter({hasText:'Live fixture project'})).toHaveCount(0);await page.goto('/guides');await expect(page.locator('.guide-card').filter({hasText:'Live fixture guide'})).toHaveCount(0);
+  const proposal=await set([{table:'projects',op:'delete',key:ids.project},{table:'articles',op:'delete',key:ids.article},{table:'guides',op:'delete',key:ids.guide}]);await enter(page,baseURL!,proposal);await expect(page.locator('.pj-row').filter({hasText:'Live fixture project'})).toHaveCount(0);await page.goto('/guides');await expect(page.locator('.guide-card').filter({hasText:'Live fixture guide'})).toHaveCount(0);
   await page.getByRole('button',{name:'Approve',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);const state=await local('/__state');expect(state.projects.find((p:{id:string})=>p.id===ids.project).public).toBe(false);expect(state.articles.find((a:{id:string})=>a.id===ids.article).published).toBe(false);expect(state.guides.find((g:{id:string})=>g.id===ids.guide).published).toBe(false);
  });
  test('copied preview cookies reveal no new project/article/guide values to visitors or members',async({page,browser,baseURL})=>{

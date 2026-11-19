@@ -463,3 +463,43 @@ Approved design: "Personal Website/Media/Previews/contact-brief.html" (open it; 
 
 Done when: unit + DB tests cover validation (project vs non-project, optional message, enums), the migration is tested locally and recorded NOT applied; browser tests at desktop and 390 px submit a Project brief and a "Just saying hi" brief against the local test setup, check required errors, the conditional reveal and the success state; old room/monitor code and manifest entries are gone (grep); typecheck, full suite, build and static assertions pass; docs and privacy updated. Report checks actually run, the migration name, and the Storage/local media list awaiting Jamie's "delete".
 ```
+
+---
+
+## Projects pages redesign — /projects index + case study template
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/architecture.md and docs/content-drafts.md first and follow them (Jamie pushes; any migration NOT applied until Jamie says "apply it"; update docs/ + MEMORY.md + docs/decisions.md after).
+
+Approved designs: "Personal Website/Media/Previews/projects-index.html" (/projects) and "Personal Website/Media/Previews/project-case-study.html" (/projects/[slug] template, shown with FinAI). Open both and match them in the site's navy editorial system (shared top bar, grain, dot grid, mono labels, chips, browser frame with traffic lights, inline-SVG diagram draw, shared magnetic gold-sweep pill/link hover component from Home polish 8).
+
+/projects:
+1. Header (eyebrow PROJECTS, "SELECTED WORK", one line, "0N PROJECTS" count from data), capability filter chips (All + the five What I build items; single-select; animate rows; empty state "Nothing public here yet."). Filter state in the URL (?capability=01) so it is shareable.
+2. Featured block: featured projects as large cards (frame with screenshots side by side when there are two, or the generated title card when none; name, tagline, chips, Case study → and Visit ↗ when url).
+3. Index list of all public projects: number, name, tagline, capability numbers, tags, arrow; desktop hover shows a cursor-following preview (screenshot or title card, lerped, transform only); phones no preview.
+4. Ending band "HAVE A PROJECT IN MIND?" + "Get in touch →" to /#contact.
+
+/projects/[slug]:
+5. Back link, hero (mono "CASE STUDY · 0N", name, tagline, meta grid: Status, Capabilities, Stack chips, Links — hide empty fields/slots), visual (frame with screenshots carousel, or the generated title card fallback), body rendered from the project's Markdown with a sticky mini-index built from its ## headings, optional "How it works" diagram, "Next project →" card with hover preview, ending band.
+6. Data (Content Drafts editable; one migration if needed, with policy tests): projects gain capabilities (array of '01'..'05', check constraint), status (short text, optional), and an optional diagram (jsonb nodes/edges validated by a zod schema; rendered by one data-driven SVG component shared with What I build). Allowlist these in Content Drafts (TS + SQL apply function). Then create live Content Drafts sets (summary + operations only; Jamie approves): capabilities — Cyterly AI 01,04; FinAI Analyst Pro 01,04; DataKind UK 05; Legal Assistance Winnie 05; Deep Learning for 3D Image Segmentation 05; status — Cyterly AI "Working prototype · sample data"; diagram — FinAI exactly as in the mockup (Filings & transcripts → Document-aware parsing → Index with metadata → Hybrid retrieval (BM25 + BGE-M3 in Qdrant, SQL pre-filter in PostgreSQL/pgvector) → Rerank → Research agent (LangGraph, ReAct, custom tools) → Investment memo, cited source per claim). Use only facts already in each project's body.
+7. Reduced motion: no lerp/draw/magnet. 390 px: no sideways scroll; filters wrap/scroll inside their row. Keep /projects and /projects/[slug] pre-rendered with ISR revalidated by approvals; keep the existing project editor working.
+
+Done when: unit tests for capability filtering, the URL filter param, diagram schema and mini-index from headings; DB/policy tests for any new columns; browser tests at desktop and 390 px (filter, hover preview present on desktop only, case study sections, next project, title-card fallback, no sideways scroll); typecheck, full suite, build and static assertions pass; docs updated; migration recorded NOT applied. Report checks actually run and the draft set ids.
+```
+
+---
+
+## My story page redesign — /about layout (content comes later)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/architecture.md and docs/content-drafts.md first and follow them (Jamie pushes; update docs/ + MEMORY.md after). No migration.
+
+Approved design: "Personal Website/Media/Previews/about-story.html". Rebuild /about in the navy editorial system to match it:
+1. Hero: eyebrow MY STORY, the About heading from site_sections.about title in the homepage display style ("to" small italic), one-line intro, meta row "N chapters · ~M min read" computed from the story Markdown (≈200 wpm).
+2. Body from site_sections.story Markdown (unchanged content model, edited through Content Drafts): each "## " heading is a chapter (numbered 01…); desktop sticky left chapter rail with gold nodes, current chapter highlighted, reading-progress fill, click to jump; phones a sticky "Chapter 0N / 0M ▾" bar. Reading column ~680 px.
+3. Markdown features: images render as tilted white-print photo breaks with gold mono captions from alt/title (wider than the column, as in the mockup); blockquotes as large condensed pull quotes; a "### " list block inside a chapter titled "Principles" (or a list of bold-led items) renders as the 2×2 principle cards.
+4. Empty/starter state: while site_sections.story is empty, show the hero, the About paragraph and "More of the story is on its way." — NEVER show the mockup's "YOUR WORDS" placeholder boxes to visitors.
+5. Ending band "HAVE A PROJECT IN MIND?" + big "Get in touch →" pill (shared hover component) to /#contact, plus "Back to the homepage".
+6. Motion: chapter titles fade/slide in, slight photo parallax; reduced motion off. No sideways scroll at 390 px.
+Done when: unit tests for chapter parsing, reading time, principles block and the empty state; browser tests at desktop/390 px (rail highlights while scrolling, jump links, empty state); Content Drafts preview of a story change still works on /about; typecheck, suite, build and static assertions pass; docs updated. Report checks actually run.
+```

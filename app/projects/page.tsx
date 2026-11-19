@@ -3,24 +3,26 @@ import {PagePreview} from "@/components/content-drafts/page-preview";
 import type { Metadata } from "next";
 import { Desktop } from "@/components/desktop";
 import { getPublicProjects } from "@/lib/portfolio";
-import { ProjectList } from "@/components/portfolio/views";
-import { ProjectManageLink } from "@/components/portfolio/manage-link";
+import { toSummary } from "@/lib/project-view";
+import { ProjectsIndex } from "@/components/projects/projects-index";
 import "../projects.css";
+import "../project-pages.css";
 
 export const metadata: Metadata = { title: "Projects · Jamie Ho", description: "Things Jamie Ho has built." };
-/** Pre-rendered; re-rendered when the owner saves a project (TKT-86), or at least daily. */
+/** Pre-rendered; re-rendered when approvals or the editor save a project, or at least daily. The capability filter runs in the browser. */
 export const revalidate = 86400;
 
-/** Home v1.1 (TKT-83): every public project, featured first. Each card opens the project's own page. */
+/** Selected work: featured projects, then the full index. */
 export default async function ProjectsPage() {
   // No try/catch: if Supabase is down the render fails and Next keeps serving the last good page.
   const preview=await getHomePreview();
   const projects = await getPublicProjects(preview);
   return (
-    <><PagePreview preview={preview} page="/projects"/><Desktop apps={[]} initialApp="projects" discoverApps content={<div className="page projects-page">
-      <header className="articles-heading"><h1>Projects</h1><ProjectManageLink /></header>
-      <p className="muted">Things I&apos;ve built: what each one does, how it works and where to try it.</p>
-      <ProjectList projects={projects} />
-    </div>} /></>
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com"/>
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
+      <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Inter:wght@400;500;600&display=swap"/>
+      <PagePreview preview={preview} page="/projects"/><Desktop apps={[]} initialApp="projects" discoverApps content={<ProjectsIndex projects={projects.map(toSummary)} />} />
+    </>
   );
 }

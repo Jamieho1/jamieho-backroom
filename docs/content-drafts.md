@@ -150,6 +150,10 @@ Projects accept optional highlights: at most three trimmed nonempty strings of 4
 Pending Home polish 7 sets: caption correction `478f314b-52dd-46b1-8202-5130a894d305`; exact approved mockup highlights `37b47db8-2872-4b2d-a5bd-c9c5b25e553a`. Both were inserted with summary/operations only, read back as draft, never approved by the agent. Photo upload sets from About polish are now approved: read-only verification confirms five public photos and two DataKind screenshots.
 
 
+## Project case studies
+
+Projects also accept `capabilities` (unique '01'–'05'), `status` (trimmed, ≤80 characters) and `diagram` (strict nodes/edges object, or null to clear); TypeScript uses projectSchema/diagramSchema and `private.apply_publishing_draft` independently validates the merged row and audits previous values. Requires migration `20261119180000_project_case_studies.sql`, which is NOT applied: a draft that references these fields cannot be approved until it is. The prepared sets (capabilities for five projects, Cyterly AI status, FinAI diagram) are not inserted; their SQL is in `Media/Previews/projects-drafts-pending.sql`, to run only after Jamie says “apply it”.
+
 ## Capability copy
 
 What I build reuses the existing owner-only `site_sections` allowlist entry (`technology`, title/body); there is no new migration or approval-engine exception. `lib/journey/build.ts` defines the version-1 structured body and safe legacy fallback. The JSON carries five ordered capabilities and two certification names/URLs; empty URLs stay non-clickable and only HTTPS Credly destinations become links. Copy renders as escaped React text, while diagram geometry remains trusted code data. Existing Technology previews mark the complete section gold on Home, including the compact/static views. Public pages retain cookie-free static/ISR loaders.

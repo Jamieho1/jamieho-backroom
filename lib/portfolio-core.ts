@@ -3,6 +3,8 @@
  * journey) can use it without pulling the database client into the browser bundle.
  */
 import { z } from "zod";
+import { capabilitiesSchema, statusSchema, normalizeCapabilities, type CapabilityId } from "./project-capabilities";
+import { diagramSchema, parseDiagram, type ProjectDiagram } from "./project-diagram";
 
 export interface Project {
   draftChanged?: boolean;
@@ -14,6 +16,10 @@ export interface Project {
   tags: string[];
   screenshots: string[];
   highlights?: string[];
+  /** '01'..'05' (What I build items); absent until the case-study migration is applied. */
+  capabilities?: CapabilityId[];
+  status?: string;
+  diagram?: ProjectDiagram | null;
   url: string;
   featured: boolean;
   public: boolean;
@@ -22,6 +28,11 @@ export interface Project {
 }
 
 export const PROJECT_SELECT = "id,slug,name,tagline,body,tags,screenshots,url,featured,public,sort,created_at";
+/** Public rows tolerate a database without the case-study columns, and never trust a stored diagram. */
+export function normalizeProject<T extends Project>(row: T): T {
+  return { ...row, capabilities: normalizeCapabilities(row.capabilities), status: typeof row.status === "string" ? row.status : "", diagram: parseDiagram(row.diagram) };
+}
+
 /** The journey's showcase shows at most this many featured projects. */
 export const FEATURED_LIMIT = 4;
 
@@ -59,6 +70,9 @@ export const projectSchema = z.object({
   screenshots: z.array(z.string().refine(https)).max(PROJECT_LIMITS.screenshots),
   url: z.string().trim().refine((s) => s === "" || https(s)),
   highlights: z.array(z.string().trim().min(1).refine(s=>!s.includes("\0")&&Array.from(s).length<=400)).max(3).optional(),
+  capabilities: capabilitiesSchema.optional(),
+  status: statusSchema.optional(),
+  diagram: diagramSchema.nullable().optional(),
   featured: z.boolean(),
   public: z.boolean(),
   sort: z.number().int().min(-1000).max(1000),

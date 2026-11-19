@@ -73,3 +73,9 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-19 · Feedback and Auto/Day/Night controls in both shared bars match the logo’s gold circle, with navy icons and lighter-gold hover; preserve focus and behaviour · Jamie’s request
 
 - 2026-11-19 · Supersedes filled navigation circles: JH, feedback and colour-mode controls use gold borders and transparent interiors, preserving the white JH mark and gold control icons · Jamie’s clarification
+
+- 2026-11-19 · /projects is “Selected Work”: capability filter chips (All + the five What I build items, single-select, state in `?capability=` via the browser so the page stays pre-rendered), Featured block, numbered list with a desktop-only cursor preview, and an ending band; /projects/[slug] is a case-study template with sticky mini-index from `##` headings, optional diagram, Next project card · Jamie’s approved mockups
+
+- 2026-11-19 · Project capabilities/status/diagram are Content-Draft-editable (not in the project editor); their migration stays unapplied and the draft sets stay uninserted until Jamie says “apply it” · Jamie’s instruction
+
+- 2026-11-19 · What I build and project diagrams share one renderer (`components/diagram.tsx`) and the same shape format · Jamie’s prompt

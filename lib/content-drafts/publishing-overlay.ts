@@ -6,7 +6,7 @@ import type {SupabaseClient} from '@supabase/supabase-js';
 export interface PublishingRows {projects:Project[];articles:Article[];guides:Guide[]}
 export type PublishingPreview=Partial<PublishingRows>;
 const defaults={
- projects:{tagline:'',body:'',tags:[],screenshots:[],url:'',featured:false,public:false,sort:100},
+ projects:{tagline:'',body:'',tags:[],screenshots:[],capabilities:[],status:'',diagram:null,url:'',featured:false,public:false,sort:100},
  articles:{summary:'',body:'',platform:'other',category:'ai',source_url:'',cover_url:'',project_id:null,published:false},
  guides:{summary:'',body:'',notion_url:'',doc_url:'',cover_url:'',published:false},
 };

@@ -1,23 +1,14 @@
 "use client";
-import {createElement,forwardRef,useId,useImperativeHandle,useRef,useState} from "react";
-import type {ReactNode} from "react";
+import {forwardRef,useId,useImperativeHandle,useRef,useState} from "react";
 import type {BuildContent} from "@/lib/journey/build";
 import {buildStep,buildStepLocal} from "@/lib/journey/build";
 import diagrams from "@/lib/journey/build-diagrams.json";
+import type {Shape} from "@/lib/project-diagram";
+import {DiagramFigure,ShapeTree} from "@/components/diagram";
 
-interface Shape {tag:string;props:Record<string,unknown>;children:(Shape|string)[]}
 export interface BuildHandle {setProgress(local:number):void}
 function Credentials({data}:{data:BuildContent}){return <div className="build-credentials">{data.certifications.map(c=>{const inside=<><svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M15 2L26 8.5V21.5L15 28L4 21.5V8.5Z M10 15.5L13.5 19L20.5 11.5" stroke="#E8C46A" strokeWidth="1.4"/></svg><span><b>{c.title}</b>{c.url?<i>Verify on Credly ↗</i>:null}</span></>;return c.url?<a key={c.title} className="cred" href={c.url} target="_blank" rel="noopener noreferrer">{inside}</a>:<div key={c.title} className="cred">{inside}</div>;})}</div>}
-/** Trusted geometry only. Owner-editable copy is always rendered as React text, never HTML. */
-function ShapeTree({shape,prefix}:{shape:Shape|string;prefix:string}):ReactNode{
- if(typeof shape==="string")return shape;
- const props={...shape.props};
- for(const [key,value]of Object.entries(props))if(typeof value==="string")props[key]=value.replace(/url\(#mk-([wg])\)/g,`url(#${prefix}-$1)`);
- if(shape.tag==="svg"){props.role="img";}
-
- return createElement(shape.tag,props,...shape.children.map((child,index)=><ShapeTree key={index} shape={child} prefix={prefix}/>));
-}
-export function BuildDiagram({index,data}:{index:number;data:BuildContent}){const id=useId().replace(/:/g,"");const item=data.items[index];return <figure className="diag on" data-diagram={index} style={{["--diagram-ratio" as string]:diagrams[index].props.viewBox.split(" ").slice(2).join(" / ")}}><header className="diag-h"><span>FIG {String(index+1).padStart(2,"0")}</span><b>{item.diagramTitle}</b></header><div className="dscroll" tabIndex={0} aria-label={`${item.title} diagram; scroll horizontally to explore`}><svg width="0" height="0" style={{position:"absolute"}} aria-hidden="true"><defs>{["w","g"].map(v=><marker key={v} id={`${id}-${v}`} markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1.5 1.5L8 5L1.5 8.5" fill="none" stroke={v==="g"?"#E8C46A":"#F3EEE6"} strokeWidth="1.3"/></marker>)}</defs></svg><ShapeTree shape={diagrams[index] as Shape} prefix={id}/></div><p className="dhint">Pan to explore →</p>{item.caption?<figcaption className="diag-c">{item.caption}</figcaption>:null}</figure>}
+export function BuildDiagram({index,data}:{index:number;data:BuildContent}){const item=data.items[index];return <DiagramFigure fig={`FIG ${String(index+1).padStart(2,"0")}`} title={item.diagramTitle} caption={item.caption||undefined} figureProps={{"data-diagram":index,style:{["--diagram-ratio" as string]:diagrams[index].props.viewBox.split(" ").slice(2).join(" / ")}}}>{prefix=><><div className="dscroll" tabIndex={0} aria-label={`${item.title} diagram; scroll horizontally to explore`}><ShapeTree shape={diagrams[index] as Shape} prefix={prefix}/></div><p className="dhint">Pan to explore →</p></>}</DiagramFigure>}
 export const WhatIBuild=forwardRef<BuildHandle,{data:BuildContent;still?:boolean;accordion?:boolean;onSeek?:(local:number)=>void}>(function WhatIBuild({data,still=false,accordion=false,onSeek},ref){
  const [active,setActive]=useState(0);const activeRef=useRef(0);const id=useId();
  useImperativeHandle(ref,()=>({setProgress(local){const next=buildStep(local);if(next!==activeRef.current){activeRef.current=next;setActive(next);}}}),[]);

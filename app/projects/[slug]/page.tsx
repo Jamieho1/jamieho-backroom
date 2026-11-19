@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Desktop } from "@/components/desktop";
 import { getPublicProject, getPublicProjects } from "@/lib/portfolio";
-import { ProjectDetail } from "@/components/portfolio/views";
+import { toSummary } from "@/lib/project-view";
+import { ProjectCaseStudy } from "@/components/projects/case-study";
 import "../../projects.css";
+import "../../project-pages.css";
 
 /** Pre-rendered on first visit; re-rendered when the owner saves the project (TKT-86), or at least daily. */
 export const revalidate = 86400;
@@ -24,12 +26,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   } catch { return { title: "Projects · Jamie Ho" }; }
 }
 
-/** Home v1.1 (TKT-83): one project's case study. The website is an option on the page, not where the card goes. */
+/** One project's case study. The website is an option on the page, not where the card goes. */
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   // No try/catch: if Supabase is down the render fails and Next keeps serving the last good page.
   const preview=await getHomePreview();
   const p = await getPublicProject(slug,preview);
   if (!p) notFound();
-  return <><PagePreview preview={preview} page={p.public?`/projects/${p.slug}`:"/projects"}/><Desktop apps={[]} initialApp="projects" discoverApps content={<ProjectDetail p={p} />} /></>;
+  // The numbered order and the next project come from the public list (featured first, then the owner's order).
+  const all = await getPublicProjects(preview);
+  const at = all.findIndex((x) => x.id === p.id);
+  const index = at >= 0 ? at + 1 : all.length + 1, total = Math.max(all.length, index);
+  const following = all.length > 1 && at >= 0 ? all[(at + 1) % all.length] : null;
+  const next = following ? { ...toSummary(following), n: ((at + 1) % all.length) + 1 } : null;
+  return <>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
+    <link rel="stylesheet" precedence="default" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Inter:wght@400;500;600&display=swap"/>
+    <PagePreview preview={preview} page={p.public?`/projects/${p.slug}`:"/projects"}/><Desktop apps={[]} initialApp="projects" discoverApps content={<ProjectCaseStudy project={p} index={index} total={total} next={next} />} />
+  </>;
 }
