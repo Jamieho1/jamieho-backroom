@@ -135,3 +135,9 @@ fieldset>*:not(legend){clear:both}
 @keyframes draw{to{stroke-dashoffset:0}}
 
 .contact-brief h2{color:var(--ink)}.contact-brief .primary-pill .primary-arrow{background:var(--bold);color:#1B2333}.contact-brief .primary-pill:hover .primary-arrow,.contact-brief .primary-pill:focus-visible .primary-arrow{background:#1B2333;color:var(--bold)}
+
+/* The former banner is now the Contact heading: one natural-flow section, without a CTA button or hold. */
+.contact-brief .brief-opening{position:relative;isolation:isolate;max-width:1240px;margin:0 auto clamp(36px,5vw,64px);text-align:center;}
+.contact-brief .brief-opening::before{content:"";position:absolute;inset:-80px -10% -70px;z-index:-1;pointer-events:none;background:radial-gradient(closest-side,rgb(232 196 106 / .2),rgb(232 196 106 / .07) 55%,transparent);}
+.contact-brief .brief-heading{margin:0;max-width:100%;font:700 clamp(48px,7vw,120px)/.95 "Barlow Condensed","Arial Narrow",Impact,sans-serif;white-space:normal;letter-spacing:-.01em;text-transform:uppercase;text-wrap:balance;overflow-wrap:anywhere;color:#f3eee6;}
+.contact-brief .brief-lede{margin-top:0;}.contact-brief .brief-opening .brief-eyebrow{color:var(--bold);}

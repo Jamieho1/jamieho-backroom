@@ -1,5 +1,5 @@
 import {DEFAULT_BUILD} from "./build";
-/** Home: artwork, editorial dial, capabilities, banner and Creator; Contact follows in normal flow. */
+/** Home: artwork, Creator, editorial dial and capabilities; Contact follows in normal flow. */
 import type { Chapter } from "./timeline";
 
 const PLACEHOLDER = "Placeholder: filled from the existing site content.";
@@ -10,13 +10,6 @@ export const HOME_CHAPTERS: Chapter[] = [
     keys: [[0, 0], [0.35, 0.12], [1, 1]],
     panels: [{ id: "hero", from: 0, to: 0.85, side: "center", eyebrow: "Welcome", title: "Jamie Ho", body: PLACEHOLDER }],
   },
-  {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,
-    panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
-  // What I build: five capabilities; one existing journey scroll clock.
-  { id: "toolkit", label: "What I build", nav: "What I build", kind: "section", tone: "dark", scroll: 5.6, build: DEFAULT_BUILD },
-  // Half-height contact banner after What I build: it rises 1:1 with scroll (48vh over 0.48 viewport heights of scroll, no hold),
-  // then Creator rises directly beneath it while the banner keeps moving up (see journey.tsx).
-  { id: "cta", label: "Start a conversation", kind: "section", tone: "dark", scroll: 0.48, wipe: 1, linear: true, cta: { title: DEFAULT_BUILD.ctaTitle, label: DEFAULT_BUILD.ctaLabel } },
   // Creator (TKT-89): YouTube & Instagram. The channel pitch with Subscribe / Follow, and the latest posts beside it.
   {
     id: "creator", label: "Creator", nav: "Creator", kind: "section", tone: "light", scroll: 1.6, wipe: 0.625, linear: true,
@@ -25,4 +18,8 @@ export const HOME_CHAPTERS: Chapter[] = [
       { id: "latest", from: 0.2, to: 1, side: "right", eyebrow: "Latest", title: "Fresh off the desk" },
     ],
   },
+  {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,
+    panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
+  // What I build: five capabilities; one existing journey scroll clock.
+  { id: "toolkit", label: "What I build", nav: "What I build", kind: "section", tone: "dark", scroll: 5.6, build: DEFAULT_BUILD },
 ];

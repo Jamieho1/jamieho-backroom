@@ -3,7 +3,6 @@ import {renderToStaticMarkup} from "react-dom/server";
 import {readFileSync} from "node:fs";
 import {DEFAULT_BUILD,buildSchema,parseBuild,buildStep,buildStepLocal} from "@/lib/journey/build";
 import {WhatIBuild} from "@/components/journey/what-i-build";
-import {CtaBanner} from "@/components/journey/cta-banner";
 import {HOME_CHAPTERS} from "@/lib/journey/chapters";
 import {withContent} from "@/lib/journey/content";
 it("matches the five approved capabilities and keeps languages first",()=>{expect(DEFAULT_BUILD.items.map(i=>i.title)).toEqual(["AI engineering","Production event systems","Cloud architecture","Full-stack & delivery","Machine learning & computer vision"]);const html=renderToStaticMarkup(<WhatIBuild data={DEFAULT_BUILD} still/>);expect(html.indexOf('Languages')).toBeLessThan(html.indexOf('>React<'));expect(html).not.toContain('href="#home-contact"');expect(html).not.toContain('wib-cta');expect(html).not.toContain('journey-toolkit');});
@@ -15,11 +14,4 @@ it("draws every static diagram and keeps text escaped",()=>{const data=structure
 
 it("places credentials in the Cloud copy and never embeds HTML into diagram geometry",()=>{const html=renderToStaticMarkup(<WhatIBuild data={DEFAULT_BUILD} still/>);expect(html).toContain('class="build-credentials"');expect(html).not.toContain('foreignObject');});
 
-it("renders the contact CTA as its own banner section with the strong pill, outside What I build",()=>{
- const html=renderToStaticMarkup(<CtaBanner title={DEFAULT_BUILD.ctaTitle} label={DEFAULT_BUILD.ctaLabel}/>);
- expect(html).toContain('class="cta-banner"');expect(html).toContain('Have a project in mind?');expect(html).toContain('primary-strong');expect(html).toContain('href="#home-contact"');expect(html).toContain('data-contact-jump');expect(html).not.toContain('cta-support');
- const chapters=withContent(HOME_CHAPTERS.filter(c=>c.id==='toolkit'||c.id==='cta'),{sections:{technology:{title:'',body:JSON.stringify({...DEFAULT_BUILD,ctaTitle:'Owner title',ctaLabel:'Owner label'})}} as never,experience:[],technologies:[]});
- const ids=chapters.map(c=>c.id);expect(ids.indexOf('cta')).toBe(ids.indexOf('toolkit')+1);
- const cta=chapters.find(c=>c.id==='cta');expect(cta&&cta.kind==='section'&&cta.cta).toEqual({title:'Owner title',label:'Owner label'});
- expect(chapters.find(c=>c.id==='toolkit')).not.toHaveProperty('cta');
-});
+it("keeps Creator immediately after Hero and has no separate CTA chapter",()=>{expect(HOME_CHAPTERS.map(c=>c.id)).toEqual(["sky","creator","about","toolkit"]);expect(HOME_CHAPTERS.some(c=>c.id==="cta")).toBe(false);});

@@ -93,8 +93,6 @@ export interface SectionChapter extends Base {
   build?: import("./build").BuildContent;
   /** One reversible Background → Experience → Work dial. */
   dial?: import("./dial").DialData;
-  /** Own call-to-action banner after What I build (title/label from the Technology section). */
-  cta?: { title: string; label: string };
 }
 
 export interface FadeChapter extends Base {

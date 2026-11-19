@@ -97,7 +97,7 @@ test('grouped navigation retains order, active pages and floating controls',asyn
  await page.goto('/resources');const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
  await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story','Content']);await expect(nav.locator(':scope > a')).toHaveText(['Interview Prep']);
  await nav.locator('[data-menu=content] summary').click();await expect(nav.getByRole('link',{name:'Resources',exact:true})).toHaveAttribute('aria-current','page');await page.keyboard.press('Escape');
- await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Background','Experience','Work','What I build','Creator','Contact']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
+ await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Creator','Background','Experience','Work','What I build','Contact']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
  const floating=page.locator('.site-navigation.is-journey');await expect(floating).toHaveAttribute('data-floating','true');await floating.locator('[data-menu=content] summary').click();await floating.getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
@@ -123,7 +123,7 @@ test('colour mode changes preserve the clouds after returning from an Education 
 
 test("Back from another page returns to clouds instead of restoring Contact", async ({ page }) => {
   await page.goto('/#home-contact');
-  await expect(page.getByRole('heading',{name:'Let’s build something',exact:true}).last()).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Have a project in mind?',exact:true}).last()).toBeVisible();
   await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.locator('.site-navigation:visible').getByRole('link',{name:'Resources',exact:true}).click();
   await expect(page).toHaveURL(/\/resources$/);
   await page.goBack();

@@ -14,7 +14,7 @@ test("homepage enters directly, keeps hero text and scrolls without an entry gat
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
 });
 
-test("editorial introduction keeps full-background framing and the scroll cue opens About", async ({ page }) => {
+test("editorial introduction keeps full-background framing and the scroll cue opens Creator", async ({ page }) => {
   await page.goto("/");
   const glass = page.locator('[data-chapter="sky"] .journey-hero-glass');
   await expect(glass).toBeVisible();
@@ -29,7 +29,7 @@ test("editorial introduction keeps full-background framing and the scroll cue op
   });
   expect(placement).toEqual({ fullBackground: true, descriptionBelowCharacters: true, headingAboveDescription: true, headingInSky: true });
   await page.getByRole("link", { name: "Scroll to discover" }).click();
-  await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
+  await expect(page.locator('[data-chapter=creator] .journey-panel-left')).toBeVisible();
   await expect(page.locator(".site-navigation.is-journey")).toHaveAttribute("data-floating", "true");
 });
 
@@ -85,7 +85,7 @@ test("reduced motion keeps readable stills and the contact form", async ({ page 
   await expect(page.locator(".journey-stills")).toBeVisible();
   await expect(page.locator(".journey-start")).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Contact", exact: true }).getByLabel("Name", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Let’s build something", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Have a project in mind?", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -138,7 +138,7 @@ test("About text remains readable and inactive project links cannot intercept th
 test('Schedule a call jumps directly to the Contact form',async({page})=>{
  await page.goto('/');
  const call=page.locator('[data-chapter=sky]').getByRole('link',{name:'Schedule a call',exact:true});
- await expect(call).toHaveAttribute('href','#home-contact');await call.click();
+ await expect(call).toHaveAttribute('href','#contact');await call.click();
  await expect(page.getByRole('region',{name:'Contact',exact:true}).getByLabel('Name',{exact:true})).toBeVisible();
 });
 

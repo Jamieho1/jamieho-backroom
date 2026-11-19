@@ -65,3 +65,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-19 · Contact uses the approved editorial project brief directly after Creator; project-only groups, optional message and shared pill motion replace room/monitor footage. Preserve legacy message budgets/transport during rollout; new six-file media retirement needs separate delete approval · Contact redesign and Jamie’s apply approval
 
 - 2026-11-19 · Jamie approved the six-file Contact media retirement: local files removed with verified hashes; Storage copies wait for redesign deployment/API access without repeat approval · Jamie: delete
+
+- 2026-11-19 · Contact redesign items 6–7 supersede the standalone banner: Creator follows Hero; Contact follows What I build with the large heading/gold glow above the brief, no extra CTA button or pinned hold · Jamie’s approved prompt

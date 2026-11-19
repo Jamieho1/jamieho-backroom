@@ -2,9 +2,7 @@
 
 ## Implementation
 
-Contact redesign is local and unpushed: the approved navy editorial project brief follows Creator in normal flow. It has content-managed Email/LinkedIn rows, Schedule a call, next steps, accessible reason/services/budget/timeline chips, optional message, required identity, conditional groups, retry-safe controlled fields and fold/check success. Submit uses the shared magnetic pill hook; phones stack and reduced motion skips animation. All Contact/legacy anchors reach the new form. Room/black-join/monitor components, styles, chapters and six manifest/worker entries are retired. The manifest retains three About photos; no Home video downloads remain.
-
-The broader checks exposed fractional icon-stroke rounding and animation-sampling races in Polish 9; offsets now interpolate without whole-pixel rounding and tests sample settled/same-frame geometry. The approved dial, banner and Creator design remain.
+Contact redesign items 6–7 are implemented locally: Hero → Creator → Background/Experience/Selected Work dial → What I build → Contact. Creator enters smoothly after the clouds; Scroll to discover and Journey dropdown follow the new order. Contact opens with the large condensed “Have a project in mind?” heading and gold glow above the intro/contact rows/next steps and brief. The separate CTA chapter/button is retired. Contact remains normal flow, with no pinned hold. Existing form validation/pipeline, editors and theme controls are unchanged. Jamie deploys and verifies live before completion.
 
 ## Database and pending content
 
@@ -16,8 +14,8 @@ Email-link draft `78b3b527-19bb-41e3-ae94-7d6e355f7827` awaits owner approval at
 
 Jamie approved deletion: six local room/contact files were removed (3,816,635 bytes) after hash/reference checks; three retained photo assets remain. Exact completion is in `../Media/Previews/contact-redesign-2026-11-19/`. The deployed worker still lists room media, so six Storage copies remain approved but pending redesign deployment/authenticated Storage API access. Earlier local cleanup is complete; its 23 Storage deletions remain approved but pending deployment/API access.
 
-Post-deletion checks: all six paths absent, three retained photo files present, eight targeted media/brief tests and diff check pass.
+## Current verification
 
-Pre-deletion implementation checks: typecheck; 1,073 unit/database tests; production build; six-page static assertions; diff check. Full desktop/390px browser suite: 227 passed / 97 conditional skips. Disposable real-migration Contact/feedback integrations: 10 passed, including Project/Hello persistence, owner Inbox metadata, optional message, hidden controls, validation, honeypot/rate limits. Screenshots inspected. The unchanged build passed after retrying the existing intermittent Next advisory lookup failure; no dependency change.
+Typecheck, all 1,073 unit/database tests, production build, six-page static assertions and diff check passed. Full local desktop/390px browser suite: 226 passed / 96 conditional skips. New checks cover Creator order/linear entry, navigation, merged heading/glow, natural Contact scroll and no sideways overflow. Desktop and phone Contact screenshots inspected. Browser assertions were updated for the canonical #contact link, shared button colour and settled dial ghost animation.
 
-Jamie commits/pushes and verifies live. No push or production test messages/emails by the agent.
+The prior Contact/feedback real-migration integration tests were not rerun for this layout-only change. No new migration, live content mutation, production test messages/emails, commit or push.

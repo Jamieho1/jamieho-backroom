@@ -9,9 +9,10 @@ import { SignInButton } from "./sign-in-button";
 import { useViewer } from "./viewer-provider";
 
 export const JOURNEY_LINKS = [
+  { id: "creator", label: "Creator" },
   { id: "about", label: "Background" }, { id: "experience", label: "Experience" },
   { id: "projects", label: "Work" }, { id: "toolkit", label: "What I build" },
-  { id: "creator", label: "Creator" }, { id: "contact", label: "Contact" },
+  { id: "contact", label: "Contact" },
 ];
 interface Props {
   items?: typeof JOURNEY_LINKS;

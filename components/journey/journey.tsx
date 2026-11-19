@@ -16,7 +16,6 @@ import type { SocialLink } from "@/lib/social";
 import { HomeDial, type HomeDialHandle } from "./home-dial";
 import {dialAnchorStep,dialCount} from "@/lib/journey/dial";
 import {WhatIBuild,type BuildHandle} from "./what-i-build";
-import {CtaBanner} from "./cta-banner";
 import type { SectionKey } from "@/lib/sections";
 import { draftChapterChanged } from "@/lib/content-drafts/overlay";
 import {PrimaryPill} from "@/components/primary-pill";
@@ -255,7 +254,6 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
       const active = chapters[index];
       // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
       const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe, active.linear) : 0;
-      const isCta = (ch?: Chapter) => ch?.kind === "section" && !!ch.cta;
       const activeGrow = 0;
       if (navigation.current) navigation.current.dataset.floating = index > 0 ? "true" : "false";
       chapters.forEach((c, i) => {
@@ -266,17 +264,13 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
         if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : 1;
         else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 : joinOpacity(active, local) < 1)) opacity = 1;
         else if (active.kind === "fade" && i === index + 1 && local >= 0.5) opacity = 1;
-        // The half-height banner floats over What I build, and Creator rises beneath the still-moving banner.
-        if (isCta(active) && i === index - 1) opacity = 1;
-        if (isCta(chapters[index - 1]) && wipeIn > 0 && i === index - 2) opacity = 1;
         el.inert = i !== index;
         el.style.opacity = String(opacity);
         el.style.visibility = opacity > 0 ? "visible" : "hidden";
         const at = i === index ? local : i < index ? 1 : 0;
         if (c.kind === "video") drawVideo(c, videos.current[i], el, at, !!ready.current[i], base, phoneStillRef.current(c.src));
         if (c.kind === "section") {
-          el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : isCta(c) && i === index - 1 && wipeIn > 0 ? `translate3d(0, ${((wipeIn - 1) * window.innerHeight).toFixed(1)}px, 0)` : "";
-          if (c.cta) el.style.setProperty("--cta-in", at.toFixed(3));
+          el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
           if(c.dial && opacity > 0)dial.current?.setProgress(at);
@@ -368,7 +362,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
         <div ref={track} className="journey-track" style={{ height: `${lay.total * 100 + 100}vh` }}>
           <div className="journey-stage">
             {chapters.map((c, i) => (
-              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} inert>
+              <div key={c.id} ref={(el) => { layers.current[i] = el; }} className={`journey-chapter${c.kind === "fade" ? ` journey-over journey-tone-${c.tone ?? "dark"}` : c.kind === "section" ? ` journey-section journey-section-${c.tone}` : ""}`} data-chapter={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} inert>
                 {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
                   <div className="journey-frame">
                     {/* No src until the whole clip has downloaded (TKT-76); until then the poster is the chapter's still. */}
@@ -383,7 +377,6 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
                     <img ref={(el) => { stills.current[i] = el; }} src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
                   </figure>
                 ) : null}
-                {c.kind === "section" && c.cta ? <CtaBanner title={c.cta.title} label={c.cta.label} /> : null}
                 {c.kind === "section" && c.timeline && (c.panels?.length ?? 0) > 1 ? (
                   <ol ref={(el) => { dots.current[i] = el; }} className="journey-timeline" aria-hidden="true">
                     {(c.panels ?? []).map((p) => <li key={p.id}><span>{p.eyebrow}</span></li>)}
@@ -400,7 +393,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
               </div>
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
-            <a ref={cue} className="journey-cue" href="#about" onClick={event => { event.preventDefault(); jump.current("about"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
+            <a ref={cue} className="journey-cue" href={chapters.some(c=>c.id==="creator")?"#creator":"#about"} onClick={event => { event.preventDefault(); jump.current(chapters.some(c=>c.id==="creator")?"creator":"about"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
             <div className="journey-grain" aria-hidden="true" />
@@ -455,7 +448,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} id={c.id}
+        <li key={c.id} data-draft-changed={c.id === "toolkit" && draftChapterChanged(c.id, draftSections) || undefined} id={c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
           {c.id === "about" ? <><span id="background" className="journey-anchor-alias" aria-hidden="true"/><span id="pivot" className="journey-anchor-alias" aria-hidden="true" /></> : null}
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
@@ -468,7 +461,6 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
             </figure>
           ) : null}
           {c.kind==="section"&&c.build?<WhatIBuild data={c.build} still/>:null}
-          {c.kind==="section"&&c.cta?<CtaBanner title={c.cta.title} label={c.cta.label}/>:null}
           {c.kind==="section"&&c.dial?<HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/>:null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>
@@ -570,7 +562,7 @@ function PanelBody({ p, heading, split = false, scheduleCall = false, disableLin
         <a key={a.href + a.label} className={a.platform ? `journey-brand journey-brand-${a.platform}` : "journey-cta-link"} href={a.href} target="_blank" rel="noopener noreferrer">
           {a.platform ? <BrandIcon platform={a.platform} size={20} /> : null}{a.label}{a.platform ? null : <span> ↗</span>}
         </a>
-      ))}{scheduleCall ? <a className="journey-brand journey-schedule" href="#home-contact" data-contact-jump>
+      ))}{scheduleCall ? <a className="journey-brand journey-schedule" href="#contact" data-contact-jump>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m3 0h2" /></svg>
         Schedule a call
       </a> : null}</p>

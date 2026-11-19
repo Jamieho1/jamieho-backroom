@@ -84,8 +84,8 @@ describe("journey timeline", () => {
   });
 
   it("orders the v1.1 journey: video only at the two ends", () => {
-    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "toolkit", "cta", "creator"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Background", "What I build", "Creator"]);
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "creator", "about", "toolkit"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Creator", "Background", "What I build"]);
   });
 
   it("shows the giant chapter word only as the chapter begins", () => {
@@ -112,7 +112,7 @@ describe("journey timeline", () => {
       for (const p of c.panels ?? []) expect(p.from).toBeLessThan(p.to);
     }
     expect(ids.has("room")).toBe(false);
-    expect(HOME_CHAPTERS.at(-1)?.id).toBe("creator"); // Contact follows in normal flow
+    expect(HOME_CHAPTERS.at(-1)?.id).toBe("toolkit"); // Contact follows in normal flow
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
 });
@@ -125,15 +125,13 @@ it('canonical About and legacy pivot land at the same readable position',()=>{
 });
 
 describe("flow-like linear wipes", () => {
-  it("linear wipe travels 1:1 with scroll and eases nothing; contact banner and Creator use it without any hold", () => {
+  it("linear wipe travels 1:1 with scroll and eases nothing; Creator uses it without any hold", () => {
     expect(wipeOffset(0, 1, true)).toBe(1);
     expect(wipeOffset(0.25, 1, true)).toBeCloseTo(0.75);
     expect(wipeOffset(1, 1, true)).toBe(0);
-    const cta = HOME_CHAPTERS.find((c) => c.id === "cta")!, creator = HOME_CHAPTERS.find((c) => c.id === "creator")!;
-    if (cta.kind !== "section" || creator.kind !== "section") throw new Error("sections expected");
-    expect(cta.linear && creator.linear).toBe(true);
-    expect(cta.wipe).toBe(1);
-    expect(cta.scroll * 100).toBeCloseTo(48); // banner height (48vh) equals its scroll length: no pinned hold
+    const creator = HOME_CHAPTERS.find((c) => c.id === "creator")!;
+    if (creator.kind !== "section") throw new Error("sections expected");
+    expect(creator.linear).toBe(true);
     expect((creator.wipe ?? 0) * creator.scroll).toBeCloseTo(1); // Creator rises one viewport height over the same distance of scroll
   });
 });
