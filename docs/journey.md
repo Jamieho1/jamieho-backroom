@@ -2,7 +2,7 @@
 
 `/` is canonical; `/journey` redirects home. Arrival opens the cloud hero directly. Public content remains cookie-free static/ISR; verified owner Draft Mode overlays request-local snapshots with gold outlines. Text is HTML, never baked into artwork. Sources: `lib/journey/{chapters,content,timeline,dial,phone}.ts`, `components/journey/journey.tsx`, `home-dial.tsx`, `app/journey.css`.
 
-The shared top and floating bars show the JH mark in a solid gold circle with a dark silhouette, keeping it distinct from the navy bar in either theme. Feedback and colour-mode controls share the gold circular background with navy icons and a lighter-gold hover. Circle dimensions, keyboard focus and navigation layout stay unchanged.
+The shared top and floating bars use gold circular borders with transparent interiors for the JH logo, feedback and colour-mode controls. The original white JH mark is preserved; control icons are gold, lightening on hover without filling the circle. Dimensions, keyboard focus and navigation behaviour stay unchanged.
 
 ## Chapters and navigation
 
