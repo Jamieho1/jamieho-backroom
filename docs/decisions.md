@@ -79,3 +79,4 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-19 · Project capabilities/status/diagram are Content-Draft-editable (not in the project editor); their migration stays unapplied and the draft sets stay uninserted until Jamie says “apply it” · Jamie’s instruction
 
 - 2026-11-19 · What I build and project diagrams share one renderer (`components/diagram.tsx`) and the same shape format · Jamie’s prompt
+- 2026-11-19 · /about is a chapter reader (rail + progress, photo prints, pull quotes, principle cards) driven only by the story Markdown; the headline is the About title, and an empty story shows only hero, About text and the starter line, never placeholders · Jamie’s prompt

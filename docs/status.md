@@ -2,9 +2,9 @@
 
 ## Implementation
 
-Projects pages redesign is implemented locally. /projects is “Selected Work”: header with public-project count, single-select capability chips (All + the five What I build items, animated, empty state, `?capability=01`–`05` kept in the URL), a Featured block (two screenshots side by side, one, or the generated title card), a numbered list with a desktop-only cursor-following preview, and a “Have a project in mind?” band. /projects/[slug] is the case-study template: back link, hero, meta grid (empty cells hidden), screenshot carousel or title card, Markdown body with a sticky mini-index from its `##` headings, optional “How it works” diagram, Next project card with hover preview and the band. Both stay pre-rendered (ISR); What I build and project diagrams share `components/diagram.tsx`. The existing project editor is unchanged. Jamie deploys and verifies live.
+My story redesign is implemented locally. /about now follows the approved about-story mockup: MY STORY hero (About title as display headline, lede from the story intro, “N chapters · ~M min read”), a chapter reader built from the `## ` headings of site_sections.story (sticky gold-node rail with progress fill on desktop, “Chapter 0N / 0M” bar on phones, 680px column), tilted photo prints, pull quotes and 2×2 principle cards (a “Principles” chapter or a `### Principles` list), and the “Have a project in mind?” band with the shared pill. The story is currently empty, so visitors see only the hero, the About text and “More of the story is on its way.”; no placeholder boxes exist in code. /about stays pre-rendered (ISR) and Content Drafts previews of story or about changes still apply. How to write the story: architecture.md. Jamie deploys and verifies live.
 
-Earlier local work stands: gold-border navigation controls, Hero → Creator → Background/Experience/Selected Work → What I build → Contact order, and the Contact brief form.
+Earlier local work stands: Projects pages redesign (Selected Work and case studies), gold-border navigation controls, Hero → Creator → Background/Experience/Selected Work → What I build → Contact order, and the Contact brief form.
 
 ## Database and pending content
 
@@ -18,4 +18,4 @@ Six Contact media Storage copies and 23 earlier Storage objects remain approved 
 
 ## Verification of this change
 
-In an isolated secret-free copy: typecheck, all 1,139 unit/database tests (new: capability filter, URL parameter, diagram schema/layout, mini-index, page components, migration/policy/draft parity), production build and six-page static assertion passed; `git diff --check` clean; the pending draft SQL was applied to a disposable database and approved cleanly. Playwright specs (projects, home-polish4, publishing-preview updated) compile (334 tests listed) but were not run: no browser is installed here, so desktop/390px behaviour, visuals and the hover preview are unverified in a browser. No live data or schema change, commit or push.
+In an isolated secret-free copy: typecheck, all 1,154 unit/database tests (new: chapter parsing, reading time, principles block, empty state, photo/pull-quote rendering, phone bar), production build and six-page static assertion (/about pre-rendered) passed; `git diff --check` clean. Playwright specs (story, story-preview with a new rail/jump/390px test) compile (338 tests listed) but were not run: no browser is installed here, so desktop/390px visuals, scroll highlighting and parallax are unverified in a browser. No live data or schema change, commit or push.
