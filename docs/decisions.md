@@ -61,3 +61,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-18 · The contact CTA is its own full-width banner section after What I build, not part of its pinned scene, with no supporting line until Jamie approves one · Home polish 9
 
 - 2026-11-18 · Jamie explicitly approved the reviewed delete/move plan; local cleanup is complete, and Storage removal waits for deployment/API access without requiring repeat approval · Jamie: delete
+
+- 2026-11-19 · Contact uses the approved editorial project brief directly after Creator; project-only groups, optional message and shared pill motion replace room/monitor footage. Preserve legacy message budgets/transport during rollout; new six-file media retirement needs separate delete approval · Contact redesign and Jamie’s apply approval
+
+- 2026-11-19 · Jamie approved the six-file Contact media retirement: local files removed with verified hashes; Storage copies wait for redesign deployment/API access without repeat approval · Jamie: delete

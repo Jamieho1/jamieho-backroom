@@ -2,26 +2,26 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import { alertText, clientIp, hashIp, readContact, validateContact } from "@/lib/contact";
 import { sendAlert } from "@/lib/resend";
 
-const ok = { name: "Ann", email: "ann@example.com", need: "A website", budget: "Not sure yet" };
+const ok = { name: "Ann", email: "ann@example.com", reason:"project",needs:["AI engineering"],timeline:"Just exploring",need: "A website", budget: "Not sure yet" };
 
 describe("contact checks", () => {
   it("reads and tidies the form", () => {
     const f = new FormData();
     f.set("name", " Ann ");
     f.set("email", " Ann@Example.com ");
-    f.set("need", " Hi ");
+    f.set("need", " Hi ");f.set("reason","project");f.append("needs","AI engineering");f.set("timeline","Just exploring");
     f.set("budget", "£15k+");
-    expect(readContact(f)).toEqual({ name: "Ann", email: "ann@example.com", need: "Hi", budget: "£15k+" });
+    expect(readContact(f)).toEqual({ ...ok, need: "Hi", budget: "£15k+" });
   });
   it("accepts a good message and names the first problem otherwise", () => {
     expect(validateContact(ok)).toBeNull();
     expect(validateContact({ ...ok, name: "" })).toMatch(/name/);
     expect(validateContact({ ...ok, email: "nope" })).toMatch(/email/);
-    expect(validateContact({ ...ok, need: "" })).toMatch(/what you need/);
+    expect(validateContact({ ...ok, need: "" })).toBeNull();
     expect(validateContact({ ...ok, need: "x".repeat(4001) })).toMatch(/4000/);
     expect(validateContact({ ...ok, budget: "" })).toMatch(/budget/);
     expect(validateContact({ ...ok, budget: "a million" })).toMatch(/budget/);
-    expect(validateContact({ ...ok, budget: "Free consultation" })).toBeNull();
+    expect(validateContact({ ...ok, budget: "Free consultation" })).toMatch(/budget/);
   });
   it("takes the first forwarded address and hashes it one way", () => {
     expect(clientIp("203.0.113.7, 10.0.0.1")).toBe("203.0.113.7");

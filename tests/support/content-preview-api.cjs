@@ -43,6 +43,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
     try {
       if(url.pathname==='/__feedback_reset'&&req.method==='POST'){await db.exec('delete from public.messages');return send(res,200,{ok:true});}
       if(url.pathname==='/__feedback_limit'&&req.method==='POST'){await db.exec("insert into public.messages(kind,need) select 'idea','Synthetic limit fixture' from generate_series(1,30)");return send(res,200,{ok:true});}
+      if(url.pathname==='/__brief_state')return send(res,200,(await db.query('select reason,needs,budget,timeline,need,name,email from public.messages order by created_at')).rows);
       if(url.pathname==='/__feedback_state')return send(res,200,(await db.query('select kind,need,page_path,name,email from public.messages order by created_at')).rows);
       if (url.pathname === '/__session') {
         const session = sessions[url.searchParams.get('role') || 'owner'];
@@ -128,7 +129,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
           return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')'+conflict+' returning *',keys.map(k=>row[k]))).rows;
         }
         if(table==='messages'){
-          if(req.method==='POST'){const row=JSON.parse(body);const keys=Object.keys(row);if(keys.some(k=>!['kind','need','page_path','name','email','budget','ip_hash'].includes(k)))throw Error('Unknown message field');await tx.query('insert into public.messages('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')',keys.map(k=>row[k]));return [];}
+          if(req.method==='POST'){const row=JSON.parse(body);const keys=Object.keys(row);if(keys.some(k=>!['kind','need','page_path','name','email','budget','ip_hash','reason','needs','timeline'].includes(k)))throw Error('Unknown message field');await tx.query('insert into public.messages('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')',keys.map(k=>row[k]));return [];}
           if(req.method==='PATCH'){const row=JSON.parse(body);if(Object.keys(row).join(',')!=='read')throw Error('Only read status may change');params.push(row.read);return (await tx.query('update public.messages set read=$'+params.length+clause+' returning *',params)).rows;}
           if(req.method==='DELETE')return (await tx.query('delete from public.messages'+clause+' returning *',params)).rows;
         }

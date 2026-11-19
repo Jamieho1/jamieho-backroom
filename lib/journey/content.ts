@@ -11,7 +11,7 @@ import { SOCIAL_LABEL, socialLinks } from "@/lib/social";
 import type { Chapter, Panel, PanelLink } from "./timeline";
 
 /** The contact form on the existing site. */
-export const CONTACT_HREF = "/#home-contact";
+export const CONTACT_HREF = "/#contact";
 
 export interface JourneyContent {
   sections: Record<SectionKey, Section>;

@@ -2,20 +2,22 @@
 
 ## Implementation
 
-Home polish 9 (local, unpushed): the Background step restores the mockup constellation (centre print plus four ring prints, gold tags above each on short leaders, wrapped/clamped, no overlaps). Four ghost prints stay dimmed at the ring edge through Experience stops and vanish before Selected Work. Centre line icons draw edges then nodes on a scrubbed GSAP timeline that reverses; neural-network is the supplied 3-3-2 icon. Stops order by `experience_items.sort`. “Have a project in mind?” is its own half-height (48vh) band after What I build that rises 1:1 with scroll, with Creator rising directly beneath it; ~1.4x strong pill, no supporting line, no pinned hold.
+Contact redesign is local and unpushed: the approved navy editorial project brief follows Creator in normal flow. It has content-managed Email/LinkedIn rows, Schedule a call, next steps, accessible reason/services/budget/timeline chips, optional message, required identity, conditional groups, retry-safe controlled fields and fold/check success. Submit uses the shared magnetic pill hook; phones stack and reduced motion skips animation. All Contact/legacy anchors reach the new form. Room/black-join/monitor components, styles, chapters and six manifest/worker entries are retired. The manifest retains three About photos; no Home video downloads remain.
 
-Earlier: What I build holds complete diagrams at wide/short desktop sizes; Cloud certification tiles sit below the tags. Retired Home/London/room/photo-orbit files and three WebPs are removed; the home-media-v2 worker retains only the nine manifest files and phones preload no videos.
+The broader checks exposed fractional icon-stroke rounding and animation-sampling races in Polish 9; offsets now interpolate without whole-pixel rounding and tests sample settled/same-frame geometry. The approved dial, banner and Creator design remain.
 
-## Pending for Jamie
+## Database and pending content
 
-Draft set `9b27d9e7-c440-44c7-85ce-73c7c5f4d47e` (“Experience stop order”: Imperial 10, Global Relay 20, KOLN3D 30; read back as draft) needs approval at /manage/review before the live order is Imperial → Global Relay → KOLN3D. Technology set `84c50b3d-2c18-4efd-90ac-cc18281ef9da`, CV bullets set `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07`, and caption/highlight sets `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a` remain drafts. Credly URLs await Jamie. No migration for Polish 9; project-highlights stays applied as remote `20261117220033`.
+`20261119090000_contact_briefs.sql` is applied live under Jamie’s explicit approval as remote `20261119150051`. Historical message fingerprints/counts, RLS and spam-guard hashes match; legacy delivery/budgets remain valid during rollout. New server submissions require the conditional brief shape. Privacy, alerts, Inbox and encrypted export coverage are updated.
 
-## Cleanup
+Email-link draft `78b3b527-19bb-41e3-ae94-7d6e355f7827` awaits owner approval at /manage/review. Until then Email scrolls to the form. Other recorded pending sets: Experience order `9b27d9e7-c440-44c7-85ce-73c7c5f4d47e`; Technology `84c50b3d-2c18-4efd-90ac-cc18281ef9da`; CV bullets `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07`; caption/highlights `478f314b-52dd-46b1-8202-5130a894d305` and `37b47db8-2872-4b2d-a5bd-c9c5b25e553a`. Credly URLs await Jamie.
 
-Reviewed inventory and results are outside Git in `../Media/Previews/media-cleanup-2026-11-18/`. Local deletion/moves are done. Storage keeps 23 objects (18,723,440 bytes) approved for deletion until the cleanup worker is deployed; the Supabase MCP has no Storage removal API. No repeat approval needed for that plan.
+## Media and verification
 
-## Verification (Polish 9)
+Jamie approved deletion: six local room/contact files were removed (3,816,635 bytes) after hash/reference checks; three retained photo assets remain. Exact completion is in `../Media/Previews/contact-redesign-2026-11-19/`. The deployed worker still lists room media, so six Storage copies remain approved but pending redesign deployment/authenticated Storage API access. Earlier local cleanup is complete; its 23 Storage deletions remain approved but pending deployment/API access.
 
-In an isolated secret-free copy (repo node_modules are macOS binaries and cannot run here): typecheck, full unit/database suite (1,068 tests), production build and static assertion pass; `git diff --check` clean. Playwright could not run because no Chromium is installed on this machine, so the new overlap, ghost, icon-scrub and banner browser tests and CSS layout are unrun and unseen. Jamie should run `npm run test:e2e` and review visually.
+Post-deletion checks: all six paths absent, three retained photo files present, eight targeted media/brief tests and diff check pass.
 
-Jamie commits/pushes and verifies live.
+Pre-deletion implementation checks: typecheck; 1,073 unit/database tests; production build; six-page static assertions; diff check. Full desktop/390px browser suite: 227 passed / 97 conditional skips. Disposable real-migration Contact/feedback integrations: 10 passed, including Project/Hello persistence, owner Inbox metadata, optional message, hidden controls, validation, honeypot/rate limits. Screenshots inspected. The unchanged build passed after retrying the existing intermittent Next advisory lookup failure; no dependency change.
+
+Jamie commits/pushes and verifies live. No push or production test messages/emails by the agent.

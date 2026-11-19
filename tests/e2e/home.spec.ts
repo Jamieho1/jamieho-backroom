@@ -123,7 +123,7 @@ test('colour mode changes preserve the clouds after returning from an Education 
 
 test("Back from another page returns to clouds instead of restoring Contact", async ({ page }) => {
   await page.goto('/#home-contact');
-  await expect(page.getByRole('heading',{name:'Contact',exact:true}).last()).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Let’s build something',exact:true}).last()).toBeVisible();
   await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.locator('.site-navigation:visible').getByRole('link',{name:'Resources',exact:true}).click();
   await expect(page).toHaveURL(/\/resources$/);
   await page.goBack();

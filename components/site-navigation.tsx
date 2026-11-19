@@ -11,7 +11,7 @@ import { useViewer } from "./viewer-provider";
 export const JOURNEY_LINKS = [
   { id: "about", label: "Background" }, { id: "experience", label: "Experience" },
   { id: "projects", label: "Work" }, { id: "toolkit", label: "What I build" },
-  { id: "creator", label: "Creator" }, { id: "screen", label: "Contact" },
+  { id: "creator", label: "Creator" }, { id: "contact", label: "Contact" },
 ];
 interface Props {
   items?: typeof JOURNEY_LINKS;

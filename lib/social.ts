@@ -13,3 +13,6 @@ export function socialLinks(markdown:string):SocialLink[]{
  const order:SocialKind[]=['linkedin','youtube','instagram','xiaohongshu'];
  return out.sort((a,b)=>order.indexOf(a.kind)-order.indexOf(b.kind));
 }
+
+/** Reuse only the content-managed plain mailbox; reject mail headers and control characters. */
+export function contactEmail(markdown:string):string|undefined{const email=markdown.match(/mailto:([^\s)<>?]+)/i)?.[1]??markdown.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/)?.[0];return email&&/^[^@\s\x00-\x1f]+@[^@\s\x00-\x1f]+\.[^@\s\x00-\x1f]+$/.test(email)?`mailto:${email}`:undefined;}

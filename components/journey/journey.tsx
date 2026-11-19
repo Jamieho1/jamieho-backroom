@@ -6,12 +6,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
   type Chapter, type Panel, type VideoChapter, alignAt, approach, displayOpacity, fadeCover, joinOpacity, layout, locate,
-  ctaOpacity, canonicalChapterId, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
+  canonicalChapterId, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
 } from "@/lib/journey/timeline";
 import { Motes, type MotesHandle } from "./motes";
 import { LineShape, type LineShapeHandle } from "./line-shape";
 import { lineState } from "@/lib/journey/lines";
-import { ScreenContact, ContactContent, type ScreenContactHandle } from "./screen-contact";
+import {ContactBrief} from "./contact-brief";
 import type { SocialLink } from "@/lib/social";
 import { HomeDial, type HomeDialHandle } from "./home-dial";
 import {dialAnchorStep,dialCount} from "@/lib/journey/dial";
@@ -39,17 +39,17 @@ import { DESKTOP_ASSETS, DESKTOP_PORTRAIT } from "@/components/desktop-scene/ass
  * without JavaScript or with reduced motion the server-rendered still-frame version is shown instead.
  */
 
-export function Journey({ chapters: all, base, socials = [], draftSections = [], aboutPhotos = [] }: { chapters: Chapter[]; base: string; socials?: SocialLink[]; draftSections?: SectionKey[]; aboutPhotos?:AboutPhoto[] }) {
+export function Journey({ chapters: all, base, emailHref, socials = [], draftSections = [], aboutPhotos = [] }: { chapters: Chapter[]; base: string; emailHref?:string; socials?: SocialLink[]; draftSections?: SectionKey[]; aboutPhotos?:AboutPhoto[] }) {
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(false);
-  // TKT-96: phones run the journey on stills only (no clip downloads), with the desk timing adjusted to match.
+  // TKT-96: phones run the journey on stills only (no clip downloads), using the approved hero artwork.
   const [compactDial,setCompactDial]=useState(false);
   const [dialHeight,setDialHeight]=useState(0);
   const [buildHeight,setBuildHeight]=useState(0);
   const compactBuild=useRef<HTMLDivElement>(null);
   const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0}:compactDial&&c.kind==="section"&&c.build?{...c,scroll:buildHeight||3,wipe:0}:c),[all,mobile,compactDial,dialHeight,buildHeight]);
   const lay = useMemo(() => layout(chapters), [chapters]);
-  const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav), [chapters]);
+  const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav).concat([{c:{id:"contact",label:"Contact",nav:"Contact",kind:"section",tone:"dark",scroll:0},i:chapters.length}]), [chapters]);
   const track = useRef<HTMLDivElement>(null);
   const layers = useRef<(HTMLElement | null)[]>([]);
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
@@ -64,7 +64,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
   const vignette = useRef<HTMLDivElement>(null);
   const motes = useRef<MotesHandle>(null);
   const lineShape = useRef<LineShapeHandle>(null);
-  const cta = useRef<ScreenContactHandle>(null);
+  const contactRoot=useRef<HTMLDivElement>(null);
   const fadeEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -153,7 +153,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     if (!live) return;
     registerMediaCache();
     const variant = mobile ? "mobile" : "desktop";
-    const items = preloadOrder(chapters, variant, ["#desk", "#screen", "#home-contact"].includes(window.location.hash) ? "c7b" : undefined);
+    const items = preloadOrder(chapters, variant);
     if (mobile || shouldSkipVideo()) return; // phones: stills only, nothing to download
     preloader.current = startPreloader(items, (i) => mediaUrl(base, i.file), {
       progress() {},
@@ -198,10 +198,10 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     const st = ScrollTrigger.create({ trigger: track.current, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
     target = st.progress;
     let shown = target, last = performance.now(), raf = 0, lastNav = -1;
-    // Contact jumps to the end of the monitor push-in; other chapters jump to their start.
+    // Contact is natural-flow content after the pinned journey.
     const dialIndex=chapters.findIndex(c=>c.kind==="section"&&c.dial);
     const yOf=(id:string)=>{
-      if(id==="screen")return st.end;
+      if(["contact","screen","desk","home-contact","contact-form"].includes(id)){const node=contactRoot.current?.querySelector<HTMLElement>("#contact-form");return node?window.scrollY+node.getBoundingClientRect().top-(navigation.current?.getBoundingClientRect().bottom??100)-24:st.end;}
       if(compactDial&&id==="toolkit"){const index=chapters.findIndex(c=>c.id==="toolkit");if(index>=0)return st.start+lay.starts[index]*innerHeight+2;}
       const c=chapters[dialIndex];
       if(compactDial&&c?.kind==="section"&&c.dial&&["about","background","pivot","experience","projects","work"].includes(id)){
@@ -214,10 +214,10 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     jump.current=(id)=>{navigationIntent.current=id;lenis.scrollTo(yOf(id),{duration:1.2,easing:t=>1-Math.pow(1-t,3)});};
     seekDial.current=(index,local)=>{navigationIntent.current=null;const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
 
-    // Straight to the switched-off computer for /journey#desk links (no forced tour).
-    skip.current = () => { navigationIntent.current="screen";lenis.start(); lenis.scrollTo(st.end, { immediate: true, force: true }); target = shown = 1; };
+    // Legacy ending links and new Contact links reach the same brief form.
+    skip.current = () => { navigationIntent.current="contact";lenis.start(); lenis.scrollTo(yOf("contact"), { immediate: true, force: true }); target = shown = 1; };
     const followHash = () => {
-      if (["#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
+      if (["#contact", "#contact-form", "#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
       else if (window.location.hash) {
         const id = canonicalChapterId(window.location.hash.slice(1));
         if (chapters.some(c => c.id === id) || ["experience","projects"].includes(id)&&dialIndex>=0) jump.current(id);
@@ -231,7 +231,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
     // Resize/accordion measurements rebuild this clock. Resume the explicit destination,
     // never replay a stale arrival hash after the visitor has navigated or scrolled elsewhere.
     if (returningToSky.current) {initialHashHandled.current=true;resetSky.current();}
-    else if(navigationIntent.current==="screen")skip.current();
+    else if(navigationIntent.current==="contact")skip.current();
     else if(navigationIntent.current)jump.current(navigationIntent.current);
     else if(!initialHashHandled.current){initialHashHandled.current=true;followHash();}
     const clearIntent=()=>{navigationIntent.current=null;};
@@ -291,7 +291,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
         }
         const d = displays.current[i];
         if (d) {
-          const o = i === index ? displayOpacity(local, c.id === "room") : 0;
+          const o = i === index ? displayOpacity(local) : 0;
           d.style.opacity = String(o);
           d.style.transform = `translate3d(-50%, -50%, 0) scale(${1 + (1 - o) * 0.08})`;
           d.style.letterSpacing = `${0.02 + (1 - o) * 0.12}em`;
@@ -319,10 +319,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
           });
         }
       });
-      // Reveal the form after the camera reaches the monitor, accounting for delayed video seeks.
-      const cv = active.id === "screen" ? videos.current[index] : null;
-      const filled = !!cv && (!ready.current[index] || (cv.duration > 0 && !cv.seeking && cv.currentTime >= cv.duration * 0.8));
-      cta.current?.setOpacity(filled ? ctaOpacity(local) : 0);
       // TKT-95: the wireframe behind the titles (desktop only; a no-op until three.js has loaded).
       lineShape.current?.frame(layers.current[index], lineState(chapters, index, local, activeGrow), active.kind === "section" ? active.tone : "dark", now - prevNow);
       prevNow = now;
@@ -339,6 +335,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       // Chapter menu: the current item is the last listed chapter at or before the active one.
       let current = -1;
       navItems.forEach(({ i }, k) => { if (i <= index) current = k; });
+      if(contactRoot.current&&contactRoot.current.getBoundingClientRect().top<innerHeight*.5)current=navItems.length-1;
       navRefs.current.forEach((b, k) => { if (b) b.ariaCurrent = k === current ? "step" : null; });
       // Phones: the menu scrolls sideways, so keep the current chapter centred in it.
       if (current !== lastNav) {
@@ -404,7 +401,6 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
             ))}
             <div ref={vignette} className="journey-vignette" aria-hidden="true" />
             <a ref={cue} className="journey-cue" href="#about" onClick={event => { event.preventDefault(); jump.current("about"); }}><span>Scroll to discover</span><span aria-hidden="true">↓</span></a>
-            <ScreenContact ref={cta} socials={socials} draftChanged={draftSections.includes("contact")} />
             <Motes ref={motes} />
             <LineShape ref={lineShape} />
             <div className="journey-grain" aria-hidden="true" />
@@ -418,6 +414,7 @@ export function Journey({ chapters: all, base, socials = [], draftSections = [],
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
       )}
+      <div ref={contactRoot}><ContactBrief socials={socials} emailHref={emailHref} draftChanged={draftSections.includes("contact")}/></div>
     </div>
   );
 }
@@ -458,7 +455,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
   return (
     <ol className="journey-stills">
       {chapters.filter((c) => c.kind !== "fade").map((c) => (
-        <li key={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} id={c.id === "room" ? "desk" : c.id}
+        <li key={c.id} data-draft-changed={(c.id === "toolkit" || c.id === "cta") && draftChapterChanged(c.id, draftSections) || undefined} id={c.id}
           className={c.kind === "section" ? `journey-still journey-still-section journey-section-${c.tone}` : "journey-still"}>
           {c.id === "about" ? <><span id="background" className="journey-anchor-alias" aria-hidden="true"/><span id="pivot" className="journey-anchor-alias" aria-hidden="true" /></> : null}
           {c.id === "sky" ? <HeroArtwork /> : c.kind === "video" ? (
@@ -478,9 +475,6 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               {c.id === "sky" ? <HeroCopy p={p} draftChanged={draftSections.includes("hero")} contactChanged={draftSections.includes("contact")} /> : <PanelBody p={p} heading="h2" disableLinks={c.id === "about"} />}
             </section>
           ))}
-          {c.id === "screen" ? (
-            <div className="journey-contact-static"><ContactContent socials={socials} draftChanged={draftSections.includes("contact")} /></div>
-          ) : null}
         </li>
       ))}
     </ol>

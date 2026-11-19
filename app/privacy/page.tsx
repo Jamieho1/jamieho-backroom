@@ -60,7 +60,7 @@ export default function Privacy() {
           <strong>Website feedback</strong> (optional) stores your Problem/Idea selection, message and optional local page link in the owner’s inbox and email alerts. It does not request your name or email; captured page links omit query parameters. It uses the same short-lived coded IP spam limits and encrypted backups as contact messages.
         </li>
         <li>
-          <strong>The contact form</strong> (optional): your name, email address, message and the budget you pick, so Jamie can
+          <strong>The contact form</strong> (optional): your name, email address, reason for getting in touch, optional message, and (for project briefs) selected services, budget and timeline, so Jamie can
           read and answer it. To stop spam, a one-way coded version of your IP address (not the address itself) is stored with the
           message and wiped after one hour. Each message is also forwarded to Jamie by email.
         </li>

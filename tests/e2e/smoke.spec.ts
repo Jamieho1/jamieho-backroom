@@ -32,7 +32,7 @@ test("a callback without a code comes back with a clear message", async ({ page 
 test("the privacy policy is public and linked from Contact", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#home-contact");
-  await page.getByRole("region", { name: "Contact", exact: true }).getByRole("link", { name: "privacy policy", exact: true }).click();
+  await page.getByRole("region", { name: "Contact", exact: true }).getByRole("link", { name: /privacy policy/i }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole("heading", { name: "Privacy policy" })).toBeVisible();
   for (const h of ["What is collected", "Why it is used", "Who processes it", "How long it is kept", "Your rights"]) await expect(page.getByRole("heading", { name: h })).toBeVisible();
@@ -63,15 +63,14 @@ test("the contact form checks fields and quietly drops bot submissions", async (
   await page.emulateMedia({ reducedMotion: "reduce" }); // Validate the form independently of scroll-camera timing.
   await page.goto("/#home-contact");
   const form = page.getByRole("region", { name: "Contact", exact: true });
-  await form.getByRole("button", { name: "Send" }).click(); // the browser blocks it: every field is required
-  await expect(form.locator(":invalid")).toHaveCount(5); // form + name, email, need, budget
-  await expect(form.getByRole("alert")).toHaveCount(0);
+  await form.getByRole("button", { name: "Send brief" }).click(); // the browser blocks it: every field is required
+  await expect(form.getByRole("alert")).toHaveCount(3);
   await form.getByLabel("Name").fill("Bot");
   await form.getByLabel("Email").fill("bot@example.com");
-  await form.getByLabel("What do you need?").fill("Spam");
-  await form.getByRole("combobox", { name: "Budget" }).selectOption("Not sure yet");
+  await form.getByRole("radio",{name:"Just saying hi"}).check();
+  await form.getByLabel("Tell me about it (optional)").fill("Spam");
   await form.locator('input[name="website"]').evaluate((el: HTMLInputElement) => { el.value = "spam.example"; });
-  await form.getByRole("button", { name: "Send" }).click();
+  await form.getByRole("button", { name: "Send brief" }).click();
   await expect(form.getByRole("status")).toContainText("Thanks");
 });
 

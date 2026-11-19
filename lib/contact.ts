@@ -1,6 +1,6 @@
 /** Contact transport helpers. Pure form rules live in contact-fields.ts. */
 import {createHmac} from "node:crypto";
-import type {ContactInput} from "./contact-fields";
+import {REASONS, type ContactInput} from "./contact-fields";
 export * from "./contact-fields";
 
 /** First address in x-forwarded-for (Vercel sets this header; it isn't the visitor's to choose). */
@@ -16,6 +16,6 @@ export function hashIp(ip: string, salt: string): string {
 
 /** Plain-text alert email for Jamie. */
 export function alertText(c: ContactInput): string {
-  return [`From: ${c.name} <${c.email}>`, `Budget: ${c.budget}`, "", c.need, "", "Reply to this email to answer them. All messages: /settings#inbox"]
+  return [`From: ${c.name} <${c.email}>`, `Reason: ${REASONS[c.reason as keyof typeof REASONS]}`, ...(c.reason==="project"?[`Needs: ${c.needs?.join(", ")}`, `Budget: ${c.budget}`, `Timeline: ${c.timeline}`]:[]), "", c.need || "(No message supplied)", "", "Reply to this email to answer them. All messages: /settings#inbox"]
     .join("\n");
 }

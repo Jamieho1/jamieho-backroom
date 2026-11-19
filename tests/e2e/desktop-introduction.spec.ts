@@ -18,6 +18,6 @@ test('without JavaScript the homepage retains its art, copy and working links', 
   await expect(page.locator('.journey-stills')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Jamie Ho', level: 1 })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Contact', exact: true }).getByLabel('Name', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Contact', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Let’s build something', exact: true })).toBeVisible();
   await context.close();
 });

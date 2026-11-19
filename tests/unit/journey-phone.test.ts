@@ -7,13 +7,6 @@ describe("phone mode (TKT-96)", () => {
   it("gives every video chapter a still to hold", () => {
     for (const c of HOME_CHAPTERS) if (c.kind === "video") expect(PHONE_STILLS[c.src], c.id).toBeTruthy();
   });
-  it("holds the room without text panels and ends on the contact monitor", () => {
-    const room = phone.find((c) => c.id === "room")!;
-    expect(room.panels ?? []).toEqual([]);
-    expect(room.scroll).toBeLessThan(HOME_CHAPTERS.find((c) => c.id === "room")!.scroll);
-    const screen = phone.find((c) => c.id === "screen")!;
-    expect(screen.scroll).toBeLessThan(1);
-  });
   it("leaves the sections and the hero untouched", () => {
     expect(phone.find((c) => c.id === "about")).toBe(HOME_CHAPTERS.find((c) => c.id === "about"));
     expect(phone[0]).toBe(HOME_CHAPTERS[0]);
@@ -21,5 +14,5 @@ describe("phone mode (TKT-96)", () => {
 });
 
 it('phone preserves the complete Home v1.3 chapter order',()=>{
- expect(phoneChapters(HOME_CHAPTERS).map(c=>c.id)).toEqual(['sky','about','toolkit','cta','creator','to-room','room','screen']);
+ expect(phoneChapters(HOME_CHAPTERS).map(c=>c.id)).toEqual(['sky','about','toolkit','cta','creator']);
 });

@@ -13,15 +13,8 @@ describe("journey media", () => {
 
   it("downloads clips in chapter order (the monitor push-in is the last chapter), once each", () => {
     const order = preloadOrder(HOME_CHAPTERS, "desktop").map((i) => i.src);
-    expect(order).toEqual(["c7a", "c7b"]); // Only retained room and contact footage; the hero is image based.
+    expect(order).toEqual([]); // Only retained room and contact footage; the hero is image based.
     expect(preloadOrder(HOME_CHAPTERS, "mobile")).toEqual([]);
-  });
-
-  it("moves the computer clip to the front for a /journey#desk link", () => {
-    const order = preloadOrder(HOME_CHAPTERS, "desktop", "c7b").map((i) => i.src);
-    expect(order[0]).toBe("c7b");
-    expect(order.filter((s) => s === "c7b")).toHaveLength(1);
-    expect(order).toHaveLength(2);
   });
 
   it("picks the still that matches where the visitor is in the chapter", () => {

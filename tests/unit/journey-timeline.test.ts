@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_CHAPTERS } from "@/lib/journey/chapters";
 import {
-  type Chapter, canonicalChapterId, alignAt, ctaOpacity, landingOf, stillDrift, wipeOffset, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
+  type Chapter, canonicalChapterId, alignAt, landingOf, stillDrift, wipeOffset, displayOpacity, wordReveal, approach, joinOpacity, layout, locate, mapKeys, panelOpacity, progressOf, validateKeys,
 } from "@/lib/journey/timeline";
 
 const demo: Chapter[] = [
@@ -84,15 +84,8 @@ describe("journey timeline", () => {
   });
 
   it("orders the v1.1 journey: video only at the two ends", () => {
-    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "toolkit", "cta", "creator", "to-room", "c7a", "c7b"]);
-    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Background", "What I build", "Creator", "Contact"]);
-  });
-
-  it("fades the contact screen in over the end of the push-in", () => {
-    expect(ctaOpacity(0.5)).toBe(0);
-    expect(ctaOpacity(0.82)).toBe(0);
-    expect(ctaOpacity(1)).toBe(1);
-    expect(ctaOpacity(0.88)).toBeGreaterThan(0);
+    expect(HOME_CHAPTERS.map((c) => c.kind === "video" ? c.src : c.id)).toEqual(["c1", "about", "toolkit", "cta", "creator"]);
+    expect(HOME_CHAPTERS.filter((c) => c.nav).map((c) => c.nav)).toEqual(["Background", "What I build", "Creator"]);
   });
 
   it("shows the giant chapter word only as the chapter begins", () => {
@@ -101,11 +94,6 @@ describe("journey timeline", () => {
     expect(displayOpacity(0.25)).toBe(0);
     expect(displayOpacity(0.25, true)).toBe(1);
     expect(displayOpacity(0.52, true)).toBe(0);
-    const room = HOME_CHAPTERS.find(c=>c.id==='room')!;
-    if (room.kind === 'video') {
-      expect(mapKeys(room.keys, 0.7)).toBeLessThan(1);
-      expect(mapKeys(room.keys, 1)).toBe(1);
-    }
   });
 
   it("reveals words one after another, all visible at full opacity", () => {
@@ -123,8 +111,8 @@ describe("journey timeline", () => {
       if (c.kind === "video" && c.keys) expect(() => validateKeys(c.keys!)).not.toThrow();
       for (const p of c.panels ?? []) expect(p.from).toBeLessThan(p.to);
     }
-    expect(ids.has("room")).toBe(true);
-    expect(HOME_CHAPTERS.at(-1)?.id).toBe("screen"); // the journey ends on the contact monitor
+    expect(ids.has("room")).toBe(false);
+    expect(HOME_CHAPTERS.at(-1)?.id).toBe("creator"); // Contact follows in normal flow
     expect(HOME_CHAPTERS[0].panels?.[0].title).toBeTruthy();
   });
 });

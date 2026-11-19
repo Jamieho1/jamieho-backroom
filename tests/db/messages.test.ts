@@ -9,7 +9,7 @@ const member = { role: "authenticated" as const, sub: MEMBER.id };
 const anon = { role: "anon" as const };
 const H = (c: string) => c.repeat(64);
 const send = (ip: string | null = H("a")) =>
-  `insert into public.messages (name, email, need, budget, ip_hash) values ('Ann', 'ann@example.com', 'A website', '£1k', ${ip ? `'${ip}'` : "null"})`;
+  `insert into public.messages (reason,name, email, need, budget, ip_hash) values ('hello','Ann', 'ann@example.com', 'A website', null, ${ip ? `'${ip}'` : "null"})`;
 
 let db: PGlite;
 beforeAll(async () => {
@@ -52,9 +52,9 @@ describe("messages", () => {
     await expect(as(db, anon, (q) => q("insert into public.messages (name, email, need, created_at) values ('a', 'a@b.co', 'x', now() - interval '1 day')"))).rejects.toThrow(/permission denied/);
   });
   it("rejects bad or over-long fields", async () => {
-    await expect(as(db, anon, (q) => q("insert into public.messages (name, email, need) values ('a', 'not-an-email', 'x')"))).rejects.toThrow(/check/);
-    await expect(as(db, anon, (q) => q(`insert into public.messages (name, email, need) values ('a', 'a@b.co', '${"x".repeat(4001)}')`))).rejects.toThrow(/check/);
-    await expect(as(db, anon, (q) => q("insert into public.messages (name, email, need) values (' ', 'a@b.co', 'x')"))).rejects.toThrow(/check/);
+    await expect(as(db, anon, (q) => q("insert into public.messages (reason,budget,name, email, need) values ('hello',null,'a', 'not-an-email', 'x')"))).rejects.toThrow(/check/);
+    await expect(as(db, anon, (q) => q(`insert into public.messages (reason,budget,name, email, need) values ('hello',null,'a', 'a@b.co', '${"x".repeat(4001)}')`))).rejects.toThrow(/check/);
+    await expect(as(db, anon, (q) => q("insert into public.messages (reason,budget,name, email, need) values ('hello',null,' ', 'a@b.co', 'x')"))).rejects.toThrow(/check/);
   });
   it("allows 5 messages an hour per sender, then refuses", async () => {
     for (let i = 0; i < 5; i++) await db.query(send(H("b")));
@@ -62,7 +62,7 @@ describe("messages", () => {
     await as(db, anon, (q) => q(send(H("c")))); // someone else is fine
   });
   it("caps everyone at 30 an hour, even direct API calls without a sender hash", async () => {
-    await db.query(`insert into public.messages (name, email, need) select 'n', 'n@x.co', 'x' from generate_series(1, 30)`);
+    await db.query(`insert into public.messages (reason,budget,name, email, need) select 'hello',null,'n', 'n@x.co', 'x' from generate_series(1, 30)`);
     await expect(as(db, anon, (q) => q(send(null)))).rejects.toThrow(/busy/);
   });
   it("forgets sender hashes after an hour", async () => {

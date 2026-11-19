@@ -435,3 +435,29 @@ You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, do
 
 Done when: browser tests show no photo/tag overlaps on the Background step; ghost photos present on Experience stops and absent on Selected Work stops; icons animate forward and reverse with scroll; dial order is Background → Imperial → Global Relay → KOLN3D → Cyterly AI → DataKind UK after the draft is approved; CTA banner renders as its own section with the larger button and reaches Contact; 390 px and reduced-motion pass with no sideways scroll; typecheck, full suite, build and static assertions pass; docs updated. Report checks actually run.
 ```
+
+---
+
+## Contact redesign — project brief (replaces the room/monitor contact scene)
+
+```
+You are working in the jamieho-backroom repo. Read AGENTS.md, docs/README.md, docs/status.md, docs/journey.md, docs/security.md and docs/operations.md first and follow them (Jamie pushes; new migration only, NOT applied until Jamie says "apply it"; update docs/ + MEMORY.md + docs/decisions.md after; privacy policy must stay accurate).
+
+Approved design: "Personal Website/Media/Previews/contact-brief.html" (open it; match its layout, styling, chips, link rows, "What happens next" rail, Send brief pill with the shared magnetic gold-sweep hover from Home polish 8, validation messages and the fold → drawn-check success state). Build it as the homepage's final Contact section, directly after Creator, in the navy editorial system.
+
+1. Retire the old ending: the black join, room video and monitor contact scene (chapters, components, CSS, tests) and remove their six room/contact video/poster files from the media manifest. List the matching Storage objects in home-media and the local files, confirm nothing references them, then show Jamie the list and wait for his "delete" before deleting Storage/local files (Git files can be deleted directly). #contact and every "Contact"/"Schedule a call"/"Start a conversation" link must land on the new section's form.
+2. Left column: heading "LET'S BUILD SOMETHING", line "Tell me what you need and I'll get back to you.", link rows Email / LinkedIn / Schedule a call — reuse the email and LinkedIn URLs already stored in the site's contact/social content; "Schedule a call" scrolls to the form for now (Jamie may add a booking link later as content). Drop the small hint labels next to the links. "What happens next" rail: 01 Send a short brief · 02 I reply by email · 03 A short call to scope it. Corner "LONDON · HONG KONG".
+3. The brief (right card), in this order:
+   a. "Why are you getting in touch?" — single-select, REQUIRED: Project · Hiring / role · Collaboration · Just saying hi.
+   b. Only when Reason = Project (revealed with a smooth height/opacity transition; hidden groups are not submitted or validated):
+      - "What do you need?" — multi-select, REQUIRED, at least one: AI engineering · Production event systems · Cloud architecture · Full-stack & delivery · Machine learning & computer vision · Something else.
+      - "Budget" — single-select, REQUIRED: Under £1k · £1k–£5k · £5k–£15k · £15k+ · Not sure yet. ("Free consultation" is removed.)
+      - "Timeline" — single-select, REQUIRED: As soon as possible · Within 1–3 months · Just exploring.
+   c. "Tell me about it (optional)" — textarea, NOT required.
+   d. Name and Email — REQUIRED.
+   Step labels count only visible groups (e.g. 01 / 03 or 01 / 06). Chips are real radio/checkbox inputs in fieldsets with legends; keyboard accessible.
+4. Server: extend the existing contact action/validation (lib/contact-fields.ts, lib/contact.ts) — reason enum; needs (array of the enum), budget and timeline required only when reason = project and must be null otherwise; message optional (keep max length). Keep the honeypot, rate limit, email alert and Settings inbox; show reason/needs/budget/timeline in the alert email and in the inbox list. One new migration: add reason, needs text[], timeline columns (with check constraints matching the enums), make message nullable, update the budget check to the new list (existing rows keep their old values — allow them via the constraint or migrate "Free consultation" → "Not sure yet"; say which). Policy/DB tests for the new constraints; RLS unchanged. Update the privacy policy text for the new fields.
+5. Phones: stacked, chips wrap, full-width Send brief; no sideways scroll. Reduced motion: no magnet/fold/draw.
+
+Done when: unit + DB tests cover validation (project vs non-project, optional message, enums), the migration is tested locally and recorded NOT applied; browser tests at desktop and 390 px submit a Project brief and a "Just saying hi" brief against the local test setup, check required errors, the conditional reveal and the success state; old room/monitor code and manifest entries are gone (grep); typecheck, full suite, build and static assertions pass; docs and privacy updated. Report checks actually run, the migration name, and the Storage/local media list awaiting Jamie's "delete".
+```

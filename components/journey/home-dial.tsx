@@ -18,8 +18,8 @@ const ORBIT=[{a0:45.86,a1:76,tilt:4},{a0:134.14,a1:104,tilt:-5},{a0:225.86,a1:25
 const orbitAt=(n:number,e:number)=>{const o=ORBIT[n],a=(o.a0+(o.a1-o.a0)*e)*Math.PI/180;return {left:`${(50+RING*Math.sin(a)).toFixed(2)}%`,top:`${(50-RING*Math.cos(a)).toFixed(2)}%`};};
 /** Edges draw first, then nodes pop in; the paused timeline is scrubbed by the shared scroll clock (1.2s of timeline). */
 function iconTimeline(svg:Element){const edges=svg.querySelectorAll('path,rect,line'),nodes=svg.querySelectorAll('circle'),tl=gsap.timeline({paused:true});
- if(edges.length)tl.fromTo(edges,{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1,duration:.5,ease:'power1.inOut',stagger:{amount:.3}},0);
- if(nodes.length)tl.fromTo(nodes,{strokeDashoffset:1,opacity:0,scale:.4,transformOrigin:'50% 50%',transformBox:'fill-box'},{strokeDashoffset:0,opacity:1,scale:1,duration:.25,ease:'back.out(2)',stagger:{amount:.15}},.8);
+ if(edges.length)tl.fromTo(edges,{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1,autoRound:false,duration:.5,ease:'power1.inOut',stagger:{amount:.3}},0);
+ if(nodes.length)tl.fromTo(nodes,{strokeDashoffset:1,opacity:0,scale:.4,transformOrigin:'50% 50%',transformBox:'fill-box'},{strokeDashoffset:0,opacity:1,scale:1,autoRound:false,duration:.25,ease:'back.out(2)',stagger:{amount:.15}},.8);
  tl.set({},{},1.2);return tl;}
 interface Props {data:DialData;panel:Panel;photos:AboutPhoto[];base:string;still?:boolean;changed?:boolean;onSeek?:(local:number)=>void}
 /** One parent-owned scroll clock. Static/compact rendering uses the same public data in natural document flow. */

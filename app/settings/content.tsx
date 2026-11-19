@@ -1,3 +1,4 @@
+import {REASONS} from "@/lib/contact-fields";
 import Link from "next/link";
 import {FEEDBACK_LABELS,validFeedbackPage} from "@/lib/feedback";
 import { notFound } from "next/navigation";
@@ -14,8 +15,11 @@ interface Message {
   email: string|null;
   kind: "contact"|"problem"|"idea";
   page_path: string|null;
-  need: string;
-  budget: string;
+  need: string|null;
+  reason: string|null;
+  needs: string[]|null;
+  timeline: string|null;
+  budget: string|null;
   read: boolean;
   created_at: string;
 }
@@ -38,7 +42,7 @@ export async function SettingsContent() {
   ] = await Promise.all([
     sb.from("apps").select("*").order("sort"),
     sb.from("invites").select("email, note, created_at").order("created_at", { ascending: false }),
-    sb.from("messages").select("id, name, email, need, budget, read, created_at, kind, page_path").order("created_at", { ascending: false }).limit(200),
+    sb.from("messages").select("id, name, email, need, budget, read, created_at, kind, page_path, reason, needs, timeline").order("created_at", { ascending: false }).limit(200),
     sb.from("profiles").select("id, email, full_name, role, created_at"),
     sb.from("signins").select("user_id, at").order("at", { ascending: false }).limit(5000),
     sb.from("app_opens").select("user_id, app_id").limit(5000),
@@ -80,13 +84,15 @@ export async function SettingsContent() {
                 <div className="msg-head">
                   <span className="badge">{FEEDBACK_LABELS[m.kind]??"Contact"}</span><strong>{m.name??"Anonymous feedback"}</strong>
                   <>{m.email?<a href={`mailto:${m.email}?subject=${encodeURIComponent("Re: your message")}`}>{m.email}</a>:null}</>
+                  {m.reason?<span className="badge">{REASONS[m.reason as keyof typeof REASONS]}</span>:null}
                   {m.budget ? <span className="badge">{m.budget}</span> : null}
                   <time className="muted small" dateTime={m.created_at}>
                     {WHEN.format(new Date(m.created_at))}
                   </time>
                 </div>
                 {m.page_path&&validFeedbackPage(m.page_path)?<p>Page: <Link prefetch={false} href={m.page_path}>{m.page_path}</Link></p>:null}
-                <p className="msg-body">{m.need}</p>
+                {m.needs?.length?<p>{m.needs.join(" · ")}</p>:null}{m.timeline?<p>Timeline: {m.timeline}</p>:null}
+                <p className="msg-body">{m.need||"No message supplied."}</p>
                 <div className="msg-actions">
                   <MessageReadForm id={m.id} read={m.read} />
                   <DeleteMessageForm id={m.id} from={m.name??"anonymous feedback"} />

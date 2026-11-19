@@ -77,26 +77,7 @@ test("About remains readable without the retired photos, timeline or fullscreen 
   await expect(page.locator(".journey-about-photos, .journey-timeline, img[src*=still-westminster]")).toHaveCount(0);
 });
 
-test("journey ends with the contact form on the monitor instead of a desktop link", async ({ page }) => {
-  await page.goto("/#home-contact");
-  const contact = page.getByRole("region", { name: "Contact", exact: true });
-  await expect(contact).toBeVisible();
-  await expect(contact.getByLabel("Name", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Switch on the computer/ })).toHaveCount(0);
-  await expect(page.getByText("At the desk", { exact: true })).toHaveCount(0);
-  await page.locator(".is-journey [data-menu=journey] summary").click();
-  await expect(page.getByRole("navigation", { name: "Journey chapters" }).getByRole("button", { name: /Contact/ })).toBeVisible();
-  await page.locator(".is-journey [data-menu=journey] summary").click();
-  await contact.getByLabel("Name", { exact: true }).fill("Local form test");
-  await contact.getByLabel("Email", { exact: true }).fill("visitor@example.test");
-  await contact.getByLabel("What do you need?", { exact: true }).fill("Testing the contact form UI.");
-  await contact.getByRole("combobox", { name: "Budget", exact: true }).selectOption({ index: 1 });
-  // The existing honeypot success path exercises the real server action without writing or emailing.
-  await contact.locator('input[name="website"]').evaluate((el: HTMLInputElement) => { el.value = "bot.example"; });
-  await contact.getByRole("button", { name: "Send", exact: true }).click();
-  await expect(contact.getByRole("status")).toContainText("Thanks, your message is in.");
-  await expect(page).toHaveURL(/\/#home-contact$/);
-});
+test("journey ends with the editorial brief and all aliases reach its form",async({page})=>{for(const hash of ["contact","home-contact","screen","desk"]){await page.goto('/#'+hash);await expect(page.locator('#contact-form .brief-card-head')).toBeInViewport();await expect(page.locator('[data-chapter="room"],[data-chapter="screen"],video')).toHaveCount(0);} });
 
 test("reduced motion keeps readable stills and the contact form", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -104,7 +85,7 @@ test("reduced motion keeps readable stills and the contact form", async ({ page 
   await expect(page.locator(".journey-stills")).toBeVisible();
   await expect(page.locator(".journey-start")).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Contact", exact: true }).getByLabel("Name", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Contact", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Let’s build something", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -156,7 +137,7 @@ test("About text remains readable and inactive project links cannot intercept th
 
 test('Schedule a call jumps directly to the Contact form',async({page})=>{
  await page.goto('/');
- const call=page.getByRole('link',{name:'Schedule a call',exact:true});
+ const call=page.locator('[data-chapter=sky]').getByRole('link',{name:'Schedule a call',exact:true});
  await expect(call).toHaveAttribute('href','#home-contact');await call.click();
  await expect(page.getByRole('region',{name:'Contact',exact:true}).getByLabel('Name',{exact:true})).toBeVisible();
 });

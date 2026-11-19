@@ -2,7 +2,7 @@
 # Encode one raw clip for the Home journey (TKT-75). Run locally; outputs go to public/home-media/ (gitignored),
 # then upload the files to the Supabase Storage bucket `home-media`.
 #   scripts/home-media/encode.sh "<raw clip.mp4>" <id> [crop-filter]
-# Example (2:1 source cropped to 16:9): scripts/home-media/encode.sh "Into the room.mp4" c7a "crop=1365:768,"
+# Example (2:1 source cropped to 16:9): scripts/home-media/encode.sh "Approved source.mp4" chapter "crop=1365:768,"
 # Settings (scroll-craft "dense GOP": seeking walks from the previous keyframe):
 #   desktop 1280x720 H.264 CRF 26, keyframe every 12 frames; no audio; faststart. Phones use stills.
 #   Posters: first and last frame of the encoded desktop clip.

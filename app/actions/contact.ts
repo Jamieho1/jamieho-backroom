@@ -8,7 +8,7 @@ import {readFeedback,validateFeedback,feedbackAlert,FEEDBACK_LABELS,type Feedbac
 import {sendAlert} from '@/lib/resend';
 const SAVED="Thanks, your message is in. I'll reply by email.";
 const FEEDBACK_SAVED='Thanks, your feedback is in.';
-type Submission=({kind:'contact'}&ContactInput)|{kind:'problem'|'idea';need:string;page_path:string|null};
+type Submission=({kind:'contact';need:string|null}&Omit<ContactInput,'need'>)|{kind:'problem'|'idea';need:string;page_path:string|null};
 /** Shared save-first transport: both forms hit the same DB guard and hourly counters. */
 async function deliver(row:Submission,subject:string,text:string,replyTo?:string):Promise<string|null>{
  const env=readSupabaseEnv();if(!env)return "The form isn't connected yet. Please try again later.";
@@ -28,7 +28,7 @@ function honeypot(form:FormData){return !!String(form.get('website')??'').trim()
 export async function sendMessage(_:ContactResult|null,form:FormData):Promise<ContactResult>{
  const values=readContact(form);if(honeypot(form))return {ok:true,message:SAVED};
  const invalid=validateContact(values);if(invalid)return {ok:false,message:invalid,values};
- const error=await deliver({...values,kind:'contact'},`New message from ${values.name}`,alertText(values),values.email);
+ const error=await deliver({...values,need:values.need||null,kind:'contact'},`New message from ${values.name}`,alertText(values),values.email);
  return error?{ok:false,message:error,values}:{ok:true,message:SAVED};
 }
 export async function sendFeedback(_:FeedbackResult|null,form:FormData):Promise<FeedbackResult>{

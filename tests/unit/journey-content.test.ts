@@ -106,7 +106,7 @@ describe("journey content (TKT-77)", () => {
     const out = withContent(HOME_CHAPTERS, { sections: quiet, experience: [], technologies: [] });
     expect(out.some((c) => c.id === "creator")).toBe(false);
     expect(panelsOf(out, "room")).toEqual([]);
-    expect(out.find(c => c.id === "screen")?.nav).toBe("Contact");
+    expect(out.some(c => ["screen","room","to-room"].includes(c.id))).toBe(false);
   });
 
   it("binds all featured public projects and opted-in journey stops into the single dial",()=>{

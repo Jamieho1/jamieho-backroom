@@ -214,12 +214,6 @@ export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): nu
   return clamp01((o - start) / (1 - spreadAmt));
 }
 
-/** The end-of-journey contact screen: fades in over the last stretch of the push-in (smoothstep). */
-export function ctaOpacity(local: number, at = 0.82): number {
-  const t = (local - at) / (1 - at) * 2;
-  return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
-}
-
 export const SECTION_WIPE = 0.14;
 /** How far (0..1 of the screen height) a section still sits below its resting place while it wipes in. */
 export function wipeOffset(local: number, wipe = SECTION_WIPE, linear = false): number {

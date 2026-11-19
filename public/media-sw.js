@@ -6,7 +6,7 @@
  */
 const CACHE = "home-media-v2";
 // Kept in sync with lib/journey/media-manifest.json; retired files pass through without caching.
-const MEDIA_FILES = new Set(["about-graduation-hall.jpg", "about-imperial-graduation.jpg", "about-jungfraujoch.jpg", "c7a-desktop.mp4", "c7a-first.jpg", "c7a-last.jpg", "c7b-desktop.mp4", "c7b-first.jpg", "c7b-last.jpg"]);
+const MEDIA_FILES = new Set(["about-graduation-hall.jpg", "about-imperial-graduation.jpg", "about-jungfraujoch.jpg"]);
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
