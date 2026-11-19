@@ -67,3 +67,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-19 · Jamie approved the six-file Contact media retirement: local files removed with verified hashes; Storage copies wait for redesign deployment/API access without repeat approval · Jamie: delete
 
 - 2026-11-19 · Contact redesign items 6–7 supersede the standalone banner: Creator follows Hero; Contact follows What I build with the large heading/gold glow above the brief, no extra CTA button or pinned hold · Jamie’s approved prompt
+
+- 2026-11-19 · Shared top/floating navigation uses a gold circular logo background with a dark JH silhouette for contrast against navy; preserve its size and layout · Jamie’s logo request
+
+- 2026-11-19 · Feedback and Auto/Day/Night controls in both shared bars match the logo’s gold circle, with navy icons and lighter-gold hover; preserve focus and behaviour · Jamie’s request

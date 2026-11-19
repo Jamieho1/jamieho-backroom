@@ -2,6 +2,8 @@
 
 ## Implementation
 
+Shared top/floating bars use gold circles for the JH logo, feedback and colour-mode controls, with dark marks/icons and lighter-gold button hover. Sizes, focus and behaviour are unchanged.
+
 Contact redesign items 6–7 are implemented locally: Hero → Creator → Background/Experience/Selected Work dial → What I build → Contact. Creator enters smoothly after the clouds; Scroll to discover and Journey dropdown follow the new order. Contact opens with the large condensed “Have a project in mind?” heading and gold glow above the intro/contact rows/next steps and brief. The separate CTA chapter/button is retired. Contact remains normal flow, with no pinned hold. Existing form validation/pipeline, editors and theme controls are unchanged. Jamie deploys and verifies live before completion.
 
 ## Database and pending content
@@ -14,8 +16,10 @@ Email-link draft `78b3b527-19bb-41e3-ae94-7d6e355f7827` awaits owner approval at
 
 Jamie approved deletion: six local room/contact files were removed (3,816,635 bytes) after hash/reference checks; three retained photo assets remain. Exact completion is in `../Media/Previews/contact-redesign-2026-11-19/`. The deployed worker still lists room media, so six Storage copies remain approved but pending redesign deployment/authenticated Storage API access. Earlier local cleanup is complete; its 23 Storage deletions remain approved but pending deployment/API access.
 
-## Current verification
+## Verification of preceding Contact change
 
 Typecheck, all 1,073 unit/database tests, production build, six-page static assertions and diff check passed. Full local desktop/390px browser suite: 226 passed / 96 conditional skips. New checks cover Creator order/linear entry, navigation, merged heading/glow, natural Contact scroll and no sideways overflow. Desktop and phone Contact screenshots inspected. Browser assertions were updated for the canonical #contact link, shared button colour and settled dial ghost animation.
 
 The prior Contact/feedback real-migration integration tests were not rerun for this layout-only change. No new migration, live content mutation, production test messages/emails, commit or push.
+
+Navigation-circle change: typecheck/diff passed. Sixteen isolated Chromium button CSS checks passed: gold/navy, circular bounds, hover, keyboard focus, no overflow at desktop/390px, light/dark, top/floating. Full app suite/build not rerun for this CSS-only change.

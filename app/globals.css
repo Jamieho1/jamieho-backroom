@@ -222,7 +222,7 @@ code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); b
 .site-navigation { position: fixed; top: 14px; left: 24px; right: 24px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 12px; border: 1px solid #526377; border-radius: 16px; background: rgb(17 32 50 / .94); color: #f3f6fa; font: 500 14px/1.4 var(--f-body, system-ui); box-sizing: border-box; }
 .site-navigation[data-floating="true"] { left: 50%; right: auto; width: max-content; max-width: calc(100% - 24px); translate: -50% 0; border-radius: 18px; }
 .site-navigation.is-embedded { position: relative; inset: auto; margin: 12px 16px 0; flex-shrink: 0; }
-.site-navigation-logo { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border: 1px solid #8796a9; border-radius: 50%; color: #f3cd7e; }
+.site-navigation-logo { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border: 1px solid #f3cd7e; border-radius: 50%; background: #f3cd7e; color: #152337; }
 .site-navigation-logo svg { width: 23px; height: 23px; --heading: #f3cd7e; --bg: #152337; }
 .site-navigation-links, .site-navigation-account { display: flex; align-items: center; gap: 20px; }
 .site-navigation a { color: #f3f6fa; text-decoration: none; }
@@ -356,6 +356,8 @@ body:has(.app-page) .site-header { background: transparent; backdrop-filter: non
 /* TKT-123 feedback uses a native modal top layer, outside either navigation container. */
 .site-feedback-button{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;cursor:pointer}
 .site-feedback-button:hover{background:rgb(255 255 255 / .10)}
+.site-navigation :is(.site-feedback-button,.theme-control){background:#f3cd7e;color:#152337}
+.site-navigation :is(.site-feedback-button,.theme-control):hover{background:#ffe0a1}
 .site-navigation .site-feedback-button:focus:not(:focus-visible){outline:none}
 .site-navigation .site-feedback-button:focus-visible{outline:2px solid #92caff;outline-offset:3px}
 .feedback-dialog{--fb-bg:#eef3f8;--fb-ink:#172738;--fb-field:#fff;--fb-border:#bccbdc;--fb-muted:#465c72;background:var(--fb-bg);color:var(--fb-ink);border:1px solid var(--fb-border);border-radius:14px;padding:22px;width:min(500px,calc(100vw - 32px));max-height:85svh;overflow-y:auto;box-sizing:border-box;font:14px/1.5 var(--f-body,system-ui);box-shadow:0 20px 80px #0005}
@@ -370,7 +372,7 @@ body:has(.app-page) .site-header { background: transparent; backdrop-filter: non
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]) .feedback-dialog{--fb-bg:#131e2c;--fb-ink:#e6edf7;--fb-field:#1b2a3c;--fb-border:#40536a;--fb-muted:#b2c2d5}}
 :root[data-theme=dark] .feedback-dialog,.feedback-dialog.is-dark{--fb-bg:#131e2c;--fb-ink:#e6edf7;--fb-field:#1b2a3c;--fb-border:#40536a;--fb-muted:#b2c2d5}
 
-.site-navigation-logo img {display:block;width:70%;height:auto;object-fit:contain;}
+.site-navigation-logo img {display:block;width:70%;height:auto;object-fit:contain;filter:brightness(0);opacity:.9;}
 .journey-chapter-list a[aria-current="page"] {background:#263f5a;color:#ffe0a1;}
 
 /* Browser windows reserve the first screenshot's ratio; native rows are the static fallback. */
