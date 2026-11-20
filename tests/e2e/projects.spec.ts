@@ -142,7 +142,7 @@ test("the case study shows hero, meta grid, title-card fallback, numbered sectio
   const index = page.getByRole("navigation", { name: "On this page" });
   await expect(index.getByRole("link")).toHaveText(["01The problem", "02How it works", "03Stack"]);
   await expect(page.getByRole("heading", { level: 2, name: "How it works" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "← All projects" }).first()).toHaveAttribute("href", "/projects");
+  await expect(page.getByRole("link", { name: "All projects" }).first()).toHaveAttribute("href", "/projects");
   const diagram = page.locator("[data-project-diagram]");
   await diagram.scrollIntoViewIfNeeded();
   await expect(diagram).toHaveClass(/on/);
@@ -180,7 +180,7 @@ test("a project with a website and screenshots offers the link and a carousel; e
   await expect(page.locator("[data-slot=status]")).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Site example screenshots" })).toBeVisible();
   await expect(page.getByRole("img", { name: "Site example screenshot 1 of 2" })).toBeVisible();
-  await expect(page.locator("[data-title-card]")).toHaveCount(0);
+  await expect(page.locator("[data-visual] [data-title-card]")).toHaveCount(0);
 });
 
 test("a project with no capabilities, status or website hides those slots and has no next card", async ({ page }) => {

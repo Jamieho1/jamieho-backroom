@@ -214,7 +214,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
     seekDial.current=(index,local)=>{navigationIntent.current=null;const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
 
     // Legacy ending links and new Contact links reach the same brief form.
-    skip.current = () => { navigationIntent.current="contact";lenis.start(); lenis.scrollTo(yOf("contact"), { immediate: true, force: true }); target = shown = 1; };
+    skip.current = () => { navigationIntent.current="contact";lenis.start(); const y=yOf("contact"); lenis.scrollTo(y, { immediate: true, force: true }); /* a native #fragment jump can desync Lenis, which then ignores a scroll to the position it believes it is at */ if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y); target = shown = 1; };
     const followHash = () => {
       if (["#contact", "#contact-form", "#desk", "#screen", "#home-contact"].includes(window.location.hash)) skip.current();
       else if (window.location.hash) {
