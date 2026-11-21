@@ -3,6 +3,7 @@ import {getSections} from "@/lib/sections";
 import {getHomePreview} from "@/lib/content-drafts/preview";
 import {PagePreview} from "@/components/content-drafts/page-preview";
 import {Story} from "@/components/story";
+import "../page-scale.css";
 import "./story.css";
 
 export const revalidate=86400;

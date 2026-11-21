@@ -6,6 +6,7 @@ import { getPublicProjects } from "@/lib/portfolio";
 import { toSummary } from "@/lib/project-view";
 import { ProjectsIndex } from "@/components/projects/projects-index";
 import "../projects.css";
+import "../page-scale.css";
 import "../project-pages.css";
 
 export const metadata: Metadata = { title: "Projects · Jamie Ho", description: "Things Jamie Ho has built." };

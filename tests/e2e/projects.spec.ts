@@ -39,7 +39,7 @@ createRoot(document.getElementById('projects-fixture')).render(<><div className=
 async function mount(page: Page, view = "", owner = false, extra = "") {
   const query = [view && `view=${view}`, owner && "owner=1", extra].filter(Boolean).join("&");
   await page.goto("/privacy" + (query ? `?${query}` : ""));
-  await page.addStyleTag({ content: "body > :not(#projects-fixture){display:none!important}\n" + readFileSync("app/projects.css", "utf8") + readFileSync("app/project-pages.css", "utf8") });
+  await page.addStyleTag({ content: "body > :not(#projects-fixture){display:none!important}\n" + readFileSync("app/page-scale.css", "utf8") + readFileSync("app/projects.css", "utf8") + readFileSync("app/project-pages.css", "utf8") });
   await page.evaluate(() => { const root = document.createElement("div"); root.id = "projects-fixture"; document.body.append(root); });
   await page.route("**/__projects_fixture.js", (r) => r.fulfill({ contentType: "text/javascript", body: bundle }));
   await page.addScriptTag({ url: "/__projects_fixture.js" });

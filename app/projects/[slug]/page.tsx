@@ -7,6 +7,7 @@ import { getPublicProject, getPublicProjects } from "@/lib/portfolio";
 import { toSummary } from "@/lib/project-view";
 import { ProjectCaseStudy } from "@/components/projects/case-study";
 import "../../projects.css";
+import "../../page-scale.css";
 import "../../project-pages.css";
 
 /** Pre-rendered on first visit; re-rendered when the owner saves the project (TKT-86), or at least daily. */

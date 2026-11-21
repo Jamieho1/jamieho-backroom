@@ -94,6 +94,7 @@
 /* Credential tiles below the Cloud tags. */
 .build-credentials{display:flex;flex-direction:column;gap:10px}
 .cred{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid rgba(243,238,230,.38);border-radius:10px;background:rgba(16,23,37,.85);color:#F3EEE6;text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s}
+a.cred{cursor:pointer}
 .cred svg{flex:none}
 .cred span{display:block;min-width:0}
 .cred b{display:block;font:400 11px/1.4 ui-monospace,"SF Mono",Menlo,monospace}

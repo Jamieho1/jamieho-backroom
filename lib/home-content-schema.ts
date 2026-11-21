@@ -12,4 +12,3 @@ export const photoFields={
 export const journeyPhotoPath=z.union([z.literal(''),photoFields.path]);
 export const aboutPhotoSchema=z.object({id:z.uuid(),...photoFields}).strict();
 export type AboutPhoto=z.infer<typeof aboutPhotoSchema>&{draftChanged?:boolean};
-export const homePhotoUrl=(path:string)=>MEDIA_PUBLIC_BASE+'home-media/'+path;

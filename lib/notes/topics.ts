@@ -21,5 +21,4 @@ export const TOPICS = [
 ] as const;
 
 export type TopicId = (typeof TOPICS)[number]["id"];
-export const TOPIC_IDS = TOPICS.map((t) => t.id) as [TopicId, ...TopicId[]];
 export const topicById = (id: string) => TOPICS.find((t) => t.id === id);

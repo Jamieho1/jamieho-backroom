@@ -9,7 +9,7 @@ test.beforeAll(async()=>{
 });
 async function fits(carousel:import('@playwright/test').Locator){
  const track=carousel.locator('.screenshot-carousel-track'),img=track.locator('img').first();await expect(img).toBeVisible();await expect.poll(()=>img.evaluate((el:HTMLImageElement)=>el.naturalWidth)).toBeGreaterThan(0);
- const box=await track.boundingBox(),picture=await img.boundingBox();expect(Math.abs(box!.width-picture!.width)).toBeLessThan(1);expect(Math.abs(box!.height-picture!.height)).toBeLessThan(1);const ratio=await img.evaluate((el:HTMLImageElement)=>el.naturalWidth/el.naturalHeight);expect(box!.width/box!.height).toBeCloseTo(ratio,2);await expect(img).toHaveCSS('object-fit','cover');
+ const box=await track.boundingBox(),picture=await img.boundingBox();expect(Math.abs(box!.width-picture!.width)).toBeLessThan(1);expect(Math.abs(box!.height-picture!.height)).toBeLessThan(1);const ratio=await img.evaluate((el:HTMLImageElement)=>el.naturalWidth/el.naturalHeight);expect(box!.width/box!.height).toBeCloseTo(ratio,2);await expect(img).toHaveCSS('object-fit','contain');
 }
 async function lights(carousel:import('@playwright/test').Locator){const dots=carousel.locator('.browser-traffic-lights i');for(const [i,color] of ['rgb(255, 95, 87)','rgb(254, 188, 43)','rgb(40, 200, 64)'].entries())await expect(dots.nth(i)).toHaveCSS('background-color',color);}
 
@@ -26,7 +26,7 @@ test('public brand icons, grouped navigation and PassLoop rail use the approved 
 
 test('project-detail browser frame fits its image and retains traffic lights in both themes and without JS',async({browser,baseURL},info)=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:info.project.use.viewport});try{
-  const page=await context.newPage();await page.goto(baseURL+'/privacy');await page.setContent(`<style>${readFileSync('app/globals.css','utf8')}${readFileSync('app/projects.css','utf8')}${readFileSync('app/project-pages.css','utf8')}</style><main>${detailHtml}</main>`);
+  const page=await context.newPage();await page.goto(baseURL+'/privacy');await page.setContent(`<style>${readFileSync('app/globals.css','utf8')}${readFileSync('app/page-scale.css','utf8')}${readFileSync('app/projects.css','utf8')}${readFileSync('app/project-pages.css','utf8')}</style><main>${detailHtml}</main>`);
   const frame=page.getByRole('region',{name:'Cyterly AI screenshots'});await fits(frame);await lights(frame);await page.locator('html').evaluate(el=>el.setAttribute('data-theme','dark'));await lights(frame);expect((await frame.boundingBox())!.height).toBeLessThan(page.viewportSize()!.height*.73);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }finally{await context.close();}
 });

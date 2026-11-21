@@ -61,10 +61,4 @@ export const ICONS: Record<string, ReactNode> = {
     </svg>
   ),
 };
-export const AppMark = () => (
-  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
-    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="var(--heading)" />
-    <path d="M6 7l3 3-3 3M10.5 13.5h4" fill="none" stroke="var(--bg)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 

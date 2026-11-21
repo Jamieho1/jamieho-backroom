@@ -1,11 +1,8 @@
 .articles-page { overflow-wrap:anywhere; }
-.articles-heading,.articles-filters,.article-admin-list li { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.articles-heading,.article-admin-list li { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .articles-heading { justify-content:space-between; }
 .articles-heading h1 { margin:.3rem 0; }
-.articles-filters { margin:24px 0; }
-.articles-filters .field { flex:1 1 180px; min-width:0; }
 .articles-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:20px; }
-.article-body { max-width:64rem; }
 .article-summary { color:var(--secondary); font-size:1.15rem; }
 .articles-page .field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
 .articles-page input:not([type="checkbox"]),.articles-page textarea,.articles-page select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; }
@@ -15,7 +12,6 @@
 .article-admin-list li { border-bottom:1px solid var(--border); padding:16px 0; }
 .article-admin-list strong { flex:1 1 180px; }
 .article-preview { border:1px solid var(--border); padding:16px; margin-top:24px; }
-.article-body .md pre { max-width:100%; overflow:auto; }
 
 /* 2026-11-03 redesign: left browse column + reading column (Jeff Su-style posts) */
 .articles-wrap { container:articles / inline-size; min-height:100%; display:flex; flex-direction:column; }

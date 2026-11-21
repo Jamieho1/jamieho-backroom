@@ -1,0 +1,32 @@
+/* Shared type and spacing scale for /about, /projects and /projects/[slug]. Both app/about/story.css and
+   app/project-pages.css read these tokens, so the three pages stay consistent. Values are the 1440px
+   desktop sizes; clamp() steps them down on narrower screens. */
+:root{
+ /* page hero titles */
+ --pg-h1-index:clamp(38px,4.2vw,60px);
+ --pg-h1-about:clamp(36px,3.9vw,56px);
+ --pg-h1-case:clamp(32px,3.4vw,48px);
+ /* titles */
+ --pg-h2:clamp(22px,1.95vw,28px);      /* section and chapter titles */
+ --pg-h2-card:clamp(21px,1.8vw,26px);  /* featured card titles */
+ --pg-h3:clamp(18px,1.5vw,21px);       /* sub-headings, index rows */
+ --pg-card-title:19px;                 /* principle cards */
+ --pg-quote:clamp(18px,1.55vw,22px);   /* pull quotes */
+ --pg-next:clamp(28px,2.6vw,38px);     /* next-project title */
+ --pg-cta:clamp(30px,3.5vw,50px);      /* "Have a project in mind?" band */
+ /* text */
+ --pg-lede:16px;
+ --pg-body:15px;
+ --pg-body-lh:1.65;
+ --pg-eyebrow:12px;
+ --pg-meta:11px;
+ /* spacing */
+ --pg-pad-top:clamp(32px,3.4vw,48px);
+ --pg-sec:clamp(36px,3.6vw,48px);      /* gap between chapters / sections */
+ --pg-band-top:clamp(36px,3.2vw,44px);
+ --pg-band-bottom:clamp(40px,3.6vw,52px);
+ /* photos: never cropped */
+ --pg-photo-max:560px;
+ --pg-photo-vh:70vh;
+ --pg-frame-max:960px;     /* title-card / screenshot frame on a case study */
+}

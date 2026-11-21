@@ -8,15 +8,6 @@ import { CodeBlock } from "./code-highlight";
 import { Fragment, useState, type ReactNode } from "react";
 
 export const slug = (t: string) => "sec-" + t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-/** Headings (## and ###) for an "On this page" bar. */
-export function mdHeadings(text: string): { id: string; text: string; level: number }[] {
-  return text
-    .split(/\r?\n/)
-    .map((l) => /^(#{2,3})\s+(.*)$/.exec(l.trim()))
-    .filter((m): m is RegExpExecArray => !!m)
-    .map((m) => ({ id: slug(m[2].replace(/[*`]/g, "")), text: m[2].replace(/\*\*|`/g, ""), level: m[1].length }));
-}
-
 /** Recall mode: a section's content stays hidden until Jamie has tried to recall it. */
 function Hidden({ children, label }: { children: ReactNode; label: string }) {
   const [open, setOpen] = useState(false);

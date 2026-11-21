@@ -81,7 +81,7 @@ export interface SectionChapter extends Base {
   kind: "section";
   /** light = warm off-white with dark ink, dark = warm near-black with light ink. */
   tone: "light" | "dark";
-  /** Optional framed picture beside the text (a media file, e.g. "still-imperial.jpg"). */
+  /** Optional framed picture beside the text (a media file name). */
   still?: { file: string; side: "left" | "right" };
   /** Fraction of the section's scroll used to wipe it in (default 0.14). */
   wipe?: number;
