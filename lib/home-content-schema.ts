@@ -8,6 +8,8 @@ export const photoFields={
  caption:text(240),alt:text(240).refine(s=>!!s.trim(),'Describe the photo.'),
  sort:z.number().int().min(-2147483648).max(2147483647),centre:z.boolean(),public:z.boolean(),
 };
+/** Optional journey-stop photo: empty clears it; otherwise the same home-media path rule as About photos. */
+export const journeyPhotoPath=z.union([z.literal(''),photoFields.path]);
 export const aboutPhotoSchema=z.object({id:z.uuid(),...photoFields}).strict();
 export type AboutPhoto=z.infer<typeof aboutPhotoSchema>&{draftChanged?:boolean};
 export const homePhotoUrl=(path:string)=>MEDIA_PUBLIC_BASE+'home-media/'+path;

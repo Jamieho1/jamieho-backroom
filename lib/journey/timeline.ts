@@ -93,6 +93,11 @@ export interface SectionChapter extends Base {
   build?: import("./build").BuildContent;
   /** One reversible Background → Experience → Work dial. */
   dial?: import("./dial").DialData;
+  /**
+   * Fraction of this section's scroll over which it cross-fades in over the previous chapter (which stays drawn and
+   * fades/lifts its text out) instead of cutting. Used for a section that does not wipe in (wipe 0).
+   */
+  fadeIn?: number;
 }
 
 export interface FadeChapter extends Base {
@@ -212,6 +217,11 @@ export function wordReveal(o: number, i: number, n: number, spreadAmt = 0.5): nu
   return clamp01((o - start) / (1 - spreadAmt));
 }
 
+/** 0..1 cross-fade progress of a section entering over its predecessor; always 1 when it has no fadeIn. */
+export function enterProgress(chapter: Pick<SectionChapter, "fadeIn">, local: number): number {
+  return chapter.fadeIn && chapter.fadeIn > 0 ? smoothstep(0, chapter.fadeIn, local) : 1;
+}
+
 export const SECTION_WIPE = 0.14;
 /** How far (0..1 of the screen height) a section still sits below its resting place while it wipes in. */
 export function wipeOffset(local: number, wipe = SECTION_WIPE, linear = false): number {
@@ -233,7 +243,8 @@ export const canonicalChapterId = (id: string): string => id === "pivot" || id =
 export function landingOf(chapters: readonly Chapter[], id: string, lay = layout(chapters)): number {
   const dialIndex=chapters.findIndex(c=>c.kind==="section"&&c.dial);
   if (dialIndex>=0 && ["about","background","pivot","experience","projects","work"].includes(id)) {
-    const c=chapters[dialIndex];if(c.kind==="section"&&c.dial)return (lay.starts[dialIndex]+c.scroll*dialAnchorLocal(id,c.dial))/lay.total;
+    // Anchors land just after the entry cross-fade so a jump never shows a half-faded Background.
+    const c=chapters[dialIndex];if(c.kind==="section"&&c.dial)return (lay.starts[dialIndex]+c.scroll*Math.max(dialAnchorLocal(id,c.dial),c.fadeIn?c.fadeIn+0.005:0))/lay.total;
   }
   const i = chapters.findIndex((c) => c.id === canonicalChapterId(id));
   if (i < 0 || !lay.total) return 0;

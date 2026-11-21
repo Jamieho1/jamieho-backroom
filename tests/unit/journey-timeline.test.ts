@@ -135,3 +135,25 @@ describe("flow-like linear wipes", () => {
     expect((creator.wipe ?? 0) * creator.scroll).toBeCloseTo(1); // Creator rises one viewport height over the same distance of scroll
   });
 });
+
+describe("Creator to Background cross-fade", () => {
+  it("enterProgress is a reversible smoothstep over fadeIn and 1 without it", async () => {
+    const {enterProgress} = await import("@/lib/journey/timeline");
+    expect(enterProgress({}, 0)).toBe(1);
+    expect(enterProgress({fadeIn: 0}, 0)).toBe(1);
+    expect(enterProgress({fadeIn: 0.1}, 0)).toBe(0);
+    expect(enterProgress({fadeIn: 0.1}, 0.05)).toBeCloseTo(0.5);
+    expect(enterProgress({fadeIn: 0.1}, 0.1)).toBe(1);
+    expect(enterProgress({fadeIn: 0.1}, 0.9)).toBe(1);
+  });
+  it("Background fades in over Creator, and anchors land after the fade", () => {
+    const about = HOME_CHAPTERS.find(c => c.id === "about");
+    expect(about?.kind === "section" && about.fadeIn).toBeGreaterThan(0);
+    expect(about?.kind === "section" && about.wipe).toBe(0);
+    const lay = layout(HOME_CHAPTERS), i = HOME_CHAPTERS.findIndex(c => c.id === "about");
+    for (const id of ["about", "background", "pivot"]) {
+      const local = (landingOf(HOME_CHAPTERS, id) * lay.total - lay.starts[i]) / HOME_CHAPTERS[i].scroll;
+      expect(local).toBeGreaterThan((about as {fadeIn: number}).fadeIn);
+    }
+  });
+});

@@ -27,7 +27,8 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
   try {const parsed=parsePhotoSet(data.operations,data.photo_slots,id);photoSlots=parsed.slots;result={operations:await withPhotoOperations(sb,parsed.operations,photoSlots)};}catch{return null;}
   let experience:ExperienceRow[]|undefined;
   if (result.operations.some(op=>op.table==="experience_items"||op.table==="experience_bullets")) {
-    const rows=await sb.from("experience_items").select(SELECT + ", show_on_journey, journey_icon").order("sort");
+    let rows=await sb.from("experience_items").select(SELECT + ", show_on_journey, journey_icon, journey_photo").order("sort");
+    if(rows.error)rows=await sb.from("experience_items").select(SELECT + ", show_on_journey, journey_icon").order("sort"); // before the journey_photo migration
     if(rows.error)return null;
     try {experience=overlayExperience((rows.data??[]) as unknown as ExperienceRow[],result.operations);} catch {return null;}
   }

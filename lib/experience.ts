@@ -36,6 +36,8 @@ export const emptyItem = (): Item => ({ kind: "role", title: "", org: "", dates:
 export interface ExperienceRow {
   show_on_journey?: boolean;
   journey_icon?: (typeof import("./home-content-schema").JOURNEY_ICONS)[number];
+  /** home-media path of an optional photo shown for this journey stop ('' = none). */
+  journey_photo?: string;
   draftChanged?: boolean;
   id: string;
   kind: Kind;

@@ -26,3 +26,18 @@ it('ghost layer exists only in the pinned dial; the static dial lists captions a
  const live=renderToStaticMarkup(<HomeDial data={dialData([entry],[project(0)])} panel={{id:'about',from:0,to:1,title:'Title',body:'Body'}} photos={photos} base="/m"/>);
  expect(live.match(/dial-orbit-photo/g)).toHaveLength(4);expect(live).toContain('dial-photo-centre');
 });
+it('a stop photo becomes a white print with a gold icon badge; stops without one keep the big icon',()=>{
+ const role={...entry,id:'role',kind:'role' as const,title:'Synthetic role',org:'Example',journey_icon:'code' as const,sort:1};
+ const withPhoto={...role,id:'photo',journey_photo:'journey-fixture.jpg',draftChanged:true},bare={...role,id:'bare',journey_icon:'rocket' as const};
+ const panel={id:'about',from:0,to:1,title:'Title',body:'Body'};
+ for(const still of [true,false]){
+  const html=renderToStaticMarkup(<HomeDial still={still} data={dialData([withPhoto,bare],[project(0)])} panel={panel} photos={[]} base="/m"/>);
+  const photoStep=html.slice(html.indexOf('class="dial-journey"'));
+  expect(html.match(/class="dial-journey"/g),String(still)).toHaveLength(1);
+  expect(photoStep).toContain('src="/m/journey-fixture.jpg');expect(photoStep).toContain('alt="Synthetic role · Example"');expect(photoStep).toContain('data-draft-changed="true"');
+  expect(photoStep.slice(0,photoStep.indexOf('dial-icon-badge')+1)).not.toContain('class="dial-tag"');
+  expect(html.match(/dial-icon-badge/g)).toHaveLength(1);expect(html.match(/class="dial-icon(?: is-present)?"/g)).toHaveLength(1);
+ }
+ const educationOnly=renderToStaticMarkup(<HomeDial still data={dialData([entry],[project(0)])} panel={panel} photos={[{id:'c',path:'c.png',caption:'C',alt:'C',sort:0,centre:true,public:true}]} base="/m"/>);
+ expect(educationOnly).not.toContain('dial-journey');expect(educationOnly).not.toContain('dial-icon-badge');
+});

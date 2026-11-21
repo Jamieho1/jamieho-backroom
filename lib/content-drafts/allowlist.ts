@@ -3,7 +3,7 @@ import {templateFields,templateOperation} from '@/lib/resume';
 import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
-import {photoFields,JOURNEY_ICONS} from "@/lib/home-content-schema";
+import {photoFields,JOURNEY_ICONS,journeyPhotoPath} from "@/lib/home-content-schema";
 import { projectSchema } from "@/lib/portfolio-core";
 import { articleSchema } from "@/lib/articles";
 import { guideSchema } from "@/lib/guides";
@@ -16,7 +16,7 @@ const text = (max: number) => z.string().refine(value => !value.includes("\0"), 
 const cvText = (max: number) => z.string().refine(value => value.length <= max, `Text must be ${max} characters or fewer.`).refine(value => !value.includes("\0"), "Text cannot contain NUL.").transform(value => value.trim());
 const uuid = z.uuid().transform(value => value.toLowerCase());
 const sort = z.number().int().min(-2147483648).max(2147483647);
-const itemFields = { show_on_journey:z.boolean(), journey_icon:z.enum(JOURNEY_ICONS), kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
+const itemFields = { show_on_journey:z.boolean(), journey_icon:z.enum(JOURNEY_ICONS), journey_photo:journeyPhotoPath, kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
 const bulletFields = { item_id: uuid, text: cvText(LIMITS.bullet).refine(value => !!value, "Give the bullet text."), sort, public: z.boolean() };
 const cvRoutes = ["/", "/journey", "/about", "/behavioral"] as const;
 export const publishingSchemas = {projects:projectSchema,articles:articleSchema,guides:guideSchema};

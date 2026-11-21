@@ -18,7 +18,7 @@ export const HOME_CHAPTERS: Chapter[] = [
       { id: "latest", from: 0.2, to: 1, side: "right", eyebrow: "Latest", title: "Fresh off the desk" },
     ],
   },
-  {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,
+  {id:"about",label:"Background",nav:"Background",kind:"section",tone:"dark",scroll:6,wipe:0,fadeIn:0.1,
     panels:[{id:"about",from:0,to:1,side:"left",title:"Background",body:PLACEHOLDER}],dial:{experiences:[],projects:[]}},
   // What I build: five capabilities; one existing journey scroll clock.
   { id: "toolkit", label: "What I build", nav: "What I build", kind: "section", tone: "dark", scroll: 5.6, build: DEFAULT_BUILD },

@@ -12,10 +12,10 @@ import {clamp01,smoothstep,type Panel} from '@/lib/journey/timeline';
 import {mediaUrl} from '@/lib/journey/media';
 import type {AboutPhoto} from '@/lib/home-content-schema';
 import {ExperienceIcon} from './experience-icon';
-export interface HomeDialHandle {setProgress(local:number):void}
+export interface HomeDialHandle {setProgress(local:number,enter?:number):void}
 /** Mockup constellation: four side prints sit on the ring (percent of the square dial) and slide to the outer edge as ghosts. */
-const ORBIT=[{a0:45.86,a1:76,tilt:4},{a0:134.14,a1:104,tilt:-5},{a0:225.86,a1:256,tilt:5},{a0:314.14,a1:284,tilt:-4}],RING=38.5;
-const orbitAt=(n:number,e:number)=>{const o=ORBIT[n],a=(o.a0+(o.a1-o.a0)*e)*Math.PI/180;return {left:`${(50+RING*Math.sin(a)).toFixed(2)}%`,top:`${(50-RING*Math.cos(a)).toFixed(2)}%`};};
+const ORBIT=[{a0:45.86,a1:72,tilt:4},{a0:134.14,a1:108,tilt:-5},{a0:225.86,a1:252,tilt:5},{a0:314.14,a1:288,tilt:-4}],RING=43,RING_GHOST=39;
+const orbitAt=(n:number,e:number)=>{const o=ORBIT[n],a=(o.a0+(o.a1-o.a0)*e)*Math.PI/180,r=RING+(RING_GHOST-RING)*e;return {left:`${(50+r*Math.sin(a)).toFixed(2)}%`,top:`${(50-r*Math.cos(a)).toFixed(2)}%`};};
 /** Edges draw first, then nodes pop in; the paused timeline is scrubbed by the shared scroll clock (1.2s of timeline). */
 function iconTimeline(svg:Element){const edges=svg.querySelectorAll('path,rect,line'),nodes=svg.querySelectorAll('circle'),tl=gsap.timeline({paused:true});
  if(edges.length)tl.fromTo(edges,{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1,autoRound:false,duration:.5,ease:'power1.inOut',stagger:{amount:.3}},0);
@@ -28,9 +28,9 @@ export const HomeDial=forwardRef<HomeDialHandle,Props>(function HomeDial({data,p
  useEffect(()=>{const map=icons.current;return()=>{map.forEach(i=>i.tl.kill());map.clear();};},[]);
  const [active,setActive]=useState(0);const selected=constellationPhotos(photos),sides=still?selected.slice(1):selected.slice(1,1+ORBIT.length),count=dialCount(data),last=useRef(-1);
  const steps=[{kind:'background' as const,key:'background',label:'Background',title:panel.title},...data.experiences.map(entry=>({kind:'experience' as const,key:entry.id,label:entry.org||entry.title,title:entry.title,entry})),...data.projects.map(project=>({kind:'project' as const,key:project.id,label:project.name,title:project.name,project}))];
- useImperativeHandle(ref,()=>({setProgress(local){if(still)return;const t=dialTime(local,count),index=Math.max(0,Math.min(count-1,Math.round(t)));if(last.current!==index){last.current=index;setActive(index);}
+ useImperativeHandle(ref,()=>({setProgress(local,enter=1){if(still)return;const t=dialTime(local,count),index=Math.max(0,Math.min(count-1,Math.round(t)));if(last.current!==index){last.current=index;setActive(index);}
   root.current?.style.setProperty('--dial-turn',`${Math.max(0,t)*40}deg`);
-  cards.current.forEach((el,i)=>{const d=t-i,o=1-smoothstep(.22,.5,Math.abs(d));if(el){el.style.opacity=String(o);el.style.visibility=o>.01?'visible':'hidden';el.inert=i!==index;el.style.transform=`translateY(${-d*24}px)`;}});
+  cards.current.forEach((el,i)=>{const d=t-i,o=1-smoothstep(.22,.5,Math.abs(d));if(el){el.style.opacity=String(o);el.style.visibility=o>.01?'visible':'hidden';el.inert=i!==index;el.style.transform=`translateY(${-d*24+(i===0?(1-enter)*56:0)}px)`;}});
   visuals.current.forEach((el,i)=>{if(!el)return;const d=t-i,o=1-smoothstep(.32,.56,Math.abs(d));el.style.opacity=String(o);el.style.visibility=o>.01?'visible':'hidden';el.inert=i!==index;
    const svg=el.querySelector('.dial-icon svg');if(!svg)return;let icon=icons.current.get(i);if(icon&&icon.svg!==svg){icon.tl.kill();icon=undefined;}if(!icon){icon={svg,tl:iconTimeline(svg),p:-1};icons.current.set(i,icon);}
    const p=clamp01((t-(i-.45))/.45);if(icon.p!==p){icon.p=p;icon.tl.progress(p);}});
@@ -43,7 +43,10 @@ export const HomeDial=forwardRef<HomeDialHandle,Props>(function HomeDial({data,p
  const side=(p:AboutPhoto,n:number,live:boolean)=>photo(p,live?'dial-orbit-photo':'dial-side-photo',live?{...orbitAt(n,0),'--tilt':`${ORBIT[n]?.tilt??0}deg`} as CSSProperties:{'--tilt':`${n%2?4:-4}deg`} as CSSProperties,live?(el=>{orbit.current[n]=el;}):undefined);
  const wrap=(node:ReactNode)=>still?node:<div className="dial-const">{node}</div>;
  function centre(i:number){const step=steps[i];if(step.kind==='background')return still?<div className="dial-photos">{selected[0]?photo(selected[0],'dial-photo-centre'):null}<div className="dial-side-photos">{sides.map((p,n)=><Fragment key={p.id}>{side(p,n,false)}</Fragment>)}</div></div>:wrap(selected[0]?photo(selected[0],'dial-photo-centre'):null);
-  if(step.kind==='experience')return step.entry.kind==='education'&&selected[0]?wrap(photo(selected[0],'dial-photo-centre')):wrap(<div className={`dial-icon${presentEntry(step.entry.dates)?' is-present':''}`}><ExperienceIcon name={step.entry.kind==='education'?'graduation-cap':step.entry.journey_icon??'briefcase'}/></div>);
+  if(step.kind==='experience'){const e=step.entry,icon=<ExperienceIcon name={e.kind==='education'?'graduation-cap':e.journey_icon??'briefcase'}/>,pulse=presentEntry(e.dates)?' is-present':'';
+   // A stop photo is a white print in the centre; its line icon shrinks to a gold badge on the ring and still draws in on scroll.
+   if(e.journey_photo)return wrap(<div className="dial-journey"><div className="dial-photo-item dial-photo-centre dial-journey-photo"><figure className="dial-print" data-draft-changed={e.draftChanged||undefined}><img src={mediaUrl(base,e.journey_photo)} alt={[e.title,e.org].filter(Boolean).join(' · ')} loading="lazy"/></figure></div><div className={`dial-icon dial-icon-badge${pulse}`}>{icon}</div></div>);
+   return e.kind==='education'&&selected[0]?wrap(photo(selected[0],'dial-photo-centre')):wrap(<div className={`dial-icon${pulse}`}>{icon}</div>);}
   return step.project.screenshots.length?<div className="dial-browser"><ScreenshotCarousel ref={h=>{carousels.current[i-1-data.experiences.length]=h;}} shots={step.project.screenshots} name={step.project.name} aspect={screenshotAspect(step.project.slug)} scrub={!still} onSelect={n=>onSeek?.(dialLocal(i,count,step.project.screenshots.length>1?-.25+.5*n/(step.project.screenshots.length-1):0))}/></div>:<div className="dial-empty">{step.project.name}</div>;
  }
  function copy(i:number){const step=steps[i];return <>

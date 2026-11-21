@@ -41,7 +41,9 @@ it('experience preview reads the complete owner snapshot and rejects stale targe
  m.from.mockImplementation((table:string)=>table==='experience_items'?{select:()=>({order:rows})}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
  expect((await getHomePreview())?.experience).toEqual([{...live,title:'Draft role',draftChanged:true}]);expect(live.title).toBe('Live role');
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
- rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
+ rows.mockResolvedValueOnce({data:null,error:{message:'offline'}}).mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
+ // Before the journey_photo migration the first select errors; the retry without that column still previews.
+ rows.mockResolvedValueOnce({data:null,error:{message:'column experience_items.journey_photo does not exist'}});expect((await getHomePreview())?.experience).toEqual([{...live,title:'Draft role',draftChanged:true}]);
 });
 it('publishing snapshots are fetched only after owner validation and reject stale references',async()=>{
  const project={id,slug:'new-project',name:'Example',tagline:'',body:'',tags:[],screenshots:[],url:'',featured:false,public:true,sort:100,created_at:'2025-01-01'};

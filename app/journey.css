@@ -628,9 +628,9 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 .dial-centre {position:absolute;inset:0;display:grid;place-items:center;}
 /* Square constellation layer sized by the dial's height; cqw units keep prints and tags proportional to the ring. */
 .dial-const {position:absolute;top:0;left:50%;height:100%;aspect-ratio:1;transform:translateX(-50%);container-type:inline-size;display:grid;place-items:center;pointer-events:none;}
-.dial-photo-item {position:absolute;width:17.8%;}
+.dial-photo-item {position:absolute;width:22.8%;}
 .dial-photo-item::before {content:'';position:absolute;left:50%;bottom:100%;height:2.2cqw;width:1px;background:#e8c46a99;opacity:var(--tag-o,1);}
-.dial-photo-centre {left:50%;top:50%;width:30%;transform:translate(-50%,-50%);z-index:2;}
+.dial-photo-centre {left:50%;top:50%;width:38.5%;transform:translate(-50%,-50%);z-index:2;}
 .dial-print {position:relative;width:100%;margin:0;padding:.6cqw;background:var(--dial-paper);box-shadow:0 12px 30px #0003;}
 .dial-print img {display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;}
 .dial-tag {position:absolute;left:50%;bottom:calc(100% + 2.6cqw);width:calc(100% + 4cqw);transform:translateX(-50%);margin:0;text-align:center;color:var(--dial-gold);font:400 clamp(7px,1.2cqw,11px)/1.5 var(--j-mono);text-transform:uppercase;letter-spacing:.04em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;opacity:var(--tag-o,1);}
@@ -643,6 +643,15 @@ html[data-theme="dark"] .journey-hero-day { opacity: 0; }
 
 .dial-icon {width:24%;padding:8%;box-sizing:content-box;border:1px solid #e8c46a55;border-radius:50%;color:var(--dial-gold);}
 .dial-icon svg {display:block;width:100%;overflow:visible;}
+/* Stop photo: a portrait white print in the centre; the line icon becomes a small gold badge on the inner ring beside it. */
+.dial-journey {display:contents;}
+.dial-journey-photo {width:31%;}
+.dial-journey-photo::before {display:none;}
+.dial-journey-photo .dial-print img {aspect-ratio:4/5;}
+.home-dial .dial-icon.dial-icon-badge {position:absolute;left:70.2%;top:60%;transform:translate(-50%,-50%);width:4.4cqw;padding:1.8cqw;background:var(--dial-ink);border-color:#e8c46a99;box-shadow:0 0 0 .8cqw #1b2333;}
+.dial-stack-visual .dial-journey {display:block;position:relative;width:min(62%,340px);margin-top:12cqw;}
+.dial-stack-visual .dial-journey .dial-journey-photo {width:100%;}
+.home-dial .dial-stack-visual .dial-icon.dial-icon-badge {left:auto;right:-5cqw;top:-4cqw;transform:none;width:8cqw;padding:3cqw;}
 .dial-icon svg :is(path,rect,circle,line) {stroke-dasharray:1 3;stroke-dashoffset:0;}
 .dial-icon.is-present {box-shadow:0 0 0 12px #e8c46a09;animation:dial-pulse 3s ease-in-out infinite;}
 @keyframes dial-pulse {50%{box-shadow:0 0 0 20px #e8c46a03;}}

@@ -10,7 +10,7 @@ export function overlayExperience(live: ExperienceRow[], operations: ContentOper
       const current = items.get(operation.key);
       if (operation.op === 'insert') {
         if (current) throw Error('Experience insert key already exists.');
-        items.set(operation.key, { id: operation.key, show_on_journey:false, journey_icon:'briefcase', kind: 'role', org: '', dates: '', location: '', summary: '', sort: 100, public: false, experience_bullets: [], ...operation.fields, draftChanged: true });
+        items.set(operation.key, { id: operation.key, show_on_journey:false, journey_icon:'briefcase', journey_photo:'', kind: 'role', org: '', dates: '', location: '', summary: '', sort: 100, public: false, experience_bullets: [], ...operation.fields, draftChanged: true });
       } else {
         if (!current) throw Error('Experience target no longer exists.');
         items.set(operation.key, { ...current, ...operation.fields, draftChanged: true });

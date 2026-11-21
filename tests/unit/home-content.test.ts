@@ -48,3 +48,13 @@ it('dial stops follow the experience stop order set through sort: Imperial, Glob
  const rows=[named('koln','KOLN3D','Jun 2023 – Sep 2023',30),named('gr','Global Relay','Sep 2024 – Present',20),named('imperial','Imperial College London','Oct 2020 – Jun 2024',10)];
  expect(publicJourneyStops(rows).map(r=>r.org)).toEqual(['Imperial College London','Global Relay','KOLN3D']);
 });
+it('journey_photo drafts validate like media paths, default empty in overlays and reach the dial rows',async()=>{
+ const edit=(journey_photo:unknown)=>validateOperations([{op:'update',table:'experience_items',key,fields:{journey_photo}}]).ok;
+ for(const ok of ['','journey-koln3d.jpg','journeys/a_b-c.webp','x.png'])expect(edit(ok),ok).toBe(true);
+ for(const bad of ['../x.jpg','https://example.test/x.jpg','x.svg','x.jpg\n','a b.jpg','/x.jpg',`${'x'.repeat(240)}.jpg`,1,null])expect(edit(bad),String(bad)).toBe(false);
+ const inserted=validateOperations([{op:'insert',table:'experience_items',key,fields:{title:'Synthetic'}}]);expect(inserted.ok).toBe(true);if(!inserted.ok)return;
+ expect(overlayExperience([],inserted.operations)[0].journey_photo).toBe('');
+ const set=validateOperations([{op:'update',table:'experience_items',key,fields:{journey_photo:'journey-fixture.jpg'}}]);expect(set.ok).toBe(true);if(!set.ok)return;
+ const [row]=overlayExperience([item(key,'2020')],set.operations);expect(row).toMatchObject({journey_photo:'journey-fixture.jpg',draftChanged:true});
+ expect(publicJourneyStops([row])[0].journey_photo).toBe('journey-fixture.jpg');
+});

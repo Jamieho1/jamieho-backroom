@@ -23,6 +23,9 @@ export async function getJourneyStops(preview?:HomePreview|null):Promise<Experie
  if(preview?.experience)return publicJourneyStops(preview.experience);
  const env=readSupabaseEnv();if(!env)return [];
  const sb=createClient(env.url,env.anonKey,{auth:{persistSession:false}});
- const {data,error}=await sb.from('experience_items').select(SELECT+', show_on_journey, journey_icon').eq('public',true).eq('show_on_journey',true);
+ const read=(cols:string)=>sb.from('experience_items').select(SELECT+cols).eq('public',true).eq('show_on_journey',true);
+ // journey_photo needs migration 20261121120000; fall back to the earlier column set until it is applied.
+ let {data,error}=await read(', show_on_journey, journey_icon, journey_photo');
+ if(error)({data,error}=await read(', show_on_journey, journey_icon'));
  if(error)throw Error('Could not load journey stops.');return publicJourneyStops((data??[]) as unknown as ExperienceRow[]);
 }

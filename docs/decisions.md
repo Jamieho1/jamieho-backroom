@@ -80,3 +80,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 
 - 2026-11-19 · What I build and project diagrams share one renderer (`components/diagram.tsx`) and the same shape format · Jamie’s prompt
 - 2026-11-19 · /about is a chapter reader (rail + progress, photo prints, pull quotes, principle cards) driven only by the story Markdown; the headline is the About title, and an empty story shows only hero, About text and the starter line, never placeholders · Jamie’s prompt
+- 2026-11-21 · Journey stops may carry an optional `journey_photo` (Content-Draft-editable): white print in the dial centre, line icon becomes a gold ring badge; migration unapplied, draft set uninserted · Jamie’s request
+- 2026-11-21 · Creator → Background is a reversible opacity/transform cross-fade (`fadeIn` on the dial chapter), never a cut; Background photos are ~28% larger on a 43% ring · Jamie’s request

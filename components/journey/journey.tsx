@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
   type Chapter, type Panel, type VideoChapter, alignAt, approach, displayOpacity, fadeCover, joinOpacity, layout, locate,
-  canonicalChapterId, landingOf, mapKeys, panelOpacity, stillDrift, wipeOffset, wordReveal,
+  canonicalChapterId, enterProgress, landingOf, mapKeys, panelOpacity, smoothstep, stillDrift, wipeOffset, wordReveal,
 } from "@/lib/journey/timeline";
 import { Motes, type MotesHandle } from "./motes";
 import { LineShape, type LineShapeHandle } from "./line-shape";
@@ -46,7 +46,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
   const [dialHeight,setDialHeight]=useState(0);
   const [buildHeight,setBuildHeight]=useState(0);
   const compactBuild=useRef<HTMLDivElement>(null);
-  const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0}:compactDial&&c.kind==="section"&&c.build?{...c,scroll:buildHeight||3,wipe:0}:c),[all,mobile,compactDial,dialHeight,buildHeight]);
+  const chapters=useMemo(()=>(mobile?phoneChapters(all):all).map(c=>compactDial&&c.kind==="section"&&c.dial?{...c,scroll:dialHeight||dialCount(c.dial)*1.3,wipe:0,fadeIn:0}:compactDial&&c.kind==="section"&&c.build?{...c,scroll:buildHeight||3,wipe:0}:c),[all,mobile,compactDial,dialHeight,buildHeight]);
   const lay = useMemo(() => layout(chapters), [chapters]);
   const navItems = useMemo(() => chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.nav).concat([{c:{id:"contact",label:"Contact",nav:"Contact",kind:"section",tone:"dark",scroll:0},i:chapters.length}]), [chapters]);
   const track = useRef<HTMLDivElement>(null);
@@ -211,7 +211,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
       return st.start+(st.end-st.start)*landingOf(chapters,id,lay)+1;
     };
     jump.current=(id)=>{navigationIntent.current=id;lenis.scrollTo(yOf(id),{duration:1.2,easing:t=>1-Math.pow(1-t,3)});};
-    seekDial.current=(index,local)=>{navigationIntent.current=null;const progress=(lay.starts[index]+chapters[index].scroll*local)/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
+    seekDial.current=(index,local)=>{navigationIntent.current=null;const ch=chapters[index],floor=ch.kind==="section"&&ch.fadeIn?ch.fadeIn+0.005:0,progress=(lay.starts[index]+ch.scroll*Math.max(local,floor))/lay.total;lenis.scrollTo(st.start+(st.end-st.start)*progress,{duration:.8,easing:t=>1-Math.pow(1-t,3)});};
 
     // Legacy ending links and new Contact links reach the same brief form.
     skip.current = () => { navigationIntent.current="contact";lenis.start(); const y=yOf("contact"); lenis.scrollTo(y, { immediate: true, force: true }); /* a native #fragment jump can desync Lenis, which then ignores a scroll to the position it believes it is at */ if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y); target = shown = 1; };
@@ -255,14 +255,16 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
       // A solid section wipes up over whatever came before it (BMW-style), then holds flat.
       const wipeIn = active.kind === "section" ? wipeOffset(local, active.wipe, active.linear) : 0;
       const activeGrow = 0;
+      // A section with fadeIn dissolves in over the previous chapter instead of cutting (1 = fully entered).
+      const enter = active.kind === "section" ? enterProgress(active, local) : 1;
       if (navigation.current) navigation.current.dataset.floating = index > 0 ? "true" : "false";
       chapters.forEach((c, i) => {
         const el = layers.current[i];
         if (!el) return;
         // Visible: the active chapter, the one beneath it while it joins in, and both sides of a fade.
         let opacity = 0;
-        if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : 1;
-        else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 : joinOpacity(active, local) < 1)) opacity = 1;
+        if (i === index) opacity = active.kind === "video" ? joinOpacity(c, local) : enter;
+        else if (i === index - 1 && (active.kind === "fade" ? local < 0.5 : active.kind === "section" ? wipeIn > 0 || enter < 1 : joinOpacity(active, local) < 1)) opacity = 1;
         else if (active.kind === "fade" && i === index + 1 && local >= 0.5) opacity = 1;
         el.inert = i !== index;
         el.style.opacity = String(opacity);
@@ -273,7 +275,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
           el.style.transform = i === index && wipeIn > 0 ? `translate3d(0, ${(wipeIn * 100).toFixed(2)}%, 0)` : "";
           const img = stills.current[i];
           if (img && opacity > 0) img.style.transform = `translate3d(0, ${(stillDrift(at) * 100).toFixed(2)}%, 0) scale(1.14)`;
-          if(c.dial && opacity > 0)dial.current?.setProgress(at);
+          if(c.dial && opacity > 0)dial.current?.setProgress(at, i === index ? enter : 1);
           if (opacity > 0) { builds.current[i]?.setProgress(at); }
           const ol = dots.current[i];
           if (ol && opacity > 0) {
@@ -294,8 +296,10 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
           const key = `${c.id}:${p.id}`;
           const node = panels.current.get(key);
           if (!node) continue;
-          const o = i === index ? panelOpacity(p, local, 0.08) : 0;
-          const leaving = local > (p.from + p.to) / 2;
+          // The previous chapter's text fades and lifts out while the next section dissolves in.
+          const outgoing = i === index - 1 && active.kind === "section" && enter < 1;
+          const o = i === index ? panelOpacity(p, local, 0.08) : outgoing ? 1 - smoothstep(0, 0.75, enter) : 0;
+          const leaving = outgoing || local > (p.from + p.to) / 2;
           const fade = 1;
           node.style.opacity = o > 0 ? fade.toFixed(3) : "0";
           node.style.visibility = o > 0 ? "visible" : "hidden";
