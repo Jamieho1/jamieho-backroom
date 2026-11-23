@@ -9,14 +9,14 @@ export function useResizablePanels(storageKey:string){
  useEffect(()=>{if(ready)try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}},[state,ready,storageKey]);
  return {state,setState};
 }
-export function ResizeHandle({label,value,min,max,onChange,scale=1,reset,unit='pixels',className='practice-resizer'}:{label:string;value:number;min:number;max:number;onChange(n:number):void;scale?:number;reset:number;unit?:string;className?:string}){
+export function ResizeHandle({label,value,min,max,onChange,scale=1,reset,unit='pixels',className='practice-resizer',orientation='vertical'}:{label:string;value:number;min:number;max:number;onChange(n:number):void;scale?:number;reset:number;unit?:string;className?:string;orientation?:'vertical'|'horizontal'}){
  const start=useRef<{x:number;value:number}|null>(null);
  const change=(next:number)=>onChange(clamp(next,min,max));
- return <div className={className} role="separator" tabIndex={0} aria-label={label} aria-orientation="vertical" aria-valuemin={min} aria-valuemax={max} aria-valuenow={Math.round(value)} aria-valuetext={`${Math.round(value)} ${unit}`} title="Drag or use arrow keys to resize; double-click to reset"
-  onPointerDown={e=>{if(e.button!==0)return;start.current={x:e.clientX,value};e.currentTarget.setPointerCapture?.(e.pointerId);e.preventDefault();}}
-  onPointerMove={e=>{if(start.current)change(start.current.value+(e.clientX-start.current.x)*scale);}}
+ return <div className={className} role="separator" tabIndex={0} aria-label={label} aria-orientation={orientation} aria-valuemin={min} aria-valuemax={max} aria-valuenow={Math.round(value)} aria-valuetext={`${Math.round(value)} ${unit}`} title="Drag or use arrow keys to resize; double-click to reset"
+  onPointerDown={e=>{if(e.button!==0)return;start.current={x:orientation==='vertical'?e.clientX:e.clientY,value};e.currentTarget.setPointerCapture?.(e.pointerId);e.preventDefault();}}
+  onPointerMove={e=>{if(start.current)change(start.current.value+((orientation==='vertical'?e.clientX:e.clientY)-start.current.x)*scale);}}
   onPointerUp={()=>{start.current=null;}} onPointerCancel={()=>{start.current=null;}} onLostPointerCapture={()=>{start.current=null;}}
   onDoubleClick={()=>change(reset)}
-  onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();change(e.key==='Home'?min:e.key==='End'?max:value+(e.key==='ArrowRight'?1:-1)*(unit==='pixels'?10:2));}}
+  onKeyDown={e=>{if(!(orientation==='vertical'?['ArrowLeft','ArrowRight','Home','End']:['ArrowUp','ArrowDown','Home','End']).includes(e.key))return;e.preventDefault();change(e.key==='Home'?min:e.key==='End'?max:value+(['ArrowRight','ArrowDown'].includes(e.key)?1:-1)*(unit==='pixels'?10:2));}}
  ><span aria-hidden="true" /></div>;
 }

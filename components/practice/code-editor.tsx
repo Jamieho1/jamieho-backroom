@@ -5,13 +5,15 @@
  * (PRD §7: interview conditions).
  */
 import { useEffect, useRef } from "react";
-import { EditorState } from "@codemirror/state";
+import { Annotation, EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, syntaxHighlighting, indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { builtinHighlight, codeHighlighter } from "./editor-highlight";
 
+
+const externalCode = Annotation.define<boolean>();
 
 const theme = EditorView.theme({
   "&": { height: "100%", fontSize: "14px", backgroundColor: "var(--input)", color: "var(--ink)" },
@@ -25,8 +27,9 @@ const theme = EditorView.theme({
   ".cm-matchingBracket": { backgroundColor: "color-mix(in srgb, var(--green) 25%, transparent)", outline: "none" },
 });
 
-export function CodeEditor({ initial, onChange, onActivity, readOnly = false, label, wrap = false }: { initial: string; onChange: (code: string) => void; onActivity?: () => void; readOnly?: boolean; label: string; wrap?: boolean }) {
+export function CodeEditor({ initial, onChange, onActivity, readOnly = false, label, wrap = false, value }: { initial: string; onChange: (code: string) => void; onActivity?: () => void; readOnly?: boolean; label: string; wrap?: boolean; value?: string }) {
   const host = useRef<HTMLDivElement>(null);
+  const editor = useRef<EditorView|null>(null);
   const cb = useRef({ onChange, onActivity });
   cb.current = { onChange, onActivity };
   useEffect(() => {
@@ -52,7 +55,7 @@ export function CodeEditor({ initial, onChange, onActivity, readOnly = false, la
           EditorState.readOnly.of(readOnly),
           EditorView.contentAttributes.of({ "aria-label": label, spellcheck: "false", autocapitalize: "off", autocorrect: "off" }),
           EditorView.updateListener.of((u) => {
-            if (u.docChanged) {
+            if (u.docChanged && !u.transactions.some(t=>t.annotation(externalCode))) {
               cb.current.onChange(u.state.doc.toString());
               cb.current.onActivity?.();
             }
@@ -60,9 +63,11 @@ export function CodeEditor({ initial, onChange, onActivity, readOnly = false, la
         ],
       }),
     });
-    return () => view.destroy();
-    // The editor owns its document after mount; `initial` is only the starting text.
+    editor.current=view;
+    return () => { editor.current=null; view.destroy(); };
+    // Create once to preserve selection/history; optional `value` hydrates external saves below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(()=>{const view=editor.current;if(view&&value!==undefined&&view.state.doc.toString()!==value)view.dispatch({changes:{from:0,to:view.state.doc.length,insert:value},annotations:externalCode.of(true)});},[value]);
   return <div ref={host} className="editor" />;
 }

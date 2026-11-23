@@ -54,3 +54,10 @@ it('signed-in member saves only own code/attempts, while shared notes stay owner
  expect(mocks.upsert.mock.calls.every(([row])=>row.user_id==='member-id')).toBe(true);
  expect((await saveQuestionNotes(217,'No')).ok).toBe(false);
 });
+
+it('refuses a queued autosave after an account switch before touching the database',async()=>{
+ mocks.viewer.mockResolvedValue({role:'member',id:'member-id'});
+ expect(await savePracticeCode(217,'Owner synthetic code','owner-id')).toEqual({ok:false,message:'Your account changed. Sign in again to sync this code.'});
+ expect(mocks.server).not.toHaveBeenCalled();expect(mocks.upsert).not.toHaveBeenCalled();
+ expect((await savePracticeCode(217,'Member synthetic code','member-id')).ok).toBe(true);
+});

@@ -18,6 +18,6 @@ export function sectionTopics(section:string,notes:readonly {id:string;title:str
 }
 export const noteHref=(id:string)=>`/interview/${noteSection(id)}/notes/${encodeURIComponent(id)}`;
 export const interviewProblemHref=(id:number|string)=>`/interview/problems/${encodeURIComponent(String(id))}`;
-export function sectionQuestions(section:string,topic?:string){return section==='dsa'?PRACTICE_LIST.filter(p=>p.topic!=='class-design'&&(!topic||p.topic===topic)):[];}
+export function sectionQuestions(section:string,topic?:string){return ['dsa','low-level-design'].includes(section)?PRACTICE_LIST.filter(p=>(section==='low-level-design'?p.topic==='class-design':p.topic!=='class-design')&&(!topic||p.topic===topic)):[];}
 export function modeHref(section:string,notes:boolean,topic?:string){return `/interview/${section}/${notes?'notes':'practice'}${topic?'/'+encodeURIComponent(topic):''}`;}
 export const topicIcon=(id:string)=>topicById(id)?.id??(id.startsWith('sd-')?'system-design':noteSection(id));

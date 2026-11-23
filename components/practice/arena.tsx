@@ -2,15 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { PRACTICE_LIST, problemByNumber, starterCode } from "@/lib/practice/catalog";
-import { extraOf, solutionOf } from "@/lib/practice/solutions";
 import { PythonRunner, type RunOutcome, type RunMode } from "@/lib/practice/runner";
 import { readCode, storeCode } from "@/lib/practice/storage";
 import { leetcodeUrl } from "@/lib/notes/neetcode150";
 import { TOPICS } from "@/lib/notes/topics";
-import { Visual } from "@/lib/notes/visual";
 import { Markdown } from "@/components/notes/markdown";
-import { CodeBlock } from "@/components/notes/code-highlight";
-import { TraceVisual } from "@/components/notes/trace-visual";
+import {ProblemSolution,Results} from "./problem-readers";
 import { CodeEditor } from "./code-editor";
 import { QuestionNotes } from "./question-notes";
 import { PracticeTimer } from "./timer";
@@ -18,6 +15,7 @@ import { usePracticePanels,ResizeHandle } from "./panels";
 import { usePracticeStars } from "./use-practice-stars";
 import {practiceData,type PracticePreview} from "@/lib/content-drafts/app-overlay";
 import { useSavedPractice } from "./use-saved-practice";
+import { InterviewPracticeWorkspace } from "./interview-workspace";
 
 export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previewData, singleProblem=false,canSave=canEdit }: {canSave?:boolean;singleProblem?:boolean; viewerKey:string; initialProblem?:number;canEdit?:boolean;previewData?:PracticePreview }) {
  const panels=usePracticePanels();
@@ -25,7 +23,7 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previ
  const [search,setSearch]=useState("");
  const [topic,setTopic]=useState("");
  const [starredOnly,setStarredOnly]=useState(false);
- const liveStars=usePracticeStars(canSave&&!previewData,viewerKey);
+ const liveStars=usePracticeStars(canSave&&!previewData&&!singleProblem,viewerKey);
  const stars=previewData?{...liveStars,stars:new Set(previewData.stars),loaded:true,loading:false}:liveStars;
  const [busy,setBusy]=useState(false);
  const list=PRACTICE_LIST.filter(p=>(!topic||p.topic===topic)&&`${p.title} ${p.lc}`.toLowerCase().includes(search.toLowerCase().trim())&&(!canSave||!starredOnly||stars.stars.has(p.lc)));
@@ -45,7 +43,7 @@ export function PracticeArena({ viewerKey, initialProblem, canEdit = false,previ
    </>:null}
   </aside>
   {!panels.state.collapsed?<ResizeHandle label="Resize question list" value={panels.state.sidebar} min={180} max={420} reset={220} onChange={sidebar=>panels.setState(s=>({...s,sidebar}))} />:<div className="practice-resizer-spacer" />}</>:null}
-  <ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} preview={previewData} flagMode={singleProblem} viewerKey={viewerKey} canSave={canSave} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!!previewData||!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />
+  {singleProblem?<InterviewPracticeWorkspace key={`${viewerKey}:${selected}`} lc={selected} viewerKey={viewerKey} canSave={canSave} canEdit={canEdit} preview={previewData}/>:<ProblemWorkspace key={`${viewerKey}:${selected}`} lc={selected} preview={previewData} flagMode={singleProblem} viewerKey={viewerKey} canSave={canSave} canEdit={canEdit} onBusy={setBusy} split={panels.state.split} onSplit={split=>panels.setState(s=>({...s,split}))} starred={stars.stars.has(selected)} starDisabled={!!previewData||!stars.loaded||stars.loading||!!stars.loadError||stars.saving||!!stars.pending} onStar={()=>void stars.save(selected,!stars.stars.has(selected))} />}
  </div>;
 }
 
@@ -133,27 +131,5 @@ function ProblemWorkspace({lc,viewerKey,canEdit,canSave,flagMode,onBusy,split,on
     </>:null}
    </div>
   </div>
- </section>;
-}
-
-function ProblemSolution({lc}:{lc:number}) {
- const problem=problemByNumber(lc)!;const solution=solutionOf(lc);const extra=extraOf(lc);
- const parsed=solution?Visual.safeParse(solution.visual):null;
- return <div className="practice-solution">
-  {solution?<><h3>Intuition</h3><Markdown text={solution.intuition} /><h3>Algorithm</h3><Markdown text={solution.algorithm} /></>:null}
-  {parsed?.success?<TraceVisual visual={parsed.data} />:null}
-  <h3>Reference code</h3><CodeBlock code={problem.solution} />
-  <h3>Complexity</h3>{extra?<dl><dt>Time: {extra.time.o}</dt><dd><Markdown text={extra.time.why} /></dd><dt>Space: {extra.space.o}</dt><dd><Markdown text={extra.space.why} /></dd></dl>:<p>{solution?.complexity}</p>}
-  {extra?<><h3>Common pitfalls</h3><ul>{extra.pitfalls.map(p=><li key={p}><Markdown text={p} /></li>)}</ul></>:null}
- </div>;
-}
-function Results({result,mode}:{result:RunOutcome;mode:RunMode}) {
- return <section className="practice-results" aria-label="Test results" aria-live="polite">
-  <h3>{mode==="run"?"Run":"Submit"} results</h3>
-  {result.status==="ok"?<>
-   <p>{result.passed} / {result.total} passed</p>
-   <ul>{result.results.map((r,i)=><li key={r.id}><strong>{r.visible?r.id:`Additional test ${i+1}`}: {r.status}</strong>{r.visible?<pre>{r.error??`Got: ${r.got}\nExpected: ${r.expected}`}</pre>:null}</li>)}</ul>
-   {result.stdout?<details open><summary>Output</summary><pre>{result.stdout}</pre></details>:null}
-  </>:result.status==="timeout"?<p>The run exceeded {result.afterMs/1000} seconds and was stopped. Check for an infinite loop.</p>:<pre>{result.error}</pre>}
  </section>;
 }

@@ -374,7 +374,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
                       poster={mediaUrl(base, stillFor(c.src, 0))} data-still={stillFor(c.src, 0)} />
                   </div>
                 ) : c.kind === "section" && c.build ? (
-                  !compactDial?<WhatIBuild ref={(h) => { builds.current[i] = h; }} data={c.build} onSeek={local=>seekDial.current(i,local)}/>:null
+                  !compactDial?<WhatIBuild ref={(h) => { builds.current[i] = h; }} data={c.build} base={base} onSeek={local=>seekDial.current(i,local)}/>:null
                 ) : c.kind === "section" && c.still ? (
                   <figure className={`journey-section-still is-${c.still.side}`} aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -406,7 +406,7 @@ export function Journey({ chapters: all, base, emailHref, socials = [], draftSec
             {debug ? <div ref={hud} className="journey-hud" /> : null}
           </div>
           {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.dial?<div key={c.id} ref={compact} className="journey-compact-dial" style={{top:`${lay.starts[i]*100}vh`}}><HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/></div>:null):null}
-          {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.build?<div key={c.id} ref={compactBuild} className="journey-compact-build" data-draft-changed={draftChapterChanged(c.id,draftSections)||undefined} style={{top:`${lay.starts[i]*100}vh`}}><WhatIBuild data={c.build} accordion/></div>:null):null}
+          {compactDial?chapters.map((c,i)=>c.kind==="section"&&c.build?<div key={c.id} ref={compactBuild} className="journey-compact-build" data-draft-changed={draftChapterChanged(c.id,draftSections)||undefined} style={{top:`${lay.starts[i]*100}vh`}}><WhatIBuild data={c.build} base={base} accordion/></div>:null):null}
         </div>
       ) : (
         <StillJourney chapters={chapters} aboutPhotos={aboutPhotos} base={base} socials={socials} draftSections={draftSections} />
@@ -464,7 +464,7 @@ export function StillJourney({ chapters, base, socials = [], draftSections = [],
               <img src={mediaUrl(base, c.still.file)} alt="" loading="lazy" />
             </figure>
           ) : null}
-          {c.kind==="section"&&c.build?<WhatIBuild data={c.build} still/>:null}
+          {c.kind==="section"&&c.build?<WhatIBuild data={c.build} base={base} still/>:null}
           {c.kind==="section"&&c.dial?<HomeDial data={c.dial} panel={c.panels?.[0]??{id:"about",title:"Background",from:0,to:1}} photos={aboutPhotos} base={base} still changed={draftChapterChanged(c.id,draftSections)}/>:null}
           {(c.id === "about" ? [] : c.panels ?? []).map((p) => (
             <section key={p.id} data-draft-changed={(p.draftChanged || c.id !== "sky" && draftChapterChanged(c.id, draftSections)) || undefined} className={`journey-still-panel${p.look ? ` journey-look-${p.look}` : ""}`} aria-label={stripKeys(p.title)}>

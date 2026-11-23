@@ -21,10 +21,11 @@ export async function loadPracticeData(problem:number):Promise<DataResult>{
   return {ok:true,data:{note:note.data?.body??'',code:saved.data?.code??null,attempts:(attempts.data??[]) as AttemptSummary[]}};
  }catch{return {ok:false,message:"Can't reach saved Practice data right now. Your browser code is still available."};}
 }
-export async function savePracticeCode(problem:number,code:string):Promise<SaveResult>{
+export async function savePracticeCode(problem:number,code:string,expectedUserId?:string):Promise<SaveResult>{
  if(!validProblem(problem)||!validCode(code))return {ok:false,message:'Choose a valid problem and keep code under 100,000 characters.'};
  try{
   const viewer=await getViewer();if(!viewer.id||viewer.role==='anonymous')return {ok:false,message:'Sign in to save Practice code.'};
+  if(expectedUserId!==undefined&&viewer.id!==expectedUserId)return {ok:false,message:'Your account changed. Sign in again to sync this code.'};
   const sb=await supabaseServer();if(!sb)throw Error('unavailable');
   const updated_at=new Date().toISOString();
   const {data,error}=await sb.from('practice_code').upsert({user_id:viewer.id,problem,code,updated_at},{onConflict:'user_id,problem'}).select('problem');

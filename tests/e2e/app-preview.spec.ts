@@ -16,7 +16,7 @@ test.describe('real owner app draft previews',()=>{
   await expect(page.locator('.notes-main[data-draft-changed="true"]')).toContainText('Draft fixture note');await expect(page.getByRole('button',{name:'Edit',exact:true})).toHaveCount(0);expect((await page.reload())?.headers()['cache-control']).toContain('no-store');
   await page.getByRole('link',{name:'Preview problem 217',exact:true}).click();await expect(page).toHaveURL(/\/interview\/problems\/217$/);await expect(page.getByRole('status').filter({hasText:'Read-only draft preview'})).toBeVisible();
   await expect(page.getByLabel('Python code',{exact:true})).toBeVisible();
-  await page.getByRole('tab',{name:'Notes',exact:true}).click();await expect(page.locator('.practice-question-notes[data-draft-changed="true"]')).toContainText('Draft fixture question');await expect(page.locator('.practice-coding[data-draft-changed="true"]')).toContainText('# Draft fixture code');
+  await page.getByRole('tab',{name:'Notes',exact:true}).click();await expect(page.locator('.practice-question-notes[data-draft-changed="true"]')).toContainText('Draft fixture question');await expect(page.locator('.pw-editor[data-draft-changed="true"]')).toContainText('# Draft fixture code');
   await expect(page.getByRole('button',{name:'Run',exact:true})).toBeDisabled();await expect(page.getByRole('button',{name:/Flag Contains Duplicate for later/})).toBeDisabled();
   expect(await page.evaluate(()=>JSON.stringify(Object.entries(localStorage)))).not.toContain('Draft fixture code');
   const editor=page.getByLabel('Python code',{exact:true});await expect(editor).toContainText('# Draft fixture code');await editor.click();await page.keyboard.type('Should not save');await expect(editor).not.toContainText('Should not save');

@@ -83,3 +83,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-21 · Journey stops may carry an optional `journey_photo` (Content-Draft-editable): white print in the dial centre, line icon becomes a gold ring badge; migration unapplied, draft set uninserted · Jamie’s request
 - 2026-11-21 · Creator → Background is a reversible opacity/transform cross-fade (`fadeIn` on the dial chapter), never a cut; Background photos are ~28% larger on a 43% ring · Jamie’s request
 - 2026-11-21 · /about, /projects and case studies share one type/spacing scale (`app/page-scale.css`, real step-downs: heroes 60/56/48px, body 15px); photos and screenshots are shown whole, never cropped or zoomed; dial journey photos carry the gold caption tag derived from org and location · Jamie’s feedback
+
+- 2026-11-23 · PassLoop P1 uses section/topic-ordered navigation, a modal question drawer, split code/console and account-guarded debounced autosave; collapsed rail has no logo; legacy Practice and P2–P4 scope remain unchanged · approved P1 prompt
