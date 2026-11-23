@@ -29,13 +29,13 @@ import {TestConsole} from './test-console';
 import {casesToTests} from '@/lib/practice/cases';
 
 const PANEL_KEY='jb.practice.workspace.v1';
-function useWorkspacePanels(){
+export function useWorkspacePanels(){
  const [state,setState]=useState({editor:60,console:true,description:true});const [ready,setReady]=useState(false);
  useEffect(()=>{try{const v=JSON.parse(localStorage.getItem(PANEL_KEY)??'null');if(v)setState({editor:typeof v.editor==='number'&&Number.isFinite(v.editor)?Math.max(25,Math.min(75,v.editor)):60,console:typeof v.console==='boolean'?v.console:true,description:typeof v.description==='boolean'?v.description:true});}catch{}setReady(true);},[]);
  useEffect(()=>{if(ready)try{localStorage.setItem(PANEL_KEY,JSON.stringify(state));}catch{}},[ready,state]);
  return {state,setState};
 }
-function Shortcuts({onClose}:{onClose():void}){
+export function Shortcuts({onClose}:{onClose():void}){
  const ref=useRef<HTMLDialogElement>(null);
  useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
  return <dialog className="pw-shortcuts" ref={ref} aria-label="Keyboard shortcuts" onCancel={e=>{e.preventDefault();onClose();}}><header><h2>Keyboard shortcuts</h2><button aria-label="Close shortcuts" onClick={onClose}>×</button></header><dl><dt>⌘ / Ctrl + Enter</dt><dd>Run</dd><dt>⌘ / Ctrl + Shift + Enter</dt><dd>Submit</dd><dt>⌘ / Ctrl + S</dt><dd>Save now</dd><dt>Escape</dt><dd>Exit fullscreen or close panels</dd></dl></dialog>;

@@ -4,6 +4,7 @@ import '../notes.css';
 import '../practice.css';
 import './interview.css';
 import './system-design.css';
+import './sql.css';
 import {getBehavioralData} from '@/lib/interview/behavioral-data';
 import {isAnswered} from '@/lib/interview/behavioral';
 import {getInterviewNotes} from '@/lib/interview/notes';

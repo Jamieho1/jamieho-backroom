@@ -2,7 +2,8 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Markdown} from '@/components/markdown';
 import {SystemDesignDiagram} from './sd-diagram';
-import {plainHeading,splitSolution,tocFromMarkdown,type TableSchema,type TableSchemaResult,type TocItem} from '@/lib/interview/system-design';
+import {TableSchemaCard} from './table-schema-card';
+import {plainHeading,splitSolution,tocFromMarkdown,type TableSchemaResult,type TocItem} from '@/lib/interview/system-design';
 export const headingDomId=(id:string)=>`sd-${id}`;
 interface HastNode{type:string;tagName?:string;value?:string;properties?:Record<string,unknown>;children?:HastNode[]}
 /** Gives each `##` heading the id the "On this page" list links to; matches by text so setext headings cannot shift ids. */
@@ -13,11 +14,7 @@ function rehypeHeadingIds(items:TocItem[]){
   walk(tree);
  };
 }
-export function TableSchemaCard({schema}:{schema:TableSchema}){
- return <figure className="iv-sd-schema" data-table-schema={schema.table}><figcaption><span>TABLE</span><b>{schema.table}</b></figcaption>
-  <table><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Key</th></tr></thead><tbody>{schema.columns.map(c=><tr key={c.name}><th scope="row">{c.name}{c.note?<small>{c.note}</small>:null}</th><td>{c.type}</td><td>{c.pk?<span className="iv-sd-pk" title="Primary key">PK</span>:null}</td></tr>)}</tbody></table>
-  {schema.note?<p>{schema.note}</p>:null}</figure>;
-}
+export {TableSchemaCard};
 const SchemaOrError=({result}:{result:TableSchemaResult})=>result.ok?<TableSchemaCard schema={result.schema}/>:<p className="iv-sd-block-error" role="note">{result.message}</p>;
 export function SolutionView({markdown,toc}:{markdown:string;toc:TocItem[]}){
  const blocks=useMemo(()=>splitSolution(markdown),[markdown]);

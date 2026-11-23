@@ -9,6 +9,7 @@ import {useEffect,useRef,useState,type ReactNode,type CSSProperties} from 'react
 import {useViewer} from '@/components/viewer-provider';
 import {SignInButton} from '@/components/sign-in-button';
 import {PRACTICE_LIST} from '@/lib/practice/catalog';
+import {SQL_LIST} from '@/lib/practice/sql-catalog';
 import {modeHref,sectionQuestions,topicIcon,ROLE_NOTE_SECTIONS} from '@/lib/interview/content';
 import {INTERVIEW_SECTIONS,interviewSection,interviewTopics} from '@/lib/interview/navigation';
 import {InterviewIcon,type InterviewIconName} from './icons';
@@ -21,10 +22,10 @@ function useCollapse(key:string){
 }
 export function InterviewShell({children,noteTopics=[],behavioralThemes=[],behavioralUserId}:{children:ReactNode;noteTopics?:{id:string;title:string}[];behavioralThemes?:(BehavioralTheme&{total:number;answered:number})[];behavioralUserId?:string}){
  const path=usePathname();const section=interviewSection(path);const topics=interviewTopics(section.id,noteTopics);const notes=path.includes('/notes');
- const problemPage=path.startsWith('/interview/problems/');
+ const sqlProblem=path.startsWith('/interview/sql/problems/');const problemPage=path.startsWith('/interview/problems/')||sqlProblem;
  const sdPage=/^\/interview\/system-design\/(?!(?:practice|notes)(?:\/|$))[^/]+\/?$/.test(path);const companyPage=path.startsWith('/interview/companies/')||sdPage;const [companyHost,setCompanyHost]=useState<HTMLElement|null>(null);const topicLabel=sdPage?'Questions':companyPage?'Companies':'Topics';const hasPractice=section.id==='system-design'||sectionQuestions(section.id).length>0;
  const [toolbarHost,setToolbarHost]=useState<HTMLElement|null>(null);
- const selectedTopic=problemPage?PRACTICE_LIST.find(p=>p.lc===Number(path.split('/').at(-1)))?.topic:path.split('/')[4];
+ const selectedTopic=problemPage?(sqlProblem?SQL_LIST:PRACTICE_LIST).find(p=>p.lc===Number(path.split('/').at(-1)))?.topic:path.split('/')[4];
  const [railCollapsed,toggleRail]=useCollapse(INTERVIEW_STORAGE.rail);const [savedTopicsCollapsed,toggleSavedTopics]=useCollapse(INTERVIEW_STORAGE.topics);
  const [problemTopicsOpen,setProblemTopicsOpen]=useState(false);
  useEffect(()=>setProblemTopicsOpen(false),[path]);
@@ -70,7 +71,7 @@ export function InterviewShell({children,noteTopics=[],behavioralThemes=[],behav
   </aside>
   <aside id="interview-topics" ref={topicPanel} className="iv-topics" data-open={topicsOpen} inert={mobile&&drawer} aria-label={sdPage?'Question list':companyPage?'Company list':'Topic list'}>
    <header><div><span className="iv-overline">Explore</span><h2>{section.label}</h2></div><button className="iv-icon-button iv-topic-collapse" aria-label={sdPage?'Collapse questions':companyPage?'Collapse companies':'Collapse topics'} aria-expanded="true" onClick={toggleTopics}><InterviewIcon name="collapse"/></button><button className="iv-icon-button iv-mobile-close" aria-label={sdPage?'Close questions':companyPage?'Close companies':'Close topics'} onClick={()=>{setTopicsOpen(false);topicsButton.current?.focus();}}><InterviewIcon name="close"/></button></header>
-   {!sdPage&&['dsa','system-design','low-level-design','finance','ai-engineering'].includes(section.id)?<>{notes&&!hasPractice?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:<Link className="iv-mode-link" href={modeHref(section.id,!notes,selectedTopic)} prefetch={false}>{notes?'Practice':'Notes'}</Link>}{!notes&&!hasPractice?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:null}</>:null}
+   {!sdPage&&['dsa','system-design','low-level-design','finance','ai-engineering','sql'].includes(section.id)?<>{notes&&!hasPractice?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:<Link className="iv-mode-link" href={modeHref(section.id,!notes,selectedTopic)} prefetch={false}>{notes?'Practice':'Notes'}</Link>}{!notes&&!hasPractice?<span className="iv-mode-link" aria-disabled="true">Practice · No practice questions yet</span>:null}</>:null}
    {companyPage?<div className={sdPage?'iv-company-list-host iv-sd-list-host':'iv-company-list-host'} ref={setCompanyHost}/>:<nav aria-label="Topics">{section.id==='behavioral'?behavioralThemes.map((t,i)=><Link key={t.id} href={themeHref(t.id)} prefetch={false} aria-current={path===themeHref(t.id)?'page':undefined}><span className="iv-icon" style={{color:t.color}}><InterviewIcon name={(['conflict','failure','leadership','ambiguity','ownership','impact','teamwork','customer','motivation'] as const)[i%9]}/></span><span>{t.title}{behavioralUserId&&viewer.id===behavioralUserId?<small style={{display:'block'}}>{t.answered} answered of {t.total}</small>:null}</span></Link>):topics.length?topics.map(topic=><Link key={topic.id} prefetch={false} href={`/interview/${section.id}/${notes||ROLE_NOTE_SECTIONS.some(s=>s===section.id)?'notes':'practice'}/${topic.id}`} aria-current={selectedTopic===topic.id?'page':undefined}><span className="iv-icon" style={{color:topic.dot} as CSSProperties}><InterviewIcon name={topicIcon(topic.id)}/></span><span>{topic.label}</span></Link>):<p className="iv-empty-topics">{section.id==='dashboard'?'Choose an Interview Skills section to explore its topics.':'Topics are coming soon.'}</p>}</nav>}
   </aside>
   <section className="iv-workspace" aria-label="Interview workspace" inert={mobile&&drawer}>

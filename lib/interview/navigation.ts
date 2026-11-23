@@ -7,7 +7,7 @@ export const INTERVIEW_SECTIONS=[
  {id:'system-design',label:'System Design',href:'/interview/system-design/practice',group:'Interview Skills',color:TOPICS[12].dot},
  {id:'low-level-design',label:'Low Level Design',href:'/interview/low-level-design/practice',group:'Interview Skills',color:TOPICS[17].dot},
  {id:'fundamental',label:'Fundamental',href:'/interview/fundamental',group:'Interview Skills',color:'#38BDF8'},
- {id:'sql',label:'SQL',href:'/interview/sql',group:'Interview Skills',color:'#2DD4BF'},
+ {id:'sql',label:'SQL',href:'/interview/sql/practice',group:'Interview Skills',color:'#2DD4BF'},
  {id:'full-stack',label:'Full-Stack',href:'/interview/full-stack',group:'Role',color:'#34D399'},
  {id:'finance',label:'Finance Engineering',href:'/interview/finance/practice',group:'Role',color:TOPICS[9].dot},
  {id:'ai-engineering',label:'AI Engineering',href:'/interview/ai-engineering/practice',group:'Role',color:TOPICS[7].dot},
@@ -25,4 +25,4 @@ export const INTERVIEW_SECTIONS=[
 export type InterviewSection=(typeof INTERVIEW_SECTIONS)[number];
 export const interviewSection=(path:string)=>path.startsWith('/interview/problems/')?INTERVIEW_SECTIONS.find(s=>s.id===(PRACTICE_LIST.find(p=>p.lc===Number(path.split('/').at(-1)))?.topic==='class-design'?'low-level-design':'dsa'))!:INTERVIEW_SECTIONS.find(s=>s.id!=='dashboard'&&(path===`/interview/${s.id}`||path.startsWith(`/interview/${s.id}/`)))??INTERVIEW_SECTIONS[0];
 export const interviewTopics=sectionTopics;
-export const PRACTICE_SECTIONS=['dsa','system-design','low-level-design','finance','ai-engineering'] as const;
+export const PRACTICE_SECTIONS=['dsa','system-design','low-level-design','finance','ai-engineering','sql'] as const;

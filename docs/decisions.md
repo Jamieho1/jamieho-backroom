@@ -119,3 +119,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · System-design solution diagrams own their full scoped styles, render immediately and adapt to reading-column width; shared geometry is reused with optional obstacle-avoiding edges while project defaults stay unchanged · Jamie’s Tiny URL diagram feedback
 
 - 2026-11-23 · System-design related Notes is directly accessible in the main question tab row, linking the selected note or Notes overview; the second column stays for questions · Jamie’s tab-placement request
+
+- 2026-11-23 · SQL practice: Postgres dialect via @electric-sql/pglite in the browser (runtime dependency, SQL routes only, Web Worker); SQL 50 list from LeetCode, all content own words · Jamie
+
+- 2026-11-23 · SQL practice runner: PGlite 0.5.13 (exact pin, now a runtime dependency) runs only in a dedicated Web Worker on `/interview/sql/problems/[lc]`; PGlite ignores statement_timeout so the 2 s limit terminates the worker; one SELECT/WITH statement in a READ ONLY transaction, 1,000-row cap; SQL numbers live in their own catalogue and `practice_submissions.language` allows `SQL` (migration 20261123230000) · Q1 build

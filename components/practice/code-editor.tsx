@@ -11,6 +11,7 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { bracketMatching, indentOnInput, syntaxHighlighting, indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { builtinHighlight, codeHighlighter } from "./editor-highlight";
+import { sqlLanguage } from "./sql-language";
 
 
 const externalCode = Annotation.define<boolean>();
@@ -27,7 +28,7 @@ const theme = EditorView.theme({
   ".cm-matchingBracket": { backgroundColor: "color-mix(in srgb, var(--green) 25%, transparent)", outline: "none" },
 });
 
-export function CodeEditor({ initial, onChange, onActivity, readOnly = false, label, wrap = false, value }: { initial: string; onChange: (code: string) => void; onActivity?: () => void; readOnly?: boolean; label: string; wrap?: boolean; value?: string }) {
+export function CodeEditor({ initial, onChange, onActivity, readOnly = false, label, wrap = false, value, language = "python" }: { language?: "python" | "sql"; initial: string; onChange: (code: string) => void; onActivity?: () => void; readOnly?: boolean; label: string; wrap?: boolean; value?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const editor = useRef<EditorView|null>(null);
   const cb = useRef({ onChange, onActivity });
@@ -45,10 +46,10 @@ export function CodeEditor({ initial, onChange, onActivity, readOnly = false, la
           highlightActiveLine(),
           indentOnInput(),
           bracketMatching(),
-          indentUnit.of("    "),
-          python(),
+          indentUnit.of(language === "sql" ? "  " : "    "),
+          language === "sql" ? sqlLanguage : python(),
           syntaxHighlighting(codeHighlighter),
-          builtinHighlight,
+          ...(language === "sql" ? [] : [builtinHighlight]),
           keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
           theme,
           ...(wrap ? [EditorView.lineWrapping] : []),

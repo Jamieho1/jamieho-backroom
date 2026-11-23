@@ -1,12 +1,12 @@
 'use server';
 import { getViewer } from '@/lib/viewer';
 import { supabaseServer } from '@/lib/supabase/server';
-import { validProblem,validCode,validAttempt,type AttemptInput,type AttemptSummary,type DataResult,type SaveResult } from '@/lib/practice/data';
+import { validPracticeProblem,validCode,validAttempt,type AttemptInput,type AttemptSummary,type DataResult,type SaveResult } from '@/lib/practice/data';
 const failed=():SaveResult=>({ok:false,message:"Couldn't save. Your draft is still here — retry."});
 async function ownerClient(){const viewer=await getViewer();return viewer.role==='owner'?supabaseServer():null;}
 
 export async function loadPracticeData(problem:number):Promise<DataResult>{
- if(!validProblem(problem))return {ok:false,message:'Choose a valid problem.'};
+ if(!validPracticeProblem(problem))return {ok:false,message:'Choose a valid problem.'};
  try{
   const viewer=await getViewer();if(viewer.role==='anonymous')return {ok:false,message:'Sign in to read question notes.'};
   const sb=await supabaseServer();if(!sb)throw new Error('unavailable');
@@ -22,7 +22,7 @@ export async function loadPracticeData(problem:number):Promise<DataResult>{
  }catch{return {ok:false,message:"Can't reach saved Practice data right now. Your browser code is still available."};}
 }
 export async function savePracticeCode(problem:number,code:string,expectedUserId?:string):Promise<SaveResult>{
- if(!validProblem(problem)||!validCode(code))return {ok:false,message:'Choose a valid problem and keep code under 100,000 characters.'};
+ if(!validPracticeProblem(problem)||!validCode(code))return {ok:false,message:'Choose a valid problem and keep code under 100,000 characters.'};
  try{
   const viewer=await getViewer();if(!viewer.id||viewer.role==='anonymous')return {ok:false,message:'Sign in to save Practice code.'};
   if(expectedUserId!==undefined&&viewer.id!==expectedUserId)return {ok:false,message:'Your account changed. Sign in again to sync this code.'};
@@ -44,7 +44,7 @@ export async function savePracticeAttempt(attempt:AttemptInput):Promise<SaveResu
  }catch{return failed();}
 }
 export async function saveQuestionNotes(problem:number,body:string):Promise<SaveResult>{
- if(!validProblem(problem)||typeof body!=='string'||body.length>200000)return {ok:false,message:'Keep question notes under 200,000 characters.'};
+ if(!validPracticeProblem(problem)||typeof body!=='string'||body.length>200000)return {ok:false,message:'Keep question notes under 200,000 characters.'};
  try{
   const sb=await ownerClient();if(!sb)return {ok:false,message:'Only the owner can edit question notes.'};
   const updated_at=new Date().toISOString();

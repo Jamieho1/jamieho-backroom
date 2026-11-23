@@ -10,10 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs && node scripts/assert-excalidraw-bundle.mjs",
+    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs && node scripts/assert-excalidraw-bundle.mjs && node scripts/assert-pglite-bundle.mjs",
     "decrypt-export": "node scripts/decrypt-export.mjs",
-    "predev": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs",
-    "prebuild": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs",
+    "predev": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs && node scripts/copy-pglite.mjs",
+    "prebuild": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs && node scripts/copy-pglite.mjs",
     "import-notes": "node scripts/import-notes.mjs"
   },
   "engines": {
@@ -25,6 +25,7 @@
     "@codemirror/language": "6.11.3",
     "@codemirror/state": "6.5.2",
     "@codemirror/view": "6.38.6",
+    "@electric-sql/pglite": "0.5.13",
     "@excalidraw/excalidraw": "0.18.1",
     "@lezer/highlight": "1.2.5",
     "@lezer/python": "1.1.19",
@@ -42,7 +43,6 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "0.5.13",
     "@playwright/test": "1.56.1",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
