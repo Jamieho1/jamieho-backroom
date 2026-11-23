@@ -35,8 +35,8 @@ it('table checks reject reserved slugs and malformed quiz or steps',async()=>{
 });
 it('approval inserts, updates and audits; delete only unpublishes; touch trigger runs',async()=>{
  const added='00000000-0000-4000-8000-000000000a03';
- const result=await approve([op({slug:'new-question',title:'New Question',solution:'## Overview\nx',quiz:[item],steps:[{id:'requirements',title:'Requirements',extra:'kept'}],public:true},'insert',added),op({title:'Renamed',sort:5},'update',added),op({},'delete',added)],async q=>{
-  expect(await q('select slug,title,sort,public,steps from public.system_design_questions where id=$1',[added])).toMatchObject([{slug:'new-question',title:'Renamed',sort:5,public:false,steps:[{id:'requirements',title:'Requirements',extra:'kept'}]}]);
+ const result=await approve([op({slug:'new-question',title:'New Question',solution:'## Overview\nx',quiz:[item],steps:[{id:'requirements',title:'Requirements',minutes:2}],public:true},'insert',added),op({title:'Renamed',sort:5},'update',added),op({},'delete',added)],async q=>{
+  expect(await q('select slug,title,sort,public,steps from public.system_design_questions where id=$1',[added])).toMatchObject([{slug:'new-question',title:'Renamed',sort:5,public:false,steps:[{id:'requirements',title:'Requirements',minutes:2}]}]);
  });
  expect(result.previous.map(p=>p.values)).toMatchObject([null,{title:'New Question',public:true},{title:'Renamed',public:true}]);
 });

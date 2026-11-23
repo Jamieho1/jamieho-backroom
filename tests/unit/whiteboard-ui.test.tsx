@@ -3,12 +3,13 @@ import {beforeEach,afterEach,it,expect,vi} from 'vitest';
 import {render,screen,fireEvent,cleanup,waitFor,act} from '@testing-library/react';
 const m=vi.hoisted(()=>({viewer:{status:'visitor' as string,id:undefined as string|undefined},load:vi.fn(),save:vi.fn(),reset:vi.fn(),phone:false,canvas:null as null|{template:{frames:{name:string}[]};scene:unknown;onSave:(s:unknown)=>void;onReset:()=>void}}));
 vi.mock('@/components/viewer-provider',()=>({useViewer:()=>({viewer:m.viewer,configured:true})}));
+vi.mock('@/app/actions/system-design-history',()=>({listSdAttempts:vi.fn(),loadSdAttempt:vi.fn(),saveSdAttempt:vi.fn(),deleteSdAttempt:vi.fn()}));
 vi.mock('@/app/actions/system-design-whiteboard',()=>({loadSdWhiteboard:m.load,saveSdWhiteboard:m.save,resetSdWhiteboard:m.reset}));
 // The real canvas (Excalidraw) is exercised in the browser spec; here it is a probe that exposes its props.
 vi.mock('next/dynamic',()=>({default:()=>(props:NonNullable<typeof m.canvas>)=>{m.canvas=props;return <div data-testid="canvas-probe">{props.template.frames.map(f=>f.name).join('|')}</div>;}}));
 import {SystemDesignWhiteboard} from '@/components/interview/sd-whiteboard';
 const QID='00000000-0000-4000-8000-000000000f11';
-const question={id:QID,slug:'fixture',title:'Fixture Design',solution:'## Overview\nA fixture.\n\n## Requirements\n- Users can add a note'};
+const question={id:QID,slug:'fixture',title:'Fixture Design',solution:'## Overview\nA fixture.\n\n## Requirements\n- Users can add a note',steps:[] as never[]};
 const scene={v:1 as const,elements:[{id:'a',type:'rectangle'}]};
 beforeEach(()=>{
  vi.clearAllMocks();vi.useRealTimers();localStorage.clear();m.canvas=null;m.viewer={status:'visitor',id:undefined};m.phone=false;
@@ -19,7 +20,7 @@ afterEach(()=>{cleanup();vi.useRealTimers();});
 it('shows the top bar, the placeholder side panel, a keyboard-resizable divider and the canvas from question data',async()=>{
  render(<SystemDesignWhiteboard question={question}/>);
  expect(screen.getByRole('heading',{level:1,name:'Fixture Design'})).toBeTruthy();expect(screen.getByRole('link',{name:'Back to the question'}).getAttribute('href')).toBe('/interview/system-design/fixture');expect(screen.getByRole('link',{name:'All questions'}).getAttribute('href')).toBe('/interview/system-design/practice');
- expect((screen.getByRole('button',{name:'History'}) as HTMLButtonElement).disabled).toBe(true);expect(screen.getByRole('complementary',{name:'Interview steps'})).toBeTruthy();
+ expect((screen.getByRole('button',{name:'History'}) as HTMLButtonElement).disabled).toBe(false);expect(screen.getByRole('complementary',{name:'Interview steps'})).toBeTruthy();
  expect((await screen.findByTestId('canvas-probe')).textContent).toBe('Functional Requirements|Non-Functional Requirements|Core Entities|API Design|High-Level Design');
  const sep=screen.getByRole('separator');expect(sep.getAttribute('aria-valuenow')).toBe('340');
  fireEvent.keyDown(sep,{key:'ArrowRight'});expect(sep.getAttribute('aria-valuenow')).toBe('356');fireEvent.keyDown(sep,{key:'ArrowLeft'});fireEvent.keyDown(sep,{key:'ArrowLeft'});expect(sep.getAttribute('aria-valuenow')).toBe('324');

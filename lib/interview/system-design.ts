@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {diagramSchema,type ProjectDiagram} from '@/lib/project-diagram';
+import {sdStepSchema,sdStepsSchema,type SdStep} from './sd-steps';
 
 /** S1: system-design questions (solution Markdown, quiz, whiteboard steps). Own-words content only; no runtime AI. */
 const text=(max:number)=>z.string().refine(s=>!s.includes('\0')&&Array.from(s).length<=max,`Text must be at most ${max} characters.`);
@@ -10,11 +11,11 @@ export const SD_LIMITS={solution:100000,quiz:40,steps:12,question:500,option:300
 
 export const quizItemSchema=z.object({q:required(SD_LIMITS.question),options:z.array(required(SD_LIMITS.option)).length(4),answer:z.number().int().min(0).max(3),explanation:text(SD_LIMITS.explanation)}).strict();
 export type QuizItem=z.infer<typeof quizItemSchema>;
-/** S3 fills the step contents; S1 only stores them, so each step needs a stable id and title and may carry more. */
-export const stepSchema=z.looseObject({id:z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).max(40),title:required(120)});
-export type SdStep=z.infer<typeof stepSchema>;
+/** S3: full step shape (see sd-steps.ts); id and title are the only required fields. */
+export const stepSchema=sdStepSchema;
+export type {SdStep};
 
-export const questionFields={slug,title:required(200),icon:text(40).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),topic:text(80),note_ref:z.union([z.literal(''),text(80).regex(/^sd-[a-z0-9]+(-[a-z0-9]+)*$/)]),solution:text(SD_LIMITS.solution),quiz:z.array(quizItemSchema).max(SD_LIMITS.quiz),steps:z.array(stepSchema).max(SD_LIMITS.steps),sort:integer,public:z.boolean()};
+export const questionFields={slug,title:required(200),icon:text(40).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),topic:text(80),note_ref:z.union([z.literal(''),text(80).regex(/^sd-[a-z0-9]+(-[a-z0-9]+)*$/)]),solution:text(SD_LIMITS.solution),quiz:z.array(quizItemSchema).max(SD_LIMITS.quiz),steps:sdStepsSchema,sort:integer,public:z.boolean()};
 export const questionSchema=z.object({id:z.uuid(),...questionFields});
 export type SdQuestion=z.infer<typeof questionSchema>;
 export const sdQuestionDefaults={icon:'system-design',topic:'',note_ref:'',solution:'',quiz:[],steps:[],sort:100,public:false};

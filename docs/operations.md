@@ -69,4 +69,6 @@ C1 Companies rollout: `20261123123946_passloop_companies.sql` is **applied live*
 
 System design (S1): export-tables.json adds system_design_questions, system_design_quiz_attempts (user_id/id paging) and system_design_progress (user_id/question_id); same encrypted export and 90-day retention. Migration 20261123200000 is local only until Jamie says "apply it". Linux-only sandboxes need a fresh `npm ci` copy (node_modules from macOS lacks native bindings); no Playwright browser could be installed there.
 
+History (S3): export-tables.json adds system_design_attempts (user_id/id paging); migration 20261123220000 is local only until Jamie says "apply it".
+
 Whiteboard (S2): export-tables.json adds system_design_whiteboards (user_id/question_id paging). Migration 20261123210000 is local only until Jamie says "apply it". `npm run dev`/`build` copy Excalidraw fonts to public/excalidraw-assets (git-ignored). `node scripts/assert-excalidraw-bundle.mjs` (part of `npm run check`, after the build) fails if Excalidraw chunks appear in any route manifest or root build manifest other than the whiteboard route's lazy loader. Typecheck with Excalidraw types is slow on a cold cache.

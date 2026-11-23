@@ -89,3 +89,42 @@
  .iv-sd-lib-search input{width:min(200px,50vw)}
 }
 @media(prefers-reduced-motion:reduce){.iv-sd-board *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* S3: interview steps, answers, model-answer comparison, history. Dark-only, scoped --iv tokens. */
+.iv-sd-board-panel{display:flex;flex-direction:column;gap:8px}
+.iv-sd-board-panel h2{margin:0}
+.iv-sd-steps-nav{display:flex;align-items:center;gap:6px}.iv-sd-steps-nav ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px;flex:1;justify-content:center}
+.iv-sd-steps-nav button,.iv-sd-board-panel .iv-sd-voice button,.iv-sd-compare-btn,.iv-sd-steps-foot button,.iv-sd-history button{min-height:32px;padding:4px 10px;border:1px solid var(--iv-line);border-radius:8px;background:var(--iv-card);color:var(--iv-ink);font:600 12px ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.iv-sd-steps-nav li button{min-width:32px;padding:4px 0;border-radius:999px}
+.iv-sd-steps-nav button[aria-current=step]{background:var(--iv-accent);border-color:#a98b59;color:#171b23}.iv-sd-steps-nav button[data-done]:not([aria-current=step]){border-color:#3f6e55;color:#7bd6a3}
+.iv-sd-steps-nav button:disabled,.iv-sd-steps-foot button:disabled{opacity:.45;cursor:not-allowed}
+.iv-sd-step{display:flex;flex-direction:column;gap:8px;min-width:0}.iv-sd-step h3{margin:0;font:600 16px/1.3 ui-sans-serif,system-ui,sans-serif;color:var(--iv-ink)}
+.iv-sd-step-count{font-size:11px!important;text-transform:uppercase;letter-spacing:.06em}.iv-sd-step-cat{color:var(--iv-accent)!important;font-weight:700;font-size:12px!important}
+.iv-sd-interviewer,.iv-sd-interviewer-says{margin:0;padding:10px 12px;border:1px solid var(--iv-line);border-left:3px solid var(--iv-accent);border-radius:8px;background:var(--iv-card);color:var(--iv-ink);font-size:13px;line-height:1.5}
+.iv-sd-interviewer span,.iv-sd-interviewer-says span{display:block;margin-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--iv-muted)}
+.iv-sd-step-todo{color:var(--iv-ink)!important}.iv-sd-step-time{color:var(--iv-accent)!important;font-size:12px!important}
+.iv-sd-answer{display:flex;flex-direction:column;gap:6px}.iv-sd-answer label{font-size:12px;font-weight:600;color:var(--iv-ink)}
+.iv-sd-answer textarea{width:100%;min-height:110px;resize:vertical;padding:9px 10px;border:1px solid #6d4fa6;border-radius:8px;background:#1d1830;color:var(--iv-ink);font:13px/1.5 ui-sans-serif,system-ui,sans-serif}
+.iv-sd-voice{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.iv-sd-voice p{flex-basis:100%}
+.iv-sd-voice .iv-sd-mic[aria-pressed=true]{border-color:#a5493f;color:#ffb4a8}.iv-sd-listening{font-size:12px;color:#ffb4a8}
+.iv-sd-voice-note{font-size:11px!important;line-height:1.4}
+.iv-sd-compare{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--iv-line);border-radius:10px;background:var(--iv-bg)}.iv-sd-compare h4{margin:4px 0 0;font-size:13px;color:var(--iv-ink)}
+.iv-sd-compare .md{font-size:13px;line-height:1.55;color:var(--iv-ink)}.iv-sd-compare .md p,.iv-sd-compare .md li{color:var(--iv-ink)!important;font-size:13px!important}
+.iv-sd-checklist{list-style:none;margin:0;padding:0;display:grid;gap:6px}.iv-sd-checklist label{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--iv-ink);cursor:pointer}.iv-sd-checklist input{margin-top:3px;min-width:16px;min-height:16px}
+.iv-sd-covered{color:#7bd6a3!important;font-weight:700;font-size:13px!important}
+.iv-sd-step-tabs{display:flex;gap:4px;border-bottom:1px solid var(--iv-line)}.iv-sd-step-tabs button{padding:8px 10px;border:0;border-bottom:2px solid transparent;background:none;color:var(--iv-muted);font:600 12px ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.iv-sd-step-tabs button[aria-selected=true]{color:var(--iv-ink);border-bottom-color:var(--iv-accent)}
+.iv-sd-step-pane{font-size:13px;line-height:1.55;color:var(--iv-ink)}.iv-sd-step-pane .md p,.iv-sd-step-pane .md li{color:var(--iv-ink)!important;font-size:13px!important}
+.iv-sd-clarify{list-style:none;margin:0;padding:0;display:grid;gap:6px}.iv-sd-clarify>li>button{width:100%;text-align:left;min-height:34px;padding:7px 10px;border:1px solid var(--iv-line);border-radius:8px;background:var(--iv-card);color:var(--iv-ink);font:13px/1.4 ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.iv-sd-clarify .iv-sd-interviewer-says{margin-top:4px}
+.iv-sd-steps-foot{position:sticky;bottom:-16px;margin-top:auto;padding:10px 0 4px;background:var(--iv-panel);display:flex;flex-wrap:wrap;gap:6px;align-items:center}.iv-sd-steps-foot p{flex-basis:100%;font-size:11px!important}
+.iv-sd-steps-foot p[data-state=failed]{color:#ffb4a8!important}.iv-sd-steps-foot p[data-state=saved]{color:#7bd6a3!important}
+.iv-sd-steps-empty{color:var(--iv-muted)}
+.iv-sd-review-meta{font-size:12px!important}.iv-sd-review-step{border-top:1px solid var(--iv-line);padding-top:8px}.iv-sd-review-step h3{margin:0 0 4px;font-size:14px}
+.iv-sd-review-answer{white-space:pre-wrap;color:var(--iv-ink)!important;overflow-wrap:anywhere}
+.iv-sd-view-banner{margin:0;padding:6px 12px;background:#302a20;border-bottom:1px solid #665535;color:var(--iv-accent);font-size:12px;font-weight:600}
+.iv-sd-history{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(360px,100%);overflow:auto;padding:14px;background:var(--iv-panel);border-left:1px solid var(--iv-line);box-shadow:-8px 0 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:8px}
+.iv-sd-history header{display:flex;justify-content:space-between;align-items:center}.iv-sd-history h2{margin:0;font-size:16px}.iv-sd-history p{margin:0;font-size:12px;color:var(--iv-muted)}
+.iv-sd-history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}.iv-sd-history li{display:flex;gap:6px;align-items:center;padding:8px 10px;border:1px solid var(--iv-line);border-radius:8px;background:var(--iv-card)}
+.iv-sd-history li div{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12px;color:var(--iv-muted)}.iv-sd-history li b{color:var(--iv-ink);font-size:13px}
+@media(max-width:768px){.iv-sd-history{position:fixed;inset:0;width:auto}.iv-sd-history button,.iv-sd-steps-nav button{min-height:44px}}

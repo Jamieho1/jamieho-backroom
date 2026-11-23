@@ -12,5 +12,5 @@ export async function systemDesignQuestionRoute(slug:string){
 export async function systemDesignWhiteboardRoute(slug:string){
  const question=await getSdQuestion(slug);
  if(!question)notFound();
- return <SystemDesignWhiteboard question={{id:question.id,slug:question.slug,title:question.title,solution:question.solution}}/>;
+ return <SystemDesignWhiteboard question={{id:question.id,slug:question.slug,title:question.title,solution:question.solution,steps:question.steps}}/>;
 }

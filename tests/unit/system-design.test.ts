@@ -75,7 +75,7 @@ describe('routing helpers',()=>{
 describe('Content Drafts allowlist',()=>{
  const op=(o:object)=>validateOperations([{table:'system_design_questions',key:KEY,...o}]);
  it('accepts inserts with slug and title plus every editable field and updates one field',()=>{
-  expect(op({op:'insert',fields:{slug:'tiny-url',title:'Tiny URL',icon:'system-design',topic:'sd-intro',note_ref:'sd-tiny-url',solution:'## Overview',quiz,steps:[{id:'requirements',title:'Requirements',extra:true}],sort:1,public:true}}).ok).toBe(true);
+  expect(op({op:'insert',fields:{slug:'tiny-url',title:'Tiny URL',icon:'system-design',topic:'sd-intro',note_ref:'sd-tiny-url',solution:'## Overview',quiz,steps:[{id:'requirements',title:'Requirements',frame:'wb-functional',checklist:['One']}],sort:1,public:true}}).ok).toBe(true);
   expect(op({op:'update',fields:{title:'Renamed'}}).ok).toBe(true);expect(op({op:'delete'}).ok).toBe(true);
  });
  it('refuses unknown fields, reserved slugs, missing insert fields, field-bearing deletes and bad quizzes',()=>{
@@ -91,9 +91,13 @@ describe('privacy and export',()=>{
  it('includes per-user quiz attempts and progress in the encrypted export manifest and pages them by user',async()=>{
   const {readFileSync}=await import('node:fs');
   const tables=JSON.parse(readFileSync('scripts/export-tables.json','utf8')) as string[];
-  for(const t of ['system_design_questions','system_design_quiz_attempts','system_design_progress','system_design_whiteboards'])expect(tables).toContain(t);
+  for(const t of ['system_design_questions','system_design_quiz_attempts','system_design_progress','system_design_whiteboards','system_design_attempts'])expect(tables).toContain(t);
   const ops=readFileSync('scripts/ops.mjs','utf8');
-  expect(ops).toContain('system_design_quiz_attempts:["user_id","id"]');expect(ops).toContain('system_design_progress:["user_id","question_id"]');expect(ops).toContain('system_design_whiteboards:["user_id","question_id"]');
+  expect(ops).toContain('system_design_quiz_attempts:["user_id","id"]');expect(ops).toContain('system_design_progress:["user_id","question_id"]');expect(ops).toContain('system_design_whiteboards:["user_id","question_id"]');expect(ops).toContain('system_design_attempts:["user_id","id"]');
+ });
+ it('discloses interview-step history and the browser speech service in the privacy page',async()=>{
+  const {readFileSync}=await import('node:fs');const page=readFileSync('app/privacy/page.tsx','utf8');
+  expect(page).toContain('Finish attempt');expect(page).toMatch(/newest 20 per question/);expect(page).toMatch(/built-in speech recognition \(Web Speech API\)/);expect(page).toMatch(/this site never receives audio/);
  });
  it('discloses quiz attempts and flag/done marks in the privacy page',async()=>{
   const {readFileSync}=await import('node:fs');const page=readFileSync('app/privacy/page.tsx','utf8');

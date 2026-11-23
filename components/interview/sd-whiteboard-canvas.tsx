@@ -41,12 +41,18 @@ export interface CanvasProps{
  template:WbTemplate;scene:WbScene|null;
  /** Debounced (about a second after the last edit) and flushed when the board closes. */
  onSave:(scene:WbScene)=>void;onReset:()=>void;
+ /** S3: hands the imperative API to the workspace (frame focus, finishing an attempt); null when the canvas goes away. */
+ onApi?:(api:ExcalidrawImperativeAPI|null)=>void;
+ /** S3: a saved attempt shown with Excalidraw's view mode: no tools, no library, never saved. */
+ readOnly?:boolean;
 }
 const SAVE_DELAY=1000;
-export default function WhiteboardCanvas({template,scene,onSave,onReset}:CanvasProps){
+export default function WhiteboardCanvas({template,scene,onSave,onReset,onApi,readOnly=false}:CanvasProps){
  const api=useRef<ExcalidrawImperativeAPI|null>(null);
  const [ready,setReady]=useState(false);const [query,setQuery]=useState('');const [confirming,setConfirming]=useState(false);
- const [frames,setFrames]=useState('');const [count,setCount]=useState(0);
+ const [frames,setFrames]=useState('');const [count,setCount]=useState(0);const [selected,setSelected]=useState('');
+ const apiCb=useRef(onApi);useEffect(()=>{apiCb.current=onApi;},[onApi]);
+ useEffect(()=>()=>{apiCb.current?.(null);},[]);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const pending=useRef<WbScene|null>(null);
  const baseline=useRef<number|null>(null);const touched=useRef(false);const userItems=useRef<LibraryItem[]>([]);
  const save=useRef(onSave);useEffect(()=>{save.current=onSave;},[onSave]);
@@ -57,9 +63,11 @@ export default function WhiteboardCanvas({template,scene,onSave,onReset}:CanvasP
   return {elements:elements as never,appState:{viewBackgroundColor:'#ffffff',...(scene?.view?{scrollX:scene.view.scrollX,scrollY:scene.view.scrollY,zoom:{value:scene.view.zoom as never}}:{})},scrollToContent:!scene?.view,libraryItems:items('')};
   // eslint-disable-next-line react-hooks/exhaustive-deps -- the starting data is read once, on mount
  },[]);
- const onChange=useCallback((elements:readonly {isDeleted?:boolean;type:string;name?:string|null}[],state:{scrollX:number;scrollY:number;zoom:{value:number}})=>{
+ const onChange=useCallback((elements:readonly {isDeleted?:boolean;type:string;name?:string|null}[],state:{scrollX:number;scrollY:number;zoom:{value:number};selectedElementIds?:Record<string,boolean>})=>{
   const live=elements.filter(e=>!e.isDeleted);
+  setSelected(Object.keys(state.selectedElementIds??{}).filter(k=>state.selectedElementIds?.[k]).join('|'));
   setCount(live.length);setFrames(live.filter(e=>e.type==='frame').map(e=>e.name??'').join('|'));
+  if(readOnly)return;
   const version=getSceneVersion(elements as never);
   // Layout passes after load (font metrics) must not create a saved copy of an untouched template.
   if(baseline.current===null||!touched.current){baseline.current=version;return;}
@@ -81,14 +89,14 @@ export default function WhiteboardCanvas({template,scene,onSave,onReset}:CanvasP
   baseline.current=null;touched.current=false;setConfirming(false);onReset();
  };
  return <div className="iv-sd-canvas-wrap">
-  <div className="iv-sd-canvas-bar" role="toolbar" aria-label="Whiteboard tools">
+  {readOnly?null:<div className="iv-sd-canvas-bar" role="toolbar" aria-label="Whiteboard tools">
    <label className="iv-sd-lib-search"><span>Components</span><input type="search" value={query} placeholder="Search: queue, cache, database…" aria-label="Search components" onChange={e=>search(e.target.value)}/></label>
    <button type="button" onClick={openLibrary}>Open library</button>
    {confirming?<span className="iv-sd-confirm" role="alertdialog" aria-label="Reset board"><span>Reset to the template? Your drawing is replaced.</span><button type="button" className="iv-sd-danger" onClick={reset}>Reset</button><button type="button" onClick={()=>setConfirming(false)}>Cancel</button></span>:<button type="button" onClick={()=>setConfirming(true)}>Reset board</button>}
-  </div>
-  <div className="iv-sd-canvas" data-testid="sd-board-canvas" data-ready={ready} data-frames={frames} data-elements={count} onPointerDownCapture={()=>{touched.current=true;}} onKeyDownCapture={()=>{touched.current=true;}} onDropCapture={()=>{touched.current=true;}}>
+  </div>}
+  <div className="iv-sd-canvas" data-testid="sd-board-canvas" data-ready={ready} data-frames={frames} data-elements={count} data-selected={selected} data-readonly={readOnly||undefined} onPointerDownCapture={()=>{touched.current=true;}} onKeyDownCapture={()=>{touched.current=true;}} onDropCapture={()=>{touched.current=true;}}>
    <Excalidraw
-    theme="dark" name="whiteboard" initialData={initialData as never} excalidrawAPI={a=>{api.current=a;setReady(true);}} onChange={onChange as never}
+    theme="dark" name="whiteboard" initialData={initialData as never} viewModeEnabled={readOnly} excalidrawAPI={a=>{api.current=a;setReady(true);apiCb.current?.(a);}} onChange={onChange as never}
     onLibraryChange={l=>{userItems.current=l.filter(i=>!i.id.startsWith(USER_PREFIX));}}
     isCollaborating={false} aiEnabled={false} validateEmbeddable={false} autoFocus={false} handleKeyboardGlobally={false} showDeprecatedFonts={false}
     UIOptions={{canvasActions:{export:false,saveAsImage:false,loadScene:false,saveToActiveFile:false,clearCanvas:false,toggleTheme:false,changeViewBackgroundColor:false},tools:{image:false}}}
