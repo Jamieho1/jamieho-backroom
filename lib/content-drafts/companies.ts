@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {companyExperienceHref} from '@/lib/interview/company-page';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import {companyFields,companyQuestionFields,experienceFields,referenceInput,companySchemas,companyDefaults,COMPANY_TABLES,isCompanyTable,validCompanyReference,type Company,type CompanyQuestion,type InterviewExperience} from '@/lib/interview/companies';
 import type {ContentOperation} from './allowlist';
@@ -38,4 +39,4 @@ export async function loadCompaniesPreview(sb:SupabaseClient,operations:ContentO
  const rows=await Promise.all(COMPANY_TABLES.map(t=>sb.from(t).select('*')));const notes=await sb.from('notes').select('id');if(rows.some(r=>r.error)||notes.error)throw Error('Could not load company draft targets.');
  return overlayCompanies(Object.fromEntries(COMPANY_TABLES.map((t,i)=>[t,rows[i].data??[]])) as unknown as CompaniesPreview,operations,(notes.data??[]).map(n=>n.id));
 }
-export function companyTargets(ops:ContentOperation[]){return ops.some(o=>isCompanyTable(o.table))?[{href:'/interview/companies',label:'Preview Companies'}]:[];}
+export function companyTargets(ops:ContentOperation[],snapshot?:CompaniesPreview){return ops.some(o=>isCompanyTable(o.table))?[{href:'/interview/companies',label:'Preview Companies'},...(snapshot?.companies.filter(c=>c.public&&c.draftChanged).map(c=>({href:'/interview/companies/'+encodeURIComponent(c.slug),label:'Preview '+c.name}))??[]),...(snapshot?.interview_experiences.filter(e=>e.published&&e.draftChanged).flatMap(e=>{const c=snapshot.companies.find(c=>c.id===e.company_id&&c.public);return c?[{href:companyExperienceHref(c.slug,e.slug),label:'Preview '+e.title}]:[];})??[])]:[];}

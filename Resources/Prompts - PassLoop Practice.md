@@ -154,3 +154,15 @@ Goal: an interview experience stays short; instead of re-explaining topics it li
 5. Company Overview tab: a "Most-mentioned topics" box aggregating prep_links across that company's experiences (top 8 by count), linking to each topic.
 Done when: unit tests (ref validation, chip parsing, aggregation), DB/policy tests if a migration was added, browser tests desktop + 390 px; typecheck, suite, build, static assertions; docs updated. Report checks actually run.
 ```
+
+## C5 — First example company: Google (content draft)
+
+```
+Ticket C5. Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md. Requires C1–C4 applied live (and ideally S1–S4 so system-design links resolve). Content only — no code changes unless a bug blocks the draft.
+
+Create ONE live Content Drafts set "Companies: Google (example)" (summary + operations only; never set status/approval fields; Jamie approves at /manage/review):
+1. companies row: slug google, name "Google", logo_path '' (monogram; Jamie may upload a logo later), public true, sort 10, overview Markdown in OWN WORDS from general, widely known public information only (no copied text, no claims of insider knowledge, no specific numbers you cannot stand behind): sections "## Interview process" (typical stages: recruiter screen, technical phone screen, onsite/virtual loop with coding, system design for experienced levels, behavioural/"Googleyness"), "## Coding interviews", "## System design", "## Low-level design", "## Behavioural", "## How to prepare" — each linking to the site's own pages with [[note:…]], [[question:…]] and [[behavioral:…]] chips where they exist. End with a one-line note that processes vary by team and level.
+2. company_questions rows linking ONLY to items that already exist on the site (validate every ref first; skip and list anything missing): Coding → DSA questions most commonly associated with Google-style interviews that exist in the catalogue (e.g. Two Sum, Longest Substring Without Repeating Characters, plus others present — aim for 6–10), section "Data Structures & Algorithms", ranked; System Design → Tiny URL and any other existing system-design questions that fit (e.g. news feed, messaging) if present; Low-Level Design → LRU Cache and any other existing LLD questions that fit. Do not invent questions that are not on the site.
+3. No interview_experiences rows (Jamie will add real ones himself).
+Before inserting, read back the referenced question ids; after inserting, read back the set id and status = draft. Report: draft id, the overview outline, the linked questions per tab, and any refs that were skipped because they don't exist yet.
+```

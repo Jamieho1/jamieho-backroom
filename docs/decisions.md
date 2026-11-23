@@ -103,3 +103,8 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · Companies is public, owner-authored through Content Drafts, with optional home-media logos/monograms and parent-filtered public question counts; company drafts unpublish instead of removing rows, anonymous experiences have no author · approved C1 prompt
 
 - 2026-11-23 · C1 schema application approved and confirmed as remote 20261123125602; company content remains unseeded and Jamie pushes/reviews frontend separately · Jamie’s “apply it”
+- 2026-11-23 · System design workspace: no AI hints/feedback for now ("Compare with model answer" checklist instead); @excalidraw/excalidraw approved for the whiteboard route only · Jamie
+
+- 2026-11-23 · C2 company tabs reuse the shell topic-column collapse/sheet and existing per-user problem flags/passed-submit completion; note references retain Notes access and have no new progress model; experience details remain C3 · approved C2 prompt
+
+- 2026-11-23 · Published company experiences use anonymous article pages and level-filtered lists; related stories cap at three same-company and five same-level other-company items, with shared owner-only draft previews and no votes/comments/premium controls · approved C3 prompt

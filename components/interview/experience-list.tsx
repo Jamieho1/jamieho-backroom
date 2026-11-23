@@ -1,0 +1,7 @@
+"use client";
+import Link from 'next/link';
+import {useState} from 'react';
+import type {InterviewExperience} from '@/lib/interview/companies';
+import {companyExperienceHref} from '@/lib/interview/company-page';
+import {EXPERIENCE_LEVELS,filterExperiences,experienceExcerpt,experienceDate,experienceMetadata,type ExperienceLevel} from '@/lib/interview/experiences';
+export function ExperienceList({experiences,slug,search}:{experiences:InterviewExperience[];slug:string;search:string}){const [level,setLevel]=useState<ExperienceLevel|'all'>('all');const rows=filterExperiences(experiences,search,level);return <section aria-label="Interview experiences"><div className="iv-experience-list-heading"><h2>Interview Experiences</h2><label>Level <select value={level} onChange={e=>setLevel(e.target.value as typeof level)}><option value="all">All levels</option>{EXPERIENCE_LEVELS.map(l=><option key={l} value={l}>{l}</option>)}</select></label></div>{rows.length?<ul className="iv-company-experiences iv-experience-list">{rows.map(e=><li key={e.id} data-draft-changed={e.draftChanged||undefined}><Link href={companyExperienceHref(slug,e.slug)} prefetch={false}><strong>{e.title}</strong><small>{experienceMetadata(e)}</small><p className="iv-experience-excerpt">{experienceExcerpt(e.body)}</p><small>Published {e.published_at?<time dateTime={e.published_at}>{experienceDate(e.published_at)}</time>:experienceDate(null)}</small></Link></li>)}</ul>:<p role="status">{experiences.length?'No matching interview experiences.':'No interview experiences yet.'}</p>}</section>;}

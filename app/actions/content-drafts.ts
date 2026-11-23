@@ -49,6 +49,7 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     // The database has committed. A cache failure must never be reported as a content rollback.
     try {
       for (const route of affectedRoutes(result.operations,saved.data[0].previous)) revalidatePath(route);
+      if(result.operations.some(op=>["companies","company_questions","interview_experiences"].includes(op.table))){revalidatePath("/interview/companies/[slug]","page");revalidatePath("/interview/companies/[slug]/experiences/[experience]","page");}
       revalidatePath("/manage/review");
     } catch {
       return { ok: true, applied: true, message: "Approved and saved, but page refresh failed. Do not approve again; ask for a cache refresh." };
