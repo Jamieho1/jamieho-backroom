@@ -20,6 +20,8 @@ import {ProblemDrawer} from './problem-drawer';
 import {ProblemSolution} from './problem-readers';
 
 import {useTestCases} from './use-test-cases';
+import {useSubmissions} from './use-submissions';
+import {Submissions} from './submissions';
 import {TestConsole} from './test-console';
 import {casesToTests} from '@/lib/practice/cases';
 
@@ -39,6 +41,7 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
  const navigation=practiceNavigation(lc),meta=navigation.current!,problem=problemByNumber(lc)!;
  const previewRow=useMemo(()=>preview?practiceData(preview,lc):undefined,[preview,lc]);
  const tests=useTestCases(problem,viewerKey,canSave,!!preview);
+ const submissions=useSubmissions(lc,viewerKey,canSave,!!preview);
  const [caseError,setCaseError]=useState('');
  const saved=useSavedPractice(lc,canSave&&!preview,()=>{},previewRow);
  const autosave=useCodeAutosave({viewerKey,problem:lc,starter:previewRow?.code??starterCode(lc),canSave:canSave&&!preview,ready:!canSave||saved.loaded&&!saved.loadError,remote:saved.data.code,readOnly:!!preview});
@@ -55,15 +58,16 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
  const [phase,setPhase]=useState<'loading'|'ready'|'busy'|'failed'>('loading'),[result,setResult]=useState<RunOutcome|null>(null),[mode,setMode]=useState<RunMode>('run');
  async function prepare(current:PythonRunner){try{await current.warmUp();if(mounted.current&&runner.current===current)setPhase('ready');}catch{if(mounted.current&&runner.current===current)setPhase('failed');}}
  useEffect(()=>{mounted.current=true;if(!preview){const current=new PythonRunner();runner.current=current;void prepare(current);}return()=>{mounted.current=false;runner.current?.dispose();runner.current=null;};},[]);
- const available=!preview&&phase==='ready'&&(!canSave||saved.loaded)&&!saved.pendingAttempt&&!saved.savingAttempt;
+ const available=!preview&&phase==='ready'&&(!canSave||saved.loaded)&&!saved.pendingAttempt&&!saved.savingAttempt&&!submissions.pending&&!submissions.saving;
  async function run(next:RunMode){
-  if(!available||!runner.current)return;const current=runner.current,snapshot=autosave.code;
+  if(!available||!runner.current)return;const current=runner.current,snapshot=autosave.code,complexitySnapshot={...submissions.complexity};
+  if(snapshot.length>100000){setCaseError('Keep code under 100,000 characters before running or submitting.');panels.setState(s=>({...s,console:true}));return;}
   let runTests;try{if(next==='run')runTests=casesToTests(problem,tests.cases);setCaseError('');}catch{setCaseError('Check test inputs: class operations and arguments must be matching JSON arrays, starting with '+problem.method+'.');panels.setState(s=>({...s,console:true}));return;}
-  setPhase('busy');setMode(next);setResult(null);panels.setState(s=>({...s,console:true}));void autosave.flush();void tests.flush();
+  setPhase('busy');setMode(next);setResult(null);panels.setState(s=>({...s,console:true}));void autosave.flush();void tests.flush();void submissions.flush();
   const out=await current.run(problem,snapshot,next,5000,runTests);if(!mounted.current)return;
-  setResult(out);setPhase('loading');void prepare(current);if(canSave){void saved.record(snapshot,next,out);if(next==='submit'&&out.status==='ok'&&out.total>0&&out.passed===out.total)setCompleted(s=>new Set([...s,lc]));}
+  setResult(out);setPhase('loading');void prepare(current);if(canSave){if(next==='submit')void submissions.record(snapshot,complexitySnapshot,out);void saved.record(snapshot,next,out);if(next==='submit'&&out.status==='ok'&&out.total>0&&out.passed===out.total)setCompleted(s=>new Set([...s,lc]));}
  }
- const commands=useRef({run,save:()=>Promise.all([autosave.flush(),tests.flush()]),fullscreen,drawer,shortcuts});commands.current={run,save:()=>Promise.all([autosave.flush(),tests.flush()]),fullscreen,drawer,shortcuts};
+ const commands=useRef({run,save:()=>Promise.all([autosave.flush(),tests.flush(),submissions.flush()]),fullscreen,drawer,shortcuts});commands.current={run,save:()=>Promise.all([autosave.flush(),tests.flush(),submissions.flush()]),fullscreen,drawer,shortcuts};
  useEffect(()=>{
   const key=(e:KeyboardEvent)=>{
    const target=e.target as HTMLElement|null;const editor=!!target?.closest('.cm-editor');
@@ -89,7 +93,7 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
     <div className="notes-tabs" role="tablist" aria-label="Problem view">{['Problem','Solution','Submissions','Notes'].map(t=><button type="button" role="tab" key={t} disabled={notesEditing&&t!=='Notes'} id={`practice-tab-${t}`} aria-selected={tab===t} aria-controls="practice-panel" onClick={()=>setTab(t)}>{t}</button>)}</div>
     <div className="pw-description-body" role="tabpanel" id="practice-panel" aria-labelledby={`practice-tab-${tab}`}>
     <header className="practice-heading" data-draft-changed={preview?.changedStars.includes(lc)||undefined}><h2>{meta.title}</h2><div className="practice-heading-meta"><span className={`practice-tag practice-difficulty ${meta.difficulty.toLowerCase()}`}>{meta.difficulty}</span><span className="practice-tag practice-collection">{meta.extra?'Extra':'NeetCode 150'}</span><a href={leetcodeUrl(meta)} target="_blank" rel="noopener noreferrer">Original problem ↗</a>{canSave?<button aria-label={`${flags.stars.has(lc)?'Unflag':'Flag'} ${meta.title} for later`} aria-pressed={flags.stars.has(lc)} disabled={!!preview||!flags.loaded||!!flags.loadError||flags.saving} onClick={()=>void flags.save(lc,!flags.stars.has(lc))}>{flags.stars.has(lc)?'⚑':'⚐'}</button>:null}</div></header>
-    {tab==='Problem'?<><Markdown text={problem.statement}/><h3>Examples</h3>{problem.examples.map((e,i)=><div className="practice-example" key={i}><h4>Example {i+1}</h4><pre>Input: {e.input}{'\n'}Output: {e.output}</pre>{e.explanation?<p>{e.explanation}</p>:null}</div>)}<h3>Constraints</h3><ul>{problem.constraints.map(c=><li key={c}>{c}</li>)}</ul><details><summary>Hints</summary>{problem.hints.map((h,i)=><p key={i}>{h}</p>)}</details></>:tab==='Solution'?<ProblemSolution lc={lc}/>:tab==='Submissions'?<p>Submissions workspace is coming soon.</p>:saved.loading?<p role="status">Loading question notes…</p>:saved.loadError?<p role="alert">{saved.loadError}<button onClick={()=>void saved.load()}>Retry loading notes</button></p>:<QuestionNotes problem={lc} body={saved.data.note} canEdit={canEdit&&!preview} draftChanged={preview?.notes.find(n=>n.problem===lc)?.draftChanged} onSaved={saved.setNote} onEditing={setNotesEditing}/>}
+    {tab==='Problem'?<><Markdown text={problem.statement}/><h3>Examples</h3>{problem.examples.map((e,i)=><div className="practice-example" key={i}><h4>Example {i+1}</h4><pre>Input: {e.input}{'\n'}Output: {e.output}</pre>{e.explanation?<p>{e.explanation}</p>:null}</div>)}<h3>Constraints</h3><ul>{problem.constraints.map(c=><li key={c}>{c}</li>)}</ul><details><summary>Hints</summary>{problem.hints.map((h,i)=><p key={i}>{h}</p>)}</details></>:tab==='Solution'?<ProblemSolution lc={lc}/>:tab==='Submissions'?<Submissions problem={lc} rows={submissions.rows} canSave={canSave} readOnly={!!preview} loading={submissions.loading} more={submissions.more} error={submissions.error} onRetry={()=>void submissions.retrySubmission()} onMore={()=>void submissions.load(true)} onLoad={code=>{autosave.edit(code);setEditorVersion(v=>v+1);}}/>:saved.loading?<p role="status">Loading question notes…</p>:saved.loadError?<p role="alert">{saved.loadError}<button onClick={()=>void saved.load()}>Retry loading notes</button></p>:<QuestionNotes problem={lc} body={saved.data.note} canEdit={canEdit&&!preview} draftChanged={preview?.notes.find(n=>n.problem===lc)?.draftChanged} onSaved={saved.setNote} onEditing={setNotesEditing}/>}
     </div></section><ResizeHandle label="Resize problem and code panels" value={horizontal.state.split} min={25} max={75} reset={50} unit="percent" scale={100/Math.max(1,size.width-8)} onChange={split=>horizontal.setState(s=>({...s,split}))}/></>:null}
    <section className="pw-right" aria-label="Code and console" data-fullscreen={fullscreen} data-console={panels.state.console}>
     <div className="pw-right-body" ref={right}>
@@ -101,19 +105,22 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
        <button ref={helpButton} aria-label="Keyboard shortcuts" aria-haspopup="dialog" onClick={()=>setShortcuts(true)}>?</button>
       </div></header>
       <CodeEditor key={editorVersion} value={autosave.code} initial={autosave.code} readOnly={!!preview} label="Python code" onChange={autosave.edit}/>
+      <div className="pw-complexity" aria-label="Your complexity">{(['time_complexity','space_complexity'] as const).map((field,i)=><label key={field}>{i?'Space':'Time'}<input aria-label={i?'Space':'Time'} placeholder={i?'e.g. O(1)':'e.g. O(n)'} value={submissions.complexity[field]} maxLength={120} disabled={!!preview} onChange={e=>submissions.edit({...submissions.complexity,[field]:e.target.value})}/></label>)}<small role="status">{submissions.status}</small></div>
+      {submissions.storageError?<p role="alert">Browser storage unavailable. Keep a copy of your complexity.</p>:null}{submissions.complexityError?<p role="alert">{submissions.complexityError}<button onClick={submissions.retryComplexity}>Retry complexity sync</button></p>:null}
       {autosave.storageError?<p role="alert">Browser storage is unavailable or full. Keep a copy before leaving.</p>:null}
      </div>
-     {panels.state.console?<><ResizeHandle className="practice-resizer pw-console-resizer" label="Resize editor and console" orientation="horizontal" value={panels.state.editor} min={25} max={75} reset={60} unit="percent" scale={100/Math.max(1,size.height-8)} onChange={editor=>panels.setState(s=>({...s,editor}))}/><section id="practice-console" className="pw-console" aria-label="Console / Test">
-      <h3>Console / Test</h3><p role={preview?undefined:"status"}>{preview?'Read-only draft preview':phase==='loading'?'Loading Python…':phase==='busy'?'Running…':phase==='ready'?'Python ready':'Python could not load. You can still edit and save code.'}</p>
+     {panels.state.console?<><ResizeHandle className="practice-resizer pw-console-resizer" label="Resize editor and console" orientation="horizontal" value={panels.state.editor} min={25} max={75} reset={60} unit="percent" scale={100/Math.max(1,size.height-8)} onChange={editor=>panels.setState(s=>({...s,editor}))}/><section id="practice-console" className="pw-console" aria-label="Console">
+      {phase==='loading'?<p role="status">Loading Python…</p>:phase==='failed'?<p role="alert">Python could not load. You can still edit and save code.</p>:null}
       {phase==='failed'?<button onClick={()=>{runner.current?.dispose();const current=new PythonRunner();runner.current=current;setPhase('loading');void prepare(current);}}>Retry Python</button>:null}
       <TestConsole problem={problem} cases={tests.cases} onChange={tests.change} result={result} mode={mode} busy={phase==='busy'} readOnly={!!preview} status={tests.status} validationError={caseError}/>{tests.storageError?<p role="alert">Browser storage is unavailable. Keep a copy of your custom inputs.</p>:null}{tests.error?<p role="alert">{tests.error}<button onClick={tests.retry}>Retry test case sync</button></p>:null}
+      {submissions.error&&submissions.pending?<p role="alert">{submissions.error}<button disabled={submissions.saving} onClick={()=>void submissions.retrySubmission()}>Retry saving submission</button></p>:null}{submissions.saving?<p role="status">Saving submission…</p>:null}
       {saved.attemptError?<p role="alert">{saved.attemptError}<button onClick={()=>void saved.retryAttempt()}>Retry saving attempt</button></p>:null}
       {saved.savingAttempt?<p role="status">Saving attempt…</p>:null}
       {progressError?<p role="alert">{progressError}<button onClick={()=>setProgressRetry(v=>v+1)}>Retry progress</button></p>:null}
       {saved.loadError&&canSave?<p role="alert">{saved.loadError}<button onClick={()=>void saved.load()}>Retry loading saved data</button></p>:null}
      </section></>:null}
     </div>
-    <footer className="pw-bottom-bar"><button aria-controls="practice-console" aria-expanded={panels.state.console} onClick={()=>panels.setState(s=>({...s,console:!s.console}))}>Console / Test <span aria-hidden="true">{panels.state.console?'⌄':'⌃'}</span></button><div><button disabled={!available} onClick={()=>void run('run')}>Run</button><button className="pw-submit" disabled={!available} onClick={()=>void run('submit')}>Submit</button></div></footer>
+    <footer className="pw-bottom-bar"><button aria-label="Toggle console" title="Toggle console" aria-controls="practice-console" aria-expanded={panels.state.console} onClick={()=>panels.setState(s=>({...s,console:!s.console}))}><span aria-hidden="true">{panels.state.console?'⌄':'⌃'}</span></button><div><button disabled={!available} onClick={()=>void run('run')}>Run</button><button className="pw-submit" disabled={!available} onClick={()=>void run('submit')}>Submit</button></div></footer>
    </section>
   </div>
   {drawer?<ProblemDrawer lc={lc} onClose={closeDrawer} onNavigate={()=>void autosave.flush()} flags={flags} completed={completed} canSave={canSave&&!preview}/>:null}

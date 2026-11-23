@@ -1,0 +1,11 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {SignInButton} from '@/components/sign-in-button';
+import {useViewer} from '@/components/viewer-provider';
+import {expectedComplexity,relativeTime,type Submission} from '@/lib/practice/submissions';
+export function Submissions({problem,rows,canSave,readOnly,loading,more,error,onRetry,onMore,onLoad}:{problem:number;rows:Submission[];canSave:boolean;readOnly:boolean;loading:boolean;more:boolean;error:string;onRetry():void;onMore():void;onLoad(code:string):void}){
+ const {configured}=useViewer();const [now,setNow]=useState(Date.now());useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(t);},[]);
+ if(readOnly)return <p>Submission history is hidden in draft preview.</p>;
+ if(!canSave)return <div><p>Sign in to view and save your submissions.</p>{configured?<SignInButton next={`/interview/problems/${problem}`}/>:null}</div>;
+ return <section className="pw-submissions" aria-label="Your submissions">{error?<p role="alert">{error}<button onClick={onRetry} disabled={loading}>Retry submissions</button></p>:null}{!rows.length&&!loading&&!error?<p>No submissions yet. Submit your solution to begin.</p>:null}{rows.map(row=><details key={row.id} className="pw-submission"><summary><span className="pw-submission-meta"><strong data-status={row.status}>{row.status==='accepted'?'Accepted':row.status==='wrong answer'?'Wrong answer':row.status==='time limit'?'Time limit':'Runtime error'}</strong><span>{row.passed}/{row.total}</span><span>{row.language}</span><span>{row.runtime_ms.toFixed(2)} ms</span><time dateTime={row.created_at} title={new Date(row.created_at).toLocaleString()}>{relativeTime(row.created_at,now)}</time></span><span className="pw-comparison"><span>Yours: {row.time_complexity||'Not specified'} · {row.space_complexity||'Not specified'}</span><span>Expected: {expectedComplexity(problem)}</span></span></summary><pre aria-label="Submission code snapshot"><code>{row.code}</code></pre><button onClick={()=>{if(window.confirm('Replace your current code with this submission?'))onLoad(row.code);}}>Load into editor</button></details>)}{loading?<p role="status">Loading submissions…</p>:more?<button onClick={onMore}>Load more submissions</button>:null}</section>;
+}

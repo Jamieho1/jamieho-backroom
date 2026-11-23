@@ -1,6 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import {problemByNumber} from '../../lib/practice/catalog';
-async function ready(page:Page,id:number){await page.goto('/interview/problems/'+id);await expect(page.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});}
+async function ready(page:Page,id:number){await page.goto('/interview/problems/'+id);await expect(page.getByRole('button',{name:'Run',exact:true})).toBeEnabled({timeout:60000});}
 async function execute(page:Page,code:string,mode:'Run'|'Submit'){const button=page.getByRole('button',{name:mode,exact:true});await expect(button).toBeEnabled({timeout:60000});await page.getByRole('textbox',{name:'Python code',exact:true}).fill(code);await button.click();}
 const fits=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 for(const id of [217,146])test(`P2 ${id} Run/Submit accepts, identifies wrong answers and trims runtime traces`,async({page})=>{

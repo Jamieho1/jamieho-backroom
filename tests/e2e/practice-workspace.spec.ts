@@ -12,7 +12,7 @@ test.beforeAll(async()=>{
  export async function saveQuestionNotes(){return {ok:true}}
  export async function loadPracticeStars(){return {ok:true,problems:account==='visitor'?[]:[217]}}
  export async function savePracticeStar(){return {ok:true}}
- export async function loadPracticeCases(){return {ok:true,cases:[]}};export async function savePracticeCases(){return {ok:true}};export async function loadPracticeCompletions(){return {ok:true,problems:account==='visitor'?[]:[217]}}`;
+ export async function loadPracticeComplexity(){return {ok:true,complexity:{time_complexity:'',space_complexity:''}}};export async function savePracticeComplexity(){return {ok:true}};export async function loadPracticeSubmissions(){return {ok:true,rows:[],more:false}};export async function savePracticeSubmission(){return {ok:true}};export async function loadPracticeCases(){return {ok:true,cases:[]}};export async function savePracticeCases(){return {ok:true}};export async function loadPracticeCompletions(){return {ok:true,problems:account==='visitor'?[]:[217]}}`;
  const modules:Record<string,{contents:string;loader?:'tsx'}>={
   'next/link':{loader:'tsx',contents:`import React from 'react';export default function Link({href,prefetch,children,...props}){const match=String(href).startsWith('/interview/problems/')?['',String(href).split('/').at(-1)]:null;const params=new URLSearchParams(location.search);if(match)params.set('id',match[1]);return <a {...props} href={match?'/p1-fixture?'+params:href}>{children}</a>}`},
   'next/navigation':{contents:`export const usePathname=()=>'/interview/problems/'+(new URLSearchParams(location.search).get('id')||217);`},
@@ -23,7 +23,7 @@ test.beforeAll(async()=>{
  };
  const out=await build({stdin:{contents:source,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'synthetic-p1',setup(b){
   b.onResolve({filter:/^(next\/link|next\/navigation|@\/components\/(viewer-provider|sign-in-button|feedback-button)|@\/lib\/practice\/runner)$/},a=>({path:a.path,namespace:'p1'}));
-  b.onResolve({filter:/app\/actions\/(practice|practice-stars|practice-progress|practice-cases)$/},()=>({path:'actions',namespace:'p1'}));
+  b.onResolve({filter:/app\/actions\/(practice|practice-stars|practice-progress|practice-cases|practice-submissions)$/},()=>({path:'actions',namespace:'p1'}));
   b.onLoad({filter:/.*/,namespace:'p1'},a=>({...(a.path==='actions'?{contents:actions}:modules[a.path]),resolveDir:process.cwd()}));
  }}]});
  const css=['app/globals.css','app/practice.css','app/notes.css','app/interview/interview.css'].map(p=>readFileSync(p,'utf8')).join('\n');
@@ -52,14 +52,14 @@ test('P1 split sizes and console preference persist; controls reset/fullscreen/d
  if(info.project.name==='desktop'){
   for(const [name,axis] of [['Resize problem and code panels','x'],['Resize editor and console','y']] as const){const handle=page.getByRole('separator',{name});const before=Number(await handle.getAttribute('aria-valuenow'));const b=(await handle.boundingBox())!;await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();await page.mouse.move(b.x+b.width/2+(axis==='x'?60:0),b.y+b.height/2+(axis==='y'?60:0));await page.mouse.up();expect(Number(await handle.getAttribute('aria-valuenow'))).toBeGreaterThan(before);}
  }else{await expect(page.getByRole('separator',{name:'Resize editor and console'})).toBeHidden();}
- await page.getByRole('button',{name:'Console / Test',exact:true}).click();await expect(page.getByRole('region',{name:'Console / Test'})).toHaveCount(0);await expect(page.getByRole('button',{name:'Submit',exact:true})).toBeVisible();
- await page.reload();await expect(page.getByRole('button',{name:'Console / Test',exact:true})).toHaveAttribute('aria-expanded','false');await expect(editor).toContainText('# synthetic draft');
+ await page.getByRole('button',{name:'Toggle console',exact:true}).click();await expect(page.getByRole('region',{name:'Console',exact:true})).toHaveCount(0);await expect(page.getByRole('button',{name:'Submit',exact:true})).toBeVisible();
+ await page.reload();await expect(page.getByRole('button',{name:'Toggle console',exact:true})).toHaveAttribute('aria-expanded','false');await expect(editor).toContainText('# synthetic draft');
  if(info.project.name==='desktop'){expect(Number(await page.getByRole('separator',{name:'Resize problem and code panels'}).getAttribute('aria-valuenow'))).toBeGreaterThan(50);}
- await page.getByRole('button',{name:'Console / Test',exact:true}).click();if(info.project.name==='desktop')expect(Number(await page.getByRole('separator',{name:'Resize editor and console'}).getAttribute('aria-valuenow'))).toBeGreaterThan(60);
+ await page.getByRole('button',{name:'Toggle console',exact:true}).click();if(info.project.name==='desktop')expect(Number(await page.getByRole('separator',{name:'Resize editor and console'}).getAttribute('aria-valuenow'))).toBeGreaterThan(60);
  await page.getByRole('button',{name:'Collapse description panel'}).click();await expect(page.getByRole('region',{name:'Question description'})).toHaveCount(0);await page.getByRole('button',{name:'Expand description panel'}).click();
  await page.getByRole('button',{name:'Fullscreen editor',exact:true}).click();await expect(page.locator('.pw-right')).toHaveAttribute('data-fullscreen','true');await editor.focus();await page.keyboard.press('Escape');await expect(page.locator('.pw-right')).toHaveAttribute('data-fullscreen','false');
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Reset to starter code'}).click();await expect(editor).toContainText('# synthetic draft');page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Reset to starter code'}).click();await expect(editor).not.toContainText('# synthetic draft');
- await page.getByRole('tab',{name:'Submissions',exact:true}).click();await expect(page.getByText('Submissions workspace is coming soon.')).toBeVisible();await fits(page);await page.screenshot({path:info.outputPath('p1-workspace.png')});
+ await page.getByRole('tab',{name:'Submissions',exact:true}).click();await expect(page.getByText('Sign in to view and save your submissions.',{exact:true})).toBeVisible();await fits(page);await page.screenshot({path:info.outputPath('p1-workspace.png')});
 });
 
 test('P1 editor shortcuts, autosave, route/unload recovery and offline retry preserve account code',async({page})=>{

@@ -257,3 +257,15 @@ body:has(.iv-shell) {background:#0e131c;}
 .pw-output .pw-test-error {background:#351d25;color:#ffb6bf;border-color:#a34555;white-space:pre-wrap;}
 .pw-tests .pw-accepted,.pw-case-tabs [data-result="pass"] {color:#7bd6a3;}
 .pw-tests .pw-failed,.pw-case-tabs :is([data-result="fail"],[data-result="error"],[data-result="too_slow"]) {color:#ff9990;}
+
+.pw-complexity {display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:7px 10px;border-top:1px solid var(--iv-line);font-size:12px;}
+.pw-complexity label {display:flex;align-items:center;gap:6px;min-width:0;flex:1;}
+.pw-complexity input {width:100%;min-width:0;max-width:150px;font-size:12px;padding:5px 7px;background:var(--iv-bg);border:1px solid var(--iv-line);border-radius:5px;color:var(--iv-text);}
+.pw-complexity small {color:var(--iv-muted);font-size:10px;}
+.pw-submission {border-bottom:1px solid var(--iv-line);padding:12px 0;min-width:0;}
+.pw-submission summary {cursor:pointer;font-size:12px;}
+.pw-submission-meta {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.pw-submission strong[data-status="accepted"] {color:#6ee7b7;}
+.pw-submission strong:not([data-status="accepted"]) {color:#fca5a5;}
+.pw-comparison {display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;color:var(--iv-muted);overflow-wrap:anywhere;}
+.pw-submission pre {max-width:100%;overflow:auto;max-height:360px;font-size:12px;}

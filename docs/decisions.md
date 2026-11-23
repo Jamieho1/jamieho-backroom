@@ -87,3 +87,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · PassLoop P1 uses section/topic-ordered navigation, a modal question drawer, split code/console and account-guarded debounced autosave; collapsed rail has no logo; legacy Practice and P2–P4 scope remain unchanged · approved P1 prompt
 
 - 2026-11-23 · PassLoop P2 keeps custom test inputs in separate own-user storage, runs Python per case with a five-second deadline and grades only known expectations; LRU Cache retains ID 146 under LLD; Submit uses catalogue tests only · approved P2 prompt
+
+- 2026-11-23 · PassLoop P3 stores typed complexity independently and immutable own-user Submit snapshots; compares authored expected complexity without grading, and confirms before loading code; console toggle is icon-only with no repeated heading/ready label · approved P3 prompt and Jamie's feedback

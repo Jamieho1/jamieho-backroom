@@ -14,14 +14,14 @@ test('owner and member have isolated flags, saved code and completions; visitors
   await member.getByRole('button',{name:'Flag Two Sum',exact:true}).click();await expect(member.getByRole('button',{name:'Unflag Two Sum',exact:true})).toBeEnabled();
   await expect(page.getByRole('button',{name:'Flag Two Sum',exact:true})).toBeEnabled();
   await member.goto('/interview/problems/217');const editor=member.getByRole('textbox',{name:'Python code',exact:true});await expect(editor).toBeVisible();await expect(editor).not.toContainText('Live fixture code');
-  await expect(member.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});await editor.fill(problemByNumber(217)!.solution+'\n# Member synthetic code');
+  await expect(member.getByRole('button',{name:'Run',exact:true})).toBeEnabled({timeout:60000});await editor.fill(problemByNumber(217)!.solution+'\n# Member synthetic code');
   await expect(member.locator('.pw-save-status')).toHaveText('Saved');
   await member.getByRole('button',{name:'Submit',exact:true}).click();await expect(member.getByRole('region',{name:'Test results'})).toContainText('Accepted',{timeout:60000});await expect(member.getByText('Saving attempt…',{exact:true})).toHaveCount(0);
   await member.reload();await expect(member.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Member synthetic code');
   await page.goto('/interview/problems/217');await expect(page.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Live fixture code');await expect(page.getByRole('textbox',{name:'Python code',exact:true})).not.toContainText('Member synthetic code');
   // Prove the other direction too: owner progress on a different problem is never the member's.
   await page.goto('/interview/problems/1');const ownerEditor=page.getByRole('textbox',{name:'Python code',exact:true});
-  await expect(page.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});await ownerEditor.fill(problemByNumber(1)!.solution+'\n# Owner synthetic code');
+  await expect(page.getByRole('button',{name:'Run',exact:true})).toBeEnabled({timeout:60000});await ownerEditor.fill(problemByNumber(1)!.solution+'\n# Owner synthetic code');
   await expect(page.locator('.pw-save-status')).toHaveText('Saved');
   await page.getByRole('button',{name:'Submit',exact:true}).click();await expect(page.getByRole('region',{name:'Test results'})).toContainText('Accepted',{timeout:60000});await expect(page.getByText('Saving attempt…',{exact:true})).toHaveCount(0);
   await page.reload();await expect(page.getByRole('textbox',{name:'Python code',exact:true})).toContainText('Owner synthetic code');

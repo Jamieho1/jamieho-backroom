@@ -82,7 +82,7 @@ test('DSA questions search and open a full-width workspace; Notes switch keeps t
 test('practice workspace executes the existing Python runner on the new address',async({page},info)=>{
  test.skip(info.project.name!=='desktop','Runner is the same at both sizes');test.setTimeout(120000);
  await page.goto('/interview/problems/217');
- await expect(page.getByText('Python ready',{exact:true})).toBeVisible({timeout:60000});
+ await expect(page.getByRole('button',{name:'Run',exact:true})).toBeEnabled({timeout:60000});
  await page.getByRole('tab',{name:'Solution',exact:true}).click();
  const solution=await page.locator('.practice-solution pre.code').textContent();
  const editor=page.getByRole('textbox',{name:'Python code',exact:true});
