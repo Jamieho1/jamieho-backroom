@@ -101,3 +101,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · P5 keeps one section home per question and links homes through existing Notes-topic concepts/prerequisites; related links can cross homes while lists/drawer/arrows cannot; problem controls share one header row and class-design displays Low Level Design · approved P5 prompt and Jamie’s layout request
 
 - 2026-11-23 · Companies is public, owner-authored through Content Drafts, with optional home-media logos/monograms and parent-filtered public question counts; company drafts unpublish instead of removing rows, anonymous experiences have no author · approved C1 prompt
+
+- 2026-11-23 · C1 schema application approved and confirmed as remote 20261123125602; company content remains unseeded and Jamie pushes/reviews frontend separately · Jamie’s “apply it”

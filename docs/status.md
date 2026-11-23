@@ -6,7 +6,7 @@ PassLoop C1 Companies is implemented locally: public search, A–Z/question-coun
 
 ## Database and pending content
 
-`20261123123946_passloop_companies.sql` is **NOT applied live**. Jamie’s “apply it” is required. No content seeds, live data/Storage changes, secret access, commit or push.
+`20261123123946_passloop_companies.sql` is **applied live** with Jamie’s explicit approval as remote `20261123125602` on 2026-11-23. No content seeds/approvals, existing-data/Storage changes, secret access, commit or push. Jamie deploys/reviews next.
 
 P2/P3 are applied as remote `20261123110809`/`20261123110824`; Journey photos as `20261121120427`, Project case studies as `20261119233658`, Contact briefs as `20261119150051`. Existing content proposals remain separate.
 
@@ -14,6 +14,8 @@ Pending reviews: email `78b3b527-19bb-41e3-ae94-7d6e355f7827`; Experience `9b27d
 
 ## Verification
 
-C1: typecheck passed; complete unit/database suite **1,370 passed / 136 files** (two workers); production build and six public-page static assertions passed. Existing Interview browsers **16 passed / 4 viewport skips**; directory fixture **2 passed / 2 conditional integration skips**; separate real-migration loopback C1 browsers **4 passed**, covering directory fixtures and owner preview/approval/discard plus copied-cookie visitor/member isolation at desktop/390px. Reduced motion, all grid breakpoints and no sideways overflow covered; screenshot inspection completed. Full browser suite not rerun.
+Prior C1 implementation checks: typecheck passed; complete unit/database suite **1,370 passed / 136 files** (two workers); production build and six public-page static assertions passed. Existing Interview browsers **16 passed / 4 viewport skips**; directory fixture **2 passed / 2 conditional integration skips**; separate real-migration loopback C1 browsers **4 passed**, covering directory fixtures and owner preview/approval/discard plus copied-cookie visitor/member isolation at desktop/390px. Reduced motion, all grid breakpoints and no sideways overflow covered; screenshot inspection completed. Full browser suite not rerun.
 
-Initial browser failures were ambiguous fixture locators, corrected and rerun. Concurrent generated route types required a clean post-build typecheck, which passed. Existing Next dependency advisory interrupted initial normal/synthetic builds; unchanged retries passed. Dependencies unchanged. Source/docs diff checks pass; Resources prompt has pre-existing trailing whitespace and is left untouched. Jamie applies the migration, deploys and reviews live.
+Initial browser failures were ambiguous fixture locators, corrected and rerun. Concurrent generated route types required a clean post-build typecheck, which passed. Existing Next dependency advisory interrupted initial normal/synthetic builds; unchanged retries passed. Dependencies unchanged. Source/docs diff checks pass; Resources prompt has pre-existing trailing whitespace and is left untouched. Jamie deploys and reviews live.
+
+C1 live application checks: all three tables empty; enabled RLS/exact policies/grants; valid constraints/indexes; tested function-source parity with hardened private execution; enabled approval trigger; anonymous/nonowner/owner read-only assertions passed. All 32 existing public-table counts/fingerprints unchanged. No new security advisory; existing notices unchanged. No application suites rerun for this unchanged-SQL application.
