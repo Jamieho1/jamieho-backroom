@@ -17,11 +17,11 @@ it('the topic list is the seven SQL 50 topics in plan order, and DSA topics are 
  expect(sectionTopics('dsa')).toHaveLength(17);expect(noteSection('sql-select')).toBe('sql');expect(noteHref('sql-basics')).toBe('/interview/sql/notes/sql-basics');
 });
 it('SQL question lists, links and previous/next stay inside SQL and never leak into DSA lists',()=>{
- expect(sectionQuestions('sql').map(p=>p.lc)).toEqual([1757,1378,620]);expect(sectionQuestions('sql','sql-basic-joins').map(p=>p.lc)).toEqual([1378]);expect(sectionQuestions('sql','sql-subqueries')).toEqual([]);
+ expect(sectionQuestions('sql').map(p=>p.lc)).toEqual([1757,584,595,1148,1683,1378,1068,1581,197,1661,577,1280,570,1934,620,1251,1075,1633,1211,1193,1174,550]);expect(sectionQuestions('sql','sql-basic-joins').map(p=>p.lc)).toEqual([1378,1068,1581,197,1661,577,1280,570,1934]);expect(sectionQuestions('sql','sql-select')).toHaveLength(5);expect(sectionQuestions('sql','sql-basic-aggregate')).toHaveLength(8);expect(sectionQuestions('sql','sql-subqueries')).toEqual([]);
  expect(sectionQuestions('dsa').some(p=>[1757,1378,620].includes(p.lc))).toBe(false);expect(PRACTICE_LIST.some(p=>[1757,1378,620].includes(p.lc))).toBe(false);
  expect(questionHref('sql',1757)).toBe('/interview/sql/problems/1757');expect(questionHref('dsa',217)).toBe('/interview/problems/217');expect(sqlProblemHref(620)).toBe('/interview/sql/problems/620');
- const middle=sqlNavigation(1378);expect(middle.previous?.lc).toBe(1757);expect(middle.next?.lc).toBe(620);expect(middle.topicLabel).toBe('Basic Joins');
- expect(sqlNavigation(1757).previous).toBeUndefined();expect(sqlNavigation(620).next).toBeUndefined();
+ const middle=sqlNavigation(1378);expect(middle.previous?.lc).toBe(1683);expect(middle.next?.lc).toBe(1068);expect(middle.topicLabel).toBe('Basic Joins');
+ expect(sqlNavigation(1757).previous).toBeUndefined();expect(sqlNavigation(620).next?.lc).toBe(1251);expect(sqlNavigation(550).next).toBeUndefined();
  expect(starterSql(1757)).toMatch(/^-- One SELECT/);expect(starterSql(217)).toBe('');
 });
 it('per-user data accepts SQL numbers while owner content drafts stay on the DSA catalogue',()=>{
