@@ -10,6 +10,7 @@ import {QuizPanel} from './sd-quiz';
 import {SolutionView,backToTop,goToHeading,prefersReducedMotion,useActiveHeading} from './sd-solution';
 import {useSdProgress} from './use-sd-progress';
 import {noteHref} from '@/lib/interview/content';
+import {wbHref} from '@/lib/interview/whiteboard';
 import {SD_LIST_HREF,SD_TABS,sdHref,sdTab,tocFromMarkdown,type SdListItem,type SdQuestion,type TocItem} from '@/lib/interview/system-design';
 import {headingDomId} from './sd-solution';
 export interface SystemDesignPageProps{question:SdQuestion;questions:SdListItem[]}
@@ -41,14 +42,14 @@ function SystemDesignContent({question,questions,account}:SystemDesignPageProps&
    {account?<div className="iv-sd-controls"><button type="button" className="iv-flag" aria-label={`${flagged?'Unflag':'Flag'} ${question.title}`} aria-pressed={flagged} disabled={!progress.loaded||progress.saving} onClick={()=>void progress.toggle(question.id,'flagged')}><svg viewBox="0 0 24 24" fill={flagged?'currentColor':'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M5 21V4h13l-3 5 3 5H5"/></svg></button>
     <button type="button" className="iv-sd-done" aria-pressed={done} disabled={!progress.loaded||progress.saving} onClick={()=>void progress.toggle(question.id,'done')}>{done?'✓ Done':'Mark as done'}</button></div>:null}</header>
   {progress.error?<p role="alert">{progress.error} <button type="button" onClick={()=>void progress.reload()}>Retry</button></p>:null}
-  <nav className="iv-sd-tabs" aria-label="Question tabs">{SD_TABS.map(t=><Link key={t.id} href={sdHref(question.slug,t.id)} aria-current={tab===t.id?'page':undefined} prefetch={false} scroll={false}>{t.label}</Link>)}</nav>
+  <nav className="iv-sd-tabs" aria-label="Question tabs">{SD_TABS.map(t=><Link key={t.id} href={t.id==='whiteboard'?wbHref(question.slug):sdHref(question.slug,t.id)} aria-current={tab===t.id?'page':undefined} prefetch={false} scroll={false}>{t.label}</Link>)}</nav>
   {question.note_ref?<p className="iv-sd-note-link"><Link href={noteHref(question.note_ref)} prefetch={false}>Read the related notes ›</Link></p>:null}
   <div className="iv-sd-layout">
    <div className="iv-sd-main">
     {showToc?<details className="iv-sd-toc-mobile" ref={details}><summary>On this page</summary><nav><TocLinks items={toc} active={active} onGo={go} onTop={top}/></nav></details>:null}
     {tab==='solution'?<SolutionView markdown={question.solution} toc={toc}/>:null}
     {tab==='quiz'?<QuizPanel questionId={question.id} slug={question.slug} title={question.title} quiz={question.quiz} account={account}/>:null}
-    {tab==='whiteboard'?<section className="iv-sd-whiteboard"><span className="iv-soon">Soon</span><h2>Whiteboard</h2><p>The whiteboard canvas for this question is coming soon.</p></section>:null}
+    {tab==='whiteboard'?<section className="iv-sd-whiteboard"><h2>Whiteboard</h2><p>The whiteboard opens in its own full-height workspace.</p><p><Link href={wbHref(question.slug)} prefetch={false} className="iv-sd-primary">Open the whiteboard ›</Link></p></section>:null}
    </div>
    {showToc?<aside className="iv-sd-toc" aria-label="On this page"><h2>On this page</h2><nav><TocLinks items={toc} active={active} onGo={go} onTop={top}/></nav></aside>:null}
   </div>

@@ -84,7 +84,7 @@ it('also renders a collapsible "On this page" for phones that closes after choos
 });
 it('tabs follow the URL: quiz, whiteboard placeholder and an unknown tab falls back to the solution; TOC only on the solution',()=>{
  m.params=new URLSearchParams('tab=quiz');const {container,rerender}=render(page());expect(screen.getByRole('heading',{name:/Quiz · 3 Qs/})).toBeTruthy();expect(container.querySelector('.iv-sd-toc')).toBeNull();expect(screen.getByRole('link',{name:'Quiz'}).getAttribute('aria-current')).toBe('page');expect(screen.getByRole('link',{name:'Quiz'}).getAttribute('href')).toBe('/interview/system-design/fixture?tab=quiz');
- m.params=new URLSearchParams('tab=whiteboard');rerender(page());expect(screen.getByRole('heading',{name:'Whiteboard'})).toBeTruthy();
+ m.params=new URLSearchParams('tab=whiteboard');rerender(page());expect(screen.getByRole('heading',{name:'Whiteboard'})).toBeTruthy();expect(screen.getByRole('link',{name:'Open the whiteboard ›'}).getAttribute('href')).toBe('/interview/system-design/fixture/whiteboard');expect(screen.getByRole('link',{name:'Whiteboard'}).getAttribute('href')).toBe('/interview/system-design/fixture/whiteboard');
  m.params=new URLSearchParams('tab=bogus');rerender(page());expect(screen.getByRole('link',{name:'Solution'}).getAttribute('aria-current')).toBe('page');expect(container.querySelector('.iv-sd-toc')).toBeTruthy();
 });
 it('visitors see no flag or done controls; a question without solution text shows a friendly empty state',()=>{

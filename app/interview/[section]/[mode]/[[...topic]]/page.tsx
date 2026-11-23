@@ -12,11 +12,12 @@ import Link from 'next/link';
 import {SystemDesignList} from '@/components/interview/sd-list';
 import {getSdQuestions} from '@/lib/interview/system-design-data';
 import {sdHref} from '@/lib/interview/system-design';
-import {systemDesignQuestionRoute} from './system-design';
+import {systemDesignQuestionRoute,systemDesignWhiteboardRoute} from './system-design';
 export const dynamic='force-dynamic';
 export default async function InterviewTopicPage({params}:{params:Promise<{section:string;mode:string;topic?:string[]}>}){
  const {section,mode,topic}=await params;
  if(section==='system-design'&&!topic&&mode!=='practice'&&mode!=='notes')return systemDesignQuestionRoute(mode);
+ if(section==='system-design'&&topic?.length===1&&topic[0]==='whiteboard'&&mode!=='practice'&&mode!=='notes')return systemDesignWhiteboardRoute(mode);
  const item=INTERVIEW_SECTIONS.find(s=>s.id===section);
  const roleNotes=ROLE_NOTE_SECTIONS.some(s=>s===section);
  if(!item||!(PRACTICE_SECTIONS.some(s=>s===section)||roleNotes)||!['practice','notes'].includes(mode)||roleNotes&&mode!=='notes'||topic&&topic.length!==1)notFound();

@@ -91,9 +91,9 @@ describe('privacy and export',()=>{
  it('includes per-user quiz attempts and progress in the encrypted export manifest and pages them by user',async()=>{
   const {readFileSync}=await import('node:fs');
   const tables=JSON.parse(readFileSync('scripts/export-tables.json','utf8')) as string[];
-  for(const t of ['system_design_questions','system_design_quiz_attempts','system_design_progress'])expect(tables).toContain(t);
+  for(const t of ['system_design_questions','system_design_quiz_attempts','system_design_progress','system_design_whiteboards'])expect(tables).toContain(t);
   const ops=readFileSync('scripts/ops.mjs','utf8');
-  expect(ops).toContain('system_design_quiz_attempts:["user_id","id"]');expect(ops).toContain('system_design_progress:["user_id","question_id"]');
+  expect(ops).toContain('system_design_quiz_attempts:["user_id","id"]');expect(ops).toContain('system_design_progress:["user_id","question_id"]');expect(ops).toContain('system_design_whiteboards:["user_id","question_id"]');
  });
  it('discloses quiz attempts and flag/done marks in the privacy page',async()=>{
   const {readFileSync}=await import('node:fs');const page=readFileSync('app/privacy/page.tsx','utf8');

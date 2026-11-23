@@ -162,3 +162,7 @@ The nested company experience route loads public company-scoped detail plus publ
 ## System design questions (S1)
 
 `/interview/system-design/<slug>` renders owner-managed rows from `system_design_questions` through `app/interview/[section]/[mode]/[[...topic]]/system-design.tsx` (dynamic, anon read of public rows; a missing table reads as no questions). Components: components/interview/sd-page|sd-solution|sd-quiz|sd-list.tsx; data lib/interview/system-design(-data).ts; actions app/actions/system-design.ts; styles app/interview/system-design.css.
+
+## System design whiteboard (S2)
+
+`/interview/system-design/<slug>/whiteboard` is handled by the same `[section]/[mode]/[[...topic]]` page (`topic=['whiteboard']`, via `systemDesignWhiteboardRoute`); the Whiteboard tab links there and `?tab=whiteboard` shows an "Open the whiteboard" link. components/interview/sd-whiteboard.tsx is the workspace (top bar, side panel placeholder, divider, timer, autosave, phone fallback); sd-whiteboard-canvas.tsx is the only module importing `@excalidraw/excalidraw` (0.18.1, exact pin) and is reached only through `next/dynamic` with `ssr:false`. Pure logic (template, library blocks, scene sanitising, timer, divider clamp) is lib/interview/whiteboard.ts; per-account persistence is app/actions/system-design-whiteboard.ts. Excalidraw fonts are self-hosted: `scripts/copy-excalidraw.mjs` (run by predev/prebuild) copies them to the git-ignored `public/excalidraw-assets` and the canvas sets `EXCALIDRAW_ASSET_PATH`.
