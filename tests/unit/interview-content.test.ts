@@ -9,8 +9,8 @@ it('assigns imported and future notes deterministically without changing the 17 
  expect(sectionTopics('low-level-design',notes).map(t=>t.id)).toEqual(['class-design']);
  expect(sectionTopics('finance',notes)[0].id).toBe('finance-fixture');expect(sectionTopics('ai-engineering',notes)[0].id).toBe('ai-fixture');
  expect(noteSection('trees')).toBe('dsa');expect(noteSection('sd-fixture')).toBe('system-design');
- expect(sectionQuestions('dsa','arrays-hashing').some(p=>p.lc===217)).toBe(true);
- for(const section of ['system-design','low-level-design','finance','ai-engineering'])expect(sectionQuestions(section)).toEqual([]);
+ expect(sectionQuestions('dsa','arrays-hashing').some(p=>p.lc===217)).toBe(true);expect(sectionQuestions('low-level-design').map(p=>p.lc)).toEqual([146]);
+ for(const section of ['system-design','finance','ai-engineering'])expect(sectionQuestions(section)).toEqual([]);
 });
 it('preserves topic and routes draft notes/problems to Interview while revalidating old addresses',()=>{
  expect(modeHref('dsa',true,'trees')).toBe('/interview/dsa/notes/trees');expect(modeHref('dsa',false,'trees')).toBe('/interview/dsa/practice/trees');

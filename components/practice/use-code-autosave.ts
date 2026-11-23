@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {savePracticeCode} from '@/app/actions/practice';
-import {codeKey,readCode,storeCode} from '@/lib/practice/storage';
+import {codeKey} from '@/lib/practice/storage';
 
 // A route unmount may leave an action in flight. Share ordering across workspace mounts,
 // and skip obsolete queued snapshots before issuing another request.
@@ -16,21 +16,23 @@ function enqueue(key:string,generation:number,save:()=>Promise<unknown>){
 }
 
 /** Local writes are immediate; remote writes are serialized and never replay an older edit last. */
-export function useCodeAutosave({viewerKey,problem,starter,canSave,ready,remote,readOnly=false}:{viewerKey:string;problem:number;starter:string;canSave:boolean;ready:boolean;remote:string|null;readOnly?:boolean}){
- const key=codeKey(viewerKey,problem),pendingKey=key+'.pending';
+export function useCodeAutosave({viewerKey,problem,starter,canSave,ready,remote,readOnly=false,storageKey,saveDraft}:{viewerKey:string;problem:number;starter:string;canSave:boolean;ready:boolean;remote:string|null;readOnly?:boolean;storageKey?:string;saveDraft?:(text:string)=>ReturnType<typeof savePracticeCode>}){
+ const key=storageKey??codeKey(viewerKey,problem),pendingKey=key+'.pending';
  const generation=useRef(0);
- const [code,setCode]=useState(()=>readOnly?starter:readCode(viewerKey,problem)??starter);
+ const transport=useRef(saveDraft);transport.current=saveDraft;
+ const read=()=>{try{return localStorage.getItem(key);}catch{return null;}};
+ const [code,setCode]=useState(()=>readOnly?starter:read()??starter);
  const [status,setStatus]=useState('Saved');
  const [storageError,setStorageError]=useState(false);
  const current=useRef(code),revision=useRef(0),dirty=useRef(false),hydrated=useRef(false),alive=useRef(true),flight=useRef<Promise<void>|null>(null);
  const access=useRef({canSave,ready,readOnly});access.current={canSave,ready,readOnly};
  const local=useCallback((value:string,pending:boolean)=>{
   if(readOnly)return true;
-  let stored=storeCode(viewerKey,problem,value);
+  let stored=true;try{localStorage.setItem(key,value);}catch{stored=false;}
   try{if(pending)localStorage.setItem(pendingKey,value);else if(localStorage.getItem(pendingKey)===value)localStorage.removeItem(pendingKey);}catch{stored=false;}
   if(alive.current)setStorageError(!stored);
   return stored;
- },[viewerKey,problem,pendingKey,readOnly]);
+ },[key,pendingKey,readOnly]);
  const flush=useCallback(()=>{
   if(flight.current)return flight.current;
   if(!dirty.current||!access.current.canSave||!access.current.ready||access.current.readOnly)return Promise.resolve();
@@ -39,7 +41,7 @@ export function useCodeAutosave({viewerKey,problem,starter,canSave,ready,remote,
     const value=current.current,version=revision.current,token=generation.current;
     if(alive.current)setStatus('Saving…');
     try{
-     const result=await enqueue(key,token,()=>savePracticeCode(problem,value,viewerKey)) as Awaited<ReturnType<typeof savePracticeCode>>|undefined;
+     const result=await enqueue(key,token,()=>transport.current?transport.current(value):savePracticeCode(problem,value,viewerKey)) as Awaited<ReturnType<typeof savePracticeCode>>|undefined;
      if(latest.get(key)!==generation.current)break;
      if(!result)continue;
      if(!result.ok){if(alive.current)setStatus('Offline — saved locally');break;}

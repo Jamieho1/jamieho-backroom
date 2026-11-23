@@ -5,9 +5,11 @@
  */
 export interface ArenaTest {
   id: string;
+  operations?: string[];
+  arguments?: unknown[][];
   /** Python expression for the list of positional arguments (after any driver conversion). */
   input: string;
-  /** Python literal of the expected return value. */
+  /** Expected value: Python expression for legacy tests; JSON list for operations/arguments tests. */
   expected: string;
   compare?: "exact" | "unordered";
   visible: boolean;
@@ -35,3 +37,9 @@ export interface ArenaProblem {
   hints: string[];
   clarify: { question: string; answer: string }[];
 }
+
+import {z} from 'zod';
+const jsonValue:z.ZodType<unknown>=z.lazy(()=>z.union([z.string().max(10000),z.number().finite(),z.boolean(),z.null(),z.array(jsonValue).max(2000),z.record(z.string().max(100),jsonValue)]));
+export const ClassSequence=z.object({operations:z.array(z.string().regex(/^[A-Za-z][A-Za-z0-9_]*$/)).min(1).max(2000),arguments:z.array(z.array(jsonValue).max(20)).min(1).max(2000)}).strict().refine(v=>v.operations.length===v.arguments.length,{message:'Each operation needs one argument list.'});
+export const ClassDesignTest=ClassSequence.safeExtend({id:z.string().min(1).max(80),expected:z.string().max(100000),visible:z.boolean()}).refine(v=>{if(!v.expected)return true;try{const out=JSON.parse(v.expected);return Array.isArray(out)&&out.length===v.operations.length;}catch{return false;}},{message:'Expected class output must be a JSON list matching the operation count.'});
+export const ArenaTestSchema=z.object({id:z.string().min(1).max(80),input:z.string().max(100000),expected:z.string().max(100000),visible:z.boolean(),compare:z.enum(['exact','unordered']).optional(),operations:z.array(z.string()).optional(),arguments:z.array(z.array(jsonValue)).optional()}).strict().superRefine((v,ctx)=>{if(v.operations!==undefined||v.arguments!==undefined){const out=ClassDesignTest.safeParse({id:v.id,operations:v.operations,arguments:v.arguments,expected:v.expected,visible:v.visible});if(!out.success)ctx.addIssue({code:'custom',message:'Invalid class-design operation sequence.'});}});

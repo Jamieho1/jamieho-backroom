@@ -85,3 +85,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-21 · /about, /projects and case studies share one type/spacing scale (`app/page-scale.css`, real step-downs: heroes 60/56/48px, body 15px); photos and screenshots are shown whole, never cropped or zoomed; dial journey photos carry the gold caption tag derived from org and location · Jamie’s feedback
 
 - 2026-11-23 · PassLoop P1 uses section/topic-ordered navigation, a modal question drawer, split code/console and account-guarded debounced autosave; collapsed rail has no logo; legacy Practice and P2–P4 scope remain unchanged · approved P1 prompt
+
+- 2026-11-23 · PassLoop P2 keeps custom test inputs in separate own-user storage, runs Python per case with a five-second deadline and grades only known expectations; LRU Cache retains ID 146 under LLD; Submit uses catalogue tests only · approved P2 prompt

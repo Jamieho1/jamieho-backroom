@@ -244,3 +244,16 @@ body:has(.iv-shell) {background:#0e131c;}
  .pw-navigation .practice-timer {font-size:11px;}
 }
 @media(prefers-reduced-motion:reduce){.pw-drawer[open]{animation:none;}}
+
+.pw-tests .notes-tabs {display:flex;gap:5px;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--iv-line);}
+.pw-tests .notes-tabs [aria-selected="true"],.pw-case-tabs [aria-selected="true"]{color:var(--iv-accent);border-color:var(--iv-accent);}
+.pw-case-tabs {display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:8px 0;}
+.pw-test-input {display:grid;gap:4px;font-size:12px;margin:8px 0;min-width:0;}
+.pw-test-input textarea {width:100%;min-width:0;resize:vertical;background:var(--iv-card);color:var(--iv-ink);border:1px solid var(--iv-line);border-radius:6px;padding:7px;font:12px/1.5 var(--f-mono,monospace);box-sizing:border-box;}
+.pw-case-save {display:block;color:var(--iv-muted);font-size:11px;margin-top:8px;}
+.pw-tests .practice-results {margin:0;padding:0;border:0;}
+.pw-output h4 {margin:8px 0 4px;font-size:11px;color:var(--iv-muted);}
+.pw-output pre {max-height:220px;overflow:auto;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
+.pw-output .pw-test-error {background:#351d25;color:#ffb6bf;border-color:#a34555;white-space:pre-wrap;}
+.pw-tests .pw-accepted,.pw-case-tabs [data-result="pass"] {color:#7bd6a3;}
+.pw-tests .pw-failed,.pw-case-tabs :is([data-result="fail"],[data-result="error"],[data-result="too_slow"]) {color:#ff9990;}

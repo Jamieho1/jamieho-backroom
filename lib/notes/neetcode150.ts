@@ -44,7 +44,7 @@ export const NEETCODE_150: Anchor[] = [
   ...g("linked-list", [
     [206, "Reverse Linked List", "Easy"], [21, "Merge Two Sorted Lists", "Easy"], [141, "Linked List Cycle", "Easy"], [143, "Reorder List", "Medium"],
     [19, "Remove Nth Node From End of List", "Medium"], [138, "Copy List with Random Pointer", "Medium"], [2, "Add Two Numbers", "Medium"],
-    [287, "Find the Duplicate Number", "Medium"], [146, "LRU Cache", "Medium"], [23, "Merge k Sorted Lists", "Hard"], [25, "Reverse Nodes in k-Group", "Hard"],
+    [287, "Find the Duplicate Number", "Medium"], [23, "Merge k Sorted Lists", "Hard"], [25, "Reverse Nodes in k-Group", "Hard"],
   ]),
   ...g("trees", [
     [226, "Invert Binary Tree", "Easy"], [104, "Maximum Depth of Binary Tree", "Easy"], [543, "Diameter of Binary Tree", "Easy"], [110, "Balanced Binary Tree", "Easy"],
@@ -98,6 +98,7 @@ export const NEETCODE_150: Anchor[] = [
     [48, "Rotate Image", "Medium"], [54, "Spiral Matrix", "Medium"], [73, "Set Matrix Zeroes", "Medium"], [202, "Happy Number", "Easy"], [66, "Plus One", "Easy"],
     [50, "Pow(x, n)", "Medium"], [43, "Multiply Strings", "Medium"], [2013, "Detect Squares", "Medium"],
   ]),
+  ...g("class-design", [[146, "LRU Cache", "Medium"]]),
 ];
 
 /** Extra practice beyond NeetCode 150 (Jamie 2026-11-03), shown in the arena and notes beside their topic. */

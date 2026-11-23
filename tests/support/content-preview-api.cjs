@@ -79,14 +79,14 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         return send(res,200,{project:'live-fixture-project-'+suffix,article:'live-fixture-article-'+suffix,guide:'live-fixture-guide-'+suffix});
       }
       if (url.pathname === '/__app_seed' && req.method==='POST') {
-        await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_code; delete from public.practice_attempts; delete from public.practice_stars");
+        await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_cases; delete from public.practice_code; delete from public.practice_attempts; delete from public.practice_stars");
         await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1),('sd-fixture','System design: Synthetic architecture','Synthetic system note','',2),('class-design','Class design','Synthetic class note','',3); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(user_id,problem,code) values ('00000000-0000-4000-8000-000000000101',217,'# Live fixture code'); insert into public.practice_stars(user_id,problem) values('00000000-0000-4000-8000-000000000101',217)");
         await db.exec("insert into public.behavioral_stories(id,title,situation) values ('00000000-0000-4000-8000-000000000903','Live fixture story','Live fixture situation'); insert into public.behavioral_answers(question_id,outline) values ('g-intro','Live fixture outline')");
         return send(res,200,{ok:true});
       }
       if(url.pathname==='/__behavioral_seed'&&req.method==='POST'){await db.exec('delete from public.interview_behavioral_answers; delete from public.interview_behavioral_custom_questions');return send(res,200,{ok:true});}
       if(url.pathname==='/__resume_seed'&&req.method==='POST'){await db.exec("delete from public.user_resumes; update public.resume_templates set title='Resume guide',content='{\"entries\":[]}'");return send(res,200,{ok:true});}
-      if (url.pathname === '/__state') return send(res,200,{ app:Object.fromEntries(await Promise.all(['notes','question_notes','practice_code','practice_stars','behavioral_stories','behavioral_answers'].map(async table=>[table,(await db.query('select * from public.'+table)).rows]))),projects:(await db.query('select * from public.projects')).rows,articles:(await db.query('select * from public.articles')).rows,guides:(await db.query('select * from public.guides')).rows,sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by,photo_slots from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
+      if (url.pathname === '/__state') return send(res,200,{ app:Object.fromEntries(await Promise.all(['notes','question_notes','practice_cases','practice_code','practice_stars','behavioral_stories','behavioral_answers'].map(async table=>[table,(await db.query('select * from public.'+table)).rows]))),projects:(await db.query('select * from public.projects')).rows,articles:(await db.query('select * from public.articles')).rows,guides:(await db.query('select * from public.guides')).rows,sections:(await db.query('select key,title,body from public.site_sections')).rows, sets:(await db.query('select id,status,previous,approved_by,photo_slots from public.content_changes')).rows, items:(await db.query('select * from public.experience_items')).rows, bullets:(await db.query('select * from public.experience_bullets')).rows });
       const session=Object.values(sessions).find(s=>req.headers.authorization==='Bearer '+s.access_token);
       if(url.pathname.startsWith('/storage/v1/object/')){
         if(!session)return send(res,403,{message:'Owner session required'});
@@ -107,13 +107,13 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
       if (url.pathname === '/auth/v1/user') return session ? send(res,200,session.user) : send(res,401,{message:'No local session'});
       if (!url.pathname.startsWith('/rest/v1/')) return send(res,404,{});
       const table=url.pathname.slice('/rest/v1/'.length);
-      if (!['about_photos','messages','content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
+      if (!['about_photos','messages','content_changes','site_sections','profiles','experience_items','experience_bullets','desktop_apps','projects','articles','guides','notes','question_notes','practice_cases','practice_code','practice_stars','practice_attempts','behavioral_stories','behavioral_answers','user_resumes','resume_templates','interview_behavioral_themes','interview_behavioral_questions','interview_behavioral_custom_questions','interview_behavioral_answers'].includes(table)) return send(res,200,[]);
       const rows=await db.transaction(async tx=>{
         await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:session?.user.id || '',role:session?'authenticated':'anon'})]);
         await tx.exec('set local role '+(session?'authenticated':'anon'));
         if (table==='profiles') return (await tx.query('select * from public.profiles where id=$1',[session?.user.id || users.member.id])).rows;
         const where=[],params=[];
-        for (const col of (table.startsWith('interview_behavioral_')?['id','user_id','question_id','theme_id','published']:table==='user_resumes'?['user_id','revision']:table==='resume_templates'?['key']:table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='about_photos'?['id','public','centre']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_code','practice_stars','practice_attempts'].includes(table)?['problem','user_id','mode','status']:table==='behavioral_answers'?['question_id']:['id'])) {
+        for (const col of (table.startsWith('interview_behavioral_')?['id','user_id','question_id','theme_id','published']:table==='user_resumes'?['user_id','revision']:table==='resume_templates'?['key']:table==='content_changes'?['id','status','operations','photo_slots']:table==='site_sections'?['key']:table==='about_photos'?['id','public','centre']:table==='projects'?['id','slug','public']:['articles','guides'].includes(table)?['id','slug','published']:['question_notes','practice_cases','practice_code','practice_stars','practice_attempts'].includes(table)?['problem','user_id','mode','status']:table==='behavioral_answers'?['question_id']:['id'])) {
           const value=url.searchParams.get(col);
           if (value?.startsWith('eq.')) { params.push(value.slice(3));where.push(col+'=$'+params.length+(['operations','photo_slots'].includes(col)?'::jsonb':'')); }
         }
@@ -126,7 +126,7 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
           const row=JSON.parse(body);const allowed=table==='interview_behavioral_answers'?['user_id','question_id','custom','situation','task','action','result','role_id']:['id','user_id','theme_id','prompt'];
           const keys=Object.keys(row);if(keys.some(k=>!allowed.includes(k)))throw Error('Unknown Behavioral field');
           const conflict=table==='interview_behavioral_answers'?' on conflict(user_id,question_id) do update set '+keys.map(k=>k+'=excluded.'+k).join(','):'';
-          return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')'+conflict+' returning *',keys.map(k=>row[k]))).rows;
+          return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')'+conflict+' returning *',keys.map(k=>table==='practice_cases'&&k==='cases'?JSON.stringify(row[k]):row[k]))).rows;
         }
         if(table==='messages'){
           if(req.method==='POST'){const row=JSON.parse(body);const keys=Object.keys(row);if(keys.some(k=>!['kind','need','page_path','name','email','budget','ip_hash','reason','needs','timeline'].includes(k)))throw Error('Unknown message field');await tx.query('insert into public.messages('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')',keys.map(k=>row[k]));return [];}
@@ -137,13 +137,13 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
           if(req.method==='POST'){const row=JSON.parse(body);return (await tx.query('insert into public.user_resumes(user_id,content) values ($1,$2) returning *',[row.user_id,JSON.stringify(row.content)])).rows;}
           if(req.method==='PATCH'){const row=JSON.parse(body);params.push(JSON.stringify(row.content),row.revision);return (await tx.query('update public.user_resumes set content=$'+(params.length-1)+'::jsonb,revision=$'+params.length+clause+' returning *',params)).rows;}
         }
-        if(['practice_code','practice_stars','practice_attempts'].includes(table)){
+        if(['practice_cases','practice_code','practice_stars','practice_attempts'].includes(table)){
           if(req.method==='DELETE')return (await tx.query('delete from public.'+table+clause+' returning *',params)).rows;
           if(req.method==='POST'){
-            const row=JSON.parse(body);const allowed=table==='practice_stars'?['user_id','problem']:table==='practice_code'?['user_id','problem','code','updated_at']:['user_id','id','problem','code','mode','status','passed','total','error'];
+            const row=JSON.parse(body);const allowed=table==='practice_stars'?['user_id','problem']:table==='practice_cases'?['user_id','problem','cases','updated_at']:table==='practice_code'?['user_id','problem','code','updated_at']:['user_id','id','problem','code','mode','status','passed','total','error'];
             const keys=Object.keys(row);if(keys.some(k=>!allowed.includes(k)))throw Error('Unknown practice field');
             const conflicts=table==='practice_attempts'?['user_id','id']:['user_id','problem'];
-            return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+') on conflict('+conflicts.join(',')+') do update set '+keys.map(k=>k+'=excluded.'+k).join(',')+' returning *',keys.map(k=>row[k]))).rows;
+            return (await tx.query('insert into public.'+table+'('+keys.join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+') on conflict('+conflicts.join(',')+') do update set '+keys.map(k=>k+'=excluded.'+k).join(',')+' returning *',keys.map(k=>table==='practice_cases'&&k==='cases'?JSON.stringify(row[k]):row[k]))).rows;
           }
         }
         if (req.method!=='GET' && req.method!=='HEAD') throw Error('Unsupported local request');

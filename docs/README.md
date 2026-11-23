@@ -15,6 +15,6 @@ Read this index and [status.md](status.md) at session start. Load only the relev
 
 These are concise current-state summaries, not a substitute for inspecting the affected source. Update relevant topics after every change; keep status factual and distinguish implementation, deployment and live approval.
 
-Specs live in `Resources/`. **Active:** `Home v1.3 - PRD.md` and `Interview - PRD.md`. Retained prompts and operating/import contracts remain alongside them. **Historical:** none kept; use git history.
+Specs live in `Resources/`. **Active:** `Home v1.3 - PRD.md`, `Interview - PRD.md` and `Prompts - PassLoop Practice.md`. Retained prompts and operating/import contracts remain alongside them. **Historical:** none kept; use git history.
 
 `README.md` holds Jamie's manual setup instructions; not a session read. No changelogs: history is in git.

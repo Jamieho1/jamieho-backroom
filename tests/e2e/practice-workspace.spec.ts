@@ -12,7 +12,7 @@ test.beforeAll(async()=>{
  export async function saveQuestionNotes(){return {ok:true}}
  export async function loadPracticeStars(){return {ok:true,problems:account==='visitor'?[]:[217]}}
  export async function savePracticeStar(){return {ok:true}}
- export async function loadPracticeCompletions(){return {ok:true,problems:account==='visitor'?[]:[217]}}`;
+ export async function loadPracticeCases(){return {ok:true,cases:[]}};export async function savePracticeCases(){return {ok:true}};export async function loadPracticeCompletions(){return {ok:true,problems:account==='visitor'?[]:[217]}}`;
  const modules:Record<string,{contents:string;loader?:'tsx'}>={
   'next/link':{loader:'tsx',contents:`import React from 'react';export default function Link({href,prefetch,children,...props}){const match=String(href).startsWith('/interview/problems/')?['',String(href).split('/').at(-1)]:null;const params=new URLSearchParams(location.search);if(match)params.set('id',match[1]);return <a {...props} href={match?'/p1-fixture?'+params:href}>{children}</a>}`},
   'next/navigation':{contents:`export const usePathname=()=>'/interview/problems/'+(new URLSearchParams(location.search).get('id')||217);`},
@@ -23,7 +23,7 @@ test.beforeAll(async()=>{
  };
  const out=await build({stdin:{contents:source,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'synthetic-p1',setup(b){
   b.onResolve({filter:/^(next\/link|next\/navigation|@\/components\/(viewer-provider|sign-in-button|feedback-button)|@\/lib\/practice\/runner)$/},a=>({path:a.path,namespace:'p1'}));
-  b.onResolve({filter:/app\/actions\/(practice|practice-stars|practice-progress)$/},()=>({path:'actions',namespace:'p1'}));
+  b.onResolve({filter:/app\/actions\/(practice|practice-stars|practice-progress|practice-cases)$/},()=>({path:'actions',namespace:'p1'}));
   b.onLoad({filter:/.*/,namespace:'p1'},a=>({...(a.path==='actions'?{contents:actions}:modules[a.path]),resolveDir:process.cwd()}));
  }}]});
  const css=['app/globals.css','app/practice.css','app/notes.css','app/interview/interview.css'].map(p=>readFileSync(p,'utf8')).join('\n');

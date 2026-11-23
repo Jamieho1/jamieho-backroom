@@ -17,7 +17,11 @@ import {useSavedPractice} from './use-saved-practice';
 import {useCodeAutosave} from './use-code-autosave';
 import {usePracticeStars} from './use-practice-stars';
 import {ProblemDrawer} from './problem-drawer';
-import {ProblemSolution,Results} from './problem-readers';
+import {ProblemSolution} from './problem-readers';
+
+import {useTestCases} from './use-test-cases';
+import {TestConsole} from './test-console';
+import {casesToTests} from '@/lib/practice/cases';
 
 const PANEL_KEY='jb.practice.workspace.v1';
 function useWorkspacePanels(){
@@ -34,6 +38,8 @@ function Shortcuts({onClose}:{onClose():void}){
 export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview}:{lc:number;viewerKey:string;canSave:boolean;canEdit:boolean;preview?:PracticePreview}){
  const navigation=practiceNavigation(lc),meta=navigation.current!,problem=problemByNumber(lc)!;
  const previewRow=useMemo(()=>preview?practiceData(preview,lc):undefined,[preview,lc]);
+ const tests=useTestCases(problem,viewerKey,canSave,!!preview);
+ const [caseError,setCaseError]=useState('');
  const saved=useSavedPractice(lc,canSave&&!preview,()=>{},previewRow);
  const autosave=useCodeAutosave({viewerKey,problem:lc,starter:previewRow?.code??starterCode(lc),canSave:canSave&&!preview,ready:!canSave||saved.loaded&&!saved.loadError,remote:saved.data.code,readOnly:!!preview});
  const liveFlags=usePracticeStars(canSave&&!preview,viewerKey);
@@ -52,11 +58,12 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
  const available=!preview&&phase==='ready'&&(!canSave||saved.loaded)&&!saved.pendingAttempt&&!saved.savingAttempt;
  async function run(next:RunMode){
   if(!available||!runner.current)return;const current=runner.current,snapshot=autosave.code;
-  setPhase('busy');setMode(next);setResult(null);panels.setState(s=>({...s,console:true}));void autosave.flush();
-  const out=await current.run(problem,snapshot,next);if(!mounted.current)return;
+  let runTests;try{if(next==='run')runTests=casesToTests(problem,tests.cases);setCaseError('');}catch{setCaseError('Check test inputs: class operations and arguments must be matching JSON arrays, starting with '+problem.method+'.');panels.setState(s=>({...s,console:true}));return;}
+  setPhase('busy');setMode(next);setResult(null);panels.setState(s=>({...s,console:true}));void autosave.flush();void tests.flush();
+  const out=await current.run(problem,snapshot,next,5000,runTests);if(!mounted.current)return;
   setResult(out);setPhase('loading');void prepare(current);if(canSave){void saved.record(snapshot,next,out);if(next==='submit'&&out.status==='ok'&&out.total>0&&out.passed===out.total)setCompleted(s=>new Set([...s,lc]));}
  }
- const commands=useRef({run,save:autosave.flush,fullscreen,drawer,shortcuts});commands.current={run,save:autosave.flush,fullscreen,drawer,shortcuts};
+ const commands=useRef({run,save:()=>Promise.all([autosave.flush(),tests.flush()]),fullscreen,drawer,shortcuts});commands.current={run,save:()=>Promise.all([autosave.flush(),tests.flush()]),fullscreen,drawer,shortcuts};
  useEffect(()=>{
   const key=(e:KeyboardEvent)=>{
    const target=e.target as HTMLElement|null;const editor=!!target?.closest('.cm-editor');
@@ -99,7 +106,7 @@ export function InterviewPracticeWorkspace({lc,viewerKey,canSave,canEdit,preview
      {panels.state.console?<><ResizeHandle className="practice-resizer pw-console-resizer" label="Resize editor and console" orientation="horizontal" value={panels.state.editor} min={25} max={75} reset={60} unit="percent" scale={100/Math.max(1,size.height-8)} onChange={editor=>panels.setState(s=>({...s,editor}))}/><section id="practice-console" className="pw-console" aria-label="Console / Test">
       <h3>Console / Test</h3><p role={preview?undefined:"status"}>{preview?'Read-only draft preview':phase==='loading'?'Loading Python…':phase==='busy'?'Running…':phase==='ready'?'Python ready':'Python could not load. You can still edit and save code.'}</p>
       {phase==='failed'?<button onClick={()=>{runner.current?.dispose();const current=new PythonRunner();runner.current=current;setPhase('loading');void prepare(current);}}>Retry Python</button>:null}
-      {result?<Results result={result} mode={mode}/>:<p>Run checks examples; Submit checks all local tests.</p>}
+      <TestConsole problem={problem} cases={tests.cases} onChange={tests.change} result={result} mode={mode} busy={phase==='busy'} readOnly={!!preview} status={tests.status} validationError={caseError}/>{tests.storageError?<p role="alert">Browser storage is unavailable. Keep a copy of your custom inputs.</p>:null}{tests.error?<p role="alert">{tests.error}<button onClick={tests.retry}>Retry test case sync</button></p>:null}
       {saved.attemptError?<p role="alert">{saved.attemptError}<button onClick={()=>void saved.retryAttempt()}>Retry saving attempt</button></p>:null}
       {saved.savingAttempt?<p role="status">Saving attempt…</p>:null}
       {progressError?<p role="alert">{progressError}<button onClick={()=>setProgressRetry(v=>v+1)}>Retry progress</button></p>:null}

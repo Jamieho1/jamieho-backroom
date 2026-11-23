@@ -1,4 +1,4 @@
-# Interview Prep test harness (TKT-29). Runs inside a fresh Pyodide worker per Run/Submit.
+# Interview Prep test harness. A fresh solution namespace per case in the browser Pyodide worker.
 # Python-level isolation is "concealed, not secret": the real network barrier is the worker's CSP + stubbed JS APIs.
 import sys, builtins, time, json, traceback
 
@@ -115,12 +115,28 @@ def _short(x, n=300):
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
+def _user_error(error):
+    lines = ["Traceback (user code):"]
+    for frame in traceback.extract_tb(error.__traceback__):
+        if frame.filename == "solution.py":
+            lines.append(f'  File "solution.py", line {frame.lineno}, in {frame.name}')
+            if frame.line:
+                lines.append("    " + frame.line)
+    if isinstance(error, SyntaxError) and error.filename == "solution.py":
+        lines.append(f'  File "solution.py", line {error.lineno}')
+        if error.text:
+            lines.append("    " + error.text.strip())
+    lines.append(type(error).__name__ + ": " + str(error))
+    return "\n".join(lines)[-4000:]
+
+
 def run_tests(code, method, tests_json, extra_json="{}"):
     tests = json.loads(tests_json)
     extra = json.loads(extra_json or "{}")
     ns = {"__name__": "__main__"}
     out = {"compile_error": None, "results": []}
     driver = None
+    class_name = extra.get("className") or (tests[0]["operations"][0] if tests and tests[0].get("operations") else None)
     try:
         exec(_PRELUDE, ns)
         if extra.get("prelude"):
@@ -130,24 +146,32 @@ def run_tests(code, method, tests_json, extra_json="{}"):
             dns = dict(ns)
             exec(compile(extra["driver"], "driver.py", "exec"), dns)
             driver = dns["run"]
+        elif class_name:
+            if not callable(ns.get(class_name)):
+                raise NameError(class_name + " is not defined")
         else:
             cls = ns.get("Solution")
             if cls is None:
                 raise NameError("class Solution is not defined")
             getattr(cls(), method)
-    except Exception:
-        out["compile_error"] = traceback.format_exc(limit=3)[-1500:]
+    except Exception as error:
+        out["compile_error"] = _user_error(error)
         return json.dumps(out)
 
     for t in tests:
         r = {"id": t["id"], "kind": t["kind"], "visible": t["visible"]}
         try:
-            args = eval(t["input"], {"__builtins__": _SAFE})
+            args = eval(t["input"], {"__builtins__": _SAFE}) if not t.get("operations") else None
             # "" = no expected value (performance-only test: correctness is covered by functional tests).
             has_expected = t["expected"] != ""
-            expected = eval(t["expected"], {"__builtins__": _SAFE}) if has_expected else None
+            expected = (json.loads(t["expected"]) if t.get("operations") else eval(t["expected"], {"__builtins__": _SAFE})) if has_expected else None
             t0 = time.perf_counter()
-            if driver is not None:
+            if t.get("operations"):
+                ops, params = t["operations"], t["arguments"]
+                if len(ops) != len(params) or not ops or ops[0] != class_name:
+                    raise ValueError("Invalid class operation sequence")
+                got = ns["replay"](ns, ops, params)
+            elif driver is not None:
                 got = driver(ns, args)
             else:
                 got = getattr(ns["Solution"](), method)(*args)
@@ -159,12 +183,13 @@ def run_tests(code, method, tests_json, extra_json="{}"):
             if ok and t["kind"] == "performance" and limit is not None and ms > limit:
                 r["status"] = "too_slow"
             else:
-                r["status"] = "pass" if ok else "fail"
-            r["got"] = _short(got)
-            r["expected"] = _short(expected) if has_expected else None
+                r["status"] = ("pass" if ok else "fail") if has_expected else "unknown"
+            display = (lambda value: json.dumps(value, ensure_ascii=False)[:10000]) if t.get("operations") else _short
+            r["got"] = display(got)
+            r["expected"] = display(expected) if has_expected else None
         except Exception as e:
             r["status"] = "error"
-            r["error"] = f"{type(e).__name__}: {e}"[:500]
+            r["error"] = _user_error(e)
         out["results"].append(r)
     return json.dumps(out)
 

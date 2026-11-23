@@ -470,68 +470,6 @@ Build a **deep copy** of the list: a brand-new set of nodes, one per original no
     ],
   },
   {
-    lc: 146,
-    kind: "class_design",
-    statement: `Design a key-value cache with a fixed capacity that evicts the **least recently used** entry when it overflows. Implement \`LRUCache\`:
-
-- \`LRUCache(capacity)\` creates an empty cache that holds at most \`capacity\` entries (\`capacity\` is positive).
-- \`get(key)\` returns the value stored for \`key\`, or \`-1\` if the key isn't in the cache.
-- \`put(key, value)\` stores \`value\` under \`key\`, replacing the old value if the key already exists. If adding a **new** key makes the cache hold more than \`capacity\` entries, remove the entry that was used least recently.
-
-A key counts as "used" whenever it is read by a successful \`get\` or written by \`put\`. Both \`get\` and \`put\` should run in O(1) average time.
-
-Tests use the operation-list format: a list of method names and a list of argument lists; the expected output has \`None\` for the constructor and for \`put\`.`,
-    examples: [
-      { input: "[\"LRUCache\", \"put\", \"put\", \"get\", \"put\", \"get\", \"get\"]\n[[2], [5, 50], [6, 60], [5], [7, 70], [6], [7]]", output: "[None, None, None, 50, None, -1, 70]", explanation: "get(5) makes 5 recent, so put(7) evicts 6." },
-      { input: "[\"LRUCache\", \"put\", \"put\", \"get\"]\n[[1], [3, 1], [3, 9], [3]]", output: "[None, None, None, 9]", explanation: "Putting an existing key overwrites it without evicting anything." },
-    ],
-    constraints: ["1 <= capacity <= 3000", "0 <= key <= 10^4", "0 <= value <= 10^5", "At most 2 * 10^5 calls to get and put."],
-    signature: `class LRUCache:
-
-    def __init__(self, capacity: int):
-
-    def get(self, key: int) -> int:
-
-    def put(self, key: int, value: int) -> None:`,
-    method: "LRUCache",
-    driver: `def run(ns, args):
-    return replay(ns, args[0], args[1])
-`,
-    tests: [
-      { id: "ex1", input: "[[\"LRUCache\", \"put\", \"put\", \"get\", \"put\", \"get\", \"get\"], [[2], [5, 50], [6, 60], [5], [7, 70], [6], [7]]]", expected: "[None, None, None, 50, None, -1, 70]", visible: true },
-      { id: "ex2", input: "[[\"LRUCache\", \"put\", \"put\", \"get\"], [[1], [3, 1], [3, 9], [3]]]", expected: "[None, None, None, 9]", visible: true },
-      { id: "cap1", input: "[[\"LRUCache\", \"put\", \"get\", \"put\", \"get\", \"get\"], [[1], [1, 1], [1], [2, 2], [1], [2]]]", expected: "[None, None, 1, None, -1, 2]", visible: false },
-      { id: "miss", input: "[[\"LRUCache\", \"get\", \"put\", \"get\", \"get\"], [[2], [4], [4, 0], [4], [5]]]", expected: "[None, -1, None, 0, -1]", visible: false },
-      { id: "update-refreshes", input: "[[\"LRUCache\", \"put\", \"put\", \"put\", \"put\", \"get\", \"get\", \"get\"], [[2], [1, 1], [2, 2], [1, 10], [3, 3], [1], [2], [3]]]", expected: "[None, None, None, None, None, 10, -1, 3]", visible: false },
-      { id: "get-miss-no-refresh", input: "[[\"LRUCache\", \"put\", \"put\", \"get\", \"put\", \"get\", \"get\", \"get\"], [[2], [1, 1], [2, 2], [9], [3, 3], [1], [2], [3]]]", expected: "[None, None, None, -1, None, -1, 2, 3]", visible: false },
-      { id: "chain", input: "[[\"LRUCache\", \"put\", \"put\", \"put\", \"get\", \"put\", \"get\", \"get\", \"get\", \"get\"], [[3], [1, 1], [2, 2], [3, 3], [1], [4, 4], [2], [3], [4], [1]]]", expected: "[None, None, None, None, 1, None, -1, 3, 4, 1]", visible: false },
-      { id: "big", input: "[[\"LRUCache\"] + [\"put\"] * 1000 + [\"get\"] * 1000, [[10]] + [[i, i] for i in range(1000)] + [[i] for i in range(1000)]]", expected: "[None] * 1001 + [-1] * 990 + list(range(990, 1000))", visible: false },
-    ],
-    solution: `class LRUCache:
-
-    def __init__(self, capacity: int):
-        self.cap = capacity
-        self.data = OrderedDict()  # least recent first
-
-    def get(self, key: int) -> int:
-        if key not in self.data:
-            return -1
-        self.data.move_to_end(key)
-        return self.data[key]
-
-    def put(self, key: int, value: int) -> None:
-        if key in self.data:
-            self.data.move_to_end(key)
-        self.data[key] = value
-        if len(self.data) > self.cap:
-            self.data.popitem(last=False)`,
-    hints: ["You need O(1) lookup by key AND O(1) 'move to most recent' / 'remove least recent'.", "Combine a hash map (key -> node) with a doubly linked list ordered by recency.", "Sentinel head/tail nodes make insert and remove branch-free. (In Python, OrderedDict already gives you both.)"],
-    clarify: [
-      { question: "Does a get on a missing key change anything?", answer: "No, it just returns -1." },
-      { question: "Does put on an existing key count as a use?", answer: "Yes, it updates the value and makes that key the most recent." },
-    ],
-  },
-  {
     lc: 23,
     kind: "algorithm",
     statement: `You receive an array \`lists\` of \`k\` singly linked lists, each sorted in **non-decreasing** order. Merge all of them into one sorted linked list and return its head.
