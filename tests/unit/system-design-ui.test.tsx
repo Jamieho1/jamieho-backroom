@@ -102,3 +102,8 @@ it('a failed save leaves the control unchanged and shows an alert',async()=>{
  render(page());const done=await screen.findByRole('button',{name:'Mark as done'});await waitFor(()=>expect((done as HTMLButtonElement).disabled).toBe(false));await act(async()=>{fireEvent.click(done);});
  expect((await screen.findByRole('alert')).textContent).toContain("Couldn't save");expect(screen.getByRole('button',{name:'Mark as done'}).getAttribute('aria-pressed')).toBe('false');
 });
+
+it('Notes sits in the question tab row and opens the linked topic or the Notes overview',()=>{
+ const {rerender}=render(page());const tabs=screen.getByRole('navigation',{name:'Question tabs'});const notes=within(tabs).getByRole('link',{name:'Notes'});expect(notes.getAttribute('href')).toBe('/interview/system-design/notes/sd-fixture');expect(within(tabs).getAllByRole('link').map(a=>a.textContent)).toEqual(['Solution','Notes','Quiz','Whiteboard']);expect(screen.queryByText('Read the related notes ›')).toBeNull();
+ rerender(<SystemDesignPage question={{...question,note_ref:''}} questions={list}/>);expect(within(tabs).getByRole('link',{name:'Notes'}).getAttribute('href')).toBe('/interview/system-design/notes');
+});

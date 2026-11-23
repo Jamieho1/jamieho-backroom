@@ -22,16 +22,16 @@ test.beforeAll(async()=>{
  bundle=out.outputFiles[0].text;
 });
 const fits=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-async function mount(page:Page,query=''){
+async function mount(page:Page,query='',withNote=false){
  await page.goto('/interview/companies'+query);
  await page.addStyleTag({content:`body>:not(#sd-fixture){display:none!important}body{margin:0;background:#101720}${readFileSync('app/interview/interview.css','utf8')}${readFileSync('app/interview/system-design.css','utf8')}`});
- await page.evaluate(q=>{(window as unknown as {__question:unknown}).__question=q;const root=document.createElement('div');root.id='sd-fixture';document.body.append(root);},question);
+ await page.evaluate(q=>{(window as unknown as {__question:unknown}).__question=q;const root=document.createElement('div');root.id='sd-fixture';document.body.append(root);},withNote?{...question,note_ref:'sd-fixture'}:question);
  await page.addScriptTag({content:bundle});await expect(page.getByRole('heading',{level:1,name:'Fixture Design'})).toBeVisible();
 }
 const settle=(page:Page)=>page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r(null)))));
 test('S1 solution: table-schema card, diagram, TOC highlight on scroll, jump and back to top',async({page},info)=>{
  const phone=info.project.name==='phone';await page.emulateMedia({reducedMotion:'reduce'});await mount(page);
- await expect(page.locator('[data-table-schema="urls"]')).toBeVisible();await expect(page.locator('[data-project-diagram="true"]')).toHaveCount(1);
+ await expect(page.locator('[data-table-schema="urls"]')).toBeVisible();await expect(page.locator('[data-system-design-diagram="true"]')).toHaveCount(1);
  const headings=['Overview','Requirements','Data Model','API Design','Key Questions','Basic design','Advanced design','Main flows','Additional discussion points'];
  const toc=phone?page.locator('details.iv-sd-toc-mobile'):page.locator('aside.iv-sd-toc');
  if(phone){await expect(page.locator('aside.iv-sd-toc')).toBeHidden();await expect(toc.locator('summary')).toHaveText('On this page');await toc.locator('summary').click();}
@@ -68,4 +68,8 @@ test('S1 quiz: keyboard 1-4, explanations, Don\'t know, score review and attempt
  await page.getByRole('button',{name:'Start quiz'}).click();await page.keyboard.press('1');await page.getByRole('button',{name:'Next'}).click();await page.keyboard.press('2');await page.getByRole('button',{name:'Next'}).click();await page.keyboard.press('2');await page.getByRole('button',{name:'See score'}).click();
  await expect(page.getByRole('heading',{name:'Your score: 3 / 3'})).toBeVisible();await page.getByRole('button',{name:'Back to attempts'}).click();await expect(page.getByRole('list',{name:'Your attempts'}).getByRole('listitem')).toHaveCount(2);
  await expect(page.getByRole('list',{name:'Your attempts'}).getByRole('listitem').first()).toContainText('3 / 3');await fits(page);
+});
+
+test('Notes is directly accessible in the question tabs at desktop and phone sizes',async({page},info)=>{
+ await mount(page,'',true);const tabs=page.getByRole('navigation',{name:'Question tabs'});await expect(tabs.getByRole('link')).toHaveText(['Solution','Notes','Quiz','Whiteboard']);const notes=tabs.getByRole('link',{name:'Notes',exact:true});await expect(notes).toBeInViewport();await expect(notes).toHaveAttribute('href','/interview/system-design/notes/sd-fixture');await expect(page.getByText('Read the related notes ›',{exact:true})).toHaveCount(0);await fits(page);await page.screenshot({path:info.outputPath('notes-tab.png')});await notes.click();await expect(page).toHaveURL('/interview/system-design/notes/sd-fixture');await expect(page.getByRole('heading',{name:'Sign in to read Notes',exact:true})).toBeVisible();
 });

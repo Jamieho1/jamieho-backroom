@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import {Markdown} from '@/components/markdown';
-import {ProjectDiagram} from '@/components/projects/project-diagram';
+import {SystemDesignDiagram} from './sd-diagram';
 import {plainHeading,splitSolution,tocFromMarkdown,type TableSchema,type TableSchemaResult,type TocItem} from '@/lib/interview/system-design';
 export const headingDomId=(id:string)=>`sd-${id}`;
 interface HastNode{type:string;tagName?:string;value?:string;properties?:Record<string,unknown>;children?:HastNode[]}
@@ -25,7 +25,7 @@ export function SolutionView({markdown,toc}:{markdown:string;toc:TocItem[]}){
  let offset=0;
  return <div className="iv-sd-solution">{blocks.map((b,i)=>{
   if(b.kind==='table-schema')return <SchemaOrError key={i} result={b.result}/>;
-  if(b.kind==='diagram')return b.diagram?<div className="iv-sd-diagram" key={i}><ProjectDiagram diagram={b.diagram}/></div>:<p className="iv-sd-block-error" role="note" key={i}>{b.message}</p>;
+  if(b.kind==='diagram')return b.diagram?<SystemDesignDiagram key={i} diagram={b.diagram}/>:<p className="iv-sd-block-error" role="note" key={i}>{b.message}</p>;
   const count=tocFromMarkdown(b.text).length;const slice=toc.slice(offset,offset+count);offset+=count;
   return <Markdown key={i} text={b.text} rehypePlugins={slice.length?[rehypeHeadingIds(slice)]:undefined}/>;
  })}</div>;

@@ -115,3 +115,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 
 - 2026-11-23 · Whiteboard: `/interview/system-design/<slug>/whiteboard` with Excalidraw 0.18.1 (exact pin) loaded only via next/dynamic ssr:false; template and frames generated in code from question data; boards autosave per account (`system_design_whiteboards`, own-row RLS) or to visitors' localStorage; fonts self-hosted; phones get a note plus preview · S2 spec
 - 2026-11-23 · Interview steps (S3): step shape is validated in TS and SQL (id/title required, optional category/question/instruction/minutes/frame/how_to_answer/model_answer/checklist/clarifying); voice is browser Web Speech only and hidden when unsupported; in-progress answers autosave in the browser only, "Finish attempt" snapshots go to own-row `system_design_attempts` (visitors: last 3 in localStorage) · S3 spec
+
+- 2026-11-23 · System-design solution diagrams own their full scoped styles, render immediately and adapt to reading-column width; shared geometry is reused with optional obstacle-avoiding edges while project defaults stay unchanged · Jamie’s Tiny URL diagram feedback
+
+- 2026-11-23 · System-design related Notes is directly accessible in the main question tab row, linking the selected note or Notes overview; the second column stays for questions · Jamie’s tab-placement request

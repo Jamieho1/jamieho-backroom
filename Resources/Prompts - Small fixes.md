@@ -27,3 +27,26 @@ Done when:
 
 Report: files changed, checks actually run and results.
 ```
+
+---
+
+## TKT-145 — Approve large Content Drafts: compare a hash, not the whole draft in the URL
+
+```
+You are working in the jamieho-backroom repo. First read AGENTS.md, docs/README.md, docs/status.md, docs/content-drafts.md and docs/security.md and follow them (Jamie pushes; never push; new migrations only, applied live only after Jamie says "apply it"; update docs/ + MEMORY.md + docs/decisions.md after). Ticket: TKT-145 (Notion).
+
+Problem (2026-11-23): approving a large draft fails with "Approval failed. No content changes were applied. Try again." and nothing reaches Postgres. approveContentChange (app/actions/content-drafts.ts) guards its PATCH with
+  .filter("operations","eq",JSON.stringify(set.operations)).filter("photo_slots","eq",JSON.stringify(set.photo_slots))
+which puts the whole draft into the request URL. The Tiny URL draft (~26k characters, ~40 KB URL-encoded) got HTTP 400 from the Supabase API gateway (edge log: PATCH /rest/v1/content_changes 400, no Postgres error). The largest draft that worked before was ~30 KB encoded. Any future large draft will hit the same limit.
+
+Fix:
+1. New migration: add to public.content_changes a stored generated column
+     content_hash text generated always as (md5(operations::text || '|' || photo_slots::text)) stored
+   (jsonb::text is canonical, so equal content gives equal hashes). Check that private.apply_content_change and the existing triggers/RLS/grants still work: the column must be readable by the owner and must not be writable by anyone (it is generated). Keep every existing check in the trigger (including "Save draft edits before reviewing the set").
+2. approveContentChange: select content_hash when loading the set, and replace the two URL filters with .eq("content_hash", loaded.content_hash). Same semantics: if the draft changed between load and approve, zero rows update and the existing "This draft changed or was already reviewed" message is returned.
+3. Grep for any other place that filters on operations/photo_slots or sends a draft's content in a URL (discard, save edits, preview, scripts/ops.mjs) and fix it the same way.
+4. Content Draft authors (docs/content-drafts.md): note that there is no longer a practical URL size limit; the 100-operation limit and per-field limits still apply.
+
+Done when: unit tests for the action (hash used, no operations/photo_slots in the query, changed-since-load still rejected), DB tests (generated column present and correct, not writable, owner can read, approval of a draft with >100 KB of operations succeeds end to end in PGlite), typecheck, full suite, build, static assertions. Report the migration filename and the checks actually run. Do NOT apply the migration.
+```
+

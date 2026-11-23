@@ -83,8 +83,8 @@ export function diagramLabel(diagram: ProjectDiagram): string {
 }
 
 /** Wide layout: nodes flow left to right in rows of up to four, each row filling the width; wrapped edges drop and run back. */
-export function layoutDesktop(diagram: ProjectDiagram, perRow = 4): DiagramLayout {
-  const W = 920, GAP_X = 56, GAP_Y = 94, TOP = 20, BOTTOM = 10;
+export function layoutDesktop(diagram: ProjectDiagram, perRow = 4, width = 920, avoidNodes = false): DiagramLayout {
+  const W = width, GAP_X = 56, GAP_Y = 94, TOP = 20, BOTTOM = 10;
   const rows: ProjectDiagram["nodes"][] = [];
   diagram.nodes.forEach((node, i) => {if (i % perRow === 0) rows.push([]); rows[rows.length - 1].push(node);});
   const placed: Placed[] = [];
@@ -105,13 +105,19 @@ export function layoutDesktop(diagram: ProjectDiagram, perRow = 4): DiagramLayou
   const height = y - GAP_Y + BOTTOM, byId = new Map(placed.map(p => [p.id, p])), index = new Map(diagram.nodes.map((n, i) => [n.id, i]));
   const route = (a: Placed, b: Placed) => {
     const ay = a.y + a.h / 2;
-    if (a.row === b.row && b.x > a.x) return `M${num(a.x + a.w)} ${num(ay)}H${num(b.x)}`;
+    if (a.row === b.row && b.x > a.x && (!avoidNodes || !placed.some(n => n.row === a.row && n.x > a.x && n.x < b.x))) return `M${num(a.x + a.w)} ${num(ay)}H${num(b.x)}`;
     if (a.row === b.row) {const t = a.y - 12; return `M${num(a.x + a.w / 2)} ${num(a.y)}V${num(t)}H${num(b.x + b.w / 2)}V${num(b.y)}`;}
+    if (avoidNodes && Math.abs(b.row - a.row) > 1) {
+      const down = b.row > a.row, start = down ? a.y + a.h : a.y, end = down ? b.y : b.y + b.h;
+      const exit = start + (down ? 1 : -1) * GAP_Y / 3, entry = end + (down ? -1 : 1) * GAP_Y / 3;
+      return `M${num(a.x + a.w / 2)} ${num(start)}V${num(exit)}H${W + 18}V${num(entry)}H${num(b.x + b.w / 2)}V${num(end)}`;
+    }
     if (b.row > a.row) {const gap = a.y + a.h + GAP_Y / 2; return `M${num(a.x + a.w / 2)} ${num(a.y + a.h)}V${num(gap)}H${num(b.x + b.w / 2)}V${num(b.y)}`;}
     const gap = a.y - GAP_Y / 2; return `M${num(a.x + a.w / 2)} ${num(a.y)}V${num(gap)}H${num(b.x + b.w / 2)}V${num(b.y + b.h)}`;
   };
-  const viewBox = `0 0 ${W} ${num(height)}`;
-  return {viewBox, width: W, height, svg: root(viewBox, diagramLabel(diagram), [...nodeShapes(placed, index), ...edgeShapes(diagram, byId, route)])};
+  const viewWidth = avoidNodes ? W + 36 : W;
+  const viewBox = `0 0 ${viewWidth} ${num(height)}`;
+  return {viewBox, width: viewWidth, height, svg: root(viewBox, diagramLabel(diagram), [...nodeShapes(placed, index), ...edgeShapes(diagram, byId, route)])};
 }
 
 /** Narrow layout: one column; non-adjacent edges run down the right margin. */
