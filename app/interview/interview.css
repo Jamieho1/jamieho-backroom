@@ -314,3 +314,10 @@ body:has(.iv-shell) {background:#0e131c;}
  .iv-problem-toolbar-slot .practice-timer-glyph {display:inline;}
  .iv-problem-toolbar-slot .practice-timer {flex-wrap:nowrap;flex:none;}
 }
+
+/* Companies: compact cards share the PassLoop palette and full-card keyboard links. */
+.iv-companies{padding:clamp(20px,3vw,40px);min-width:0}.iv-companies h1{font-size:28px;margin:0 0 24px}
+.iv-company-controls{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}.iv-company-controls input{flex:1;min-width:0;max-width:440px}.iv-company-controls input,.iv-company-controls select{background:var(--iv-panel);color:var(--iv-ink);border:1px solid var(--iv-line);padding:10px 12px;border-radius:8px;font:inherit}.iv-company-controls label{display:flex;align-items:center;gap:8px}
+.iv-company-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;list-style:none;padding:0;margin:0}.iv-company-grid li{min-width:0}.iv-company-grid a{display:flex;align-items:center;gap:12px;padding:18px 14px;border:1px solid var(--iv-line);border-radius:10px;background:var(--iv-panel);color:var(--iv-ink);height:100%;text-decoration:none;box-sizing:border-box}.iv-company-grid a:hover,.iv-company-grid a:focus-visible{border-color:var(--iv-accent);outline:2px solid var(--iv-accent);outline-offset:2px}.iv-company-grid [data-draft-changed=true]{outline:2px solid var(--iv-accent);outline-offset:2px}
+.iv-company-copy{display:grid;gap:6px;min-width:0;flex:1}.iv-company-copy strong{font-size:14px;overflow-wrap:anywhere}.iv-company-copy small{color:var(--iv-muted);font-size:12px}.iv-company-logo{width:24px;height:24px;object-fit:contain;flex-shrink:0}.iv-company-monogram{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+@media(max-width:1600px){.iv-company-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:1100px){.iv-company-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.iv-company-grid{grid-template-columns:minmax(0,1fr)}.iv-company-controls input{flex-basis:100%;width:100%}}

@@ -99,3 +99,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · Inline code nested inside Markdown highlights uses white text on its dark grey chip; surrounding highlighted prose keeps its readable yellow/black treatment · Jamie’s readability feedback
 
 - 2026-11-23 · P5 keeps one section home per question and links homes through existing Notes-topic concepts/prerequisites; related links can cross homes while lists/drawer/arrows cannot; problem controls share one header row and class-design displays Low Level Design · approved P5 prompt and Jamie’s layout request
+
+- 2026-11-23 · Companies is public, owner-authored through Content Drafts, with optional home-media logos/monograms and parent-filtered public question counts; company drafts unpublish instead of removing rows, anonymous experiences have no author · approved C1 prompt

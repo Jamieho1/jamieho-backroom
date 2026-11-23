@@ -1,3 +1,4 @@
+import {loadCompaniesPreview,companyTargets} from './companies';
 import {loadAboutPhotosPreview} from './about-photos';
 import {loadBehavioralPreview,behavioralTargets} from './behavioral-guides';
 import {loadTemplatePreview} from './resume-template';
@@ -32,10 +33,10 @@ export async function loadOwnerPreview(id: string): Promise<HomePreview | null> 
     if(rows.error)return null;
     try {experience=overlayExperience((rows.data??[]) as unknown as ExperienceRow[],result.operations);} catch {return null;}
   }
-  let publishing,appData,resumeTemplate,behavioral,aboutPhotos;
-  try {aboutPhotos=await loadAboutPhotosPreview(sb,result.operations);behavioral=await loadBehavioralPreview(sb,result.operations);resumeTemplate=await loadTemplatePreview(sb,result.operations);publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations,viewer.id);} catch {return null;}
-  const targets=[...behavioralTargets(result.operations),...(resumeTemplate?[{href:'/interview/resume',label:'Preview resume template'}]:[]),...publishingTargets(result.operations),...appTargets(result.operations)];
-  return { ...(aboutPhotos?{aboutPhotos}:{}),...(behavioral?{behavioral}:{}),...(resumeTemplate?{resumeTemplate}:{}),...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
+  let publishing,appData,resumeTemplate,behavioral,aboutPhotos,companies;
+  try {companies=await loadCompaniesPreview(sb,result.operations);aboutPhotos=await loadAboutPhotosPreview(sb,result.operations);behavioral=await loadBehavioralPreview(sb,result.operations);resumeTemplate=await loadTemplatePreview(sb,result.operations);publishing=await loadPublishingPreview(sb,result.operations);appData=await loadAppPreview(sb,result.operations,viewer.id);} catch {return null;}
+  const targets=[...companyTargets(result.operations),...behavioralTargets(result.operations),...(resumeTemplate?[{href:'/interview/resume',label:'Preview resume template'}]:[]),...publishingTargets(result.operations),...appTargets(result.operations)];
+  return { ...(companies?{companies}:{}),...(aboutPhotos?{aboutPhotos}:{}),...(behavioral?{behavioral}:{}),...(resumeTemplate?{resumeTemplate}:{}),...(Object.keys(publishing).length?{publishing}:{}),...(Object.keys(appData).length?{appData}:{}),...(targets.length?{targets}:{}), ...(photoSlots.length?{photoSlots}:{}),id: data.id, summary: data.summary, operations: result.operations, ...(experience ? {experience} : {}) };
 }
 
 /** Draft Mode is false at prerender time. Only its enabled branch reads request cookies/auth. */

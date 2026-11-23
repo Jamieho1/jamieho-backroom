@@ -1,4 +1,5 @@
 "use server";
+import {loadCompaniesPreview} from '@/lib/content-drafts/companies';
 
 import {loadAboutPhotosPreview} from '@/lib/content-drafts/about-photos';
 import {loadBehavioralPreview} from '@/lib/content-drafts/behavioral-guides';
@@ -36,7 +37,7 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
       for(const slot of parsed.slots)await checkSlotObject(sb,slot);
       result={operations:await withPhotoOperations(sb,parsed.operations,parsed.slots)};
     }catch(error){return {ok:false,message:error instanceof Error?error.message:"Invalid photo draft."};}
-    try { await loadAboutPhotosPreview(sb,result.operations); await loadBehavioralPreview(sb,result.operations); await loadTemplatePreview(sb,result.operations); await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations,viewer.id); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
+    try { await loadCompaniesPreview(sb,result.operations); await loadAboutPhotosPreview(sb,result.operations); await loadBehavioralPreview(sb,result.operations); await loadTemplatePreview(sb,result.operations); await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations,viewer.id); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
     // Re-check the verified session immediately before the mutation; SQL independently checks ownership.
     const current = await getViewer();
     if (current.role !== "owner" || current.id !== viewer.id) return denied();

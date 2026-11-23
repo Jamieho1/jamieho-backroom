@@ -89,3 +89,68 @@ Goal: each question keeps ONE home section (no duplicates across DSA and Low Lev
 6. Section lists, the topic drawer and ‹ › stay within the current section (unchanged).
 Done when: unit tests (schema validation, concept ids exist, related ranking across sections, "Used in design" lookup), browser tests desktop + 390 px (Builds on chips on LRU Cache link to the right notes, Practise first links, Used in design block on the linked-list note); typecheck, suite, build, static assertions; docs/interview.md updated. Report checks actually run.
 ```
+
+---
+
+# Companies (Tools → Companies)
+
+Layout reference: techprep.app/companies and /companies/google (structure only — no copying of their text, data, logos or question lists). All content is Jamie's own, entered through Content Drafts. No paywall: everything visible (sign-in only for personal progress).
+
+## C1 — Companies data model and directory
+
+```
+Ticket C1 (PassLoop Companies). Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md and follow them.
+
+1. Migration (NOT applied until Jamie says "apply it"; policy tests): 
+   - companies: id uuid, slug (unique, kebab), name, logo_path (optional home-media path; '' = monogram), overview (Markdown), sort, public, timestamps.
+   - company_questions: id, company_id, kind ('coding' | 'system_design' | 'low_level_design'), section label for coding ('Data Structures & Algorithms' | 'SQL' | …), question_ref (practice problem id from the code catalogue, or a notes/system-design topic id), rank (frequency order, lower = more frequent), public.
+   - interview_experiences: id, company_id, slug, title, level ('Junior'|'Mid'|'Senior'|'Staff'|'Other'), role, interview_date (month), region, body (Markdown), published, published_at. Anonymous by default (no author field).
+   RLS: anyone reads public/published rows; only the owner writes (existing owner check). Add all three tables to the Content Drafts allowlist (TS + SQL apply functions, mirroring existing patterns) with preview overlay support. Validate question_ref against the catalogue in the TS allowlist (unknown ids refused).
+2. /interview/companies (sidebar Tools → Companies; remove its "Soon" placeholder): title "Companies", search box ("Search N companies"), sort select (A–Z, Most questions), responsive card grid (5 / 3 / 2 / 1 columns): logo or a monogram tile (first letters on a colour derived from the name), name, "N questions", chevron; whole card links to the company page. Empty state when there are no companies yet.
+3. Logos: optional; if logo_path is set use it from home-media (small, 20–24 px, alt "<name> logo"); otherwise the monogram. Never fetch logos from third-party sites.
+
+Done when: DB policy tests; unit tests for search/sort and monogram; browser tests desktop + 390 px with fixture companies; typecheck, suite, build, static assertions; docs/interview.md + security.md updated; migration recorded NOT applied. Report checks actually run.
+```
+
+## C2 — Company page: tabs, question lists, overview
+
+```
+Ticket C2. Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md. Requires C1 (migration applied).
+
+/interview/companies/[slug]:
+1. Desktop layout: PassLoop rail, then a narrow companies list column (search + scrollable list with logos/monograms, current highlighted, collapsible like the topic list), then the content. Phones: the companies list becomes a "Companies ▾" sheet.
+2. Header: logo/monogram + name, a "Search questions" box and a "Status" filter (All / To do / Done / Flagged — uses the signed-in user's existing practice flags and completions; visitors see All only). Tabs: Overview · Coding · System Design · Low-Level Design · Interview Experiences (tab in the URL, e.g. ?tab=coding).
+3. Overview: the company's Markdown overview with an "On this page" sticky TOC from ## headings, a "Practice" box (Coding N Qs · System Design N Qs · Low-Level Design N Qs linking to the tabs) and "Latest interview experiences" (3 newest, linking to C3 pages).
+4. Coding: "Ordered by most frequently asked within each section"; grouped by section label; list rows: topic-colour icon, question name, difficulty badge, flag + done controls (existing per-user practice state); grid/list toggle; row opens the question workspace (/interview/problems/<id>) and the workspace's ‹ › stay as today.
+5. System Design and Low-Level Design: two-column cards (icon, title, small "Problem statement · Solution" meta, flag/done, chevron) linking to the existing system-design notes / LLD question pages.
+6. Search and status filter apply across the current tab; empty states for tabs with no items.
+
+Done when: unit tests (grouping/ranking, filters, URL tab), browser tests desktop + 390 px (directory → company → each tab → open a question), typecheck, suite, build, static assertions; docs updated. Report checks actually run.
+```
+
+## C3 — Interview experiences
+
+```
+Ticket C3. Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md. Requires C2.
+
+1. Interview Experiences tab: list of published experiences for the company (title, level · role · month year · region, 2-line excerpt, published date), newest first, filter by level.
+2. Detail page /interview/companies/[slug]/experiences/[experience]: "← All interview experiences", company chip · level · role · month year · region, big title, "By an anonymous member · Published <date>", Markdown body (## sections like Recruiter, Technical screen, Onsite, Outcome). Right sidebar (desktop): "More from <company>" (up to 3) and "More at <level>" across companies (up to 5); phones: these move below the article.
+3. No votes/comments/premium box for now.
+4. Content Drafts: experiences are drafted and approved like other content; preview overlay works on these pages.
+
+Done when: unit tests (related lists), browser tests desktop + 390 px, typecheck, suite, build, static assertions; docs updated. Report checks actually run.
+```
+
+## C4 — "What to prepare" links in interview experiences + role notes
+
+```
+Ticket C4. Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md. Requires C3.
+
+Goal: an interview experience stays short; instead of re-explaining topics it links to the site's own notes, questions and guides so readers know what to study and practise.
+1. Role notes: Role sections (Full-Stack, Finance Engineering, AI Engineering, FDE, Data Science, Machine Learning) can hold notes topics like the existing sections (reuse the notes table's section assignment; add 'full-stack' etc. as sections if missing — migration only if needed, NOT applied until "apply it"). Each role page shows its note topics instead of "Soon" once it has at least one note (keep "Soon" when empty). Example future topic: Full-Stack → "Locking mechanisms". Notes are created/edited through Content Drafts as today.
+2. Prep links on experiences: add `prep_links` to interview_experiences — an ordered list of {kind: 'note' | 'question' | 'behavioral_theme', ref, label?} where ref is a notes topic id, a practice question id or a behavioral theme id. Validate refs (TS allowlist + SQL check on shape; unknown refs refused). Allowlist in Content Drafts with preview support.
+3. Rendering on the experience page: a "What to prepare" block after the article (and a compact copy in the right sidebar on desktop): grouped as Concepts (notes) · Practice (questions, with difficulty + the reader's done tick) · Behavioral (themes, with "answered X of Y" for signed-in users). Each item links to its page. Hide empty groups.
+4. Inline references: in experience Markdown, `[[note:locking]]`, `[[question:lru-cache]]` and `[[behavioral:conflict]]` render as small linked chips (unknown refs render as plain text and are reported in Content Drafts validation).
+5. Company Overview tab: a "Most-mentioned topics" box aggregating prep_links across that company's experiences (top 8 by count), linking to each topic.
+Done when: unit tests (ref validation, chip parsing, aggregation), DB/policy tests if a migration was added, browser tests desktop + 390 px; typecheck, suite, build, static assertions; docs updated. Report checks actually run.
+```

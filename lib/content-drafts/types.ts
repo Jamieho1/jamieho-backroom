@@ -43,6 +43,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
 }
 
 export interface HomePreview {
+  companies?:import('./companies').CompaniesPreview;
   aboutPhotos?:import("@/lib/home-content-schema").AboutPhoto[];
   behavioral?:import('./behavioral-guides').BehavioralPreview;
   resumeTemplate?:import('@/lib/resume').ResumeTemplate;
