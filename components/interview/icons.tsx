@@ -46,4 +46,5 @@ const paths:Record<InterviewSection['id']|TopicId|'brand'|'menu'|'close'|'collap
  feedback:'M4 4h16v12H9l-5 4ZM12 7v4M12 13h.01',back:'M20 12H4M10 6l-6 6 6 6',account:'M9 3h6v6H9ZM4 21v-5l4-3h8l4 3v5Z',topics:'M4 5h3M10 5h10M4 12h3M10 12h10M4 19h3M10 19h10',
 };
 export type InterviewIconName=keyof typeof paths;
+export const isInterviewIcon=(name:string):name is InterviewIconName=>Object.hasOwn(paths,name);
 export function InterviewIcon({name,...props}:{name:InterviewIconName}&SVGProps<SVGSVGElement>){return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" {...props}><path d={paths[name]}/></svg>;}

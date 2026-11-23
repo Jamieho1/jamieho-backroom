@@ -1,15 +1,17 @@
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import type { Options } from "react-markdown";
 
 /**
  * Safe Markdown for site content: raw HTML in the text is never rendered (react-markdown escapes it),
  * and links to other sites open in a new tab without access to this page.
  */
-export function Markdown({ text, disableLinks = false }: { text: string; disableLinks?: boolean }) {
+export function Markdown({ text, disableLinks = false, rehypePlugins }: { text: string; disableLinks?: boolean; rehypePlugins?: Options["rehypePlugins"] }) {
   return (
     <div className="md">
       <ReactMarkdown
         skipHtml
+        rehypePlugins={rehypePlugins}
         components={{
           a: ({ href = "", children, title }) => {
             if (disableLinks) return <>{children}</>;

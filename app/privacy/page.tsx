@@ -45,6 +45,9 @@ export default function Privacy() {
           are covered by the retention and encrypted-backup periods below.
         </li>
         <li>
+          <strong>System design questions</strong>: the question pages (solution, quiz and whiteboard steps) are written by the owner and are public. A visitor&apos;s quiz attempts stay in this browser only. Signed-in users&apos; quiz attempts (score, the answer chosen for each question and date) and their flag/done marks are stored with their account and question ID in Supabase to sync across devices. Each user can access only their own records through the site, including the owner; deleting an account removes them. Administrative encrypted backups include these records and follow the retention periods below. Clearing site storage removes a visitor&apos;s attempts.
+        </li>
+        <li>
           <strong>Articles</strong> are stored in Supabase. Signed-in readers can pin published articles; the article ID, account ID and pin date are stored privately to sync their list across devices. Readers can unpin them; deleting an account or article removes its pins. These records follow the retention and backup periods below. The owner can save private drafts and publish articles and reference links for everyone to read. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>

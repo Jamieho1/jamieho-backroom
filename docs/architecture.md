@@ -158,3 +158,7 @@ PassLoop P5: static `problem-content/concepts.ts` attaches validated DSA-topic I
 ## Interview experience articles (C3)
 
 The nested company experience route loads public company-scoped detail plus public cross-company related data through companies-data.ts, or an explicit verified owner snapshot. `lib/interview/experiences.ts` supplies immutable newest/date/level/search/excerpt/related helpers, reused by company overview links. `experience-list.tsx` adds level filtering/list metadata/excerpts; `experience-detail.tsx` renders safe Markdown, anonymous attribution, company navigation and responsive related lists. The existing shell resets workspace scroll only when entering a story route. Existing Content Drafts targets and approval cache invalidation include nested story pages. No new tables, policies, API, personal data, export fields or public prerendering changes.
+
+## System design questions (S1)
+
+`/interview/system-design/<slug>` renders owner-managed rows from `system_design_questions` through `app/interview/[section]/[mode]/[[...topic]]/system-design.tsx` (dynamic, anon read of public rows; a missing table reads as no questions). Components: components/interview/sd-page|sd-solution|sd-quiz|sd-list.tsx; data lib/interview/system-design(-data).ts; actions app/actions/system-design.ts; styles app/interview/system-design.css.

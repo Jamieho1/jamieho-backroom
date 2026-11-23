@@ -1,4 +1,6 @@
 import {COMPANY_ALLOWLIST,companyOperation} from './companies';
+import {SD_ALLOWLIST,systemDesignOperation,isSystemDesignTable} from './system-design';
+import {sdHref} from '@/lib/interview/system-design';
 import {isCompanyTable} from '@/lib/interview/companies';
 import {themeFields,questionFields,themeSchema,behavioralOperation,isGuideTable,questionHref} from '@/lib/interview/behavioral';
 import {templateFields,templateOperation} from '@/lib/resume';
@@ -30,6 +32,7 @@ const guideFields=guideSchema.omit({id:true}).shape;
 export const CONTENT_ALLOWLIST = {
   ...APP_ALLOWLIST,
   ...COMPANY_ALLOWLIST,
+  ...SD_ALLOWLIST,
   about_photos:{key:uuid,fields:photoFields,operations:["insert","update","delete"] as const,routes:["/","/about","/journey"] as const},
   interview_behavioral_themes:{key:themeSchema.shape.id,fields:themeFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
   interview_behavioral_questions:{key:z.uuid(),fields:questionFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
@@ -95,7 +98,7 @@ const publishingOperations={projects:publishingOperation("projects"),articles:pu
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
-  const schema = typeof op?.table==='string'&&isCompanyTable(op.table)?companyOperation(op.table):op?.table==='about_photos'?(op.op==='insert'?photoInsert:op.op==='delete'?photoDelete:photoUpdate):typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
+  const schema = typeof op?.table==='string'&&isCompanyTable(op.table)?companyOperation(op.table):typeof op?.table==='string'&&isSystemDesignTable(op.table)?systemDesignOperation:op?.table==='about_photos'?(op.op==='insert'?photoInsert:op.op==='delete'?photoDelete:photoUpdate):typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
     : op?.table === "experience_items" ? op.op === "insert" ? itemInsert : itemUpdate
     : op?.table === "experience_bullets" ? op.op === "insert" ? bulletInsert : op.op === "delete" ? bulletDelete : bulletUpdate
     : null;
@@ -121,6 +124,8 @@ export function affectedRoutes(operations: ContentOperation[], previous:unknown 
   for(const op of operations)if(isCompanyTable(op.table)){
     if(op.table==='companies'&&'slug' in op.fields&&typeof op.fields.slug==='string')routes.push(`/interview/companies/${encodeURIComponent(op.fields.slug)}`);
   }
+  for(const op of operations)if(isSystemDesignTable(op.table)&&'slug' in op.fields&&typeof op.fields.slug==='string')routes.push(sdHref(op.fields.slug));
+  if(Array.isArray(previous))for(const row of previous)if(row?.table==='system_design_questions'&&typeof row.values?.slug==='string')routes.push(sdHref(row.values.slug));
   if(Array.isArray(previous))for(const row of previous)if(row?.table==='companies'&&typeof row.values?.slug==='string')routes.push(`/interview/companies/${encodeURIComponent(row.values.slug)}`);
   return [...new Set(routes)];
 }

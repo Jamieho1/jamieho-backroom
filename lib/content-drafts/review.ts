@@ -1,4 +1,5 @@
 import {isCompanyTable} from '@/lib/interview/companies';
+import {isSystemDesignTable} from './system-design';
 import {companyTargets} from './companies';
 import {isGuideTable} from '@/lib/interview/behavioral';
 import {behavioralTargets} from './behavioral-guides';
@@ -28,10 +29,10 @@ export async function loadContentReview(): Promise<{ drafts: ReviewDraft[]; erro
   ]);
   if (sets.error || sections.error || items.error || bullets.error||projects.error||articles.error||guides.error) return { drafts: [], error: "Could not load content drafts and current live values. Try again." };
   const appRows:Record<string,Record<string,Record<string,unknown>>>={};
-  const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isCompanyTable(op.table)||op.table==='about_photos'||isGuideTable(op.table)||isAppTable(op.table)||op.table==='resume_templates'?[op.table]:[]):[];}));
+  const appTables=new Set((sets.data??[]).flatMap(set=>{const parsed=validateOperations(set.operations);return parsed.ok?parsed.operations.flatMap(op=>isCompanyTable(op.table)||isSystemDesignTable(op.table)||op.table==='about_photos'||isGuideTable(op.table)||isAppTable(op.table)||op.table==='resume_templates'?[op.table]:[]):[];}));
   for(const table of appTables){
     let query=sb.from(table).select("*");if(isPersonalPractice(table))query=query.eq("user_id",viewer.id);const rows=await query;if(rows.error)return {drafts:[],error:"Could not load current app values. Try again."};
-    appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[isCompanyTable(table)||table==='about_photos'||isGuideTable(table)?row.id:table==='resume_templates'?row.key:appKey(table as import('./app-allowlist').AppTable,row),row]));
+    appRows[table]=Object.fromEntries((rows.data??[]).map(row=>[isCompanyTable(table)||isSystemDesignTable(table)||table==='about_photos'||isGuideTable(table)?row.id:table==='resume_templates'?row.key:appKey(table as import('./app-allowlist').AppTable,row),row]));
   }
   const live = Object.fromEntries((sections.data ?? []).map(row => [row.key, { title: row.title ?? "", body: row.body ?? "" }]));
   const drafts = ((sets.data ?? []) as ContentChange[]).map(set => {

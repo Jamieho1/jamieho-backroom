@@ -110,3 +110,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · Published company experiences use anonymous article pages and level-filtered lists; related stories cap at three same-company and five same-level other-company items, with shared owner-only draft previews and no votes/comments/premium controls · approved C3 prompt
 
 - 2026-11-23 · Experience “What to prepare” uses `prep_links` (note/question/behavioral_theme) plus `[[kind:ref]]` chips; role notes reuse id-prefix section assignment (full-stack-, fde-, data-science-, ml-) and role pages stay Soon until a readable note exists · C4 spec
+
+- 2026-11-23 · System-design questions live in one owner-managed `system_design_questions` table (Markdown solution, quiz JSON, S3 step JSON) with own-row quiz attempts and flag/done tables; `/interview/system-design/<slug>` is resolved inside the existing `[section]/[mode]` route (practice/notes are reserved slugs); the score is recomputed server-side and visitors' attempts stay in localStorage · S1 spec
