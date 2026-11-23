@@ -1,7 +1,12 @@
 import {TOPICS,topicById} from '@/lib/notes/topics';
 import {PRACTICE_LIST} from '@/lib/practice/catalog';
 import {shelfTitle} from '@/lib/notes';
-export type SkillSection='dsa'|'system-design'|'low-level-design'|'finance'|'ai-engineering';
+export type RoleNoteSection='full-stack'|'forward-deploy-engineer'|'data-scientist'|'machine-learning';
+export type SkillSection='dsa'|'system-design'|'low-level-design'|'finance'|'ai-engineering'|RoleNoteSection;
+/** Role sections that hold notes only (no practice catalogue yet); the page stays Soon until a note exists. */
+export const ROLE_NOTE_SECTIONS:readonly RoleNoteSection[]=['full-stack','forward-deploy-engineer','data-scientist','machine-learning'];
+const ROLE_PREFIX:readonly (readonly [string,RoleNoteSection])[]=[['full-stack-','full-stack'],['fde-','forward-deploy-engineer'],['data-science-','data-scientist'],['ml-','machine-learning']];
+const ROLE_DOT:Record<RoleNoteSection,string>={'full-stack':'#34D399','forward-deploy-engineer':'#22D3EE','data-scientist':'#A78BFA','machine-learning':'#F472B6'};
 export interface InterviewTopic {id:string;label:string;dot:string}
 /** Deterministic assignment for imports and drafts; no schema or private-content mapping required. */
 export function noteSection(id:string):SkillSection {
@@ -9,11 +14,12 @@ export function noteSection(id:string):SkillSection {
  if(id.startsWith('sd-'))return 'system-design';
  if(id.startsWith('finance-'))return 'finance';
  if(id.startsWith('ai-'))return 'ai-engineering';
+ for(const [prefix,section] of ROLE_PREFIX)if(id.startsWith(prefix))return section;
  return 'dsa';
 }
 export function sectionTopics(section:string,notes:readonly {id:string;title:string}[]=[]):InterviewTopic[]{
  const fixed:InterviewTopic[]=section==='dsa'?TOPICS.filter(t=>t.id!=='class-design'):section==='low-level-design'?TOPICS.filter(t=>t.id==='class-design'):[];
- const extra=notes.filter(n=>noteSection(n.id)===section&&!fixed.some(t=>t.id===n.id)).map(n=>({id:n.id,label:shelfTitle(n.title),dot:section==='system-design'?'#F54E00':section==='finance'?'#F7A501':section==='ai-engineering'?'#7C3AED':TOPICS[0].dot}));
+ const extra=notes.filter(n=>noteSection(n.id)===section&&!fixed.some(t=>t.id===n.id)).map(n=>({id:n.id,label:shelfTitle(n.title),dot:section==='system-design'?'#F54E00':section==='finance'?'#F7A501':section==='ai-engineering'?'#7C3AED':ROLE_DOT[section as RoleNoteSection]??TOPICS[0].dot}));
  return [...fixed,...extra];
 }
 export const noteHref=(id:string)=>`/interview/${noteSection(id)}/notes/${encodeURIComponent(id)}`;

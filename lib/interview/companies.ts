@@ -1,16 +1,18 @@
 import {z} from 'zod';
 import {PRACTICE_ANCHORS as PRACTICE_LIST} from '@/lib/notes/neetcode150';
 import {TOPICS} from '@/lib/notes/topics';
+import {prepLinksSchema} from './prep';
 const text=(max:number)=>z.string().refine(s=>!s.includes('\0')&&Array.from(s).length<=max,`Text must be at most ${max} characters.`);
 const required=(max:number)=>text(max).refine(s=>!!s.trim(),'Text cannot be blank.');
 const integer=z.number().int().min(-2147483648).max(2147483647);
 const slug=text(80).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/);
 export const companyFields={slug,name:required(160),logo_path:z.union([z.literal(''),text(240).regex(/^[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*\.(?:png|jpg|jpeg|webp|svg)$/)]),overview:text(50000),sort:integer,public:z.boolean()};
 export const companyQuestionFields={company_id:z.uuid(),kind:z.enum(['coding','system_design','low_level_design']),section:required(80),question_ref:required(80),rank:integer,public:z.boolean()};
-export const experienceFields={company_id:z.uuid(),slug,title:required(200),level:z.enum(['Junior','Mid','Senior','Staff','Other']),role:required(160),interview_date:z.union([z.literal(''),z.string().regex(/^[0-9]{4}-(0[1-9]|1[0-2])$/)]),region:text(160),body:text(50000),published:z.boolean(),published_at:z.iso.datetime({offset:true}).nullable()};
+export const experienceFields={company_id:z.uuid(),slug,title:required(200),level:z.enum(['Junior','Mid','Senior','Staff','Other']),role:required(160),interview_date:z.union([z.literal(''),z.string().regex(/^[0-9]{4}-(0[1-9]|1[0-2])$/)]),region:text(160),body:text(50000),published:z.boolean(),published_at:z.iso.datetime({offset:true}).nullable(),prep_links:prepLinksSchema};
 export const companySchema=z.object({id:z.uuid(),...companyFields});
 export const companyQuestionSchema=z.object({id:z.uuid(),...companyQuestionFields});
-export const interviewExperienceSchema=z.object({id:z.uuid(),...experienceFields});
+/** prep_links is optional on read so rows from a database without the C4 column still parse during rollout. */
+export const interviewExperienceSchema=z.object({id:z.uuid(),...experienceFields,prep_links:prepLinksSchema.optional()});
 export type Company=z.infer<typeof companySchema>&{draftChanged?:boolean};
 export type CompanyQuestion=z.infer<typeof companyQuestionSchema>&{draftChanged?:boolean};
 export type InterviewExperience=z.infer<typeof interviewExperienceSchema>&{draftChanged?:boolean};
@@ -19,7 +21,7 @@ export const COMPANY_TABLES=['companies','company_questions','interview_experien
 export type CompanyTable=typeof COMPANY_TABLES[number];
 export const isCompanyTable=(s:string):s is CompanyTable=>COMPANY_TABLES.some(t=>t===s);
 export const companySchemas={companies:companySchema,company_questions:companyQuestionSchema,interview_experiences:interviewExperienceSchema};
-export const companyDefaults={companies:{logo_path:'',overview:'',sort:100,public:false},company_questions:{rank:100,public:false},interview_experiences:{level:'Other',interview_date:'',region:'',body:'',published:false,published_at:null}};
+export const companyDefaults={companies:{logo_path:'',overview:'',sort:100,public:false},company_questions:{rank:100,public:false},interview_experiences:{level:'Other',interview_date:'',region:'',body:'',published:false,published_at:null,prep_links:[]}};
 export const companyHref=(slug:string)=>`/interview/companies/${encodeURIComponent(slug)}`;
 export function validCompanyReference(ref:string,kind?:string,notes:readonly string[]=[]):boolean {
  const problem=PRACTICE_LIST.find(p=>String(p.lc)===ref);

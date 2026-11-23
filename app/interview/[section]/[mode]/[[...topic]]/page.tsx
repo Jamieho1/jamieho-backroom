@@ -7,11 +7,12 @@ import {getInterviewNotes} from '@/lib/interview/notes';
 import {NotesReader} from '@/components/notes/reader';
 import {PagePreview} from '@/components/content-drafts/page-preview';
 import {NotesSignIn} from '@/components/notes/sign-in';
-import {modeHref,noteSection} from '@/lib/interview/content';
+import {modeHref,noteSection,ROLE_NOTE_SECTIONS} from '@/lib/interview/content';
 export const dynamic='force-dynamic';
 export default async function InterviewTopicPage({params}:{params:Promise<{section:string;mode:string;topic?:string[]}>}){
  const {section,mode,topic}=await params;const item=INTERVIEW_SECTIONS.find(s=>s.id===section);
- if(!item||!PRACTICE_SECTIONS.some(s=>s===section)||!['practice','notes'].includes(mode)||topic&&topic.length!==1)notFound();
+ const roleNotes=ROLE_NOTE_SECTIONS.some(s=>s===section);
+ if(!item||!(PRACTICE_SECTIONS.some(s=>s===section)||roleNotes)||!['practice','notes'].includes(mode)||roleNotes&&mode!=='notes'||topic&&topic.length!==1)notFound();
  const data=await getInterviewNotes();const topics=interviewTopics(section,data.notes);const id=topic?.[0];
  const selected=id?topics.find(t=>t.id===id):undefined;
  // Private imported note IDs must not become a signed-out existence oracle.

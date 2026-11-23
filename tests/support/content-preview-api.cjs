@@ -107,6 +107,21 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await db.query("insert into public.practice_attempts(user_id,id,problem,code,mode,status,passed,total,error) values($1,'00000000-0000-4000-8000-000000000985',1,'# Synthetic completion','submit','ok',1,1,'')",[users.owner.id]);
         return send(res,200,{ok:true});
       }
+      if(url.pathname==='/__prep_seed'&&req.method==='POST'){
+        // C4 fixtures: run after __company_page_seed and __experiences_seed. Body {roleNote:false} removes the role note.
+        const input=JSON.parse(body||'{}');
+        await db.exec("delete from public.notes where id like 'full-stack-%'");
+        if(input.roleNote!==false)await db.exec("insert into public.notes(id,title,body,free,sort) values ('full-stack-locking','Locking mechanisms','Synthetic locking note body','',9)");
+        const set=async(slug,links,body)=>{await db.query('update public.interview_experiences set prep_links=$1::jsonb'+(body?',body=$3':'')+' where slug=$2',body?[JSON.stringify(links),slug,body]:[JSON.stringify(links),slug]);};
+        await set('synthetic-interview',[{kind:'question',ref:'146'},{kind:'note',ref:'full-stack-locking'},{kind:'behavioral_theme',ref:'conflict'},{kind:'question',ref:'1'},{kind:'note',ref:'sd-fixture',label:'Synthetic architecture'}],'## Recruiter\nPractise [[question:lru-cache]] and [[note:full-stack-locking]] before [[behavioral:conflict]]; unknown [[note:no-such-note]] stays plain text.\n\n## Technical screen\nA fictional exercise.\n\n## Outcome\nThe interview concluded.');
+        await set('synthetic-interview-2',[{kind:'question',ref:'146'},{kind:'note',ref:'full-stack-locking'}]);
+        await set('synthetic-interview-3',[{kind:'question',ref:'146'}]);
+        await set('synthetic-interview-4',[{kind:'note',ref:'arrays-hashing'}]);
+        await set('synthetic-interview-6',[{kind:'note',ref:'sd-extra-1'},{kind:'note',ref:'sd-extra-2'},{kind:'note',ref:'sd-extra-3'},{kind:'note',ref:'sd-extra-4'},{kind:'question',ref:'217'}]);
+        await db.query("delete from public.interview_behavioral_answers where user_id in ($1,$2)",[users.owner.id,users.member.id]);
+        await db.query("insert into public.interview_behavioral_answers(user_id,question_id,custom,situation,task,action,result) select $1,id,false,'s','t','a','r' from public.interview_behavioral_questions where theme_id='conflict' and published order by sort,id limit 1",[users.owner.id]);
+        return send(res,200,{ok:true});
+      }
       if(url.pathname==='/__companies_seed'&&req.method==='POST'){
         await db.exec("delete from public.companies; insert into public.companies(id,slug,name,public) values ('00000000-0000-4000-8000-000000000951','fixture-company','Fixture Company',true),('00000000-0000-4000-8000-000000000952','hidden-company','Hidden Company',false); insert into public.company_questions(company_id,kind,section,question_ref,public) values ('00000000-0000-4000-8000-000000000951','coding','DSA','217',true),('00000000-0000-4000-8000-000000000951','coding','DSA','1',false)");
         return send(res,200,{ok:true});

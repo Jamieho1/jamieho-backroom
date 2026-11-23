@@ -11,10 +11,11 @@ export function Markdown({ text, disableLinks = false }: { text: string; disable
       <ReactMarkdown
         skipHtml
         components={{
-          a: ({ href = "", children }) => {
+          a: ({ href = "", children, title }) => {
             if (disableLinks) return <>{children}</>;
             const external = /^https?:\/\//.test(href);
-            if(href.startsWith("/")&&!href.startsWith("//"))return <Link href={href} prefetch={false}>{children}</Link>;
+            // Inline reference chips (C4) arrive as internal links titled "iv-chip"; the title itself is never shown.
+            if(href.startsWith("/")&&!href.startsWith("//"))return <Link href={href} prefetch={false} className={title==="iv-chip"?"iv-chip":undefined}>{children}</Link>;
             return (
               <a href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
                 {children}
