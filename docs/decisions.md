@@ -89,3 +89,9 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · PassLoop P2 keeps custom test inputs in separate own-user storage, runs Python per case with a five-second deadline and grades only known expectations; LRU Cache retains ID 146 under LLD; Submit uses catalogue tests only · approved P2 prompt
 
 - 2026-11-23 · PassLoop P3 stores typed complexity independently and immutable own-user Submit snapshots; compares authored expected complexity without grading, and confirms before loading code; console toggle is icon-only with no repeated heading/ready label · approved P3 prompt and Jamie's feedback
+
+- 2026-11-23 · Jamie approved live P2/P3 application; remote versions 20261123110809/20261123110824 create only own-user cases/complexity/submission storage, preserving legacy practice data; frontend push/live review remain Jamie’s step · explicit “apply it”
+
+- 2026-11-23 · P4 requires authored follow-ups and multiple complete approaches for every catalogue question; one marked optimum drives Expected complexity, and related questions follow Notes concepts/topic then the same section without inventing LLD neighbors · approved P4 prompt
+
+- 2026-11-23 · The practice panel toggle shows “Console” beside its chevron in both expanded/collapsed states; the redundant panel heading and Python ready label remain removed · Jamie’s clarification

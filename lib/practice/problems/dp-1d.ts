@@ -13,9 +13,9 @@
  * - 300 Longest Increasing Subsequence (Medium)
  * - 416 Partition Equal Subset Sum (Medium)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 70,
     kind: "algorithm",

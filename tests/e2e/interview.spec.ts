@@ -84,7 +84,7 @@ test('practice workspace executes the existing Python runner on the new address'
  await page.goto('/interview/problems/217');
  await expect(page.getByRole('button',{name:'Run',exact:true})).toBeEnabled({timeout:60000});
  await page.getByRole('tab',{name:'Solution',exact:true}).click();
- const solution=await page.locator('.practice-solution pre.code').textContent();
+ const solution=await page.locator('.practice-approach[data-optimal="true"] pre.code').textContent();
  const editor=page.getByRole('textbox',{name:'Python code',exact:true});
  await editor.fill(solution!);await page.getByRole('button',{name:'Run',exact:true}).click();
  await expect(page.getByRole('region',{name:'Test results'})).toContainText('passed',{timeout:60000});

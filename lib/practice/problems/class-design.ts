@@ -1,5 +1,5 @@
-import type {ArenaProblem} from "../types";
-export const arena:ArenaProblem[]=[
+import type {ArenaProblemSeed} from "../types";
+export const arena:ArenaProblemSeed[]=[
   {
     lc: 146,
     kind: "class_design",

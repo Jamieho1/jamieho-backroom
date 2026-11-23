@@ -7,9 +7,9 @@
  * - 76 Minimum Window Substring (Hard)
  * - 239 Sliding Window Maximum (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 121,
     kind: "algorithm",

@@ -25,7 +25,7 @@ it('disables Run/Submit if Python fails, while Solution stays readable',async()=
  mocks.warm.mockRejectedValue(new Error('offline'));render(<PracticeArena viewerKey="member" initialProblem={217} />);
  await screen.findByRole('alert');expect((screen.getByRole('button',{name:'Run'}) as HTMLButtonElement).disabled).toBe(true);
  expect((screen.getByRole('button',{name:'Submit'}) as HTMLButtonElement).disabled).toBe(true);
- fireEvent.click(screen.getByRole('tab',{name:'Solution'}));expect(screen.getByRole('heading',{name:'Reference code'})).toBeTruthy();
+ fireEvent.click(screen.getByRole('tab',{name:'Solution'}));expect(screen.getByRole('heading',{name:'Approaches'})).toBeTruthy();
 });
 it('passes the selected mode to the browser runner and displays the result',async()=>{
  render(<PracticeArena viewerKey="member" initialProblem={217} />);

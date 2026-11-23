@@ -11,9 +11,8 @@ export function ProblemSolution({lc}:{lc:number}) {
  const parsed=solution?Visual.safeParse(solution.visual):null;
  return <div className="practice-solution">
   {solution?<><h3>Intuition</h3><Markdown text={solution.intuition} /><h3>Algorithm</h3><Markdown text={solution.algorithm} /></>:null}
-  {parsed?.success?<TraceVisual visual={parsed.data} />:null}
-  <h3>Reference code</h3><CodeBlock code={problem.solution} />
-  <h3>Complexity</h3>{extra?<dl><dt>Time: {extra.time.o}</dt><dd><Markdown text={extra.time.why} /></dd><dt>Space: {extra.space.o}</dt><dd><Markdown text={extra.space.why} /></dd></dl>:<p>{solution?.complexity}</p>}
+  <section className="practice-approaches" aria-label="Solution approaches"><h3>Approaches</h3>{problem.approaches.map((approach,i)=><details className="practice-approach" data-optimal={approach.optimal} key={approach.id} open={approach.optimal}><summary><strong>{i+1}. {approach.title}</strong>{approach.optimal?<span className="practice-tag">Optimal approach</span>:null}<span className="practice-complexity-badges"><span className="practice-tag">Time: {approach.time}</span><span className="practice-tag">Space: {approach.space}</span></span></summary><Markdown text={approach.explanation}/><CodeBlock code={approach.code}/></details>)}</section>
+  {parsed?.success?<><h3>Reference walkthrough</h3><TraceVisual visual={parsed.data}/></>:null}
   {extra?<><h3>Common pitfalls</h3><ul>{extra.pitfalls.map(p=><li key={p}><Markdown text={p} /></li>)}</ul></>:null}
  </div>;
 }

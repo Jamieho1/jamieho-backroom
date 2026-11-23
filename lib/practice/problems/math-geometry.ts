@@ -9,9 +9,9 @@
  * - 43 Multiply Strings (Medium)
  * - 2013 Detect Squares (Medium)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 48,
     kind: "algorithm",

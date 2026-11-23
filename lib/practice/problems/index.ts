@@ -1,3 +1,4 @@
+import {enrichProblem} from '../problem-content';
 import {arena as class_design} from "./class-design";
 /** Every topic file of pre-written arena problems. */
 import { arena as arrays_hashing } from "./arrays-hashing";
@@ -18,5 +19,7 @@ import { arena as greedy } from "./greedy";
 import { arena as intervals } from "./intervals";
 import { arena as math_geometry } from "./math-geometry";
 
-export const ARENA_FILES = {
+const SEED_FILES = {
  "class-design":class_design, "arrays-hashing": arrays_hashing, "two-pointers": two_pointers, "sliding-window": sliding_window, "stack": stack, "binary-search": binary_search, "linked-list": linked_list, "trees": trees, "tries": tries, "heap": heap, "backtracking": backtracking, "graphs": graphs, "advanced-graphs": advanced_graphs, "dp-1d": dp_1d, "dp-2d": dp_2d, "greedy": greedy, "intervals": intervals, "math-geometry": math_geometry };
+
+export const ARENA_FILES=Object.fromEntries(Object.entries(SEED_FILES).map(([topic,problems])=>[topic,problems.map(enrichProblem)])) as {[K in keyof typeof SEED_FILES]:ReturnType<typeof enrichProblem>[]};

@@ -7,9 +7,9 @@
  * - 269 Alien Dictionary (Hard)
  * - 787 Cheapest Flights Within K Stops (Medium)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 743,
     kind: "algorithm",

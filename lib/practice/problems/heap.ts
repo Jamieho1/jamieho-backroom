@@ -8,9 +8,9 @@
  * - 355 Design Twitter (Medium)
  * - 295 Find Median from Data Stream (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 703,
     kind: "class_design",

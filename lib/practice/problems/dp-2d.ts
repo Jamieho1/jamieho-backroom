@@ -12,9 +12,9 @@
  * - 312 Burst Balloons (Hard)
  * - 10 Regular Expression Matching (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 62,
     kind: "algorithm",

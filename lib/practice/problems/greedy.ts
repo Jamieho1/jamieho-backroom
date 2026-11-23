@@ -9,9 +9,9 @@
  * - 763 Partition Labels (Medium)
  * - 678 Valid Parenthesis String (Medium)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 53,
     kind: "algorithm",

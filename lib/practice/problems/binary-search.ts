@@ -8,9 +8,9 @@
  * - 981 Time Based Key-Value Store (Medium)
  * - 4 Median of Two Sorted Arrays (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 704,
     kind: "algorithm",

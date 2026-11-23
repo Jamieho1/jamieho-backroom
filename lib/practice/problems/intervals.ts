@@ -7,9 +7,9 @@
  * - 253 Meeting Rooms II (Medium)
  * - 1851 Minimum Interval to Include Each Query (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 57,
     kind: "algorithm",

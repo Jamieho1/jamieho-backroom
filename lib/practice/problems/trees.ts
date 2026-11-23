@@ -16,9 +16,9 @@
  * - 124 Binary Tree Maximum Path Sum (Hard)
  * - 297 Serialize and Deserialize Binary Tree (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 226,
     kind: "algorithm",

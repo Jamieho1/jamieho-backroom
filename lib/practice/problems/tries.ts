@@ -4,9 +4,9 @@
  * - 211 Design Add and Search Words Data Structure (Medium)
  * - 212 Word Search II (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 208,
     kind: "class_design",

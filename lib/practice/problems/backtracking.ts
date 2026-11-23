@@ -10,9 +10,9 @@
  * - 17 Letter Combinations of a Phone Number (Medium)
  * - 51 N-Queens (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 78,
     kind: "algorithm",

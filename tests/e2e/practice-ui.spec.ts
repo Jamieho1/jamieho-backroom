@@ -64,7 +64,7 @@ test('actual Practice UI remains readable when the worker cannot load',async({pa
  await expect(page.getByRole('button',{name:'Run',exact:true})).toBeDisabled();
  await expect(page.getByRole('button',{name:'Submit',exact:true})).toBeDisabled();
  await page.getByRole('tab',{name:'Solution',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Reference code'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Approaches'})).toBeVisible();
 });
 
 test('owner controls preserve code and question-note drafts on failure',async({page})=>{

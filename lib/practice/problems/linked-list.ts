@@ -12,9 +12,9 @@
  * - 23 Merge k Sorted Lists (Hard)
  * - 25 Reverse Nodes in k-Group (Hard)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 206,
     kind: "algorithm",

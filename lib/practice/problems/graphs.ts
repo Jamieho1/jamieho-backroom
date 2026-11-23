@@ -15,9 +15,9 @@
  * - 127 Word Ladder (Hard)
  * - 773 Sliding Puzzle (Hard, extra)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 200,
     kind: "algorithm",

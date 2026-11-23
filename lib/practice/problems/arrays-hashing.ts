@@ -10,9 +10,9 @@
  * - 271 Encode and Decode Strings (Medium)
  * - 128 Longest Consecutive Sequence (Medium)
  */
-import type { ArenaProblem } from "../types";
+import type { ArenaProblemSeed } from "../types";
 
-export const arena: ArenaProblem[] = [
+export const arena: ArenaProblemSeed[] = [
   {
     lc: 217,
     kind: "algorithm",
