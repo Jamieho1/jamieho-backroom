@@ -1,3 +1,4 @@
+import {UsedInDesign} from '@/components/practice/question-connections';
 import {notFound} from 'next/navigation';
 import {INTERVIEW_SECTIONS,PRACTICE_SECTIONS,interviewTopics} from '@/lib/interview/navigation';
 import {InterviewPlaceholder} from '@/components/interview/placeholder';
@@ -23,6 +24,6 @@ export default async function InterviewTopicPage({params}:{params:Promise<{secti
  if(data.viewer.role==='anonymous')return <NotesSignIn next={page} configured={data.configured}/>;
  if(!data.allowed||data.error)return <p role="alert">Can&apos;t reach the notes right now. Please try again.</p>;
  if(!id)return <section className="iv-question-page"><h1>{item.label} notes</h1><p>This notes overview will be designed later.</p></section>;
- const note=data.notes.find(n=>n.id===id);if(!note)return <section className="iv-question-page"><h1>{selected?.label}</h1><p>No notes have been added for this topic yet.</p></section>;
- return <div className="iv-note-reader"><NotesReader key={`${id}:${data.preview?.id??'live'}`} notes={[note]} canEdit={data.viewer.role==='owner'&&!data.preview} singleTopic interviewLinks/><PagePreview preview={data.preview} page={page}/></div>;
+ const note=data.notes.find(n=>n.id===id);if(!note)return <section className="iv-question-page"><h1>{selected?.label}</h1><p>No notes have been added for this topic yet.</p>{section==='dsa'?<UsedInDesign topic={id} readOnly={!!data.preview}/>:null}</section>;
+ return <div className="iv-note-reader"><NotesReader key={`${id}:${data.preview?.id??'live'}`} notes={[note]} canEdit={data.viewer.role==='owner'&&!data.preview} singleTopic interviewLinks/>{section==='dsa'?<UsedInDesign topic={id} readOnly={!!data.preview}/>:null}<PagePreview preview={data.preview} page={page}/></div>;
 }

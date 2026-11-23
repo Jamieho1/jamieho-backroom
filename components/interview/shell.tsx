@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import {WorkspaceToolbarContext} from './workspace-toolbar';
 import {FeedbackButton} from '@/components/feedback-button';
 import {themeHref,type BehavioralTheme} from '@/lib/interview/behavioral';
 import {usePathname} from 'next/navigation';
@@ -20,6 +21,7 @@ function useCollapse(key:string){
 export function InterviewShell({children,noteTopics=[],behavioralThemes=[],behavioralUserId}:{children:ReactNode;noteTopics?:{id:string;title:string}[];behavioralThemes?:(BehavioralTheme&{total:number;answered:number})[];behavioralUserId?:string}){
  const path=usePathname();const section=interviewSection(path);const topics=interviewTopics(section.id,noteTopics);const notes=path.includes('/notes');
  const problemPage=path.startsWith('/interview/problems/');
+ const [toolbarHost,setToolbarHost]=useState<HTMLElement|null>(null);
  const selectedTopic=problemPage?PRACTICE_LIST.find(p=>p.lc===Number(path.split('/').at(-1)))?.topic:path.split('/')[4];
  const [railCollapsed,toggleRail]=useCollapse(INTERVIEW_STORAGE.rail);const [savedTopicsCollapsed,toggleSavedTopics]=useCollapse(INTERVIEW_STORAGE.topics);
  const [problemTopicsOpen,setProblemTopicsOpen]=useState(false);
@@ -50,7 +52,8 @@ export function InterviewShell({children,noteTopics=[],behavioralThemes=[],behav
  const tipProps=(label:string)=>({onMouseEnter:(e:React.MouseEvent<HTMLElement>)=>tooltip(label,e.currentTarget),onMouseLeave:(e:React.MouseEvent<HTMLElement>)=>{if(document.activeElement!==e.currentTarget)setTip(null);},onFocus:(e:React.FocusEvent<HTMLElement>)=>tooltip(label,e.currentTarget),onBlur:()=>setTip(null),'aria-describedby':tip?.label===label?'iv-tooltip':undefined});
  const iconLabel=(icon:InterviewIconName,label:string,color?:string)=><><span className="iv-icon" style={{color}}><InterviewIcon name={icon}/></span><span className="iv-rail-label">{label}</span></>;
  const closeDrawer=()=>{setDrawer(false);requestAnimationFrame(()=>menuButton.current?.focus());};
- return <div className="iv-shell" data-rail-collapsed={railCollapsed} data-topics-collapsed={topicsCollapsed} data-problem={problemPage}>
+ const mobileControls=<><button ref={menuButton} className="iv-toolbar-button" aria-label="Open interview menu" aria-controls="interview-rail" aria-expanded={drawer} onClick={()=>{setTopicsOpen(false);setDrawer(true);}}><InterviewIcon name="menu"/><span className="iv-mobile-control-label">Menu</span></button><button ref={topicsButton} className="iv-toolbar-button" aria-label="Topics" aria-controls="interview-topics" aria-expanded={topicsOpen} onClick={()=>setTopicsOpen(value=>!value)}><span className="iv-mobile-control-label">Topics <span aria-hidden="true">▾</span></span><span aria-hidden="true" className="iv-problem-topics-icon"><InterviewIcon name="topics"/></span></button></>;
+ return <WorkspaceToolbarContext.Provider value={toolbarHost}><div className="iv-shell" data-rail-collapsed={railCollapsed} data-topics-collapsed={topicsCollapsed} data-problem={problemPage}>
   <a className="iv-skip" href="#interview-content">Skip to content</a>
   {mobile&&drawer?<button className="iv-backdrop" aria-label="Dismiss interview menu" onClick={closeDrawer}/>:null}
   <aside id="interview-rail" ref={rail} className="iv-rail" data-open={drawer} role={mobile&&drawer?'dialog':undefined} aria-modal={mobile&&drawer?true:undefined} aria-label="Interview menu" inert={mobile&&!drawer}>
@@ -67,10 +70,10 @@ export function InterviewShell({children,noteTopics=[],behavioralThemes=[],behav
    <nav aria-label="Topics">{section.id==='behavioral'?behavioralThemes.map((t,i)=><Link key={t.id} href={themeHref(t.id)} prefetch={false} aria-current={path===themeHref(t.id)?'page':undefined}><span className="iv-icon" style={{color:t.color}}><InterviewIcon name={(['conflict','failure','leadership','ambiguity','ownership','impact','teamwork','customer','motivation'] as const)[i%9]}/></span><span>{t.title}{behavioralUserId&&viewer.id===behavioralUserId?<small style={{display:'block'}}>{t.answered} answered of {t.total}</small>:null}</span></Link>):topics.length?topics.map(topic=><Link key={topic.id} prefetch={false} href={`/interview/${section.id}/${notes?'notes':'practice'}/${topic.id}`} aria-current={selectedTopic===topic.id?'page':undefined}><span className="iv-icon" style={{color:topic.dot} as CSSProperties}><InterviewIcon name={topicIcon(topic.id)}/></span><span>{topic.label}</span></Link>):<p className="iv-empty-topics">{section.id==='dashboard'?'Choose an Interview Skills section to explore its topics.':'Topics are coming soon.'}</p>}</nav>
   </aside>
   <section className="iv-workspace" aria-label="Interview workspace" inert={mobile&&drawer}>
-   <div className="iv-mobile-toolbar"><button ref={menuButton} className="iv-toolbar-button" aria-label="Open interview menu" aria-controls="interview-rail" aria-expanded={drawer} onClick={()=>{setTopicsOpen(false);setDrawer(true);}}><InterviewIcon name="menu"/>Menu</button><button ref={topicsButton} className="iv-toolbar-button" aria-controls="interview-topics" aria-expanded={topicsOpen} onClick={()=>setTopicsOpen(value=>!value)}>Topics <span aria-hidden="true">▾</span></button></div>
-   <div className="iv-content-toolbar">{topicsCollapsed?<button className="iv-toolbar-button iv-expand-topics" aria-controls="interview-topics" aria-expanded="false" onClick={toggleTopics}><InterviewIcon name="topics"/>Topics</button>:null}<span>{section.id==='dashboard'?'Your preparation space':section.label}</span></div>
+   {!problemPage?<div className="iv-mobile-toolbar">{mobileControls}</div>:null}
+   <div className="iv-content-toolbar">{problemPage?<div className="iv-problem-mobile-controls">{mobileControls}</div>:null}{topicsCollapsed?<button className="iv-toolbar-button iv-expand-topics" aria-controls="interview-topics" aria-expanded="false" onClick={toggleTopics}><InterviewIcon name="topics"/>Topics</button>:null}{problemPage?<div className="iv-problem-toolbar-slot" ref={setToolbarHost}/>:<span>{section.id==='dashboard'?'Your preparation space':section.label}</span>}</div>
    <main id="interview-content" tabIndex={-1}>{children}</main>
   </section>
   {tip&&!mobile&&railCollapsed?<div id="iv-tooltip" className="iv-tooltip" role="tooltip" style={{left:tip.x,top:tip.y}}>{tip.label}</div>:null}
- </div>;
+ </div></WorkspaceToolbarContext.Provider>;
 }

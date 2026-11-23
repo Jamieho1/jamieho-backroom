@@ -78,6 +78,11 @@ const sessions = Object.fromEntries(Object.entries(users).map(([role, user]) => 
         await db.query("insert into public.guides(id,slug,title,published) values ($1,$2,'Live fixture guide',true)",[ids[2],'live-fixture-guide-'+suffix]);
         return send(res,200,{project:'live-fixture-project-'+suffix,article:'live-fixture-article-'+suffix,guide:'live-fixture-guide-'+suffix});
       }
+      if(url.pathname==='/__concepts_seed'&&req.method==='POST'){
+        await db.exec("insert into public.notes(id,title,body,free,sort) values ('linked-list','Linked List','Synthetic linked-list concept note','',4) on conflict(id) do nothing");
+        await db.query("insert into public.practice_attempts(user_id,id,problem,code,mode,status,passed,total,error) values($1,'00000000-0000-4000-8000-000000000505',146,'Synthetic LRU completion','submit','ok',12,12,'') on conflict(user_id,id) do nothing",[users.owner.id]);
+        return send(res,200,{ok:true});
+      }
       if (url.pathname === '/__app_seed' && req.method==='POST') {
         await db.exec("delete from public.behavioral_answers; delete from public.behavioral_stories; delete from public.notes; delete from public.question_notes; delete from public.practice_complexities; delete from public.practice_submissions; delete from public.practice_cases; delete from public.practice_code; delete from public.practice_attempts; delete from public.practice_stars");
         await db.exec("insert into public.notes(id,title,body,free,sort) values ('fixture-note','Fixture note','Live fixture note','Live free',1),('sd-fixture','System design: Synthetic architecture','Synthetic system note','',2),('class-design','Class design','Synthetic class note','',3); insert into public.question_notes(problem,body) values (217,'Live fixture question'); insert into public.practice_code(user_id,problem,code) values ('00000000-0000-4000-8000-000000000101',217,'# Live fixture code'); insert into public.practice_stars(user_id,problem) values('00000000-0000-4000-8000-000000000101',217)");

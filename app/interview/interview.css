@@ -269,3 +269,48 @@ body:has(.iv-shell) {background:#0e131c;}
 .pw-submission strong:not([data-status="accepted"]) {color:#fca5a5;}
 .pw-comparison {display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;color:var(--iv-muted);overflow-wrap:anywhere;}
 .pw-submission pre {max-width:100%;overflow:auto;max-height:360px;font-size:12px;}
+
+/* Problem controls share the shell toolbar; other pages keep their existing header. */
+.iv-problem-mobile-controls {display:none;}
+.iv-problem-toolbar-slot {flex:1;min-width:0;}
+.iv-problem-toolbar-slot .pw-navigation {flex-wrap:nowrap;min-width:0;width:100%;}
+.iv-problem-toolbar-slot .pw-navigation button,.iv-problem-toolbar-slot .pw-navigation a {display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:30px;border:1px solid var(--iv-line);border-radius:6px;padding:4px 8px;background:var(--iv-card);color:var(--iv-ink);font:inherit;}
+.iv-shell[data-problem="true"] .iv-content-toolbar {height:58px;min-height:58px;flex:none;gap:12px;padding:8px;}
+.iv-problem-topics-icon {display:none;}
+.practice-timer-glyph {display:none;}
+.pw-builds-on {display:flex;flex-wrap:wrap;align-items:center;gap:6px;width:100%;font-size:12px;margin:8px 0;}
+.iv-shell .pw-concept-chip {display:inline-flex;gap:6px;align-items:center;border:1px solid var(--iv-line);border-radius:999px;padding:3px 8px;}
+.pw-concept-chip>span {height:7px;width:7px;flex:none;border-radius:50%;background:var(--concept-colour);}
+.iv-shell .pw-concept-chip:hover {color:var(--iv-accent);border-color:var(--iv-accent);}
+.pw-practise-first {width:100%;font-size:12px;}
+.pw-practise-first h3 {font-size:12px;margin:4px 0;}
+.pw-connected-questions {list-style:none;padding:0!important;margin:0!important;}
+.pw-connected-questions a {display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:7px 0;}
+.pw-connected-questions a>span:first-child {overflow-wrap:anywhere;}
+.iv-shell .pw-connected-questions a:hover {color:var(--iv-accent);}
+.pw-used-in-design {margin-top:18px;padding:16px;border:1px solid var(--iv-line);border-radius:8px;}
+.pw-used-in-design h3 {margin:0 0 10px;}
+@media(max-width:768px){
+ .iv-problem-mobile-controls {display:flex;gap:4px;flex:none;}
+ .iv-problem-mobile-controls .iv-mobile-control-label {display:none;}
+ .iv-problem-mobile-controls .iv-problem-topics-icon {display:flex;}
+ .iv-problem-mobile-controls .iv-toolbar-button {padding:4px;width:28px;min-height:30px;}
+ .iv-shell[data-problem="true"] .iv-content-toolbar {gap:6px;position:sticky;top:0;z-index:20;background:var(--iv-bg);}
+ .iv-problem-toolbar-slot .pw-navigation {gap:4px;}
+ .iv-problem-toolbar-slot .pw-navigation nav {min-width:0;flex:1;gap:3px;}
+ .iv-problem-toolbar-slot .pw-navigation nav>a,.iv-problem-toolbar-slot .pw-navigation nav>button:not([aria-haspopup]) {width:24px;padding:3px;flex:none;}
+ .iv-problem-toolbar-slot .pw-navigation nav>button[aria-haspopup] {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;padding:4px;font-size:11px;}
+ .iv-problem-toolbar-slot .practice-timer {flex-wrap:nowrap;gap:3px;flex:none;}
+ .iv-problem-toolbar-slot .practice-timer-time {font-size:9px;min-width:5ch;}
+ .iv-problem-toolbar-slot .practice-timer button {width:24px;padding:3px;min-height:28px;}
+ .iv-problem-toolbar-slot .practice-timer-label {display:none;}
+ .iv-problem-toolbar-slot .practice-timer-glyph {display:inline;}
+}
+
+.iv-problem-toolbar-slot .pw-navigation nav {min-width:0;}
+.iv-problem-toolbar-slot .pw-navigation nav>button[aria-haspopup] {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
+@media(min-width:769px) and (max-width:1100px){
+ .iv-problem-toolbar-slot .practice-timer-label {display:none;}
+ .iv-problem-toolbar-slot .practice-timer-glyph {display:inline;}
+ .iv-problem-toolbar-slot .practice-timer {flex-wrap:nowrap;flex:none;}
+}

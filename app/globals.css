@@ -74,6 +74,8 @@ body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body
 h1, h2, h3 { font-family: var(--f-head); color: var(--heading); line-height: 1.15; margin: 0 0 0.5em; }
 a { color: var(--blue); }
 code { font-family: var(--f-mono); font-size: 0.9em; background: var(--input); border: 1px solid var(--border-light); border-radius: 4px; padding: 0 4px; }
+/* Highlighted inline code retains a dark chip instead of inheriting mark’s black text. */
+.md mark.hl code { color:#fff; background:#192331; border-color:#293649; }
 
 .page { max-width: 72rem; margin: 0 auto; padding: 72px 16px; }
 .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); letter-spacing: -0.02em; }

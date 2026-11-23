@@ -14,7 +14,7 @@ export function formatElapsed(ms: number): string {
  * Stopwatch for one problem (Jamie 2026-11-03): starts and pauses only when the user clicks; Reset sets it to 0.
  * Elapsed time comes from timestamps, so a throttled background tab doesn't drift. Opening another problem starts fresh.
  */
-export function PracticeTimer({ title }: { title: string }) {
+export function PracticeTimer({ title,compact=false }: { title: string;compact?:boolean }) {
   const [banked, setBanked] = useState(0); // ms from earlier runs
   const [since, setSince] = useState<number | null>(null); // start of the current run
   const [now, setNow] = useState(() => Date.now());
@@ -31,9 +31,9 @@ export function PracticeTimer({ title }: { title: string }) {
     else { setSince(t); setNow(t); }
   };
   const reset = () => { setBanked(0); setSince(null); };
-  return <div className="practice-timer" role="group" aria-label={`Timer for ${title}`}>
+  return <div className={`practice-timer${compact?" practice-timer-compact":""}`} role="group" aria-label={`Timer for ${title}`}>
     <span className={`practice-timer-time${running ? " running" : ""}`} role="timer" aria-live="off">{formatElapsed(elapsed)}</span>
-    <button type="button" className="btn ghost small" aria-pressed={running} onClick={toggle}>{running ? "Pause" : elapsed ? "Resume" : "Start timer"}</button>
-    {elapsed || running ? <button type="button" className="btn ghost small" onClick={reset}>Reset</button> : null}
+    <button type="button" className="btn ghost small" aria-label={running?"Pause":elapsed?"Resume":"Start timer"} aria-pressed={running} onClick={toggle}><span className="practice-timer-label">{running?"Pause":elapsed?"Resume":"Start timer"}</span>{compact?<span className="practice-timer-glyph" aria-hidden="true">{running?"Ⅱ":"▶"}</span>:null}</button>
+    {elapsed || running ? <button type="button" className="btn ghost small" aria-label="Reset" onClick={reset}><span className="practice-timer-label">Reset</span>{compact?<span className="practice-timer-glyph" aria-hidden="true">↺</span>:null}</button> : null}
   </div>;
 }

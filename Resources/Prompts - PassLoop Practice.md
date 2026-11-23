@@ -72,3 +72,20 @@ Ticket P4. Read the shared rules at the top of Resources/Prompts - PassLoop Prac
 
 Done when: unit tests for the catalogue schema (every question has ≥1 follow-up and ≥1 approach with complexity; related questions exclude itself), browser tests desktop + 390 px for examples, follow-ups, solution approaches and related links; typecheck, suite, build, static assertions; docs updated. Report checks actually run.
 ```
+
+---
+
+## P5 — Shared concepts between Low Level Design and DSA
+
+```
+Ticket P5. Read the shared rules at the top of Resources/Prompts - PassLoop Practice.md. Requires P4 (related questions, follow-ups, solutions are in place). No migration: content lives in the code catalogue.
+
+Goal: each question keeps ONE home section (no duplicates across DSA and Low Level Design); sections are linked through shared concept tags.
+1. Data: add `concepts: string[]` to every practice question in the catalogue, using the SAME ids as the DSA note topics in lib/notes/topics.ts (e.g. hash-map, linked-list, heap, sliding-window, two-pointers, tree, graph, stack, queue…). Optional `prerequisites: string[]` (question ids) for harder questions. zod-validate: every concept id exists in the topics list; every prerequisite id exists; no self-reference. Fill concepts for every existing question (DSA and LLD); add prerequisites for LLD questions where a DSA question is the natural warm-up (e.g. LRU Cache → a hash-map question and a linked-list question if present in the catalogue).
+2. LLD (and any question with concepts outside its own topic): under the title, a "Builds on" row of small chips (topic colour + name); each chip links to that DSA topic's Notes page. Chips use the site's gold hover, not plain links styling.
+3. "Practise first" line (only when prerequisites exist): links to those questions with difficulty + done tick.
+4. DSA notes pages: a "Used in design" block listing Low Level Design questions whose concepts include that note's topic (name, difficulty, done tick), hidden when empty.
+5. Related questions (from P4): rank shared-concept matches first regardless of section, then same topic, then same section; max 5; exclude itself.
+6. Section lists, the topic drawer and ‹ › stay within the current section (unchanged).
+Done when: unit tests (schema validation, concept ids exist, related ranking across sections, "Used in design" lookup), browser tests desktop + 390 px (Builds on chips on LRU Cache link to the right notes, Practise first links, Used in design block on the linked-list note); typecheck, suite, build, static assertions; docs/interview.md updated. Report checks actually run.
+```

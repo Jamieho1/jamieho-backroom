@@ -95,3 +95,7 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · P4 requires authored follow-ups and multiple complete approaches for every catalogue question; one marked optimum drives Expected complexity, and related questions follow Notes concepts/topic then the same section without inventing LLD neighbors · approved P4 prompt
 
 - 2026-11-23 · The practice panel toggle shows “Console” beside its chevron in both expanded/collapsed states; the redundant panel heading and Python ready label remain removed · Jamie’s clarification
+
+- 2026-11-23 · Inline code nested inside Markdown highlights uses white text on its dark grey chip; surrounding highlighted prose keeps its readable yellow/black treatment · Jamie’s readability feedback
+
+- 2026-11-23 · P5 keeps one section home per question and links homes through existing Notes-topic concepts/prerequisites; related links can cross homes while lists/drawer/arrows cannot; problem controls share one header row and class-design displays Low Level Design · approved P5 prompt and Jamie’s layout request
