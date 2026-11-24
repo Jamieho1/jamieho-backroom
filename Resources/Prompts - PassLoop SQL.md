@@ -70,3 +70,24 @@ Ticket Q4. Read the shared rules at the top of Resources/Prompts - PassLoop SQL.
    - sql-postgres-mysql: the differences that matter on LeetCode and in interviews (IFNULL vs COALESCE, DATE_FORMAT vs TO_CHAR, integer division, string concat, LIMIT/OFFSET, GROUP BY strictness, regex syntax, DATEDIFF vs date subtraction).
 Done when: unit tests for chip validation with SQL numbers, browser test for the notes list, typecheck, suite, build. Report checks actually run.
 ```
+
+---
+
+## Q5 — SQL visuals: a "tables" visual kind, and visuals editable through Content Drafts
+
+```
+Ticket Q5. Read the shared rules at the top of Resources/Prompts - PassLoop SQL.md. Requires Q1–Q4.
+
+Context (2026-11-24): the three SQL notes are live but the Visuals panel says "No visuals for this topic yet". Note visuals (lib/notes/visual.ts: kinds array | grid | graph, frames of highlights/pointers/vars, rendered by components/notes/trace-visual.tsx and grouped in visuals-tab.tsx) suit algorithms, not SQL. Also notes.visual is not draftable: the TS allowlist and private.apply_app_draft only allow body and free for notes, so Claude cannot add visuals without a direct DB write.
+
+1. New visual kind "tables" in lib/notes/visual.ts (strict zod, keep the existing kinds unchanged):
+   tables: [{id, name, columns[≤8], rows[≤10] of values (NULL shown as ∅)}] (≤3 tables: e.g. two inputs and one result),
+   frames (2–14), each: caption, highlight [{table, row?, col?}] (cells or whole rows), done (same addressing), result rows revealed so far (e.g. `show: {resultTableId: n}`) or replaced rows for that frame, optional vars (as today).
+   Render: small tables side by side on desktop (stacked at 390 px), current rows/cells highlighted, revealed result rows fade in, NULL cells styled distinctly, same stepper, keyboard and reduced-motion behaviour as the existing visuals. No new dependencies.
+2. Make `visual` an allowed field for notes update drafts: TS allowlist + preview/approval validation (every visual must pass the Visual schema and visualIssues; reject unknown kinds) + private.apply_app_draft in a NEW migration (copy the live function and only add 'visual' to the notes allowlist with a jsonb array/object check). Do NOT apply it; Jamie says "apply it".
+3. Draft preview: a notes draft that changes `visual` must show the new visuals in the /manage/review preview and on the page preview overlay, like body changes do.
+4. Docs: content-drafts docs show the tables-visual JSON shape with one small example (two input tables, a LEFT JOIN result filled row by row).
+Done when: unit tests (tables schema incl. limits and bad addresses, renderer frames, draft validation accepts a valid tables visual and rejects a bad one), DB tests (apply_app_draft accepts visual for notes only, still rejects title/sort), a browser test that steps through a tables visual at desktop and 390 px, typecheck, suite, build, static + bundle assertions. Report checks actually run.
+```
+
+After Q5 lands and its migration is applied, Claude writes the SQL visuals as Content Drafts: LEFT vs INNER JOIN, WHERE vs HAVING with GROUP BY, NULL in comparisons and COUNT, DENSE_RANK top-N per group, LAG for consecutive rows, running total, anti-join (rows with no match).

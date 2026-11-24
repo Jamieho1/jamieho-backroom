@@ -88,7 +88,7 @@ function NoteView({ note, canEdit, onEdit, savedMessage, split, onSplit, practic
       </section>
       {showVisuals ? <>
       <ResizeHandle className="notes-resizer" label="Resize notes and visuals" value={split} min={25} max={75} reset={50} unit="percent" scale={100 / Math.max(1, width - 8)} onChange={onSplit} />
-      <section className="notes-visuals" aria-label="Visuals">
+      <section className="notes-visuals" aria-label="Visuals" data-draft-changed={note.visualChanged||undefined}>
         <h2>Visuals</h2>
         {parsed.invalid ? <p role="status">Some visuals could not be loaded. The note is still available.</p> : null}
         <VisualsTab groups={groups} focus={focus} />

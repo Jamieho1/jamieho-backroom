@@ -3,13 +3,16 @@ import {NOTE_TEXT_LIMIT} from '@/lib/notes';
 import {validProblem} from '@/lib/practice/data';
 import {storySchema} from '@/lib/behavioral';
 import {answerSchema} from '@/lib/behavioral/answers';
+import {visualFieldIssues} from '@/lib/notes/visual';
 const rawText=(max:number)=>z.string().refine(s=>s.length<=max,`Text must be ${max} characters or fewer.`).refine(s=>!s.includes('\0'),'Text cannot contain NUL.');
+/** Q5: notes.visual drafts are raw JSON (array of visuals or one visual); the raw value is kept, only validated. */
+const visualField=z.unknown().superRefine((value,ctx)=>{for(const message of visualFieldIssues(value))ctx.addIssue({code:'custom',message});});
 const problem=z.number().int().refine(validProblem,'Choose an existing practice problem.');
 const noteKey=z.string().regex(/^[a-z0-9][a-z0-9-]{0,79}$/);
 const storyFields=storySchema.omit({id:true}).shape;
 const answerFields={primary_story_id:answerSchema.shape.primary_story_id,secondary_story_id:answerSchema.shape.secondary_story_id,outline:answerSchema.shape.outline,followups:answerSchema.shape.followups};
 export const APP_ALLOWLIST={
- notes:{key:noteKey,fields:{body:rawText(NOTE_TEXT_LIMIT),free:rawText(NOTE_TEXT_LIMIT)},operations:['update'] as const,routes:['/notes'] as const},
+ notes:{key:noteKey,fields:{body:rawText(NOTE_TEXT_LIMIT),free:rawText(NOTE_TEXT_LIMIT),visual:visualField},operations:['update'] as const,routes:['/notes'] as const},
  question_notes:{key:problem,fields:{body:rawText(200000)},operations:['insert','update'] as const,routes:['/practices'] as const},
  practice_code:{scope:'owner-user' as const,key:problem,fields:{code:rawText(100000)},operations:['insert','update'] as const,routes:['/practices'] as const},
  practice_stars:{scope:'owner-user' as const,key:problem,fields:{},operations:['insert','delete'] as const,routes:['/practices'] as const},

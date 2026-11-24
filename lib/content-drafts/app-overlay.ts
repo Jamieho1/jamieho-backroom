@@ -2,6 +2,7 @@ import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {chipRefs,validPrepRef} from '@/lib/interview/prep';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import {validateNoteEdit,type NoteRow} from '@/lib/notes';
+import {visualFieldIssues} from '@/lib/notes/visual';
 import {validCode,validProblem,type PracticeData} from '@/lib/practice/data';
 import {storySchema,type Story} from '@/lib/behavioral';
 import {answerSchema,type Answer} from '@/lib/behavioral/answers';
@@ -36,6 +37,7 @@ export function overlayApp<T extends AppTable>(table:T,live:AppRows[T],operation
    :{problem:op.key,created_at:stamp};
   const next:Record<string,unknown>={...(old??defaults),...op.fields,updated_at:stamp};
   if(table==='notes'&&validateNoteEdit(op.key,next))throw Error('Invalid note text.');
+  if(table==='notes'&&'visual' in op.fields){const bad=visualFieldIssues(op.fields.visual);if(bad.length)throw Error(`Invalid note visual: ${bad[0]}`);next.visualChanged=true;}
   if(table==='practice_code'&&(!validProblem(op.key)||!validCode(next.code)))throw Error('Invalid practice code.');
   if(table==='behavioral_stories'){
    const parsed=storySchema.safeParse(next);if(!parsed.success)throw Error('Invalid story fields.');Object.assign(next,parsed.data);

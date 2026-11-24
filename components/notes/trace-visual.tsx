@@ -1,12 +1,12 @@
 "use client";
-/** Step-by-step visual of a worked example (arrays, DP grids, graphs/trees), with play/step controls. */
+/** Step-by-step visual of a worked example (arrays, DP grids, graphs/trees, SQL tables), with play/step controls. */
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { rowsAt, valuesAt, type Visual } from "@/lib/notes/visual";
+import { colIndex, rowsAt, tablesAt, valuesAt, type ClassicVisual, type TableAddr, type TablesVisual, type Visual } from "@/lib/notes/visual";
 
 const has = (xs: (string | number)[], v: string | number) => xs.some((x) => String(x) === String(v));
 
-function ArrayView({ v, i }: { v: Visual; i: number }) {
+function ArrayView({ v, i }: { v: ClassicVisual; i: number }) {
   const f = v.frames[i];
   const vals = valuesAt(v, i);
   const range = f.range;
@@ -33,7 +33,7 @@ function ArrayView({ v, i }: { v: Visual; i: number }) {
   );
 }
 
-function GridView({ v, i }: { v: Visual; i: number }) {
+function GridView({ v, i }: { v: ClassicVisual; i: number }) {
   const f = v.frames[i];
   const rows = rowsAt(v, i);
   const cols = Math.max(...rows.map((r) => r.length));
@@ -69,7 +69,7 @@ function GridView({ v, i }: { v: Visual; i: number }) {
 }
 
 /** Top-down layered layout from the first node (trees read naturally; graphs come out as BFS levels). */
-function layoutGraph(v: Visual) {
+function layoutGraph(v: ClassicVisual) {
   const adj = new Map<string, string[]>(v.nodes.map((n) => [n.id, []]));
   for (const e of v.edges) {
     adj.get(e.from)?.push(e.to);
@@ -96,7 +96,7 @@ function layoutGraph(v: Visual) {
   return { pos, W, H: 34 + (byLevel.size - 1) * 74 + 40 };
 }
 
-function GraphView({ v, i }: { v: Visual; i: number }) {
+function GraphView({ v, i }: { v: ClassicVisual; i: number }) {
   const f = v.frames[i];
   const { pos, W, H } = useMemo(() => layoutGraph(v), [v]);
   const R = 18;
@@ -147,6 +147,118 @@ function GraphView({ v, i }: { v: Visual; i: number }) {
   );
 }
 
+/** Which parts of one table an address list touches: whole table, rows, columns and single cells. */
+function marks(list: TableAddr[], id: string, columns: string[]) {
+  const m = { table: false, rows: new Set<number>(), cols: new Set<number>(), cells: new Set<string>() };
+  for (const a of list) {
+    if (a.table !== id) continue;
+    const c = colIndex({ columns }, a.col);
+    if (c === undefined) continue;
+    if (a.row === undefined && c < 0) m.table = true;
+    else if (c < 0) m.rows.add(a.row!);
+    else if (a.row === undefined) m.cols.add(c);
+    else m.cells.add(`${a.row},${c}`);
+  }
+  return m;
+}
+
+/** SQL tables side by side. Highlight = outline plus a marker (and hidden text); NULL (∅) is styled and labelled. */
+function TablesView({ v, i }: { v: TablesVisual; i: number }) {
+  const f = v.frames[i];
+  const now = useMemo(() => tablesAt(v, i), [v, i]);
+  const before = useMemo(() => (i > 0 ? tablesAt(v, i - 1) : null), [v, i]);
+  return (
+    <div className="tv-tables">
+      {now.map((t, ti) => {
+        const hl = marks(f.highlight, t.id, t.columns);
+        const dn = marks(f.done, t.id, t.columns);
+        const prevShown = before ? before[ti].shown : t.result ? 0 : t.shown;
+        const gone = t.rows.length - t.shown;
+        const cols = t.columns.length;
+        return (
+          <figure key={t.id} className="tv-sqlt" data-table={t.id} data-hl={hl.table || undefined}>
+            <div className="tv-scroll" tabIndex={0} role="group" aria-label={`${t.name}, scrollable`}>
+              <table>
+                <caption>
+                  {hl.table ? <span aria-hidden="true">◆ </span> : null}
+                  {t.name}
+                  {t.result ? <span className="tv-rescount"> · result, {t.shown} {t.shown === 1 ? "row" : "rows"}</span> : null}
+                  {hl.table ? <span className="sr-only"> (highlighted)</span> : null}
+                </caption>
+                <thead>
+                  <tr>
+                    <td className="tv-gutter" />
+                    {t.columns.map((c, ci) => (
+                      <th key={ci} scope="col" data-hl={hl.cols.has(ci) || undefined}>
+                        {hl.cols.has(ci) ? <span aria-hidden="true">▾ </span> : null}
+                        {c}
+                        {hl.cols.has(ci) ? <span className="sr-only"> (highlighted column)</span> : null}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.rows.slice(0, t.shown).map((r, ri) => {
+                    const rowHl = hl.rows.has(ri);
+                    const rowDone = dn.rows.has(ri);
+                    return (
+                      <tr key={ri} data-hl={rowHl || undefined} data-done={rowDone || undefined} className={t.result && ri >= prevShown ? "tv-new" : undefined}>
+                        <th scope="row" className="tv-gutter">
+                          {rowHl ? (
+                            <>
+                              <span aria-hidden="true">▸</span>
+                              <span className="sr-only">highlighted row</span>
+                            </>
+                          ) : rowDone ? (
+                            <>
+                              <span aria-hidden="true">✓</span>
+                              <span className="sr-only">done row</span>
+                            </>
+                          ) : (
+                            <span className="sr-only">row {ri + 1}</span>
+                          )}
+                        </th>
+                        {Array.from({ length: cols }, (_, ci) => {
+                          const val = r[ci] ?? "";
+                          const cell = hl.cells.has(`${ri},${ci}`);
+                          const cdone = dn.cells.has(`${ri},${ci}`) || dn.cols.has(ci);
+                          return (
+                            <td key={ci} data-hl={cell || hl.cols.has(ci) || undefined} data-done={cdone || undefined} data-null={val === "∅" || undefined} className="mono">
+                              {cell ? <span aria-hidden="true" className="tv-mark">◆</span> : null}
+                              {val === "∅" ? (
+                                <>
+                                  <span aria-hidden="true">∅</span>
+                                  <span className="sr-only">NULL</span>
+                                </>
+                              ) : (
+                                val
+                              )}
+                              {cell ? <span className="sr-only"> (highlighted)</span> : null}
+                              {cdone && !cell ? <span className="sr-only"> (done)</span> : null}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                  {Array.from({ length: Math.max(0, gone) }, (_, k) => (
+                    <tr key={`g${k}`} className="tv-ghost" aria-hidden="true">
+                      <th className="tv-gutter" />
+                      {t.columns.map((_, ci) => (
+                        <td key={ci}>&nbsp;</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        );
+      })}
+    </div>
+  );
+}
+
 export function TraceVisual({ visual, side }: { visual: Visual; side?: ReactNode }) {
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -184,7 +296,7 @@ export function TraceVisual({ visual, side }: { visual: Visual; side?: ReactNode
         </div>
       </div>
       <div className="tv-stage">
-        <div className="tv-pic">{visual.kind === "array" ? <ArrayView v={visual} i={i} /> : visual.kind === "grid" ? <GridView v={visual} i={i} /> : <GraphView v={visual} i={i} />}</div>
+        <div className={`tv-pic${visual.kind === "tables" ? " tv-pic-tables" : ""}`}>{visual.kind === "tables" ? <TablesView v={visual} i={i} /> : visual.kind === "array" ? <ArrayView v={visual} i={i} /> : visual.kind === "grid" ? <GridView v={visual} i={i} /> : <GraphView v={visual} i={i} />}</div>
         {f.vars.length ? (
           <dl className="tv-vars">
             {f.vars.map((x) => (
