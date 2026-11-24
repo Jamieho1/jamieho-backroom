@@ -5,6 +5,7 @@ import Link from "next/link";
  * links). It builds React elements, never HTML strings, so nothing in a note can inject markup.
  */
 import { CodeBlock } from "./code-highlight";
+import { noteChip } from "@/lib/interview/prep";
 import { Fragment, useState, type ReactNode } from "react";
 
 export const slug = (t: string) => "sec-" + t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -170,7 +171,7 @@ function inline(text: string, key = 0): ReactNode[] {
     ];
   }
   const out: ReactNode[] = [];
-  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\s][^*]*\*)|(\[[^\]]+\]\((https?:\/\/[^)\s]+)\))|(==[^=\s](?:[^=\n]*[^=\s])?==)/g;
+  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\s][^*]*\*)|(\[[^\]]+\]\((https?:\/\/[^)\s]+)\))|(==[^=\s](?:[^=\n]*[^=\s])?==)|(\[\[(?:note|question):[A-Za-z0-9-]{1,80}\]\])/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let k = key;
@@ -180,6 +181,11 @@ function inline(text: string, key = 0): ReactNode[] {
     if (m[1]) out.push(<code key={k++}>{t.slice(1, -1)}</code>);
     else if (m[2]) out.push(<strong key={k++}>{inline(t.slice(2, -2), k * 100)}</strong>);
     else if (m[3]) out.push(<em key={k++}>{t.slice(1, -1)}</em>);
+    else if (m[7]) {
+      // Q4: [[note:id]] and [[question:number]] chips. Unknown references stay as plain text.
+      const chip = noteChip(t);
+      out.push(chip ? <Link prefetch={false} key={k++} href={chip.href} className="iv-chip">{chip.label}</Link> : t);
+    }
     else if (m[6]) out.push(<mark key={k++} className="hl">{inline(t.slice(2, -2), k * 100)}</mark>);
     else if (m[4]) {
       const label = t.slice(1, t.indexOf("]("));

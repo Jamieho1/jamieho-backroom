@@ -8,6 +8,8 @@ const invited = { id: "00000000-0000-4000-8000-0000000000f3", email: "invited@ex
 const who = (sub: string) => ({ role: "authenticated" as const, sub });
 beforeAll(async () => {
   db = await freshDb();
+  // The Q4 migration seeds three empty SQL notes (see sql-notes.test.ts); these RLS tests count only their own rows.
+  await db.exec("delete from public.notes where id like 'sql-%'");
   await db.query("insert into private.settings (key,value) values ('owner_email',$1)", [owner.email]);
   for (const u of [owner, member, invited]) await addUser(db, u);
   await db.query("insert into public.invites (email) values ($1)", [invited.email]);

@@ -15,6 +15,8 @@ beforeAll(async()=>{
   await db.exec("insert into public.notes(id,title,body) values('synthetic-note','Synthetic','Synthetic private note'); insert into public.behavioral_stories(title) values('Synthetic private story'); insert into public.behavioral_answers(question_id,outline) values('g-intro','Synthetic private outline'); insert into public.experience_items(title) values('Synthetic hidden role')");
   before=(await db.query("select jsonb_build_object('notes',(select jsonb_agg(n) from public.notes n),'stories',(select jsonb_agg(s) from public.behavioral_stories s),'answers',(select jsonb_agg(a) from public.behavioral_answers a),'cv',(select jsonb_agg(to_jsonb(i)-array['show_on_journey','journey_icon','journey_photo']) from public.experience_items i)) snapshot")).rows;
  }});
+ // The Q4 migration seeds three empty SQL notes; these tests compare only the synthetic fixtures above.
+ await db.exec("delete from public.notes where id like 'sql-%'");
 });
 afterAll(async()=>{await db.close();});
 it('opens exactly the three registry entries; no content is changed or removed',async()=>{

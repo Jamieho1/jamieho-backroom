@@ -1,4 +1,5 @@
 import {noteHref,interviewProblemHref} from '@/lib/interview/content';
+import {chipRefs,validPrepRef} from '@/lib/interview/prep';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import {validateNoteEdit,type NoteRow} from '@/lib/notes';
 import {validCode,validProblem,type PracticeData} from '@/lib/practice/data';
@@ -44,7 +45,16 @@ export function overlayApp<T extends AppTable>(table:T,live:AppRows[T],operation
   }
   rows.set(key,{...next,draftChanged:true});
  }
+ if(table==='notes')checkNoteChips([...rows.values()]);
  return [...rows.values()] as unknown as AppRows[T];
+}
+/** Q4: changed notes may only use known [[note:id]] / [[question:number]] chips (behavioral chips are not rendered in notes). */
+function checkNoteChips(rows:Record<string,unknown>[]){
+ const ctx={notes:rows.map(r=>({id:String(r.id)})),themes:[]};
+ for(const row of rows){if(!row.draftChanged)continue;for(const field of ['body','free']){
+  const bad=chipRefs(String(row[field]??'')).filter(c=>c.kind==='behavioral_theme'||!validPrepRef(c.kind,c.ref,ctx));
+  if(bad.length)throw Error(`Unknown inline reference in note "${String(row.id)}" (${field}): ${bad.map(c=>c.raw).join(', ')}. Notes accept [[note:id]] and [[question:number]] only.`);
+ }}
 }
 export async function loadAppPreview(sb:SupabaseClient,operations:ContentOperation[],ownerId?:string):Promise<AppPreview>{
  const tables=new Set(operations.filter(op=>isAppTable(op.table)).map(op=>op.table as AppTable));

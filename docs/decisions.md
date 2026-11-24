@@ -123,3 +123,5 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 - 2026-11-23 · SQL practice: Postgres dialect via @electric-sql/pglite in the browser (runtime dependency, SQL routes only, Web Worker); SQL 50 list from LeetCode, all content own words · Jamie
 
 - 2026-11-23 · SQL practice runner: PGlite 0.5.13 (exact pin, now a runtime dependency) runs only in a dedicated Web Worker on `/interview/sql/problems/[lc]`; PGlite ignores statement_timeout so the 2 s limit terminates the worker; one SELECT/WITH statement in a READ ONLY transaction, 1,000-row cap; SQL numbers live in their own catalogue and `practice_submissions.language` allows `SQL` (migration 20261123230000) · Q1 build
+
+- 2026-11-24 · SQL notes (Q4): three fixed notes `sql-basics`, `sql-tackling`, `sql-postgres-mysql` on `/interview/sql/notes` (order fixed in code, Coming soon until drafted); the SQL notes migration seeds them empty because notes drafts are update-only; SQL numbers are valid question chips/prep links next to DSA numbers; notes render and validate note/question chips · Jamie's Q4 ticket

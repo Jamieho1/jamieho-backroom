@@ -2,7 +2,8 @@ import {z} from 'zod';
 import {PRACTICE_ANCHORS,leetcodeSlug} from '@/lib/notes/neetcode150';
 import {topicById} from '@/lib/notes/topics';
 import {shelfTitle} from '@/lib/notes';
-import {interviewProblemHref,noteHref} from './content';
+import {interviewProblemHref,noteHref,isSqlNoteId,sqlNoteLabel} from './content';
+import {SQL_LIST,sqlProblemHref} from '@/lib/practice/sql-catalog';
 import {themeHref} from './behavioral';
 
 /** "What to prepare" links (C4): pointers to the site's own notes, practice questions and behavioral themes. */
@@ -22,19 +23,22 @@ export interface PrepContext{
  notes:readonly {id:string;title?:string}[];
  themes:readonly {id:string;title:string;total?:number;answered?:number}[];
 }
-const SECTION_PREFIX=/^(?:sd|finance|ai|full-stack|fde|data-science|ml)-/;
+const SECTION_PREFIX=/^(?:sd|sql|finance|ai|full-stack|fde|data-science|ml)-/;
+/** Q4: question chips and prep links accept DSA numbers (linking to /interview/problems) and the 50 SQL numbers (linking to /interview/sql/problems). A DSA number wins if the two ever collide. */
+const dsaQuestion=(ref:string)=>PRACTICE_ANCHORS.find(p=>String(p.lc)===ref);
+const sqlQuestion=(ref:string)=>SQL_LIST.find(p=>String(p.lc)===ref);
 /** Render-time check for visitors who cannot read private note metadata: fixed topics, accessible notes or a known section prefix. */
 const looksLikeNote=(ref:string)=>SECTION_PREFIX.test(ref)&&ref.length>3;
 export function questionRef(raw:string):string|undefined{
- if(/^\d+$/.test(raw))return PRACTICE_ANCHORS.some(p=>String(p.lc)===raw)?raw:undefined;
+ if(/^\d+$/.test(raw))return dsaQuestion(raw)||sqlQuestion(raw)?raw:undefined;
  const slug=raw.toLowerCase();const matches=PRACTICE_ANCHORS.filter(p=>(p.slug??leetcodeSlug(p.title))===slug);
  return matches.length===1?String(matches[0].lc):undefined;
 }
 /** strict=true validates against actual database notes (Content Drafts); false is the visitor-safe render check. */
 export function validPrepRef(kind:PrepKind,ref:string,ctx:PrepContext,strict=true):boolean{
- if(kind==='question')return PRACTICE_ANCHORS.some(p=>String(p.lc)===ref);
+ if(kind==='question')return !!dsaQuestion(ref)||!!sqlQuestion(ref);
  if(kind==='behavioral_theme')return ctx.themes.some(t=>t.id===ref);
- return !!topicById(ref)||ctx.notes.some(n=>n.id===ref)||!strict&&looksLikeNote(ref);
+ return !!topicById(ref)||isSqlNoteId(ref)||ctx.notes.some(n=>n.id===ref)||!strict&&looksLikeNote(ref);
 }
 export const unknownPrepLinks=(links:readonly PrepLink[],ctx:PrepContext)=>links.filter(l=>!validPrepRef(l.kind,l.ref,ctx));
 
@@ -43,10 +47,10 @@ export interface PrepItem{kind:PrepKind;ref:string;label:string;href:string;grou
 const titleCase=(ref:string)=>ref.replace(SECTION_PREFIX,'').split('-').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
 export function resolvePrepLink(link:PrepLink,ctx:PrepContext):PrepItem|undefined{
  if(!validPrepRef(link.kind,link.ref,ctx,false))return undefined;
- if(link.kind==='question'){const p=PRACTICE_ANCHORS.find(p=>String(p.lc)===link.ref)!;return {kind:'question',ref:link.ref,label:link.label??p.title,href:interviewProblemHref(p.lc),group:'practice',difficulty:p.difficulty,problem:p.lc};}
+ if(link.kind==='question'){const p=dsaQuestion(link.ref);if(p)return {kind:'question',ref:link.ref,label:link.label??p.title,href:interviewProblemHref(p.lc),group:'practice',difficulty:p.difficulty,problem:p.lc};const s=sqlQuestion(link.ref)!;return {kind:'question',ref:link.ref,label:link.label??s.title,href:sqlProblemHref(s.lc),group:'practice',difficulty:s.difficulty,problem:s.lc};}
  if(link.kind==='behavioral_theme'){const t=ctx.themes.find(t=>t.id===link.ref)!;return {kind:'behavioral_theme',ref:link.ref,label:link.label??t.title,href:themeHref(t.id),group:'behavioral',total:t.total,answered:t.answered};}
  const note=ctx.notes.find(n=>n.id===link.ref);
- return {kind:'note',ref:link.ref,label:link.label??(note?.title?shelfTitle(note.title):topicById(link.ref)?.label??titleCase(link.ref)),href:noteHref(link.ref),group:'concept'};
+ return {kind:'note',ref:link.ref,label:link.label??sqlNoteLabel(link.ref)??(note?.title?shelfTitle(note.title):topicById(link.ref)?.label??titleCase(link.ref)),href:noteHref(link.ref),group:'concept'};
 }
 export function resolvePrepLinks(links:readonly PrepLink[]|undefined,ctx:PrepContext){return (links??[]).flatMap(l=>{const item=resolvePrepLink(l,ctx);return item?[item]:[];});}
 export const PREP_GROUPS:readonly {id:PrepGroup;label:string}[]=[{id:'concept',label:'Concepts'},{id:'practice',label:'Practice'},{id:'behavioral',label:'Behavioral'}];
@@ -76,3 +80,10 @@ export function renderChips(text:string,ctx:PrepContext):string{
 }
 /** Plain-text view for excerpts and search. */
 export const stripChips=(text:string)=>text.replace(CHIP,'$2');
+
+/** Notes renderer: one [[note:id]] or [[question:id]] chip to its label and href with no private context (behavioral chips are not supported in notes). */
+export function noteChip(raw:string):{label:string;href:string}|undefined{
+ const m=/^\[\[(note|question):([A-Za-z0-9-]{1,80})\]\]$/.exec(raw);if(!m)return undefined;
+ const item=resolvePrepLink(chipLink(m[1] as keyof typeof CHIP_KIND,m[2]),{notes:[],themes:[]});
+ return item?{label:item.label,href:item.href}:undefined;
+}

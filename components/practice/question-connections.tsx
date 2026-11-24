@@ -4,7 +4,7 @@ import {useEffect,useState,type CSSProperties} from 'react';
 import {useViewer} from '@/components/viewer-provider';
 import {loadPracticeCompletions} from '@/app/actions/practice-progress';
 import {buildsOn,prerequisiteQuestions,usedInDesign} from '@/lib/interview/concepts';
-import {interviewProblemHref,noteHref} from '@/lib/interview/content';
+import {interviewProblemHref,noteHref,SQL_NOTES} from '@/lib/interview/content';
 import type {Anchor} from '@/lib/notes/neetcode150';
 export function QuestionLinks({questions,completed,canSave,onNavigate}:{questions:readonly Anchor[];completed:ReadonlySet<number>;canSave:boolean;onNavigate?():void}){return <ul className="pw-connected-questions">{questions.map(q=><li key={q.lc}><Link href={interviewProblemHref(q.lc)} onClick={onNavigate}><span>{q.title}</span><span className={`practice-tag practice-difficulty ${q.difficulty.toLowerCase()}`}>{q.difficulty}</span>{canSave?<span className="pw-done" role="img" data-complete={completed.has(q.lc)} aria-label={`${q.title} ${completed.has(q.lc)?'completed':'not completed'}`}>{completed.has(q.lc)?'✓':'○'}</span>:null}</Link></li>)}</ul>;}
 export function QuestionConnections({lc,completed,canSave,onNavigate}:{lc:number;completed:ReadonlySet<number>;canSave:boolean;onNavigate():void}){
@@ -13,3 +13,5 @@ export function QuestionConnections({lc,completed,canSave,onNavigate}:{lc:number
 }
 export function UsedInDesign({topic,readOnly=false}:{topic:string;readOnly?:boolean}){const {viewer}=useViewer();const account=!readOnly&&(viewer.status==='owner'||viewer.status==='member')?viewer.id:undefined;const rows=usedInDesign(topic);return rows.length?<DesignRows key={account??'visitor'} rows={rows} account={account}/>:null;}
 function DesignRows({rows,account}:{rows:Anchor[];account?:string}){const [completed,setCompleted]=useState<Set<number>>(new Set()),[error,setError]=useState(''),[retry,setRetry]=useState(0);useEffect(()=>{let alive=true;if(account)void loadPracticeCompletions().then(r=>{if(!alive)return;if(r.ok){setCompleted(new Set(r.problems));setError('');}else setError(r.message);}).catch(()=>{if(alive)setError('Could not load your progress.');});return()=>{alive=false;};},[account,retry]);return <section className="pw-used-in-design" aria-label="Used in design"><h3>Used in design</h3>{error?<p role="alert">{error}<button onClick={()=>setRetry(n=>n+1)}>Retry design progress</button></p>:null}<QuestionLinks questions={rows} completed={completed} canSave={!!account}/></section>;}
+/** SQL questions link the SQL basics note (DSA questions link their topic notes the same way, as "Builds on" chips). */
+export function SqlBuildsOn(){const note=SQL_NOTES[0];return <nav className="pw-builds-on" aria-label="Builds on"><span>Builds on</span><Link className="pw-concept-chip" href={noteHref(note.id)} style={{'--concept-colour':'#2DD4BF'} as CSSProperties}><span aria-hidden="true"/>{note.label}</Link></nav>;}
