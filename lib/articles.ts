@@ -30,12 +30,6 @@ export const emptyArticle=():ArticleEdit=>({id:crypto.randomUUID(),slug:'',title
 export type ArticleSave={ok:true;article:Article}|{ok:false;message:string};
 export const articleDate=(iso:string)=>{const d=new Date(iso);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(d);};
 
-/** "If you liked this": same category first, then the newest others. */
-export function relatedArticles(all:ArticleCard[],current:Pick<ArticleCard,'id'|'category'>,n=3):ArticleCard[]{
- const others=all.filter(a=>a.id!==current.id);
- return [...others.filter(a=>a.category===current.category),...others.filter(a=>a.category!==current.category)].slice(0,n);
-}
-
 /** A YouTube video id from a watch / youtu.be / shorts / embed link, or null. */
 export function youtubeId(url:string):string|null{
  try{const u=new URL(url);const host=u.hostname.replace(/^www\.|^m\./,'');
@@ -62,12 +56,6 @@ export function articleSections(md:string):{id:string;text:string}[]{
 }
 /** Headings that close an article (links, sources, further reading) are styled as end matter. */
 export const isEndMatter=(text:string)=>/^(links|sources|references|resources|additional resources|further reading|links (and|&) sources)\b/i.test(text.trim());
-/** Reading order is by date: Previous = the older post, Next = the newer one. */
-export function adjacentArticles(all:ArticleCard[],currentId:string):{prev?:ArticleCard;next?:ArticleCard}{
- const byDate=[...all].sort((a,b)=>a.created_at.localeCompare(b.created_at));
- const i=byDate.findIndex(a=>a.id===currentId);
- return i<0?{}:{prev:byDate[i-1],next:byDate[i+1]};
-}
 /** Fenced-code options: ```text title="My prompt" collapsed */
 export function codeMeta(meta:string|undefined):{title:string;collapsed:boolean}{
  const m=meta??'';

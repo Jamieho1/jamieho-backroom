@@ -8,7 +8,7 @@ import type { AppRow } from "@/lib/apps";
 
 /** Mirrors the seed row for the page that still exists here; used only when Supabase isn't configured (local dev, CI). Notes, Practice and Behavioral moved to PassLoop. */
 export const FALLBACK_APPS: AppRow[] = [
-  { id:"articles",name:"Articles",icon:"articles",kind:"internal",url:"/articles",visibility:"public",screenshots:[],tags:["References","Writing"],description:"Extra references and reading for videos and posts.",sort:35,locked:true },
+  { id:"articles",name:"Articles",icon:"articles",kind:"internal",url:"/content",visibility:"public",screenshots:[],tags:["References","Writing"],description:"Extra references and reading for videos and posts.",sort:35,locked:true },
 ];
 
 /** Pre-rendered pages read with the public key. Throws if Supabase is down so the last good page is kept. */

@@ -85,7 +85,7 @@ export function withContent(chapters: readonly Chapter[], content: JourneyConten
           if (rednote) links.push({ platform: "xiaohongshu", kicker: "RedNote", title: rednote.title, href: rednote.source_url, image: rednote.cover_url || undefined, external: true });
           else if (profile("xiaohongshu")) links.push({ platform: "xiaohongshu", placeholder: true, kicker: "RedNote", title: "Latest posts", href: profile("xiaohongshu")!, external: true });
           if (article) links.push({ platform: "article", kicker: "Latest article", title: article.title, href: articleHref(article.slug), image: article.cover_url || undefined });
-          else if (links.length) links.push({ platform: "article", placeholder: true, kicker: "Articles", title: "Notes and references", href: "/articles" });
+          else if (links.length) links.push({ platform: "article", placeholder: true, kicker: "Articles", title: "Notes and references", href: "/content" });
           if (links.length) panels.push(at({ links }));
           break;
         }

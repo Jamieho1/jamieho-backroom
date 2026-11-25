@@ -2,19 +2,15 @@ import {getHomePreview} from "@/lib/content-drafts/preview";
 import {PagePreview} from "@/components/content-drafts/page-preview";
 import type {Metadata} from 'next';
 import {notFound} from 'next/navigation';
-import Link from 'next/link';
-import {Desktop} from '@/components/desktop';
-import {ArticlesShell,ArticleCardView} from '@/components/articles/library';
-import {ArticleMarkdown} from '@/components/articles/article-markdown';
-import {ArticlesFooter} from '@/components/articles/footer';
-import {YouTubeEmbed} from '@/components/articles/youtube';
-import {OnThisPage} from '@/components/articles/on-this-page';
-import {MarkRead} from '@/components/content/mark-read';
-import {getPublicArticle,getPublicArticles} from '@/lib/articles-public';
+import {HubFrame} from '@/components/content/hub-frame';
+import {PostDetail} from '@/components/content/post-detail';
+import {getPublicArticle} from '@/lib/articles-public';
+import {getHubData} from '@/lib/content-hub-data';
 import {getSections} from '@/lib/sections';
 import {getProjectApps} from '@/lib/projects';
 import {socialLinks} from '@/lib/social';
-import {CATEGORY_LABEL,PLATFORM_LABEL,adjacentArticles,articleDate,articleHref,articleSections,relatedArticles,youtubeId} from '@/lib/articles';
+import {articleHref} from '@/lib/articles';
+import {nextPart,relatedPosts} from '@/lib/post-view';
 import '../../articles.css';
 export const dynamic='force-dynamic';
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
@@ -23,34 +19,13 @@ export async function generateMetadata({params}:{params:Promise<{slug:string}>})
 export default async function ArticlePage({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params;
  const preview=await getHomePreview();
- let article,all,sections;
- try{[article,all,sections]=await Promise.all([getPublicArticle(slug,preview),getPublicArticles(preview),getSections()]);}catch{return <Desktop apps={[]} initialApp="articles" discoverApps content={<div className="page"><p role="alert">Can&apos;t load this article right now.</p><a href={articleHref(slug)}>Try again</a></div>} />;}
+ let article;
+ try{article=await getPublicArticle(slug,preview);}catch{return <main className="page"><p role="alert">Can&apos;t load this article right now.</p><a href={articleHref(slug)}>Try again</a></main>;}
  if(!article)notFound();
- const project=article.project_id?(await getProjectApps().catch(()=>[])).find(p=>p.id===article.project_id):undefined;
- const video=article.source_url?youtubeId(article.source_url):null;
- const related=relatedArticles(all,article);
- const {prev,next}=adjacentArticles(all,article.id);
- const toc=articleSections(article.body);
- return <><PagePreview preview={preview} page={article.published?`/articles/${article.slug}`:"/content"}/><Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
-  <div className="article-layout">
-  <article className="article-read" data-draft-changed={article.draftChanged||undefined}>
-   <MarkRead id={article.id}/>
-   <p className="article-meta" id="overview">{articleDate(article.created_at)} · {CATEGORY_LABEL[article.category]}</p>
-   {article.draftChanged&&!article.published?<p role="status">Unpublished in this preview</p>:null}
-   <h1>{article.title}</h1>
-   {article.summary?<p className="article-summary">{article.summary}</p>:null}
-   {project?<p className="article-project">Part of <Link href="/projects" prefetch={false}>{project.name}</Link></p>:null}
-   {/* eslint-disable-next-line @next/next/no-img-element */}
-   {article.cover_url?<img className="article-cover" src={article.cover_url} alt="" referrerPolicy="no-referrer" />:null}
-   {video?<YouTubeEmbed id={video} title={article.title} />:article.source_url?<p><a className="btn ghost" href={article.source_url} target="_blank" rel="noopener noreferrer">Watch on {PLATFORM_LABEL[article.platform]} ↗</a></p>:null}
-   <ArticleMarkdown text={article.body} />
-   {prev||next?<nav className="article-pager" aria-label="More articles">
-    {prev?<Link className="article-pager-prev" href={articleHref(prev.slug)} prefetch={false}><small>← Previous</small><span>{prev.title}</span></Link>:<span />}
-    {next?<Link className="article-pager-next" href={articleHref(next.slug)} prefetch={false}><small>Next →</small><span>{next.title}</span></Link>:null}
-   </nav>:null}
-   {related.length?<section className="article-related" aria-labelledby="related-h"><h2 id="related-h">If you liked this, you might also like</h2><div className="articles-grid">{related.map(a=><ArticleCardView key={a.id} a={a} />)}</div></section>:null}
-  </article>
-  <OnThisPage sections={toc} topId="overview" />
-  </div>
- </ArticlesShell>} /></>;
+ /* The series, the next part and More like this are optional: if they cannot be read the post still renders. */
+ const [data,sections,apps]=await Promise.all([getHubData(preview).catch(()=>null),getSections(preview),article.project_id?getProjectApps().catch(()=>[]):Promise.resolve([])]);
+ const project=article.project_id?apps.find(p=>p.id===article.project_id):undefined;
+ const series=data?.series.find(s=>s.id===article.series_id)??null;
+ return <><PagePreview preview={preview} page={article.published?`/articles/${article.slug}`:"/content"}/>
+  <HubFrame socials={socialLinks(sections.contact.body)}><PostDetail article={article} series={series} allSeries={data?.series??[]} next={series&&data?nextPart(article,data.posts,data.guides):null} related={data?relatedPosts(data.posts,article):[]} project={project} unpublished={!!article.draftChanged&&!article.published}/></HubFrame></>;
 }
