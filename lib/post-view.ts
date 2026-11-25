@@ -20,8 +20,8 @@ export function postMeta(a:Pick<Article,'created_at'|'category'|'platform'|'code
  return [articleDate(a.created_at),timeLabel({platform:a.platform,minutes}),CATEGORY_LABEL[a.category],a.code?`Code ${a.code}`:''].filter(Boolean).join(' · ');
 }
 const ORIGIN:Record<Platform,string>={instagram:'Instagram carousel',youtube:'YouTube video',xiaohongshu:'RedNote post',other:'post'};
-/** "The long version of my Instagram carousel." */
-export const originLine=(platform:Platform)=>`The long version of my ${ORIGIN[platform]}.`;
+/** "The complete content of my Instagram carousel." */
+export const originLine=(platform:Platform)=>`The complete content of my ${ORIGIN[platform]}.`;
 export const originName=(platform:Platform)=>PLATFORM_LABEL[platform];
 
 /** The next part of the post's series by part number (an article or a guide), or null: no series, no part number, or this is the last released part. */

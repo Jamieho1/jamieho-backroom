@@ -16,7 +16,7 @@ export default async function HubLayout({children}:{children:ReactNode}){
  const series=visibleSeries(data.series,data.posts,data.guides);
  return <HubFrame socials={socialLinks(sections.contact.body)} top={<>
    <header className="hub-in hub-head">
-    <div><p className="sty-eyebrow">CONTENT</p><h1>The long version <em>of</em> every post</h1>
+    <div><p className="sty-eyebrow">CONTENT</p><h1>Complete content <em>of</em> every post</h1>
      <p className="sty-lede">Written versions of my Instagram and YouTube posts, plus free guides.</p></div>
     <HubSearch index={buildSearchIndex({posts:data.posts,guides:data.guides,series})}/>
    </header>

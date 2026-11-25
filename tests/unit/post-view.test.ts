@@ -26,8 +26,8 @@ describe('header lines',()=>{
   expect(postMeta({...a,code:null,platform:'youtube'},3)).toBe('11 Nov 2026 · 3 min video · AI');
  });
  it('origin line names the platform',()=>{
-  expect(originLine('instagram')).toBe('The long version of my Instagram carousel.');
-  expect(originLine('youtube')).toBe('The long version of my YouTube video.');
+  expect(originLine('instagram')).toBe('The complete content of my Instagram carousel.');
+  expect(originLine('youtube')).toBe('The complete content of my YouTube video.');
  });
 });
 describe('next part',()=>{

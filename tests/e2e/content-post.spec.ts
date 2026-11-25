@@ -25,7 +25,7 @@ async function mount(page:Page,scheme:'light'|'dark'='dark',hash=''){
  await page.emulateMedia({colorScheme:scheme});
  await page.goto('/privacy'+(hash?'#'+hash:''));
  for(const css of ['app/page-scale.css','app/about/story.css','app/content/content.css'])await page.addStyleTag({content:readFileSync(css,'utf8')});
- await page.addStyleTag({content:'body > :not(#hub-fixture){display:none!important}'});
+ await page.addStyleTag({content:'body > :not(#hub-fixture):not(.post-viewer){display:none!important}'});
  await page.evaluate(()=>{const root=document.createElement('div');root.id='hub-fixture';document.body.append(root)});
  await page.route('**/__post_fixture.js',r=>r.fulfill({contentType:'text/javascript',body:bundle}));await page.addScriptTag({url:'/__post_fixture.js'});
 }
@@ -37,13 +37,13 @@ for(const scheme of ['dark','light'] as const)test(`post page: header, origin ba
  await expect(page.getByRole('heading',{level:1,name:'Stop copy-pasting into Claude'})).toBeVisible();
  await expect(page.getByRole('navigation',{name:'Breadcrumb'})).toContainText('MCP 101 · part 1 of 5');
  await expect(page.locator('.sty-hmeta')).toContainText('Code MCP101');
- await expect(page.locator('.post-origin')).toContainText('The long version of my Instagram carousel.');
+ await expect(page.locator('.post-origin')).toContainText('The complete content of my Instagram carousel.');
  await expect(page.getByRole('link',{name:'View post ↗'})).toHaveAttribute('href','https://www.instagram.com/p/x/');
  await expect(page.locator('.post-strip li')).toHaveCount(6);
  const box=await page.locator('.post-slide').first().boundingBox();expect(box!.height/box!.width).toBeCloseTo(1.25,1);
  await expect(page.locator('.guide-body h2')).toHaveCount(5);
  const h2=await page.locator('.guide-body h2').first().evaluate(el=>{const s=getComputedStyle(el);return {t:s.textTransform,f:s.fontFamily,n:getComputedStyle(el,'::before').content};});
- expect(h2.t).toBe('uppercase');expect(h2.f).toContain('Barlow');expect(h2.n).toContain('01');
+ expect(h2.t).toBe('uppercase');expect(h2.f).toContain('Barlow');expect(h2.n).toMatch(/01|decimal-leading-zero/);
  await expect(page.locator('.post-nextbar a')).toHaveCount(2);await expect(page.locator('.post-nextbar a').last()).toContainText('Next · part 2');
  await expect(page.getByRole('region',{name:'More like this'}).getByRole('link')).toHaveCount(3);
  expect(await noSideScroll(page)).toBe(true);

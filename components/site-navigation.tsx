@@ -36,7 +36,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
         </nav>}
       </NavigationMenu>
       <NavigationMenu label="My story" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="My story pages">{navLink("About","/about",close)}{navLink("Projects","/projects",close)}</nav>}</NavigationMenu>
-      <NavigationMenu label="Content" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="Content pages">{navLink("Latest","/content",close,true)}{navLink("Series","/content/series",close)}{navLink("Free guides","/content/guides",close)}</nav>}</NavigationMenu>
+      <Link href="/content" prefetch={false} aria-current={pathname==="/content"||pathname.startsWith("/content/")?"page":undefined}>Content</Link>
       <a href={PASSLOOP_URL} rel="noopener">PassLoop ↗</a>
     </nav>
     <div className="site-navigation-account">

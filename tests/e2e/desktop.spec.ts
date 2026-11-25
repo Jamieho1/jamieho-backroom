@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("the retired desktop redirects to the Free guides tab", async ({ page }) => {
  await page.goto('/desktop'); await expect(page).toHaveURL(/\/content\/guides$/);
- await expect(page.getByRole('heading',{name:/The long version of every post/i,level:1})).toBeVisible();
+ await expect(page.getByRole('heading',{name:/Complete content of every post/i,level:1})).toBeVisible();
  await expect(page.getByRole('navigation',{name:'Content sections'}).getByRole('link',{name:/^Free guides/})).toHaveAttribute('aria-current','page');
  await expect(page.locator('.resource-preview')).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -17,11 +17,11 @@ test('retired Notes, Practice and Behavioral addresses permanently redirect to P
  }
 });
 
-test('Latest, Series and Free guides use client navigation without replacing the document',async({page})=>{
+test('the Latest, Series and Free guides tabs use client navigation without replacing the document',async({page})=>{
  await page.goto('/content/guides');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
  const marker=()=>page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker);
  for(const [label,url] of [['Latest',/\/content$/],['Series',/\/content\/series$/],['Free guides',/\/content\/guides$/]] as const){
-  await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:label,exact:true}).click();
+  await page.getByRole('navigation',{name:'Content sections'}).getByRole('link',{name:new RegExp('^'+label)}).click();
   await expect(page).toHaveURL(url);expect(await marker()).toBe('persistent');
  }
 });

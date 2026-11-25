@@ -22,7 +22,7 @@ export function HubSearch({index}:{index:SearchItem[]}){
   <small className="hub-find-hint">Every post ends with a code, like <b>MCP101</b>.</small>
   {result.mode!=='idle'?<div className="hub-hits" id={panel} role="region" aria-label="Search results" aria-live="polite">
    {result.mode==='code'
-    ?<Link className="hub-hit is-code" href={result.hit.href} prefetch={false}>{result.hit.platform?<PlatformMark platform={result.hit.platform}/>:null}<span className="hub-hit-main"><b>{result.hit.title}</b><small>Code {result.hit.code} · open the long version</small></span><span aria-hidden="true">→</span></Link>
+    ?<Link className="hub-hit is-code" href={result.hit.href} prefetch={false}>{result.hit.platform?<PlatformMark platform={result.hit.platform}/>:null}<span className="hub-hit-main"><b>{result.hit.title}</b><small>Code {result.hit.code} · open the complete content</small></span><span aria-hidden="true">→</span></Link>
     :result.items.length
      ?<ul>{result.items.map(item=><li key={item.kind+item.href+item.title}><Link className="hub-hit" href={item.href} prefetch={false}><span className="hub-hit-main"><b>{item.title}</b><small>{KIND_LABEL[item.kind]}{item.summary?` · ${item.summary}`:''}</small></span><span aria-hidden="true">→</span></Link></li>)}</ul>
      :<p className="hub-hit-none">Nothing matches &ldquo;{q.trim()}&rdquo;. Codes are letters and digits, like MCP101.</p>}

@@ -32,7 +32,7 @@ describe('post page',()=>{
   expect(screen.getByRole('heading',{level:1,name:'Stop copy-pasting into Claude'})).toBeTruthy();
   expect(screen.getByText('What MCP changes.')).toBeTruthy();
   expect(container.querySelector('.sty-hmeta')?.textContent).toBe('11 Nov 2026 · 1 min read · AI · Code MCP101');
-  expect(container.querySelector('.post-origin')?.textContent).toContain('The long version of my Instagram carousel.');
+  expect(container.querySelector('.post-origin')?.textContent).toContain('The complete content of my Instagram carousel.');
   const link=screen.getByRole('link',{name:'View post ↗'});expect(link.getAttribute('href')).toBe('https://www.instagram.com/p/x/');expect(link.getAttribute('rel')).toContain('noopener');
  });
  it('has the left chapter rail from ## headings and no old sidebar or On this page column',()=>{

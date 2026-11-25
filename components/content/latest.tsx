@@ -35,7 +35,7 @@ export function LatestView({posts,series,guide}:{posts:HubPost[];series:HubSerie
    <span className="hub-result" role="status">{filtered.length} {filtered.length===1?'post':'posts'}</span>
   </div>
   {guide?<div className="hub-band"><span className="hub-plat hub-plat-guide" aria-hidden="true">G</span><span className="hub-band-text"><b>Free: {guide.title}.</b>{guide.summary?<span> {guide.summary}</span>:null}</span><Link href="/content/guides" prefetch={false}>All free guides →</Link></div>:null}
-  <div className="hub-intro"><span><b>Every post&apos;s long version, newest first.</b> Posts you&apos;ve opened are marked Read.</span>
+  <div className="hub-intro"><span><b>Every post&apos;s complete content, newest first.</b> Posts you&apos;ve opened are marked Read.</span>
    <span className="hub-switch" role="group" aria-label="View"><button type="button" aria-pressed={view==='grid'} onClick={()=>chooseView('grid')}>▦ Cards</button><button type="button" aria-pressed={view==='list'} onClick={()=>chooseView('list')}>☰ List</button></span></div>
   {!posts.length?<p className="hub-empty">No posts have been published yet.</p>
    :!filtered.length?<p className="hub-empty">No posts match these filters. <button type="button" className="hub-clear" onClick={()=>setQuery('')}>Clear filters</button></p>

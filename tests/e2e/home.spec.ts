@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("My story renders and the retired desktop address keeps its redirect", async ({ page }) => {
   await page.goto("/about"); await expect(page).toHaveURL(/\/about$/); await expect(page.locator(".story-editorial")).toBeVisible();
   await page.goto("/desktop"); await expect(page).toHaveURL(/\/content\/guides$/);
-  await expect(page.getByRole("heading", { name: /The long version of every post/i, level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Complete content of every post/i, level: 1 })).toBeVisible();
 });
 
 test("Free guides shows only public Guides", async ({ page }) => {
@@ -40,7 +40,8 @@ test("navigation controls remain available in the floating bar", async ({ page }
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Background',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
   await expect(page.getByRole('link',{name:'PassLoop ↗',exact:true})).toBeVisible();
-  for(const menu of ['my story','content']){await page.locator(`.site-navigation:visible [data-menu="${menu}"] summary`).click();await expect(page.locator(`.site-navigation:visible [data-menu="${menu}"] nav`)).toBeVisible();await page.keyboard.press('Escape');}
+  await expect(page.locator('.site-navigation:visible').getByRole('link',{name:'Content',exact:true})).toBeVisible();
+  for(const menu of ['my story']){await page.locator(`.site-navigation:visible [data-menu="${menu}"] summary`).click();await expect(page.locator(`.site-navigation:visible [data-menu="${menu}"] nav`)).toBeVisible();await page.keyboard.press('Escape');}
   await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
@@ -92,10 +93,10 @@ test('Projects opens the catalogue while Journey Work links to the showcase',asy
 
 test('grouped navigation retains order, active pages and floating controls',async({page})=>{
  await page.goto('/content/guides');const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
- await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story','Content']);await expect(nav.locator(':scope > a')).toHaveText(['PassLoop ↗']);
- await nav.locator('[data-menu=content] summary').click();await expect(nav.getByRole('link',{name:'Free guides',exact:true})).toHaveAttribute('aria-current','page');await expect(nav.getByRole('link',{name:'Latest',exact:true})).not.toHaveAttribute('aria-current','page');await page.keyboard.press('Escape');
+ await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story']);await expect(nav.locator(':scope > a')).toHaveText(['Content','PassLoop ↗']);
+ await expect(nav.getByRole('link',{name:'Content',exact:true})).toHaveAttribute('aria-current','page');
  await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Creator','Background','Experience','Work','What I build','Contact']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
- const floating=page.locator('.site-navigation.is-journey');await expect(floating).toHaveAttribute('data-floating','true');await floating.locator('[data-menu=content] summary').click();await floating.getByRole('link',{name:'Latest',exact:true}).click();await expect(page).toHaveURL(/\/content$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const floating=page.locator('.site-navigation.is-journey');await expect(floating).toHaveAttribute('data-floating','true');await floating.getByRole('link',{name:'Content',exact:true}).click();await expect(page).toHaveURL(/\/content$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
 // A chapter hash can remain after the logo scrolls back to the clouds.
@@ -121,8 +122,8 @@ test('colour mode changes preserve the clouds after returning from an Education 
 test("Back from another page returns to clouds instead of restoring Contact", async ({ page }) => {
   await page.goto('/#home-contact');
   await expect(page.getByRole('heading',{name:'Have a project in mind?',exact:true}).last()).toBeVisible();
-  await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.locator('.site-navigation:visible').getByRole('link',{name:'Free guides',exact:true}).click();
-  await expect(page).toHaveURL(/\/content\/guides$/);
+  await page.locator('.site-navigation:visible').getByRole('link',{name:'Content',exact:true}).click();
+  await expect(page).toHaveURL(/\/content$/);
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
   await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBeLessThan(5);

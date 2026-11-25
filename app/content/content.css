@@ -20,7 +20,7 @@ html[data-theme="dark"] body:has(.hub) .sty.hub{--bg:#1B2333;--card:#222c40;--ca
 .hub .sty-lede{margin-top:14px}
 
 /* heading + search */
-.hub-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,400px);gap:40px;align-items:end;padding-top:var(--pg-pad-top);padding-bottom:28px}
+.hub-head{z-index:35;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,400px);gap:40px;align-items:end;padding-top:var(--pg-pad-top);padding-bottom:28px}
 .hub-head h1{margin:0;font:700 var(--pg-h1-about)/.95 var(--cond);text-transform:uppercase;letter-spacing:.005em;color:var(--ink)}
 .hub-head h1 em{font:italic 400 .6em Georgia,serif;text-transform:lowercase;letter-spacing:0;margin:0 .12em;color:var(--boldtx)}
 @media(max-width:900px){.hub-head{grid-template-columns:1fr;gap:20px}}

@@ -12,7 +12,7 @@ test.beforeAll(async()=>{
  const series=[{id:sid,slug:'mcp-101',title:'MCP 101',goal:'Ship a server',topic:'ai',planned_parts:5,sort:1}];
  const posts=Array.from({length:30},(_,i)=>({id:'id'+i,slug:'post-'+i,title:i===0?'Stop copy-pasting into Claude':'Sample post '+i,summary:'',platform:i%2?'youtube':'instagram',category:i%3?'ai':'career',cover_url:'',firstSlide:'',created_at:new Date(Date.UTC(2026,10,28)-i*86400000*3).toISOString(),series_id:i===0?sid:null,series_part:i===0?1:null,code:i===0?'MCP101':null,takeaway:i===0?'Wire up a tool':'',minutes:4}));
  const guide={id:'g',slug:'mcp',title:'The MCP Guide',summary:'From first connection to production.',cover_url:'',notion_url:'',doc_url:'',created_at:'a',updated_at:'b',series_id:null,series_part:null,audience:'',highlights:[],exercises:null,minutes:25,chapters:5};
- createRoot(document.getElementById('hub-fixture')).render(<div className="sty hub"><div className="sty-layer sty-dots"/><header className="hub-in hub-head"><div><p className="sty-eyebrow">CONTENT</p><h1>The long version <em>of</em> every post</h1><p className="sty-lede">Lede.</p></div><HubSearch index={buildSearchIndex({posts,guides:[guide],series})}/></header><HubTabs counts={{latest:30,series:1,guides:1}}/><div className="hub-in hub-content"><LatestView posts={posts} series={series} guide={guide}/></div><ContentFooterBand socials={[{kind:'instagram',href:'https://example.com/i'},{kind:'youtube',href:'https://example.com/y'}]}/></div>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'hub-fixture',setup(b){
+ createRoot(document.getElementById('hub-fixture')).render(<div className="sty hub"><div className="sty-layer sty-dots"/><header className="hub-in hub-head"><div><p className="sty-eyebrow">CONTENT</p><h1>Complete content <em>of</em> every post</h1><p className="sty-lede">Lede.</p></div><HubSearch index={buildSearchIndex({posts,guides:[guide],series})}/></header><HubTabs counts={{latest:30,series:1,guides:1}}/><div className="hub-in hub-content"><LatestView posts={posts} series={series} guide={guide}/></div><ContentFooterBand socials={[{kind:'instagram',href:'https://example.com/i'},{kind:'youtube',href:'https://example.com/y'}]}/></div>);`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,format:'iife',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},plugins:[{name:'hub-fixture',setup(b){
   b.onResolve({filter:/components\/viewer-provider$/},()=>({path:'viewer',namespace:'hub-viewer'}));b.onLoad({filter:/.*/,namespace:'hub-viewer'},()=>({contents:'export function useViewer(){return {viewer:{status:"anonymous"},configured:false}}'}));
   b.onResolve({filter:/^next\/link$/},()=>({path:'link',namespace:'hub-link'}));b.onLoad({filter:/.*/,namespace:'hub-link'},()=>({resolveDir:process.cwd(),contents:'import React from "react";export default function Link({prefetch,children,...props}){return React.createElement("a",props,children)}'}));
   b.onResolve({filter:/^next\/navigation$/},()=>({path:'nav',namespace:'hub-nav'}));b.onLoad({filter:/.*/,namespace:'hub-nav'},()=>({contents:'export const useRouter=()=>({push:(href)=>{window.__pushed=href}});export const usePathname=()=>"/content";'}));
@@ -31,7 +31,7 @@ const noSideScroll=(page:Page)=>page.evaluate(()=>document.documentElement.scrol
 
 for(const scheme of ['dark','light'] as const)test(`frame, Latest and tabs render without side scroll (${scheme})`,async({page})=>{
  await mount(page,scheme);
- await expect(page.getByRole('heading',{level:1,name:/The long version of every post/i})).toBeVisible();
+ await expect(page.getByRole('heading',{level:1,name:/Complete content of every post/i})).toBeVisible();
  await expect(page.getByRole('navigation',{name:'Content sections'}).getByRole('link',{name:'Latest 30'})).toHaveAttribute('aria-current','page');
  expect(await noSideScroll(page)).toBe(true);
  const bg=await page.locator('.sty.hub').evaluate(el=>getComputedStyle(el).backgroundColor);
@@ -82,7 +82,7 @@ test('/p/<code> redirects: unknown codes go to the hub with a note, known codes 
  const unknown=await request.get('/p/zzzz9',{maxRedirects:0});expect(unknown.status()).toBe(307);expect(unknown.headers()['location']).toBe('/content?code=ZZZZ9');
  await page.goto('/p/zzzz9');await expect(page).toHaveURL(/\/content\?code=ZZZZ9$/);await expect(page.getByText('No post with that code yet.')).toBeVisible();
 });
-test('the Content menu offers Latest, Series and Free guides',async({page})=>{
- await page.goto('/privacy');const menu=page.locator('.site-navigation:visible').locator('[data-menu="content"]');
- await menu.locator('summary').click();for(const [name,href] of [['Latest','/content'],['Series','/content/series'],['Free guides','/content/guides']])await expect(menu.getByRole('link',{name,exact:true})).toHaveAttribute('href',href);
+test('Content is one link in the site navigation, no dropdown',async({page})=>{
+ await page.goto('/privacy');const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
+ await expect(nav.locator('[data-menu="content"]')).toHaveCount(0);await expect(nav.getByRole('link',{name:'Content',exact:true})).toHaveAttribute('href','/content');
 });

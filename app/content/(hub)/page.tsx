@@ -6,7 +6,7 @@ import {visibleSeries} from '@/lib/content-hub';
 import {LatestView} from '@/components/content/latest';
 
 export const revalidate=3600;
-export const metadata:Metadata={title:'Content · Jamie Ho',description:'The long version of every post: articles from Instagram and YouTube, series and free guides on AI, career, productivity and building in public.'};
+export const metadata:Metadata={title:'Content · Jamie Ho',description:'Complete content of every post: articles from Instagram and YouTube, series and free guides on AI, career, productivity and building in public.'};
 export default async function ContentPage(){
  const preview=await getHomePreview();
  const data=await getHubData(preview);

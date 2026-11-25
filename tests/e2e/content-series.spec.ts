@@ -22,7 +22,7 @@ async function mount(page:Page,scheme:'light'|'dark'='dark',hash='',read:string[
  await page.emulateMedia({colorScheme:scheme});
  await page.goto('/privacy');
  await page.evaluate(ids=>localStorage.setItem('jb.content.read',JSON.stringify(ids)),read);
- await page.goto('/privacy'+(hash?'#'+hash:''));
+ await page.goto('/privacy?fixture=series'+(hash?'#'+hash:''));
  for(const css of ['app/page-scale.css','app/about/story.css','app/content/content.css'])await page.addStyleTag({content:readFileSync(css,'utf8')});
  await page.addStyleTag({content:'body > :not(#hub-fixture){display:none!important}'});
  await page.evaluate(()=>{const root=document.createElement('div');root.id='hub-fixture';document.body.append(root)});
