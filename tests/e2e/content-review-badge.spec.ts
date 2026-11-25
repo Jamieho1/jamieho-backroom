@@ -24,7 +24,7 @@ test('owner sees two drafts in top and floating bars without overflow or changed
   await mount(page,'owner',2,floating);const badge=page.getByRole('link',{name:'2 to review',exact:true});await expect(badge).toBeVisible();await expect(badge).toHaveAttribute('href','/manage/review');
   await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
   const navigation=page.getByRole('navigation',{name:'Site',exact:true});
-  await expect(navigation.locator(':scope > a')).toHaveText(['Interview Prep']);
+  await expect(navigation.locator(':scope > a')).toHaveText(['PassLoop ↗']);
   for(const [menu,links] of [['my story',[['About','/about'],['Projects','/projects']]],['content',[['Articles','/articles'],['Resources','/resources']]]] as const){
    await navigation.locator(`[data-menu="${menu}"] summary`).click();for(const [label,href] of links)await expect(navigation.getByRole('link',{name:label,exact:true})).toHaveAttribute('href',href);await page.keyboard.press('Escape');
   }

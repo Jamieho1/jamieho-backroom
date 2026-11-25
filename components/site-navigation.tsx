@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 import { SignInButton } from "./sign-in-button";
 import { useViewer } from "./viewer-provider";
+import { PASSLOOP_URL } from "@/lib/passloop";
 
 export const JOURNEY_LINKS = [
   { id: "creator", label: "Creator" },
@@ -36,7 +37,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
       </NavigationMenu>
       <NavigationMenu label="My story" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="My story pages">{navLink("About","/about",close)}{navLink("Projects","/projects",close)}</nav>}</NavigationMenu>
       <NavigationMenu label="Content" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="Content pages">{navLink("Articles","/articles",close)}{navLink("Resources","/resources",close)}</nav>}</NavigationMenu>
-      <Link href="/interview" aria-current={pathname.startsWith("/interview")?"page":undefined}>Interview Prep</Link>
+      <a href={PASSLOOP_URL} rel="noopener">PassLoop ↗</a>
     </nav>
     <div className="site-navigation-account">
       <FeedbackButton className="site-feedback-button"/>

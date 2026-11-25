@@ -11,7 +11,8 @@ import { encrypt } from "./export-crypto.mjs";
 
 const TABLES = JSON.parse(readFileSync(new URL("./export-tables.json", import.meta.url), "utf8"));
 const PAGE = 1000;
-const PRACTICE_KEYS={practice_complexities:["user_id","problem"],practice_submissions:["user_id","id"],practice_cases:["user_id","problem"],interview_behavioral_themes:["id"],interview_behavioral_questions:["id"],interview_behavioral_custom_questions:["user_id","id"],interview_behavioral_answers:["user_id","question_id"],user_resumes:["user_id"],resume_templates:["key"],practice_stars:["user_id","problem"],practice_code:["user_id","problem"],practice_attempts:["user_id","id"],system_design_questions:["id"],system_design_quiz_attempts:["user_id","id"],system_design_progress:["user_id","question_id"],system_design_whiteboards:["user_id","question_id"],system_design_attempts:["user_id","id"]};
+// PassLoop's tables (practice, notes, interview, resumes, system design) are exported by PassLoop's own manifest, not this one (PL4).
+const ORDER_KEYS={};
 
 function client() {
   const url = process.env.SUPABASE_URL;
@@ -36,7 +37,7 @@ async function dumpTable(sb, table) {
   const rows = [];
   for (let from = 0; ; from += PAGE) {
     let query=sb.from(table).select("*");
-    for(const key of PRACTICE_KEYS[table]??[])query=query.order(key);
+    for(const key of ORDER_KEYS[table]??[])query=query.order(key);
     const { data, error } = await query.range(from, from + PAGE - 1);
     if (error) throw new Error(`${table}: ${error.message}`);
     rows.push(...data);

@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { journeyPosition, projectTechnologies } from "@/lib/home";
-import { FALLBACK_APPS } from "@/lib/projects";
+import type { AppRow } from "@/lib/apps";
+const app = (id: string, tags: string[]): AppRow => ({ id, name: id, icon: id, kind: "internal", url: `/${id}`, visibility: "public", screenshots: [], tags, description: "", sort: 0, locked: false });
 
 describe("Home project technology evidence", () => {
   it("uses actual project tags, deduplicates shared tools and excludes owner-only cards and topic tags", () => {
-    const cards = [FALLBACK_APPS[0], { ...FALLBACK_APPS[1], tags: ["Next.js", "next.js", "Unknown claim", "TypeScript"] }, { ...FALLBACK_APPS[2], visibility: "owner_only" as const, tags: ["AWS"] }];
+    const cards = [app("notes", ["Next.js", "Supabase", "Markdown"]), app("practice", ["Next.js", "next.js", "Unknown claim", "TypeScript"]), { ...app("behavioral", ["AWS"]), visibility: "owner_only" as const }];
     const tools = projectTechnologies(cards);
     expect(tools.map(tool => tool.name)).toEqual(["Next.js", "Supabase", "Markdown", "TypeScript"]);
     expect(tools[0].projects.map(project => project.id)).toEqual(["notes", "practice"]);

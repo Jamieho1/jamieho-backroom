@@ -4,6 +4,7 @@ Read `docs/README.md` and `docs/status.md` first, then only the topic documents 
 
 - Ask before starting each new ticket; existing approval continues for its scope. Mark Done only after Jamie verifies live.
 - Jamie pushes. Never push; commits use Jamie Ho <shinghimho@gmail.com>.
+- PassLoop (interview practice) lives in its own repo; this site only links and redirects to it via lib/passloop.ts. Do not re-add its routes, libs or tables here.
 - Prefer APIs/MCP and local checks. Do not visit the website or control Jamie's browser/computer unless explicitly requested.
 - Jamie handles secrets. Never read, print or request their values.
 - Use new migrations; never edit applied SQL. Test changes and obtain Jamie's approval before applying them live. Record confirmed applied/pending/unknown state.

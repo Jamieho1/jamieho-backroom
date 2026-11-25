@@ -26,28 +26,24 @@ test.describe('real Experience/CV draft previews',()=>{
   const panel=experience.locator('.dial-stack-step[data-draft-changed="true"]').filter({has:page.getByRole('heading',{name:'Draft fixture role',exact:true})});await expect(panel).toBeVisible();
   await expect(experience.locator('li[data-draft-changed="true"]')).toContainText('Draft new proof');await expect(experience).not.toContainText('Hide fixture role');await expect(experience).not.toContainText('Delete fixture proof');
   expect(await page.content()).not.toContain('Private fixture proof');await page.screenshot({path:testInfo.outputPath('home-preview.png')});
-  await page.getByRole('link',{name:'Preview CV',exact:true}).click();await expect(page).toHaveURL(/\/behavioral$/);
-  const cv=page.getByRole('region',{name:'CV',exact:true});await expect(cv.getByRole('heading',{name:'Draft fixture role',exact:true})).toBeVisible();
-  const changed=cv.locator('article[data-draft-changed="true"]').filter({hasText:'Draft fixture role'});await expect(changed).toBeVisible();expect(await changed.evaluate(el=>getComputedStyle(el).outlineStyle)).toBe('solid');
-  await expect(cv.locator('li[data-draft-changed="true"]')).toContainText('Draft new proof');await expect(cv).toContainText('Hidden from homepage');await expect(cv).not.toContainText('Delete fixture proof');await expect(cv.getByRole('button',{name:'Add experience',exact:true})).toHaveCount(0);
-  expect((await page.reload())?.headers()['cache-control']).toContain('no-store');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:testInfo.outputPath('cv-preview.png')});
+  expect((await page.reload())?.headers()['cache-control']).toContain('no-store');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:testInfo.outputPath('home-preview-reloaded.png')});
   await page.getByRole('button',{name:'Discard',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);
-  await expect(cv).toContainText('Live fixture role');await expect(cv).toContainText('Delete fixture proof');await expect(cv.getByRole('button',{name:'Add experience',exact:true})).toBeVisible();
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');const live=page.locator('.journey-stills #about .dial-stacked');await expect(live).toContainText('Live fixture role');await expect(live).toContainText('Delete fixture proof');
   expect((await local('/__state')).sets.find((s:{id:string})=>s.id===set.id).status).toBe('discarded');
  });
- test('approve from CV applies the entire set and preserves deleted bullet history',async({page,baseURL})=>{
-  const set=await enter(page,baseURL!,'Preview CV');await expect(page.getByRole('region',{name:'CV',exact:true})).toContainText('Draft fixture role');
+ test('approve from Home applies the entire set and preserves deleted bullet history',async({page,baseURL})=>{
+  const set=await enter(page,baseURL!);await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.journey-stills #about .dial-stacked')).toContainText('Draft fixture role');
   await page.getByRole('button',{name:'Approve',exact:true}).click();await expect(page.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);await expect(page.locator('[data-draft-changed="true"]')).toHaveCount(0);
   const state=await local('/__state');const saved=state.sets.find((s:{id:string})=>s.id===set.id);expect(saved.status).toBe('approved');expect(saved.previous.find((p:{key:string})=>p.key===removed).values.text).toBe('Delete fixture proof');expect(state.items.find((i:{id:string})=>i.id===hidden).public).toBe(false);expect(state.bullets.some((b:{id:string})=>b.id===removed)).toBe(false);
   await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await expect(page.locator('.journey-stills #about .dial-stacked')).toContainText('Draft fixture role');await expect(page.locator('.journey-stills #about .dial-stacked')).toContainText('Draft new proof');
  });
- test('copied cookies expose no Experience drafts on Home or CV to visitors and members',async({page,browser,baseURL})=>{
-  const set=await enter(page,baseURL!,'Preview CV');const cookies=(await page.context().cookies()).filter(c=>['jb.content-preview','__prerender_bypass'].includes(c.name));
+ test('copied cookies expose no Experience drafts on Home to visitors and members',async({page,browser,baseURL})=>{
+  const set=await enter(page,baseURL!);const cookies=(await page.context().cookies()).filter(c=>['jb.content-preview','__prerender_bypass'].includes(c.name));
   for(const role of ['anonymous','member']){
    const context=await browser.newContext({viewport:page.viewportSize()!,reducedMotion:'reduce'});const other=await context.newPage();
    try{
     if(role==='member')await signIn(other,baseURL!,role);await context.addCookies(cookies);
-    for(const path of ['/','/behavioral']){await other.goto(baseURL+path);const html=await other.content();expect(html).not.toContain('Draft fixture role');expect(html).not.toContain('Draft new proof');expect(html).not.toContain(set.summary);await expect(other.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);if(path==='/behavioral')await expect(other.getByRole('link',{name:'Open Behavioral Playbook'})).toBeVisible();}
+    for(const path of ['/']){await other.goto(baseURL+path);const html=await other.content();expect(html).not.toContain('Draft fixture role');expect(html).not.toContain('Draft new proof');expect(html).not.toContain(set.summary);await expect(other.getByRole('complementary',{name:'Content preview'})).toHaveCount(0);}
    }finally{await context.close();}
   }
  });

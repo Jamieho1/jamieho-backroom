@@ -8,7 +8,7 @@ export async function startContentPreview(id: string, target: string = "/"): Pro
   try {
     const preview = await loadOwnerPreview(id);
     if (!preview) return { ok: false, message: "Preview unavailable. Sign in as the owner and choose a valid pending draft." };
-    const routes=["/",...(preview.experience?["/behavioral"]:[]),...(preview.targets??[]).map(t=>t.href)];
+    const routes=["/",...(preview.targets??[]).map(t=>t.href)];
     for(const [table,rows] of Object.entries(preview.publishing??{}))for(const row of rows??[])if(row.draftChanged)routes.push(`/${table}/${encodeURIComponent(row.slug)}`);
     if(!routes.includes(target))return {ok:false,message:"This set has no preview at that route."};
     const store = await cookies();

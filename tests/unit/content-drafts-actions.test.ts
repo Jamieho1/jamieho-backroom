@@ -61,7 +61,7 @@ it('handles load and connection failures without claiming success',async()=>{
 it('experience approval refreshes every CV consumer through the same atomic status action',async()=>{
  mocks.single.mockResolvedValue({data:{...set,operations:[{op:'update',table:'experience_items',key:id,fields:{title:'Draft role'}}]},error:null});
  expect((await approveContentChange(id)).ok).toBe(true);expect(mocks.update).toHaveBeenCalledExactlyOnceWith({status:'approved'});
- expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(['/','/journey','/about','/behavioral','/manage/review']);
+ expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(['/','/journey','/about','/manage/review']);
 });
 it('publishing approval refreshes both slugs from committed audit history',async()=>{
  const key='00000000-0000-4000-8000-000000000601';const publishingOps=[{table:'projects',op:'update',key,fields:{slug:'new-project'}}];
@@ -76,12 +76,18 @@ it('publishing row validation errors happen before the approval transaction',asy
  mocks.single.mockResolvedValue({data:{...set,operations:[{table:'guides',op:'update',key,fields:{title:'Valid title'}}]},error:null});
  expect(await approveContentChange(id)).toMatchObject({ok:false,message:expect.stringContaining('no longer exists')});expect(mocks.update).not.toHaveBeenCalled();
 });
-it('app approval refreshes notes, behavioral and the exact practice problem path',async()=>{
- const ops=[{table:'notes',op:'update',key:'fixture-note',fields:{body:'Synthetic note'}},{table:'question_notes',op:'update',key:217,fields:{body:'Synthetic question'}},{table:'behavioral_stories',op:'update',key:id,fields:{title:'Synthetic story'}}];
+it('legacy owner-table approval has no public route to refresh, and PassLoop tables are refused',async()=>{
+ const ops=[{table:'behavioral_stories',op:'update',key:id,fields:{title:'Synthetic story'}}];
  mocks.single.mockResolvedValue({data:{...set,operations:ops},error:null});
- const rows:Record<string,unknown[]>={notes:[{id:'fixture-note',body:'Live',free:''}],question_notes:[{problem:217,body:'Live'}],practice_code:[],practice_stars:[],behavioral_stories:[{id,bullet_id:null,title:'Live',situation:'',task:'',action:'',result:'',skills:'',numbers:'',updated_at:'2026-01-01'}]};
- mocks.from.mockImplementation(table=>table==='content_changes'?{select:mocks.select,update:mocks.update}:{select:()=>{const result={data:rows[table]??[],error:null};return {...result,eq:()=>Promise.resolve(result)};}});
- expect(await approveContentChange(id)).toMatchObject({ok:true,applied:true});expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(expect.arrayContaining(['/notes','/practices','/practices/217','/behavioral','/manage/review']));
+ const rows:Record<string,unknown[]>={behavioral_stories:[{id,bullet_id:null,title:'Live',situation:'',task:'',action:'',result:'',skills:'',numbers:'',updated_at:'2026-01-01'}]};
+ mocks.from.mockImplementation(table=>table==='content_changes'?{select:mocks.select,update:mocks.update}:{select:()=>Promise.resolve({data:rows[table]??[],error:null})});
+ expect(await approveContentChange(id)).toMatchObject({ok:true,applied:true});expect(mocks.revalidate.mock.calls.map(([path])=>path)).toEqual(['/manage/review']);
+ mocks.update.mockClear();
+ for(const table of ['notes','question_notes','practice_code','companies','system_design_questions','resume_templates','interview_behavioral_themes']){
+  mocks.single.mockResolvedValue({data:{...set,operations:[{table,op:'update',key:id,fields:{body:'X'}}]},error:null});
+  const result=await approveContentChange(id);expect(result.ok).toBe(false);expect(result.message).toContain('Invalid draft');
+ }
+ expect(mocks.update).not.toHaveBeenCalled();
 });
 
 it('Story approval invalidates the editorial page without changing approval rules',async()=>{

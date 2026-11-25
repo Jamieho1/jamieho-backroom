@@ -11,10 +11,10 @@ const op=(table='experience_items',action='update',fields:unknown={title:'New ti
 const parse=(ops:unknown)=>{const r=validateOperations(ops);if(!r.ok)throw Error(r.message);return r.operations;};
 const row=(id=item,visible=true):ExperienceRow=>({id,kind:'role',title:'Live role',org:'Example',dates:'2024',location:'London',summary:'Live summary',sort:100,public:visible,experience_bullets:[]});
 describe('experience draft validation',()=>{
- it('accepts every editor content field and preserves CV routes',()=>{
+ it('accepts every editor content field and preserves the CV routes still on this site',()=>{
   const result=parse([op('experience_items','insert',{kind:'skills',title:' Title ',org:' Org ',dates:'Dates',location:'Location',summary:' Summary ',sort:0,public:true}),op('experience_bullets','insert',{item_id:item,text:' Proof ',sort:1,public:true},bullet),op('experience_bullets','update',{item_id:other,text:'Edit',sort:2,public:false},bullet),op('experience_bullets','delete',{},bullet)]);
   expect(result[0].fields).toMatchObject({title:'Title',org:'Org',summary:'Summary'});
-  expect(affectedRoutes(result)).toEqual(['/','/journey','/about','/behavioral']);
+  expect(affectedRoutes(result)).toEqual(['/','/journey','/about']);
  });
  for(const action of ['insert','update']) {
   for(const [field,max] of Object.entries(LIMITS).filter(([f])=>f!=='bullet'))it(`${action} enforces editor ${field} length`,()=>{

@@ -1,10 +1,12 @@
 # jamieho-backroom
 
+**PassLoop (interview practice) now lives in its own repo; the Notes, Practice and Behavioral setup sections were removed here. Set `NEXT_PUBLIC_PASSLOOP_URL` in Vercel once PassLoop is deployed.**
+
 Agent context: see `AGENTS.md`, `docs/README.md` and `docs/status.md`. Older feature notes below may be superseded by `docs/`.
 
 Jamie Ho's personal website. It has three parts:
 - a public portfolio;
-- a Google-sign-in desktop of apps (Notes, practice arena, Behavioral);
+- Google sign-in for the owner area (Settings, Content Drafts); interview practice moved to the separate PassLoop repo (see `docs/interview.md`);
 - a hub for later projects on subdomains.
 
 Current implementation summaries and task-specific reading paths are in `docs/`. Active product specs remain in `Resources/`; use git history for superseded scope; ticket dependencies are in `Resources/Tickets - Dependency Map.md`. Live ticket status is tracked in Notion.
@@ -92,99 +94,9 @@ view, which uses the current caller's RLS access checks without exposing invite 
 Applied to production with Jamie's approval on 31 October 2026.
 
 `/desktop` asks anonymous visitors to sign in. Registry apps launch inside the desktop; external apps
-open in a new tab. Notes, Practice and Behavioral render inside the desktop.
-Canonical app routes are `/notes`, `/practices` (problem links `/practices/217`) and `/behavioral`.
-Legacy `/desktop?app=...` URLs redirect to their clean equivalents with the same sign-in/access checks.
+open in a new tab. Old `/notes`, `/practices` and `/behavioral` addresses (and `/desktop?app=notes|practice|behavioral`) redirect to PassLoop.
 Launches use the existing `app_opens` log (one entry per person, app and day), shown in Settings → Visitors.
 After deployment, check a member, an invited member and the owner; the owner alone should see Settings.
-
-## Notes read view (TKT-61)
-
-Apply `supabase/migrations/20261031150000_notes.sql` before deploying this version. It creates an empty,
-RLS-protected `notes` table; applied to production through Supabase MCP with Jamie's approval on 31 October 2026. Open Notes from `/desktop` to read it.
-The import format for Claude's TKT-63 copy is in `Resources/Notes - Import Contract.md`.
-No personal note content is included in the repository or seeded by this migration.
-
-Notes uses a collapsible/resizable topic list, note content in the middle and a resizable visuals panel on the right. Open all / Close all lives beside the topic heading; there is no Recall mode or Notes/Visuals view switch. Panel preferences are saved only in this browser, separately from Practice. Narrow layouts stack text and visuals.
-
-## Notes owner editor (TKT-62)
-
-Apply `supabase/migrations/20261031151127_notes_free.sql` before deploying this version. It adds the empty
-`free` text column to notes and keeps the existing RLS policies. Applied to production through Supabase MCP with Jamie's approval on 31 October 2026.
-The owner sees **Edit note** on an existing note and can save its body and free notes. Failed saves keep both
-draft fields with **Retry**. Cancel discards the draft; readers have no editing controls. Notes must be imported
-before the editor is visible; this ticket creates no sample content.
-
-## Practice arena (TKT-64)
-
-Open Practice at `/practices`, or link to a problem with `/practices/217`.
-The 143 prewritten problems, tests, reference solutions, visuals and pitfalls are ported from the artifact's
-own-words source. No LeetCode statements, saved attempts or personal question notes were imported.
-
-Run checks visible cases; Submit checks all local tests. Python runs only in a fresh browser Web Worker;
-there is no code-execution API or server execution. Runs stop after five seconds. If Python cannot load,
-Run/Submit stay disabled with Retry Python, while the statement and Solution remain readable.
-
-Code is stored in localStorage per signed-in viewer and problem. It survives reloads in the same browser;
-visitor code is not sent to Supabase. Clearing site data clears this browser's code.
-
-TKT-65 adds owner-only **Save code** to sync the current problem between devices. The saved database
-version loads first; **Restore browser draft** can recover a different local draft. If the saved-data
-load fails, Save code stays disabled until Retry succeeds. **Load saved code** then lets you explicitly
-open the recovered server copy without automatically replacing code typed during recovery. Owner Run/Submit
-automatically saves a private attempt snapshot and result; failed saves offer Retry. Retrying an old
-attempt never replaces the separately saved code. Visitors keep browser-only code and attempts.
-The per-question Notes tab is shared with people allowed to open Practice; only the owner edits it.
-Notes problem links open the corresponding Practice problem. The privacy page describes this storage.
-
-TKT-65 migration `supabase/migrations/20261101005242_practice_owner_data.sql` was approved and applied live on 2026-11-01.
-It adds owner-only `practice_code` / `practice_attempts` and shared `question_notes`, all protected by RLS.
-Remote migration version: `20261101080700`. Claude handles the TKT-66 import using
-`Resources/Practice - Import Contract.md`; no personal code, attempts or question notes belong in git.
-
-`predev` and `prebuild` copy the pinned Pyodide package into ignored `public/pyodide/`; commit the package
-lock and `scripts/copy-pyodide.mjs`, not generated runtime assets. The worker and Python harness in
-`public/runner/` are tracked. Runtime source/license notices are generated alongside Pyodide.
-No database migration is needed for TKT-64.
-
-Tests validate all 143 reference solutions with the local test harness. Headless browser tests exercise real
-Pyodide, network restrictions, worker failure, CodeMirror, local code persistence, five-second termination
-and the 390 px layout. Their UI bundle is test-only; it does not create a public fixture route.
-
-## Behavioral CV and stories (TKT-67)
-
-Open Behavioral at `/behavioral`. It reuses Experience roles/projects/education and all
-of their bullets, including hidden bullets, for people permitted to open Behavioral. The registry starts
-Invite-only; Settings remains the place to change access. Public landing-page reads stay unchanged.
-
-Each CV bullet shows a story count and opens its linked STAR stories. The owner can Add story, select
-its CV bullet, and edit Situation, Task, Action, Result, Skills and Numbers. Invitees read only.
-Save/Retry retains the draft on failure; Cancel discards it. Removing an Experience bullet keeps its
-stories with no linked bullet, accessible under All stories. Story text is stored in Supabase, not localStorage.
-
-`supabase/migrations/20261101104828_behavioral_stories.sql` was approved and **applied live** on
-2026-11-01 (remote version `20261101105507`). It adds RLS-protected `behavioral_stories` and splits the existing Experience
-owner write policies into INSERT/UPDATE/DELETE without changing public read rules. No data is imported.
-Current Behavioral/Resume behavior is documented in `docs/interview.md`; personal CV and story text
-must never be committed. The question bank/coverage strip is implemented in TKT-68 below.
-
-## Behavioral question bank (TKT-68)
-
-Behavioral → Questions has 37 generic prompts grouped under Conflict, Failure, Leadership, Ambiguity,
-Ownership, Impact and Customer, with General/Palantir/Balyasny/JPMorgan set filters and search.
-Company sets are practice prompts, not an official list of interview questions.
-
-The owner maps up to two different stories to each question and edits its answer outline/follow-ups.
-Save updates coverage immediately; failed Save/Retry keeps the draft and locks filters/view switching.
-Invitees read the saved preparation and can open its linked STAR stories. Coverage counts mapped
-questions with an existing linked story, once per question; outlines alone do not count. Theme totals
-always cover the complete bank, independently of filters. Clearing links removes coverage; deleting a
-story clears its database links without deleting answer text.
-
-Migration `supabase/migrations/20261101110015_behavioral_answers.sql` was approved and **applied live**
-on 2026-11-01 (remote version `20261101110756`). It creates RLS-protected `behavioral_answers`;
-Behavioral app access controls reads and only the owner writes. Generic prompts stay in code;
-personal preparation stays in Supabase and encrypted exports. Claude handles the TKT-69 import.
 
 ## Shared public desktop and window sizing
 
@@ -232,34 +144,6 @@ content scrolls inside the window rather than extending the document. Phone laun
 with their own scroll limit so the active page remains usable at 390 px. Settings' standalone owner
 route and sign-in/unavailable desktop states also use the shell. No database migration is needed.
 
-## Practice tags and private review list
-
-Practice shows green Easy, orange Medium and red Hard pills, plus a NeetCode 150 collection tag.
-The current 143 supported problems are members of that collection; the tag does not imply all 150
-problems are implemented. Search accepts titles or problem numbers and has a tinted field/placeholder.
-Notes and Behavioral search fields also have descriptive placeholders.
-
-The owner can Star a question from its heading and use the Starred filter to revisit saved questions.
-Stars are private and stored in Supabase for cross-device use; visitors cannot read or change them.
-Failed loads/saves offer Retry, preserve the existing list and keep the original target question when
-retrying after navigating elsewhere. Owner code/attempt/note saves are independent of stars.
-
-Migration `supabase/migrations/20261101142129_practice_stars.sql` was approved and **applied live**
-on 2026-11-01 (remote version `20261101144554`). It adds RLS-protected practice_stars, owner-only writes and
-owner-only app-access reads. No SQL functions are exposed. Privacy and encrypted exports include the list.
-
-## Practice panels and CI Retry fix
-
-The Practice question list can collapse/expand. On desktop, drag the divider beside the list to resize
-it, and the divider between the problem and code to adjust those panels. Dividers also support arrow
-keys, Home/End and double-click to reset. Sizes and collapse state stay in this browser. Phone layouts
-remain stacked and avoid narrow draggable columns. Resizing/collapsing does not reset the code editor.
-
-The CI note-Retry failure was a test synchronization/query issue under load: the integration test now
-awaits the React transition and scopes Save/Retry queries to the named notes editor. Deprecated ignored
-esbuild JSX config was removed; tsconfig's automatic JSX configuration is used. Ubuntu 24.04, Node 22
-and pinned dependencies are unchanged. GitHub will verify the fix when Jamie pushes.
-
 ## Articles
 
 Articles is public at `/articles`, with shareable `/articles/your-slug` pages for extra references
@@ -277,16 +161,6 @@ Articles' registry visibility stays public; individual entries are published or 
 No content is seeded, no external-platform API/secret is needed, and no video/post content is fetched.
 Privacy and encrypted exports include Articles; owner management is excluded from analytics.
 The Articles index is also checked for pre-rendering. See `Resources/Articles - Content Guide.md`.
-
-
-## Resume and shared app presentation (2026-11-02)
-The public **About Me** app is at `/about`; its London content stays in its window. Closing a window returns to `/` and reveals the introduction and app chrome. Behavioral's **Resume & Stories** has adjacent CV/Questions controls and separate Professional experience, Projects, Education, Certificates and Skills sections. Legacy Other entries remain visible until the owner chooses a more specific Type. The story library lives under Questions; a linked/selected story opens only on request.
-
-Owners can add/edit/reorder/remove resume entries and individual bullets using the shared Experience editor, paste multiline text into bullets, and choose publication explicitly. New rows/bullets start hidden. Existing bullet IDs are preserved during edits, and deleting a bullet clears its story link without removing the story. These are the same Experience records shown publicly on About Me when marked Public.
-
-Migration `supabase/migrations/20261102194339_resume_sections.sql` adds `certificate` and `skills` to the existing kind constraint; it is **APPLIED live** with Jamie's approval on 2 November 2026 (remote version `20261102195356`). It changes no records, visibility flags, functions, grants or RLS policies. Existing `other` entries are not automatically reclassified.
-
-Light-mode app surfaces use warm stone tones, search fields use the neutral input color, and content pages use shared horizontal gutters. Notes/Practice retain their panel padding; About Me retains its dedicated visual design.
 
 
 ## Illustrated desktop introduction (2026-11-03)

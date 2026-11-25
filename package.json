@@ -2,7 +2,7 @@
   "name": "jamieho-backroom",
   "version": "0.1.0",
   "private": true,
-  "description": "Jamie Ho's personal website: public portfolio, a signed-in desktop of apps, and a hub for subdomain projects.",
+  "description": "Jamie Ho's personal website: public portfolio, articles, guides and a hub linking to subdomain projects (PassLoop interview practice lives in its own repo).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,23 +10,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs && node scripts/assert-excalidraw-bundle.mjs && node scripts/assert-pglite-bundle.mjs",
-    "decrypt-export": "node scripts/decrypt-export.mjs",
-    "predev": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs && node scripts/copy-pglite.mjs",
-    "prebuild": "node scripts/copy-pyodide.mjs && node scripts/copy-excalidraw.mjs && node scripts/copy-pglite.mjs",
-    "import-notes": "node scripts/import-notes.mjs"
+    "check": "npm run typecheck && npm test && npm run build && node scripts/assert-static.mjs",
+    "decrypt-export": "node scripts/decrypt-export.mjs"
   },
   "engines": {
     "node": ">=20.9"
   },
   "dependencies": {
-    "@codemirror/commands": "6.9.0",
-    "@codemirror/lang-python": "6.2.1",
-    "@codemirror/language": "6.11.3",
-    "@codemirror/state": "6.5.2",
-    "@codemirror/view": "6.38.6",
-    "@electric-sql/pglite": "0.5.13",
-    "@excalidraw/excalidraw": "0.18.1",
     "@lezer/highlight": "1.2.5",
     "@lezer/python": "1.1.19",
     "@supabase/ssr": "0.12.7",
@@ -35,7 +25,6 @@
     "gsap": "3.15.0",
     "lenis": "1.3.11",
     "next": "16.4.3",
-    "pyodide": "314.0.7",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-markdown": "10.1.0",
@@ -43,6 +32,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.13",
     "@playwright/test": "1.56.1",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",

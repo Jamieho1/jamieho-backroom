@@ -1,12 +1,13 @@
 import { Desktop } from "@/components/desktop";
 import type { Metadata } from "next";
+import { PASSLOOP_PRIVACY_URL } from "@/lib/passloop";
 
 export const metadata: Metadata = {
   title: "Privacy policy · Jamie Ho",
   description: "What this site collects, why, and how to have it deleted.",
 };
 
-const UPDATED = "15 November 2026";
+const UPDATED = "24 November 2026";
 
 /**
  * Privacy policy (needed for Google sign-in to be published). Keep it true to what the code does:
@@ -40,24 +41,10 @@ export default function Privacy() {
           can see who has visited the signed-in area. A cookie keeps you signed in; it is needed for sign-in to work and is removed when you sign out.
         </li>
         <li>
-          <strong>Practice code</strong>: visitors' code stays in this browser, stored separately for each signed-in account
-          and problem. Signed-in users’ flags, autosaved code, typed time/space complexity, editable/custom test inputs and run/submission attempts (including code and complexity snapshots, status, results, runtime, language and date) are stored with their account and problem IDs in Supabase to sync across devices. Completion is derived from a passed submission. Each user can access only their own practice records through the site, including the owner; deleting an account removes its practice records. Administrative encrypted backups include these records. Shared practice question notes are public and owner-edited. Study Notes require Google sign-in and are available to every signed-in account; only the owner edits them. Python and SQL execute only in the browser (SQL runs on a copy of PostgreSQL compiled to WebAssembly that loads from this site); saved SQL queries are stored exactly like saved code. Practice and Notes panel sizes, plus their collapsed question/topic-list preferences, are also kept in this browser. Clearing site storage removes local drafts and these preferences. Database copies
-          are covered by the retention and encrypted-backup periods below.
-        </li>
-        <li>
-          <strong>System design questions</strong>: the question pages (solution, quiz and whiteboard steps) are written by the owner and are public. A visitor&apos;s quiz attempts stay in this browser only. Signed-in users&apos; quiz attempts (score, the answer chosen for each question and date) and their flag/done marks are stored with their account and question ID in Supabase to sync across devices. Each user can access only their own records through the site, including the owner; deleting an account removes them. Administrative encrypted backups include these records and follow the retention periods below. Whiteboard: each question&apos;s canvas (the shapes you draw, with the view position) is saved automatically. A visitor&apos;s board stays in this browser only; a signed-in user&apos;s board is stored with their account and question ID in Supabase and is included in the same backups. Drawing never leaves the site: there is no sharing, collaboration, image upload or cloud export. Interview steps: the answers you type, the checklist points you tick and the timer are kept in this browser only while you work. &ldquo;Finish attempt&rdquo; saves a history snapshot (the board, your answers, ticked checklist points, the timer value and the date): a signed-in user&apos;s snapshots are stored with their account and question ID in Supabase (the newest 20 per question are kept) and are included in the same backups, and a visitor&apos;s last 3 stay in this browser only. Voice answers are optional: they use your browser&apos;s built-in speech recognition (Web Speech API), which may send your audio to the browser maker&apos;s speech service, so this site never receives audio; only the text you save is stored. Clearing site storage removes a visitor&apos;s attempts, board, drafts and history.
-        </li>
-        <li>
           <strong>Articles</strong> are stored in Supabase. Signed-in readers can pin published articles; the article ID, account ID and pin date are stored privately to sync their list across devices. Readers can unpin them; deleting an account or article removes its pins. These records follow the retention and backup periods below. The owner can save private drafts and publish articles and reference links for everyone to read. They are retained and backed up for the periods below. Pictures in an article are served from the site's own Supabase storage, or occasionally from another site that hosts them, which sees your IP address like any web request. Videos load from YouTube (privacy-enhanced mode) only after you press play; until then nothing is requested from YouTube.
         </li>
         <li>
-          <strong>Interview Resume</strong> stores your private entries, bullets, certificates and skills with your account ID, revision and save date in Supabase. Each signed-in user can read and edit only their own resume through the site, including the owner. The public guide is a separate shared template; starting from it copies its structure into your private resume. Account deletion removes your resume. It is included in the encrypted backups and retention periods below.
-        </li>
-        <li>
-          <strong>Interview Behavioral</strong> stores your private custom questions, STAR answers, optional links to roles in your own resume, and save dates with your account ID. Each account, including the owner, can access only its own preparation through the site. Shared questions and guides are public and owner-managed. Existing owner preparation is copied privately with its original details retained. Account deletion removes your private questions and answers; encrypted backups follow the retention periods below.
-        </li>
-        <li>
-          <strong>The owner’s legacy CV, Behavioral stories and answers</strong> are stored in Supabase. Only the owner can read hidden CV entries, private stories, story links, preparation outlines and follow-ups. CV entries and bullets appear publicly in the journey only when marked Public, with a Public parent entry. Opening the public Behavioral Playbook never grants access to this private material. These records follow the retention and encrypted-backup periods below.
+          <strong>The owner’s legacy CV, Behavioral stories and answers</strong> are stored in Supabase. Only the owner can read hidden CV entries, private stories, story links, preparation outlines and follow-ups. CV entries and bullets appear publicly in the journey only when marked Public, with a Public parent entry. Nothing on the PassLoop site grants access to this private material. These records follow the retention and encrypted-backup periods below.
         </li>
         <li>
           <strong>Website feedback</strong> (optional) stores your Problem/Idea selection, message and optional local page link in the owner’s inbox and email alerts. It does not request your name or email; captured page links omit query parameters. It uses the same short-lived coded IP spam limits and encrypted backups as contact messages.
@@ -68,6 +55,10 @@ export default function Privacy() {
           message and wiped after one hour. Each message is also forwarded to Jamie by email.
         </li>
         <li>
+          <strong>PassLoop</strong> (interview practice) is a separate service with its own privacy page. This site no longer collects PassLoop practice, notes, resume or interview data. For now both sites use the same sign-in and database project, so one account works on both. Read{" "}
+          <a href={PASSLOOP_PRIVACY_URL}>the PassLoop privacy policy</a> for what that service does.
+        </li>
+        <li>
           <strong>Hosting logs</strong>: the hosting providers keep standard technical logs (such as IP address and browser type) for
           security and reliability.
         </li>
@@ -76,7 +67,7 @@ export default function Privacy() {
       <h2>Why it is used</h2>
       <p>
         Only to let you sign in, to decide which parts of the site you can open, to let the site owner see who has signed in, and to
-        read and reply to messages you send, and sync your private Interview resume, Behavioral questions and STAR answers, and Practice code, complexity, test inputs, submissions, attempts and flags, plus the owner’s notes, resume entries, Behavioral stories, answer preparation and articles for use across devices.
+        read and reply to messages you send, and keep the owner’s resume entries, Behavioral stories, answer preparation and articles available across devices.
         The legal basis is legitimate interest in running a personal portfolio site, and your choice to sign in.
       </p>
 
@@ -91,7 +82,7 @@ export default function Privacy() {
 
       <h2>How long it is kept</h2>
       <p>
-        Your profile, sign-in records, contact messages, website feedback and your private Interview resume, Behavioral questions and STAR answers, Practice code, complexity, test inputs, submissions, attempts and flags, plus the owner’s saved notes, resume entries, Behavioral stories, answer preparation and articles are kept until you ask for them to be deleted, or until the site no longer
+        Your profile, sign-in records, contact messages and website feedback, plus the owner’s saved resume entries, Behavioral stories, answer preparation and articles, are kept until you ask for them to be deleted, or until the site no longer
         needs them. The coded IP address on a message is wiped after one hour. An encrypted weekly backup of the site&apos;s data is
         kept for 90 days, so deleted data is fully gone from backups within 90 days.
       </p>

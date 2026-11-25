@@ -1,6 +1,7 @@
 "use server";
 import { getViewer } from "@/lib/viewer";
 import { supabaseServer } from "@/lib/supabase/server";
+import { CONTENT_SITE } from "@/lib/content-drafts/site";
 
 /** Request-scoped count only; no draft content is sent to navigation clients. RLS checks ownership too. */
 export async function getContentDraftCount(): Promise<number | null> {
@@ -9,7 +10,7 @@ export async function getContentDraftCount(): Promise<number | null> {
     if (viewer.role !== "owner" || !viewer.id) return null;
     const sb = await supabaseServer();
     if (!sb) return null;
-    const { count, error } = await sb.from("content_changes").select("id", { count: "exact", head: true }).eq("status", "draft");
+    const { count, error } = await sb.from("content_changes").select("id", { count: "exact", head: true }).eq("status", "draft").eq("site", CONTENT_SITE);
     return !error && Number.isSafeInteger(count) && count! >= 0 ? count : null;
   } catch { return null; }
 }

@@ -1,6 +1,17 @@
 # Data and security contract
 
-Access is enforced in database RLS with PGlite policy tests, never just hidden UI. Only the owner edits managed site/app content. Readers manage only their own article_pins, practice progress, Interview resume and Behavioral preparation, separate from owner-managed content. Contact submissions and permitted self app-open records have their existing constrained visitor writes. Shared app content can use rls.can_view_app; private per-user tables must never widen reads through it. Settings remains owner-only. Interview access follows TKT-124 below: public Practice/guides/template, account-only Notes and own-row private preparation.
+Access is enforced in database RLS with PGlite policy tests, never just hidden UI. Only the owner edits managed site/app content. Readers manage only their own article_pins; their practice, Interview resume and Behavioral preparation data is PassLoop's (see PassLoop split below). Contact submissions and permitted self app-open records have their existing constrained visitor writes. Shared app content can use rls.can_view_app; private per-user tables must never widen reads through it. Settings remains owner-only.
+
+
+## PassLoop split (PL4)
+
+PassLoop (interview practice) runs from its own repo and Vercel project on the same Supabase project for now. **No table, row, policy or function was dropped or altered**, and no migration was written here; `desktop_apps` row `notes` stays because PassLoop's notes RLS reads it. This repo's code no longer reads or writes notes, question_notes, practice_*, resume_templates, user_resumes, interview_*, companies, company_questions, interview_experiences or system_design_*. Everything below about those tables describes shared database policies that PassLoop's code relies on; it is unchanged and kept as the RLS contract, while their app code, privacy text and export now belong to PassLoop.
+
+- Privacy: /privacy no longer describes PassLoop data collection; it says PassLoop is a separate service with its own privacy page and links `${PASSLOOP_URL}/privacy` (both sites share one sign-in and database for now).
+- Export: scripts/export-tables.json lists only personal-site tables (18). PassLoop's 22 tables are exported by PassLoop's manifest, never both (tests assert the two lists plus the migrations cover every public table). Until PassLoop's weekly export is running, those tables are not in this repo's backup.
+- Content Drafts: `content_changes` is shared; this site reads and writes only `site = 'personal'` rows (PL2 migration, authored in PassLoop and applied by Jamie). See content-drafts.md.
+- Deploy order: apply the PL2 migration and make PassLoop live before deploying this change; otherwise review/preview fail on the missing `site` column and /interview redirects to a site that does not exist yet.
+
 
 Anon/authenticated may execute only public.record_signin over the API. ops_usage is service-role-only. RLS helpers belong in rls; trigger functions in private. Preserve grants, security-invoker discovery and tests/db coverage.
 
@@ -18,7 +29,7 @@ Storage reads/writes require appropriate bucket/policy checks. Keep schema and e
 
 The supplied public Cyterly screenshot is delivered under public/project-art for the requested project display. This contains no private CV/notes/import data. Other project screenshots remain database/Storage managed.
 
-Resources now lists only public Guides (TKT-118). Retained membership-gate components contain generic placeholders only; their unlock state uses existing server-filtered app discovery; Notes requires Google sign-in; Practice is public. Nonowners at /behavioral receive a link to the public Playbook, while the owner retains the legacy editor. Membership gates are not used for these Interview sections; payment integration is not implemented. My story /about reads public site_sections through the existing owner-verified preview boundary; /desktop retains its redirect.
+Resources now lists only public Guides (TKT-118). The membership-gate components and lib/resources.ts were removed with the old apps; no membership gating or payment integration remains in this repo. My story /about reads public site_sections through the existing owner-verified preview boundary; /desktop retains its redirect.
 
 Article pins: 20261111180819_article_pins.sql (applied live 2026-11-11 as remote 20261111181807) grants authenticated SELECT/INSERT/DELETE only. RLS isolates every user, including owner; inserts require an accessible published article. No UPDATE, anonymous grants or new callable functions. Account/article deletion cascades; export-tables.json includes pins. Privacy discloses account/article IDs and pin dates. Approved application and live RLS/grant/policy/cascade checks succeeded; no article-pins security advisory.
 

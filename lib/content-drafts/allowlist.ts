@@ -1,10 +1,3 @@
-import {COMPANY_ALLOWLIST,companyOperation} from './companies';
-import {SD_ALLOWLIST,systemDesignOperation,isSystemDesignTable} from './system-design';
-import {sdHref} from '@/lib/interview/system-design';
-import {isCompanyTable} from '@/lib/interview/companies';
-import {themeFields,questionFields,themeSchema,behavioralOperation,isGuideTable,questionHref} from '@/lib/interview/behavioral';
-import {templateFields,templateOperation} from '@/lib/resume';
-import {noteHref,interviewProblemHref} from '@/lib/interview/content';
 import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
 import {photoFields,JOURNEY_ICONS,journeyPhotoPath} from "@/lib/home-content-schema";
@@ -22,7 +15,7 @@ const uuid = z.uuid().transform(value => value.toLowerCase());
 const sort = z.number().int().min(-2147483648).max(2147483647);
 const itemFields = { show_on_journey:z.boolean(), journey_icon:z.enum(JOURNEY_ICONS), journey_photo:journeyPhotoPath, kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
 const bulletFields = { item_id: uuid, text: cvText(LIMITS.bullet).refine(value => !!value, "Give the bullet text."), sort, public: z.boolean() };
-const cvRoutes = ["/", "/journey", "/about", "/behavioral"] as const;
+const cvRoutes = ["/", "/journey", "/about"] as const;
 export const publishingSchemas = {projects:projectSchema,articles:articleSchema,guides:guideSchema};
 export type PublishingTable = keyof typeof publishingSchemas;
 export const isPublishingTable = (table:string):table is PublishingTable => Object.hasOwn(publishingSchemas,table);
@@ -31,12 +24,7 @@ const articleFields=articleSchema.omit({id:true}).shape;
 const guideFields=guideSchema.omit({id:true}).shape;
 export const CONTENT_ALLOWLIST = {
   ...APP_ALLOWLIST,
-  ...COMPANY_ALLOWLIST,
-  ...SD_ALLOWLIST,
   about_photos:{key:uuid,fields:photoFields,operations:["insert","update","delete"] as const,routes:["/","/about","/journey"] as const},
-  interview_behavioral_themes:{key:themeSchema.shape.id,fields:themeFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
-  interview_behavioral_questions:{key:z.uuid(),fields:questionFields,operations:['insert','update'] as const,routes:['/interview/behavioral'] as const},
-  resume_templates:{key:z.literal('default'),fields:templateFields,operations:['update'] as const,routes:['/interview/resume'] as const},
   projects: {key:uuid,fields:projectFields,operations:["insert","update","delete"] as const,routes:["/projects","/","/journey"] as const},
   articles: {key:uuid,fields:articleFields,operations:["insert","update","delete"] as const,routes:["/articles","/","/journey"] as const},
   guides: {key:uuid,fields:guideFields,operations:["insert","update","delete"] as const,routes:["/guides","/resources"] as const},
@@ -98,7 +86,7 @@ const publishingOperations={projects:publishingOperation("projects"),articles:pu
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
-  const schema = typeof op?.table==='string'&&isCompanyTable(op.table)?companyOperation(op.table):typeof op?.table==='string'&&isSystemDesignTable(op.table)?systemDesignOperation:op?.table==='about_photos'?(op.op==='insert'?photoInsert:op.op==='delete'?photoDelete:photoUpdate):typeof op?.table==='string'&&isGuideTable(op.table)?behavioralOperation(op.table):op?.table==='resume_templates'?templateOperation:typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
+  const schema = op?.table==='about_photos'?(op.op==='insert'?photoInsert:op.op==='delete'?photoDelete:photoUpdate):typeof op?.table === "string" && isAppTable(op.table) ? appOperationSchema : typeof op?.table === "string" && isPublishingTable(op.table) ? publishingOperations[op.table] : op?.table === "site_sections" ? sectionOperation
     : op?.table === "experience_items" ? op.op === "insert" ? itemInsert : itemUpdate
     : op?.table === "experience_bullets" ? op.op === "insert" ? bulletInsert : op.op === "delete" ? bulletDelete : bulletUpdate
     : null;
@@ -117,15 +105,6 @@ export function validateOperations(input: unknown): { ok: true; operations: Cont
 export function affectedRoutes(operations: ContentOperation[], previous:unknown = []): string[] {
   const routes=operations.flatMap(operation=>[...CONTENT_ALLOWLIST[operation.table].routes] as string[]);
   for(const operation of operations)if(isPublishingTable(operation.table)&&"slug" in operation.fields&&typeof operation.fields.slug==="string")routes.push(`/${operation.table}/${encodeURIComponent(operation.fields.slug)}`);
-  for(const op of operations)if(op.table==="question_notes"||op.table==="practice_code"||op.table==="practice_stars")routes.push(`/practices/${op.key}`,interviewProblemHref(op.key));
-  for(const op of operations)if(op.table==="notes")routes.push(noteHref(String(op.key)));
   if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(`/${row.table}/${encodeURIComponent(row.values.slug)}`);
-  for(const op of operations)if(op.table==='interview_behavioral_questions')routes.push(questionHref(op.key));
-  for(const op of operations)if(isCompanyTable(op.table)){
-    if(op.table==='companies'&&'slug' in op.fields&&typeof op.fields.slug==='string')routes.push(`/interview/companies/${encodeURIComponent(op.fields.slug)}`);
-  }
-  for(const op of operations)if(isSystemDesignTable(op.table)&&'slug' in op.fields&&typeof op.fields.slug==='string')routes.push(sdHref(op.fields.slug));
-  if(Array.isArray(previous))for(const row of previous)if(row?.table==='system_design_questions'&&typeof row.values?.slug==='string')routes.push(sdHref(row.values.slug));
-  if(Array.isArray(previous))for(const row of previous)if(row?.table==='companies'&&typeof row.values?.slug==='string')routes.push(`/interview/companies/${encodeURIComponent(row.values.slug)}`);
   return [...new Set(routes)];
 }

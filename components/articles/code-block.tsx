@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {CodeBlock} from '@/components/notes/code-highlight';
+import {CodeBlock} from '@/components/code-highlight';
 
 const LABEL:Record<string,string>={text:'Text',prompt:'Prompt',bash:'Terminal',sh:'Terminal',shell:'Terminal',zsh:'Terminal',python:'Python',py:'Python',js:'JavaScript',ts:'TypeScript',json:'JSON',sql:'SQL',md:'Markdown',markdown:'Markdown'};
 

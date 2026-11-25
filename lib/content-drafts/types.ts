@@ -16,7 +16,6 @@ export interface ReviewDraft extends ContentChange {
   photoSlots?: import("./photo-slots").PhotoSlot[];
   fields: ReviewField[];
   validationError?: string;
-  previewCv?: boolean;
   previewTargets?: {href:string;label:string}[];
 }
 export interface DraftResult { ok: boolean; message: string; applied?: boolean }
@@ -25,12 +24,8 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
   const proposed = new Map<string, ReviewField>();
   for (const operation of operations) {
     const row = operation.table === "site_sections" ? live[operation.key] : experience[operation.table]?.[operation.key];
-    if(operation.table === "practice_stars" && operation.op === "insert") {
-      proposed.set(`practice_stars.${operation.key}`,{field:`practice_stars.${operation.key}`,current:row?"Starred":"Not starred",proposed:"Starred"});
-      continue;
-    }
     if (operation.op === "delete") {
-      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "practice_stars" ? "(unstar problem)" : operation.table === "experience_bullets" ? "(delete bullet)" : operation.table === "about_photos" ? "(delete photo)" : "(unpublish; keep row)"});
+      proposed.set(`${operation.table}.${operation.key}`,{field:`${operation.table}.${operation.key}`,current:JSON.stringify(row ?? "(missing)"),proposed:operation.table === "experience_bullets" ? "(delete bullet)" : operation.table === "about_photos" ? "(delete photo)" : "(unpublish; keep row)"});
       continue;
     }
     for (const [field,value] of Object.entries(operation.fields)) {
@@ -43,10 +38,7 @@ export function reviewFields(operations: ContentOperation[], live: Record<string
 }
 
 export interface HomePreview {
-  companies?:import('./companies').CompaniesPreview;
   aboutPhotos?:import("@/lib/home-content-schema").AboutPhoto[];
-  behavioral?:import('./behavioral-guides').BehavioralPreview;
-  resumeTemplate?:import('@/lib/resume').ResumeTemplate;
   photoSlots?: import("./photo-slots").PhotoSlot[];
   id: string;
   summary: string;

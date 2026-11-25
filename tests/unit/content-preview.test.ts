@@ -7,7 +7,7 @@ import {overlaySections,draftChapterChanged} from '@/lib/content-drafts/overlay'
 import {FALLBACK_SECTIONS} from '@/lib/sections';
 const id='00000000-0000-4000-8000-000000000101';
 const operations=[{op:'update' as const,table:'site_sections' as const,key:'hero' as const,fields:{title:'Preview name'}}];
-beforeEach(()=>{vi.resetAllMocks();m.mode.mockResolvedValue({isEnabled:true});m.cookies.mockResolvedValue({get:m.get});m.get.mockReturnValue({value:id});m.viewer.mockResolvedValue({role:'owner',id:'owner'});m.server.mockResolvedValue({from:m.from});m.from.mockReturnValue({select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});m.single.mockResolvedValue({data:{id,summary:'Preview hero',status:'draft',operations,photo_slots:[]},error:null});});
+beforeEach(()=>{vi.resetAllMocks();m.mode.mockResolvedValue({isEnabled:true});m.cookies.mockResolvedValue({get:m.get});m.get.mockReturnValue({value:id});m.viewer.mockResolvedValue({role:'owner',id:'owner'});m.server.mockResolvedValue({from:m.from});m.from.mockReturnValue({select:()=>({eq:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})})});m.single.mockResolvedValue({data:{id,summary:'Preview hero',status:'draft',operations,photo_slots:[]},error:null});});
 it('public prerender and normal requests read no cookies, session or draft data',async()=>{
  m.mode.mockResolvedValue({isEnabled:false});expect(await getHomePreview()).toBeNull();expect(m.cookies).not.toHaveBeenCalled();expect(m.viewer).not.toHaveBeenCalled();expect(m.server).not.toHaveBeenCalled();
 });
@@ -38,7 +38,7 @@ it('experience preview reads the complete owner snapshot and rejects stale targe
  const live={id,kind:'role',title:'Live role',org:'',dates:'',location:'',summary:'',sort:1,public:true,experience_bullets:[]};
  const rows=vi.fn().mockResolvedValue({data:[live],error:null});
  m.single.mockResolvedValue({data:{id,summary:'Edit role',status:'draft',operations,photo_slots:[]},error:null});
- m.from.mockImplementation((table:string)=>table==='experience_items'?{select:()=>({order:rows})}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ m.from.mockImplementation((table:string)=>table==='experience_items'?{select:()=>({order:rows})}:{select:()=>({eq:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})})});
  expect((await getHomePreview())?.experience).toEqual([{...live,title:'Draft role',draftChanged:true}]);expect(live.title).toBe('Live role');
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
  rows.mockResolvedValueOnce({data:null,error:{message:'offline'}}).mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
@@ -48,18 +48,18 @@ it('experience preview reads the complete owner snapshot and rejects stale targe
 it('publishing snapshots are fetched only after owner validation and reject stale references',async()=>{
  const project={id,slug:'new-project',name:'Example',tagline:'',body:'',tags:[],screenshots:[],url:'',featured:false,public:true,sort:100,created_at:'2025-01-01'};
  m.single.mockResolvedValue({data:{id,status:'draft',summary:'Edit project',created_at:'2026-11-14',operations:[{table:'projects',op:'update',key:id,fields:{name:'Draft project'}}],photo_slots:[]},error:null});
- const rows=vi.fn().mockResolvedValue({data:[project],error:null});m.from.mockImplementation((table:string)=>table==='projects'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ const rows=vi.fn().mockResolvedValue({data:[project],error:null});m.from.mockImplementation((table:string)=>table==='projects'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})})});
  expect((await getHomePreview())?.publishing?.projects?.[0]).toMatchObject({name:'Draft project',draftChanged:true});
  expect(m.from.mock.calls.map(([table])=>table)).not.toContain('experience_items');
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
  m.viewer.mockResolvedValue({role:'member',id:'member'});rows.mockClear();expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();
 });
-it('private app snapshots load only for the verified owner; stale and invalid merged rows fail closed',async()=>{
- const note={id:'fixture-note',title:'Fixture',body:'Live',free:'',visual:[],sort:1,updated_at:'2026-01-01'};
- const rows=vi.fn().mockResolvedValue({data:[note],error:null});
- m.single.mockResolvedValue({data:{id,status:'draft',summary:'App proposal',operations:[{table:'notes',op:'update',key:'fixture-note',fields:{body:'Private proposal'}}],photo_slots:[]},error:null});
- m.from.mockImplementation((table:string)=>table==='notes'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
- expect((await getHomePreview())?.appData?.notes?.[0]).toMatchObject({body:'Private proposal',draftChanged:true});expect(note.body).toBe('Live');
+it('legacy owner-table snapshots load only for the verified owner; stale and invalid merged rows fail closed',async()=>{
+ const story={id,bullet_id:null,title:'Live',situation:'',task:'',action:'',result:'',skills:'',numbers:'',updated_at:'2026-01-01'};
+ const rows=vi.fn().mockResolvedValue({data:[story],error:null});
+ m.single.mockResolvedValue({data:{id,status:'draft',summary:'App proposal',operations:[{table:'behavioral_stories',op:'update',key:id,fields:{title:'Private proposal'}}],photo_slots:[]},error:null});
+ m.from.mockImplementation((table:string)=>table==='behavioral_stories'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})})});
+ expect((await getHomePreview())?.appData?.behavioral_stories?.[0]).toMatchObject({title:'Private proposal',draftChanged:true});expect(story.title).toBe('Live');
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();
  for(const role of ['anonymous','member']){rows.mockClear();m.viewer.mockResolvedValue({role,id:'other'});expect(await getHomePreview()).toBeNull();expect(rows).not.toHaveBeenCalled();}
 });
@@ -68,7 +68,7 @@ it('About photo snapshots are owner-gated, immutable and fail closed on invalid 
  const live={id,path:'fixture.png',alt:'Fixture',caption:'Live caption',sort:1,centre:false,public:true};
  m.single.mockResolvedValue({data:{id,summary:'Photo edit',status:'draft',operations:[{op:'update',table:'about_photos',key:id,fields:{caption:'Proposed caption'}}],photo_slots:[]},error:null});
  const rows=vi.fn().mockResolvedValue({data:[live],error:null});
- m.from.mockImplementation((table:string)=>table==='about_photos'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})});
+ m.from.mockImplementation((table:string)=>table==='about_photos'?{select:rows}:{select:()=>({eq:()=>({eq:()=>({eq:()=>({maybeSingle:m.single})})})})});
  expect((await getHomePreview())?.aboutPhotos?.[0]).toMatchObject({caption:'Proposed caption',draftChanged:true});expect(live.caption).toBe('Live caption');
  rows.mockResolvedValueOnce({data:[],error:null});expect(await getHomePreview()).toBeNull();
  rows.mockResolvedValueOnce({data:null,error:{message:'offline'}});expect(await getHomePreview()).toBeNull();

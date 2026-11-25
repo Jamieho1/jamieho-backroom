@@ -1,19 +1,16 @@
 import { test, expect } from "@playwright/test";
 
-test("My story renders and retired desktop addresses keep their redirects", async ({ page }) => {
+test("My story renders and the retired desktop address keeps its redirect", async ({ page }) => {
   await page.goto("/about"); await expect(page).toHaveURL(/\/about$/); await expect(page.locator(".story-editorial")).toBeVisible();
   await page.goto("/desktop"); await expect(page).toHaveURL(/\/resources$/);
   await expect(page.getByRole("heading", { name: "Resources", level: 1 })).toBeVisible();
-  await page.goto("/desktop?app=notes"); await expect(page).toHaveURL(/\/notes$/);
 });
 
-test("Resources shows only public Guides and Notes requires an account", async ({ page }) => {
+test("Resources shows only public Guides", async ({ page }) => {
   await page.goto("/resources");
   await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();
   for(const name of ['Notes','Practice','Resume & Stories','Member apps'])await expect(page.getByRole('heading',{name,exact:true})).toHaveCount(0);
   await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);
-  await page.goto('/notes'); await expect(page.getByRole('heading',{name:'Sign in to read Notes'})).toBeVisible();
-  await expect(page.locator('.notes-layout')).toHaveCount(0);
 });
 
 test("Auto tracks the computer while explicit Day and Night choices persist", async ({ page }) => {
@@ -42,7 +39,7 @@ test("navigation controls remain available in the floating bar", async ({ page }
   await page.goto('/'); await page.locator('.is-journey [data-menu=journey] summary').click();
   await page.getByRole('navigation',{name:'Journey chapters'}).getByRole('button',{name:'Background',exact:true}).click();
   await expect(page.locator('.site-navigation.is-journey')).toHaveAttribute('data-floating','true');
-  await expect(page.getByRole('link',{name:'Interview Prep',exact:true})).toBeVisible();
+  await expect(page.getByRole('link',{name:'PassLoop ↗',exact:true})).toBeVisible();
   for(const menu of ['my story','content']){await page.locator(`.site-navigation:visible [data-menu="${menu}"] summary`).click();await expect(page.locator(`.site-navigation:visible [data-menu="${menu}"] nav`)).toBeVisible();await page.keyboard.press('Escape');}
   await expect(page.getByRole('button', { name: /^Colour mode:/ })).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -95,7 +92,7 @@ test('Projects opens the catalogue while Journey Work links to the showcase',asy
 
 test('grouped navigation retains order, active pages and floating controls',async({page})=>{
  await page.goto('/resources');const nav=page.locator('.site-navigation:visible').getByRole('navigation',{name:'Site',exact:true});
- await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story','Content']);await expect(nav.locator(':scope > a')).toHaveText(['Interview Prep']);
+ await expect(nav.locator(':scope > details > summary')).toHaveText(['Journey','My story','Content']);await expect(nav.locator(':scope > a')).toHaveText(['PassLoop ↗']);
  await nav.locator('[data-menu=content] summary').click();await expect(nav.getByRole('link',{name:'Resources',exact:true})).toHaveAttribute('aria-current','page');await page.keyboard.press('Escape');
  await nav.locator('[data-menu=journey] summary').click();const chapters=page.getByRole('navigation',{name:'Journey chapters'});await expect(chapters.getByRole('link')).toHaveText(['Creator','Background','Experience','Work','What I build','Contact']);await chapters.getByRole('link',{name:'Background',exact:true}).click();await expect(page).toHaveURL(/\/#about$/);
  const floating=page.locator('.site-navigation.is-journey');await expect(floating).toHaveAttribute('data-floating','true');await floating.locator('[data-menu=content] summary').click();await floating.getByRole('link',{name:'Articles',exact:true}).click();await expect(page).toHaveURL(/\/articles$/);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

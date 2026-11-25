@@ -10,7 +10,7 @@ Work in ~/Documents/Developer/Personal Website/jamieho-backroom, never the paren
 
 CI uses Node22 and ubuntu-24.04 because pinned Playwright1.56.1 cannot install browsers on newer runners. Use package.json for current exact pins; do not duplicate version lists across docs. Verify relevant behavior first; use full required checks for release changes. Jamie verifies live; no browser/computer control unless requested.
 
-Pyodide assets are copied by predev/prebuild into ignored public/pyodide/. Track worker/harness and lockfile; not generated runtime files.
+PassLoop-only tooling (Pyodide/Excalidraw/PGlite copy and bundle-assertion scripts, import-notes) was removed with the PL4 split; `npm run check` is typecheck, tests, build and assert-static only, and there is no predev/prebuild. @electric-sql/pglite is a dev dependency for the database test harness.
 
 Infrastructure:
 - GitHub: Jamieho1/jamieho-backroom.
@@ -23,11 +23,10 @@ Public health: /api/health. Manual service setup remains in README.md. Journey m
 
 Local browser verification may use an installed Chromium via a temporary config if the pinned executable is absent. Keep repository CI pins unchanged. Use an isolated copy excluding .env files for tests that assume unconfigured placeholder content.
 
-Practice export (TKT-120): retained practice_code/practice_stars/practice_attempts entries in export-tables.json include every account’s user_id and data through the existing encrypted service-role export. scripts/ops.mjs pages these tables in user_id plus problem/id order; do not apply per-viewer filters to backups. Account deletion cascades live progress; encrypted retention stays 90 days. Migration 20261115000906_per_user_practice.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115005816; legacy values, owner assignment and access rules verified. Frontend deployment remains pending.
+Export manifest (PL4): scripts/export-tables.json lists only the 18 personal-site tables; practice, notes, resume, interview, company and system-design tables are exported by PassLoop's manifest. Tests assert the two lists plus the migrations cover every public table, with no overlap. This repo's migrations remain the shared history; encrypted backups keep the same 90-day retention.
 
 Resume export (TKT-121): export-tables.json includes user_resumes (all accounts’ validated JSON/revision/timestamps) and resume_templates. scripts/ops.mjs orders them by user_id/key before existing encrypted pagination; backups remain encrypted with the same 90-day retention. No live CV import/seed. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347.
 
-Behavioral export (TKT-122): export-tables.json adds interview_behavioral_themes/questions/custom_questions/answers, including private source archives and role/account IDs. Stable pagination uses id for shared tables, user_id/id for custom questions and user_id/question_id for answers. Existing encrypted backups retain 90 days; no authenticated-owner read bypass. Migration 20261115111230_behavioral_playbook.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115114339. Review/approve the seeded starter-guide change set at /manage/review separately. Never seed shared guides from personal answers.
 
 Feedback (TKT-123): messages exports already use select(*), so kind/page_path and nullable anonymous sender fields need no new export table. Existing encrypted retention and contact/feedback hourly counters are shared. Resend remains optional; anonymous feedback alerts omit reply_to, contact alerts retain it. No new key/secret/provider configuration. Migration 20261115115900_message_feedback.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115124743. Existing contacts/guard/RLS are preserved.
 
@@ -70,7 +69,3 @@ C1 Companies rollout: `20261123123946_passloop_companies.sql` is **applied live*
 System design (S1): export-tables.json adds system_design_questions, system_design_quiz_attempts (user_id/id paging) and system_design_progress (user_id/question_id); same encrypted export and 90-day retention. Migration 20261123200000 is local only until Jamie says "apply it". Linux-only sandboxes need a fresh `npm ci` copy (node_modules from macOS lacks native bindings); no Playwright browser could be installed there.
 
 History (S3): export-tables.json adds system_design_attempts (user_id/id paging); migration 20261123220000 is local only until Jamie says "apply it".
-
-Whiteboard (S2): export-tables.json adds system_design_whiteboards (user_id/question_id paging). Migration 20261123210000 is local only until Jamie says "apply it". `npm run dev`/`build` copy Excalidraw fonts to public/excalidraw-assets (git-ignored). `node scripts/assert-excalidraw-bundle.mjs` (part of `npm run check`, after the build) fails if Excalidraw chunks appear in any route manifest or root build manifest other than the whiteboard route's lazy loader. Typecheck with Excalidraw types is slow on a cold cache.
-
-SQL practice (Q1): `npm run dev`/`build` also copy PGlite's wasm/data to public/pglite (git-ignored). `node scripts/assert-pglite-bundle.mjs` (part of `npm run check`, after the build) fails if PGlite or the SQL worker chunks appear in any route's first-load list, manifest or root build manifest other than `/interview/sql/problems/[lc]`, or if that route first-loads PGlite itself instead of leaving it to the worker. Turbopack also emits unused hashed copies of PGlite's wasm/data in .next/static/media. The SQL unit checks run PGlite in Node: `tests/unit/sql-*.test.ts` (guard, compare, engine, runner with a scripted and a real PGlite port, every seeded solution with a mutation check) plus `tests/db/practice-sql-submissions.test.ts`.

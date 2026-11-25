@@ -1,6 +1,7 @@
 import {beforeAll,afterAll,it,expect} from 'vitest';
 import type {PGlite} from '@electric-sql/pglite';
 import {readFileSync} from 'node:fs';
+import {PASSLOOP_TABLES} from '../support/passloop-tables';
 import {freshDb,as,addUser} from './harness';
 let db:PGlite;
 const owner={id:'00000000-0000-4000-8000-000000000d01',email:'owner@example.com'};
@@ -39,7 +40,7 @@ it('public questions, Resume template and Behavioral guides stay readable anonym
  expect(await as(db,{role:'anon'},q=>q('select id from public.interview_behavioral_themes'))).toHaveLength(9);
  expect(await as(db,{role:'anon'},q=>q('select id from public.interview_behavioral_questions'))).toHaveLength(18);
 });
-it('encrypted export manifest includes every actual public table, including all private Interview data',async()=>{
+it('every public table is exported by exactly one site: this manifest or PassLoop-owned',async()=>{
  const actual=(await db.query<{tablename:string}>("select tablename from pg_tables where schemaname='public' order by tablename")).rows.map(t=>t.tablename);
- expect(JSON.parse(readFileSync('scripts/export-tables.json','utf8')).sort()).toEqual(actual);
+ const manifest:string[]=JSON.parse(readFileSync('scripts/export-tables.json','utf8'));expect(manifest.filter(t=>(PASSLOOP_TABLES as readonly string[]).includes(t))).toEqual([]);expect([...manifest,...PASSLOOP_TABLES].sort()).toEqual(actual);
 });

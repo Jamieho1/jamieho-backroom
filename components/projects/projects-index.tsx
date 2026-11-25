@@ -8,6 +8,7 @@ import {hostOf,isVolunteer,pad2,type ProjectSummary} from "@/lib/project-view";
 import {CONTACT_HREF} from "@/lib/journey/content";
 import {FloatingPreview,type PreviewHandle,type PreviewItem} from "./floating-preview";
 import {ProjectFrame} from "./project-frame";
+import {PASSLOOP_URL,PASSLOOP_NAME,PASSLOOP_DESCRIPTION} from "@/lib/passloop";
 
 const Arrow=({glyph="→"}:{glyph?:string})=><span className="pj-ar" aria-hidden="true"><em className="a1">{glyph}</em><em className="a2">{glyph}</em></span>;
 const Chips=({tags}:{tags:string[]})=>tags.length?<span className="chips">{tags.slice(0,4).map(t=><span key={t} className={`chip${isVolunteer(t)?" vol":""}`} tabIndex={0}>{t}</span>)}</span>:null;
@@ -72,6 +73,12 @@ export function ProjectsIndex({projects}:{projects:ProjectSummary[]}){
       <div className="pj-acts"><PrimaryPill href={`/projects/${encodeURIComponent(p.slug)}`}>Case study</PrimaryPill>{p.url?<a className="pj-lnk g pj-fx" href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${p.name} (${hostOf(p.url)})`}>Visit <Arrow glyph="↗"/></a>:null}</div></div>
     </article>;})}</div>
    </div></section>:null}
+   {/* Code-defined (not in public.projects): PassLoop is a separate site with its own repo and deployment. */}
+   <section className="pj-pass" aria-labelledby="pj-pass-h" data-passloop-card>
+    <div className="pj-sec-h"><h2 className="pj-lbl" id="pj-pass-h">Also on its own site</h2></div>
+    <div className="pj-pass-card"><div><h3>{PASSLOOP_NAME}</h3><p>{PASSLOOP_NAME} — {PASSLOOP_DESCRIPTION.charAt(0).toLowerCase()+PASSLOOP_DESCRIPTION.slice(1)}</p></div>
+     <a className="pj-lnk g pj-fx" href={PASSLOOP_URL} rel="noopener" aria-label="Open PassLoop (opens the PassLoop site)">Open PassLoop <Arrow glyph="↗"/></a></div>
+   </section>
    <section className="pj-list" aria-labelledby="pj-all-h">
     <div className="pj-sec-h"><h2 className="pj-lbl" id="pj-all-h">All projects</h2></div>
     <div className="pj-lh" aria-hidden="true"><span>No.</span><span>Project</span><span>Capabilities</span><span>Tags</span><span>-</span></div>

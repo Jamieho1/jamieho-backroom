@@ -20,7 +20,7 @@ app/actions/content-drafts.ts verifies the owner, loads/validates the set and re
 
 That UPDATE locks the draft row and invokes private.apply_content_change(), a SECURITY DEFINER trigger with an empty search_path and no API EXECUTE grants. It independently checks the verified owner and validates the same allowlist. No public RPC or new secret is required; record_signin remains the sole public API-callable function. The trigger applies every operation, captures prior values per operation (complete experience rows; null for inserts), and fills previous, approved_at and approved_by (a historical UUID retained independently of account deletion) in the same transaction. Any exception rolls everything back. Inserts must start as draft; finalized sets cannot be reapproved or edited. RLS restricts all API table operations to the owner. Administrative draft insertion does not require pretending to be Jamie; administrative approval without his authenticated session is refused.
 
-Successful approval revalidates /, /journey, /about and /manage/review; experience operations also revalidate /behavioral. Cache-refresh failures are reported separately from committed database writes. Discard updates status only and never changes managed content or approval history. The encrypted export includes content_changes; it contains owner audit data, not new visitor tracking.
+Successful approval revalidates /, /journey, /about and /manage/review; experience operations use the same routes (the old /behavioral CV page is gone). Cache-refresh failures are reported separately from committed database writes. Discard updates status only and never changes managed content or approval history. The encrypted export includes content_changes; it contains owner audit data, not new visitor tracking.
 
 ## State and verification
 
@@ -51,7 +51,7 @@ Shared top/floating navigation loads an exact pending-set count after the client
 
 ## Experience preview — TKT-104
 
-loadOwnerPreview fetches the complete owner CV snapshot only for experience sets, then experience-overlay.ts applies operations sequentially to cloned rows. Missing targets, duplicate inserts or absent parents refuse preview. Home filters public entries/bullets after overlay, before sending data to the client; hidden content is not serialized into its preview. Existing Home role/education/certificate bindings and display limits remain. /behavioral retains its normal access checks, displays the overlaid CV with changed entry/bullet outlines and disables editing only during preview. Normal editor behavior, including direct bullet deletion, remains unchanged by Jamie's explicit choice. Draft deletion occurs only on approval and retains the full old bullet in previous; existing foreign-key effects are preserved.
+loadOwnerPreview fetches the complete owner CV snapshot only for experience sets, then experience-overlay.ts applies operations sequentially to cloned rows. Missing targets, duplicate inserts or absent parents refuse preview. Home filters public entries/bullets after overlay, before sending data to the client; hidden content is not serialized into its preview. Existing Home role/education/certificate bindings and display limits remain. The CV page and editor on /behavioral were removed; the preview shows on Home only. Normal editor behavior, including direct bullet deletion, remains unchanged by Jamie's explicit choice. Draft deletion occurs only on approval and retains the full old bullet in previous; existing foreign-key effects are preserved.
 
 Migration 20261114110327_content_drafts_experience.sql extends the private approval trigger with an owner-checked, non-API-callable helper. Applied live through Supabase MCP after Jamie’s explicit approval on 2026-11-14 as remote 20261114114045; local SQL remains unchanged. No new public RPC, table RLS/grant or live content changes. TKT-98's applied migration stays unchanged.
 
@@ -77,27 +77,11 @@ Coverage: publishing-drafts unit/DB tests, approval/preview guard tests and publ
 Live TKT-105 verification confirmed exact function-source parity, hardened settings/API revocations, owner draft policy/RLS, valid/invalid URL behavior and unchanged content/draft fingerprints. No new public RPC or TKT-105 security advisory; no content approvals or test records created.
 
 
-## Private app drafts — TKT-106
+## Private app drafts — TKT-106 (legacy owner tables only)
 
-app-allowlist.ts reuses existing editor fields/constraints; app-overlay.ts clones owner-validated snapshots. Notes/question notes/stories/answers remain owner-managed. TKT-120 adds per-user ownership to practice_code/practice_stars, retaining their table names and draft keys. These draft entries have owner-user scope: review/preview/approval snapshots require the verified owner ID and filter by user_id; the private SQL apply helper independently binds all practice reads/writes to auth.uid(). Identity fields cannot be supplied or reassigned. Attempts remain outside the allowlist.
+app-allowlist.ts now covers only `behavioral_stories` (insert/update: bullet_id, title, situation, task, action, result, skills, numbers) and `behavioral_answers` (insert/update: primary_story_id, secondary_story_id, outline, followups). Their editor and pages left with PassLoop, so there is no preview target and no route to revalidate; the owner review list still shows current versus proposed values and approval applies through the existing private apply function. Limits are the story/answer schemas in lib/behavioral.ts (answer keys are free strings; the question catalogue is PassLoop's). PassLoop's tables (notes, question_notes, practice_code, practice_stars and the rest) are not in this allowlist: a draft naming them is refused as an unknown table.
 
-| Table | Operations | Editable fields |
-| --- | --- | --- |
-| notes | update | body, free, visual |
-| question_notes | insert/update | body |
-| practice_code | insert/update | code |
-| practice_stars | insert/delete | none; key identifies the problem |
-| behavioral_stories | insert/update | bullet_id, title, situation, task, action, result, skills, numbers |
-| behavioral_answers | insert/update | primary_story_id, secondary_story_id, outline, followups |
-
-Practice keys must be existing numeric catalogue IDs; behavioral answer keys must match the question bank. Notes preserve imported metadata/visuals. Limits match existing editors, including UTF-16 notes/code limits and Zod code-point story/answer limits. Story references retain foreign-key checks; duplicate answer mappings fail. SQL independently validates complete merged rows; all edits/status/history remain one transaction. Unstarring retains the full previous row. No attempts, problem catalogue or app-registry edits.
-
-Review compares current/proposed app values and supplies validated app/problem preview destinations. TKT-119 routes note previews to /interview/<assigned-section>/notes/<id> and practice previews to /interview/problems/<id>; behavioral destinations stay unchanged. New readers preserve the same owner-only overlays and read-only preview controls. Approval invalidates the new note/problem route plus legacy addresses; no allowlist fields or SQL rules change. /notes, /practices and /practices/[problem], /behavioral keep normal access checks and apply overlays only after owner verification. Changed content is gold outlined; changed note/story/answer/problem is initially selected. Preview editors are read-only. Practice loads the full owner note/code/star snapshot, bypasses async live replacement, disables execution/saves and never stores proposed code in browser storage. Approval refreshes affected app routes and exact practice problem paths. Normal editors and shared live reads remain unchanged.
-
-Migration 20261114151936_content_drafts_apps.sql was **applied live with Jamie’s explicit approval on 2026-11-14**, remote version 20261114155720 (content_drafts_apps). It adds hardened private helpers and extends the approval trigger; no new public RPC or table grants/policies. Code-catalogue changes must update the SQL identifier validation in a new migration; parity tests enforce this. Deployment and Jamie’s live verification remain pending. App unit/DB tests and app-preview.spec.ts use synthetic data and the disposable loopback adapter only.
-
-Live TKT-106 verification: all three function bodies exactly match tested local SQL; empty search_path/revoked API execution, enabled RLS and sole public record_signin execution confirmed. Catalogue validation passed. All 13 content/app/draft fingerprints matched before/after; no live test rows or content approvals. Security advisors report no new finding.
-
+Migration 20261114151936_content_drafts_apps.sql is applied live (remote 20261114155720) and unchanged; its SQL still accepts all six app tables for PassLoop.
 
 ## Photo slots — TKT-107
 
@@ -118,18 +102,6 @@ Live TKT-107 checks confirmed exact function-source parity, hardened permissions
 
 TKT-120 migration 20261115000906_per_user_practice.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115005816. It preserves existing owner rows while adding per-user keys/policies; only the owner’s code/flags can enter an owner-reviewed change set. Other users’ rows cannot be read, audited, updated or deleted by the draft engine even with colliding problem keys. Prior values retain the owner user_id. No new draft fields or public RPC. Live helper source/permissions, RLS and unchanged content fingerprints verified. Frontend deployment remains pending; older applied migrations remain untouched.
 
-
-## Resume template — TKT-121
-
-resume_templates supports update only for key default, fields title/content. content uses lib/resume.ts’s strict complete-document schema; private user_resumes is not on the allowlist. Migration seeds only an empty template; Claude drafts the anonymised guide through ordinary change sets, never by importing the live CV. Review compares structured JSON; loadTemplatePreview composes owner-verified operations and exposes /interview/resume as the preview target. The guide is read-only/gold outlined in preview and never copies unapproved content into personal resumes. Approve revalidates /interview/resume; existing copied resumes stay independent.
-
-The SQL approval trigger delegates to private.apply_resume_template_draft, enforcing owner, singleton key, operation/field rules and the same nested validators before recording full prior values. Later operation failures roll back all template/content/status/history changes. No new public RPC or private-resume access. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347. Existing applied SQL remains unchanged.
-
-## Behavioral guides — TKT-122
-
-interview_behavioral_themes permits insert/update: slug-like id key, title (100), hex colour and nonnegative sort (≤10,000). interview_behavioral_questions permits insert/update by UUID: theme_id, prompt (400), looking_for/talk_about/star/mistakes/followups (6,000 each), sample (12,000), sort and published. Both TS and private.apply_playbook_draft reject unknown fields/types, unsupported operations and invalid merged values; SQL constraints/triggers enforce UTF-16 lengths, relationships and required text. Private questions/STAR answers are excluded. No new public RPC or changes to earlier draft rules.
-
-Review displays current/proposed values. Owner-verified previews compose request-local guides, link to /interview/behavioral/questions/<uuid> and mark changed questions gold; cookies never authorize access. Approval remains one transaction with full prior shared rows in previous; a later failure rolls back every edit/status/audit entry. Revalidation covers Playbook and affected question URLs; all Behavioral pages are dynamic. The migration seeds approved starter prompts and one pending set containing the 18 fictional guide proposals; guide content remains unpublished until Jamie approves that set. Migration 20261115111230_behavioral_playbook.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115114339.
 
 ## Home data proposals
 
@@ -160,43 +132,11 @@ What I build reuses the existing owner-only `site_sections` allowlist entry (`te
 
 Pending Home polish 8 proposals: `84c50b3d-2c18-4efd-90ac-cc18281ef9da` converts the old Toolkit body into approved capability copy with empty Credly URLs; `a2ba8b2f-0ebe-4e8f-9134-45b0bd7f5f07` updates only the first and third Global Relay bullets. Both contain summary/operations only, were verified as drafts and are not agent-approved. Bullet 2 and all live content remain unchanged. Deploy the new reader before approving the structured Technology body. Proposal `84c50b3d…` still has empty certificate URLs: approving it as drafted makes the tiles plain again until URLs are added to it or a further reviewed edit sets them.
 
-## Companies — C1
+## Site split — PL2 / PL4
 
-companies/company_questions/interview_experiences support strict insert/update/delete proposals. Delete unpublishes (public=false or published=false) and stores the full previous row, never removes it. Required insert fields, code-catalogue problem references, kind compatibility, fixed note topics and existing sd-* Notes are verified in the TypeScript owner snapshot and independently in SQL approval. Nonexistent dynamic Notes fail before preview/approval. No company content is seeded; experiences have no author field.
+`public.content_changes` is shared with PassLoop and has `site text not null default 'personal' check (site in ('personal','passloop'))`. The PL2 migration is authored in PassLoop's repo (not here) and applied by Jamie; it also holds the shared final `private.apply_content_change`. Do not define another one in this repo.
 
-Review loads current rows only for targeted tables and offers Preview on page → `/interview/companies`. Owner snapshots overlay all three tables; publication filtering occurs before rendering, and child edits flag the parent card. Existing preview-bar approval/discard/exit are reused. C2 supplies company detail tabs and overlays. Approval revalidates the directory and old/new company slugs; no editor/navigation changes. Migration `20261123123946_passloop_companies.sql` is applied live with Jamie’s explicit approval as remote `20261123125602` on 2026-11-23; both function-source hashes match the tested local SQL. No live sets were created or approved. Jamie deploys/reviews the frontend.
-
-C2 company detail previews use the same verified C1 three-table snapshot, including sorted/ranked question and experience changes; no approval schema/SQL rules change. Preview targets include changed public company slugs, and copied cookies never enable owner content. Approval revalidates `/interview/companies/[slug]` as a page pattern in addition to existing directory and exact old/new-slug invalidation, covering child-only edits. Preview detail pages disable personal progress and use the existing Approve/Discard/Back to list bar. C3 experience detail routes use the same snapshot as described below.
-
-C3 implements `/interview/companies/[slug]/experiences/[experience]` using the same C1 owner-verified snapshot. Published proposed stories get direct preview-bar targets and gold article/related outlines; proposed slugs work only within the authorized preview. Preview approval/discard reuse existing actions. Company changes and experience edits invalidate `/interview/companies/[slug]/experiences/[experience]` with page scope in addition to C2 invalidation, covering renamed slugs/related lists. No new migration or allowlist fields/rules; copied cookies never expose pending text. Public story reads and related lists continue filtering publication and public parents.
-
-Q4 SQL notes: three notes exist for the SQL section (`/interview/sql/notes`), and the `notes` operation is update-only, so each row is created empty by migration `20261124100000_sql_notes.sql` (local until Jamie says "apply it"; until then approval fails with "App target no longer exists"). Authors write them as ordinary notes operations: `{table:"notes", op:"update", key:<id>, fields:{body:"<Markdown>", free?:"<Markdown>"}}` with key exactly one of `sql-basics` ("SQL basics"), `sql-tackling` ("Tackling SQL questions") or `sql-postgres-mysql` ("Postgres vs MySQL"). Title and sort (9001, 9002, 9003) are not editable by drafts (visual became editable in Q5, below); the shelf order is fixed in code (`SQL_NOTES` in lib/interview/content.ts). Preview is `/interview/sql/notes/<id>`; an empty body and free text shows "Coming soon". SQL question chips are allowed everywhere chips are: `[[question:<LeetCode number>]]` accepts the 50 SQL 50 numbers (links to `/interview/sql/problems/<number>`) as well as the DSA numbers (still `/interview/problems/<number>`); `[[note:sql-basics]]` etc. work from any note, company overview or interview experience, and as `note` prep links. Notes now render `[[note:…]]` and `[[question:…]]` chips (not `[[behavioral:…]]`) and a changed note whose body or free text holds an unknown chip fails preview/approval with "Unknown inline reference in note …". Migration also lets `private.valid_draft_problem` accept the SQL numbers (question prep links approve them); question notes, practice code and flags drafts stay DSA-only in the TypeScript allowlist.
-
-C4 adds `prep_links` to the interview_experiences allowlist (strict zod list of kind/ref/label, ≤20, no duplicates). While loading the owner snapshot (preview and approval), changed experiences must reference existing things: notes against the owner's notes table or fixed topics, questions against the code catalogue, behavioral themes against live themes plus themes inserted earlier in the same set; unknown links fail with “Unknown prep link: kind:ref”. Inline `[[note:…]]`, `[[question:…]]` and `[[behavioral:…]]` chips in a changed experience body or company overview that do not resolve fail with “Unknown inline reference …”; untouched rows are not re-validated. Preview shows the block/chips in the owner-only overlay; delete still unpublishes. The SQL approval function re-checks shape, question and theme references.
-
-S1 `system_design_questions` supports strict insert/update/delete drafts (slug, title, icon, topic, note_ref `sd-*`, solution, quiz ≤40 items of four options, steps ≤12 objects (S3 shape: id, title plus optional category, question, instruction, minutes 1-60, frame wb-functional|wb-non|wb-entities|wb-api|wb-hld, how_to_answer, model_answer, checklist ≤12, clarifying ≤10 {q,a}; unknown keys and duplicate ids refused), sort, public); reserved slugs `practice`/`notes` are refused in TS and SQL, delete unpublishes, review shows current-vs-proposed fields, routes revalidated are the section list and the question page. No owner preview overlay yet.
-
-Q5 note visuals as drafts (migration `20261124110000_notes_visual_drafts.sql`, local until Jamie says "apply it"; until then approval of a `visual` field fails with "Unknown editable app field."): a notes update may set `visual`, the note's whole Visuals list. It is raw JSON, not a string: an array of visuals (at most 40) or one visual object, at most 200,000 characters of JSON, no NUL. Every visual must pass the `Visual` schema in `lib/notes/visual.ts` and `visualIssues` (unknown kinds, bad table/row/column addresses and wrong row widths are refused with the reason), in the TypeScript allowlist, again in the preview/approval overlay (`overlayApp`), and loosely in SQL (jsonb array/object, size, at most 40, every element an object whose `kind` is array|grid|graph|tables). A `visual` value replaces the existing list, so send every visual you want to keep. `visual` alone does not change `body`/`free`; a note with an empty body is still "Coming soon" even if it has visuals. The preview overlay and /manage/review preview show the new visuals in the Visuals panel (outlined gold as changed); visuals group under the `### N.` concept whose name equals the visual's `concept`, otherwise under "More".
-
-Operation that sets visuals:
-
-```json
-{"table":"notes","op":"update","key":"sql-basics","fields":{"visual":[ <visual>, <visual> ]}}
-```
-
-Visual kinds: `array`, `grid`, `graph` (unchanged) and `tables` (SQL). A tables visual is strict (unknown keys are errors): 1-3 tables, each `{id, name, columns (1-8), rows (0-10, each row as wide as columns), result?}`, 2-14 frames. Cells are strings, numbers, booleans or `null` (shown as ∅ and read as NULL). Input tables show all rows; a table with `result: true` starts with 0 rows shown. Per frame: `caption` (required), `highlight` and `done` (lists of `{table, row?, col?}`: row = 0-based row index, col = 0-based index or column name; row only = whole row, col only = whole column, both = one cell, neither = the whole table), `show` `{tableId: n}` (reveal the first n rows; sticky until changed), `replace` `{tableId: rows}` (swap that table's rows from this frame on, e.g. GROUP BY collapse or a window column filled in; all replaced rows show unless the frame also gives `show`), `vars` `[{name, value}]`. A highlighted row must exist and already be revealed. Optional `concept`, `time`, `space` as for the other kinds. Highlights are outlined and marked (▸ row, ◆ cell, ▾ column), never colour alone; revealed result rows fade in except under prefers-reduced-motion.
-
-Small LEFT JOIN example (two inputs, result filled row by row):
-
-```json
-{"kind":"tables","title":"LEFT JOIN keeps every customer","concept":"Joins",
- "tables":[
-  {"id":"customers","name":"customers","columns":["id","name"],"rows":[[1,"Asha"],[2,"Ben"],[3,"Chloe"]]},
-  {"id":"orders","name":"orders","columns":["id","customer_id","total"],"rows":[[10,1,40],[11,1,15],[12,3,22]]},
-  {"id":"result","name":"result","columns":["name","total"],"result":true,"rows":[["Asha",40],["Asha",15],["Ben",null],["Chloe",22]]}],
- "frames":[
-  {"caption":"Start with every customer. The result is empty."},
-  {"caption":"Asha matches two orders.","highlight":[{"table":"customers","row":0},{"table":"orders","row":0},{"table":"orders","row":1}],"show":{"result":2}},
-  {"caption":"Ben has no order, so his total is NULL.","highlight":[{"table":"customers","row":1}],"show":{"result":3}},
-  {"caption":"Chloe matches order 12.","highlight":[{"table":"customers","row":2},{"table":"orders","row":2,"col":"total"}],"done":[{"table":"customers","row":0}],"show":{"result":4}}]}
-```
+- Every draft Claude inserts for this site sets `site: 'personal'` explicitly (the default is also `personal`).
+- `lib/content-drafts/site.ts` exports `CONTENT_SITE = 'personal'`. The review list (`loadContentReview`), owner preview (`loadOwnerPreview`), approve, discard and the draft counter all add `.eq('site', CONTENT_SITE)`; a PassLoop draft is never listed, previewed, approved or discarded here, even by exact id (tests/unit/content-drafts-site.test.ts).
+- The TS allowlist drops PassLoop's tables (notes, question_notes, practice_*, resume_templates, interview_behavioral_*, companies, company_questions, interview_experiences, system_design_*); about_photos, projects, articles, guides, site_sections, experience_* and the legacy behavioral_stories/answers remain personal.
+- Requires the PL2 migration live: without the `site` column this site's review, preview, approve, discard and counter fail. The disposable preview adapter adds the column as a test fixture only.

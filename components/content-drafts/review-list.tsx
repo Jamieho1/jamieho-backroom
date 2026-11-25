@@ -44,7 +44,7 @@ export function ContentReviewList({ drafts, error }: { drafts: ReviewDraft[]; er
       </div>}
       {messages[set.id] && !messages[set.id].ok ? <p role="alert">{messages[set.id].message}</p> : null}
       <PhotoSlots id={set.id} slots={set.photoSlots??[]} disabled={!!pending||uploading||!!set.validationError} onBusy={setUploading}/>
-      <footer><button disabled={!!pending || uploading || !!set.validationError} onClick={() => preview(set.id,set.previewTargets?.[0]?.href??"/")}>Preview on page</button>{set.previewTargets?.slice(1).map(t=><button key={t.href} disabled={!!pending||uploading||!!set.validationError} onClick={()=>preview(set.id,t.href)}>{t.label}</button>)}{set.previewCv ? <button disabled={!!pending || uploading || !!set.validationError} onClick={()=>preview(set.id,"/behavioral")}>Preview CV</button> : null}<button className="site-auth-button" disabled={!!pending || uploading || !!set.validationError || !slotsComplete(set.photoSlots??[])} onClick={() => review(set.id, true)}>{pending === set.id ? "Saving…" : "Approve"}</button>
+      <footer><button disabled={!!pending || uploading || !!set.validationError} onClick={() => preview(set.id,set.previewTargets?.[0]?.href??"/")}>Preview on page</button>{set.previewTargets?.slice(1).map(t=><button key={t.href} disabled={!!pending||uploading||!!set.validationError} onClick={()=>preview(set.id,t.href)}>{t.label}</button>)}<button className="site-auth-button" disabled={!!pending || uploading || !!set.validationError || !slotsComplete(set.photoSlots??[])} onClick={() => review(set.id, true)}>{pending === set.id ? "Saving…" : "Approve"}</button>
         <button disabled={!!pending||uploading} onClick={() => review(set.id, false)}>Discard</button></footer>
     </article>)}
   </>;

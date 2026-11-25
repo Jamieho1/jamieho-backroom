@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { FREE_LIMITS, opsWarnings, usageOf, warnRatio, type OpsRow } from "@/lib/ops";
 // @ts-expect-error plain JS module used by the GitHub Action
 import { encrypt, decrypt } from "../../scripts/export-crypto.mjs";
+import { PASSLOOP_TABLES } from "../support/passloop-tables";
 
 const NOW = new Date("2026-11-02T12:00:00Z").getTime();
 const ping = (detail: Record<string, unknown> = {}, ran_at = "2026-11-02T05:23:00Z", ok = true): OpsRow => ({
@@ -46,12 +47,15 @@ describe("export encryption", () => {
 });
 
 describe("export table list", () => {
-  it("names every table the migrations create in public", () => {
+  it("names every personal-site table; PassLoop's tables are exported by PassLoop, never both", () => {
     const sql = readdirSync("supabase/migrations").filter((f) => f.endsWith(".sql"))
       .map((f) => readFileSync(`supabase/migrations/${f}`, "utf8"))
       .join("\n");
     const created = [...sql.matchAll(/create table public\.(\w+)/g)].map((m) => m[1]).sort();
-    expect(JSON.parse(readFileSync("scripts/export-tables.json", "utf8")).sort()).toEqual(created);
+    const manifest: string[] = JSON.parse(readFileSync("scripts/export-tables.json", "utf8"));
+    expect(manifest.filter((t) => (PASSLOOP_TABLES as readonly string[]).includes(t))).toEqual([]);
+    expect([...manifest, ...PASSLOOP_TABLES].sort()).toEqual(created);
+    for (const table of ["profiles", "messages", "articles", "projects", "guides", "about_photos", "experience_items", "behavioral_stories", "behavioral_answers", "content_changes"]) expect(manifest).toContain(table);
   });
 });
 

@@ -1,9 +1,5 @@
 "use server";
-import {loadCompaniesPreview} from '@/lib/content-drafts/companies';
-
 import {loadAboutPhotosPreview} from '@/lib/content-drafts/about-photos';
-import {loadBehavioralPreview} from '@/lib/content-drafts/behavioral-guides';
-import {loadTemplatePreview} from '@/lib/content-drafts/resume-template';
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getViewer } from "@/lib/viewer";
@@ -13,6 +9,7 @@ import {parsePhotoSet,withPhotoOperations,checkSlotObject} from "@/lib/content-d
 import { affectedRoutes } from "@/lib/content-drafts/allowlist";
 import {loadAppPreview} from "@/lib/content-drafts/app-overlay";
 import {loadPublishingPreview} from "@/lib/content-drafts/publishing-overlay";
+import {CONTENT_SITE} from "@/lib/content-drafts/site";
 import type { ContentChange, DraftResult } from "@/lib/content-drafts/types";
 
 const idSchema = z.uuid();
@@ -26,7 +23,7 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     if (viewer.role !== "owner" || !viewer.id) return denied();
     const sb = await supabaseServer();
     if (!sb) return { ok: false, message: "Content drafts are not configured." };
-    const loaded = await sb.from("content_changes").select("id, summary, status, operations, photo_slots, created_at").eq("id", id).maybeSingle();
+    const loaded = await sb.from("content_changes").select("id, summary, status, operations, photo_slots, created_at").eq("id", id).eq("site", CONTENT_SITE).maybeSingle();
     if (loaded.error) return { ok: false, message: "Could not load this change set. Try again." };
     const set = loaded.data as ContentChange | null;
     if (!set || set.status !== "draft") return { ok: false, message: "This change set is missing or already reviewed." };
@@ -37,11 +34,11 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
       for(const slot of parsed.slots)await checkSlotObject(sb,slot);
       result={operations:await withPhotoOperations(sb,parsed.operations,parsed.slots)};
     }catch(error){return {ok:false,message:error instanceof Error?error.message:"Invalid photo draft."};}
-    try { await loadCompaniesPreview(sb,result.operations); await loadAboutPhotosPreview(sb,result.operations); await loadBehavioralPreview(sb,result.operations); await loadTemplatePreview(sb,result.operations); await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations,viewer.id); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
+    try { await loadAboutPhotosPreview(sb,result.operations); await loadPublishingPreview(sb,result.operations); await loadAppPreview(sb,result.operations); } catch(error) {return {ok:false,message:error instanceof Error?error.message:"Invalid content draft."};}
     // Re-check the verified session immediately before the mutation; SQL independently checks ownership.
     const current = await getViewer();
     if (current.role !== "owner" || current.id !== viewer.id) return denied();
-    const saved = await sb.from("content_changes").update({ status: "approved" }).eq("id", id).eq("status", "draft")
+    const saved = await sb.from("content_changes").update({ status: "approved" }).eq("id", id).eq("status", "draft").eq("site", CONTENT_SITE)
       .filter("operations", "eq", JSON.stringify(set.operations)).filter("photo_slots","eq",JSON.stringify(set.photo_slots)).select("id,previous");
     if (saved.error) return { ok: false, message: saved.error.code === "22023" || saved.error.code === "42501"
       ? saved.error.message : "Approval failed. No content changes were applied. Try again." };
@@ -49,7 +46,6 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     // The database has committed. A cache failure must never be reported as a content rollback.
     try {
       for (const route of affectedRoutes(result.operations,saved.data[0].previous)) revalidatePath(route);
-      if(result.operations.some(op=>["companies","company_questions","interview_experiences"].includes(op.table))){revalidatePath("/interview/companies/[slug]","page");revalidatePath("/interview/companies/[slug]/experiences/[experience]","page");}
       revalidatePath("/manage/review");
     } catch {
       return { ok: true, applied: true, message: "Approved and saved, but page refresh failed. Do not approve again; ask for a cache refresh." };
@@ -67,7 +63,7 @@ export async function discardContentChange(id: string): Promise<DraftResult> {
     if (viewer.role !== "owner" || !viewer.id) return denied();
     const sb = await supabaseServer();
     if (!sb) return { ok: false, message: "Content drafts are not configured." };
-    const { data, error } = await sb.from("content_changes").update({ status: "discarded" }).eq("id", id).eq("status", "draft").select("id");
+    const { data, error } = await sb.from("content_changes").update({ status: "discarded" }).eq("id", id).eq("status", "draft").eq("site", CONTENT_SITE).select("id");
     if (error) return { ok: false, message: "Could not discard this draft. Try again." };
     if (!data?.length) return { ok: false, message: "This change set is missing or already reviewed." };
     try { revalidatePath("/manage/review"); } catch { /* Discard already committed; router refresh can reload the list. */ }

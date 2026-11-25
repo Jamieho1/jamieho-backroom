@@ -243,3 +243,8 @@ body:has(.pj){background:#1B2333}
  .pj-nx{background-image:none}.pj-nx:hover,.pj-nx:focus-visible{background-color:var(--bold)}
  .pj-fx:hover .a1,.pj-nx:hover .a1{transform:none!important}.pj-fx:hover .a2,.pj-nx:hover .a2{transform:translateX(-140%)!important}
 }
+
+.pj-pass{margin:0 0 32px}
+.pj-pass-card{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.pj-pass-card h3{margin:0;font:700 var(--pg-h2-card)/1 var(--cond);text-transform:uppercase;letter-spacing:.005em;color:var(--ink)}
+.pj-pass-card p{margin:8px 0 0;max-width:38em;font-size:var(--pg-body);line-height:1.5;color:var(--body80)}

@@ -24,7 +24,7 @@ export function ContentPreviewBar({ summary, page = "/", experience = false, tar
     {id?<PhotoSlots id={id} slots={photoSlots} disabled={pending||uploading} onBusy={setUploading}/>:null}
     <div className="content-preview-actions">
       {targets.filter(t=>t.href!==page).map(t=><a key={t.href} href={t.href}>{t.label}</a>)}
-      {experience ? <a href={page === "/" ? "/behavioral" : "/"}>{page === "/" ? "Preview CV" : "Preview homepage"}</a> : null}
+      {experience && page !== "/" ? <a href="/">Preview homepage</a> : null}
       <button className="site-auth-button" disabled={pending || uploading || !ready || !slotsComplete(photoSlots)} onClick={() => run("approve")}>Approve</button>
       <button disabled={pending || uploading || !ready} onClick={() => run("discard")}>Discard</button>
       <button disabled={pending || uploading || !ready} onClick={() => run("exit")}>Back to list</button>

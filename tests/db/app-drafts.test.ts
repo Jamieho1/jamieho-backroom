@@ -1,9 +1,6 @@
 import {beforeAll,afterAll,it,expect} from 'vitest';
 import type {PGlite} from '@electric-sql/pglite';
 import {freshDb,as,addUser} from './harness';
-import {PROBLEMS} from '@/lib/practice/catalog';
-import {SQL_LIST} from '@/lib/practice/sql-catalog';
-import {QUESTIONS} from '@/lib/behavioral/questions';
 const user={id:'00000000-0000-4000-8000-000000000901',email:'app-owner@example.test'},member={id:'00000000-0000-4000-8000-000000000902',email:'app-member@example.test'};
 const owner={role:'authenticated' as const,sub:user.id};const story='00000000-0000-4000-8000-000000000903',added='00000000-0000-4000-8000-000000000904';
 const op=(table='notes',action='update',fields:unknown={body:'Draft note'},key:string|number='fixture-note')=>({table,op:action,fields,key});
@@ -33,10 +30,6 @@ const invalid:unknown[]=[op('notes','insert'),op('notes','delete',{}),op('notes'
 for(const [table,field,max,key] of [['notes','body',200000,'fixture-note'],['notes','free',200000,'fixture-note'],['question_notes','body',200000,217],['practice_code','code',100000,217],['behavioral_stories','title',160,story],['behavioral_stories','situation',20000,story],['behavioral_stories','task',20000,story],['behavioral_stories','action',20000,story],['behavioral_stories','result',20000,story],['behavioral_stories','skills',1000,story],['behavioral_stories','numbers',2000,story],['behavioral_answers','outline',20000,'g-intro'],['behavioral_answers','followups',10000,'g-intro']] as const)for(const action of table==='notes'?['update']:['insert','update'])invalid.push(op(table,action,{...(table==='behavioral_stories'?{title:'X'}:{}),[field]:'x'.repeat(max+1)},action==='insert'?(table==='behavioral_stories'?added:table==='behavioral_answers'?'g-proud':1):key));
 for(const [i,operation] of invalid.entries())it(`invalid app proposal ${i+1} rolls back earlier content, status and audit`,async()=>{
  await as(db,owner,async q=>{const before=await q('select * from public.notes where id=$1',['fixture-note']);const id=await seed(q,[op('notes','update',{body:'Must roll back'}),operation]);await q('savepoint approval');await expect(approve(q,id)).rejects.toThrow();await q('rollback to savepoint approval');expect(await q('select * from public.notes where id=$1',['fixture-note'])).toEqual(before);expect(await q('select status,previous,approved_at from public.content_changes where id=$1',[id])).toEqual([{status:'draft',previous:null,approved_at:null}]);});
-});
-it('SQL catalogue keys match code and behavioral question identifiers',async()=>{
- const result=await db.query<{id:number}>('select i as id from generate_series(1,10000) i where private.valid_draft_problem(i)');expect(result.rows.map(r=>r.id)).toEqual([...PROBLEMS.map(p=>p.lc),...SQL_LIST.map(p=>p.lc)].sort((a,b)=>a-b));
- await as(db,owner,async q=>{for(const question of QUESTIONS){const id=await seed(q,[op('behavioral_answers',question.id==='g-intro'?'update':'insert',{outline:'Synthetic answer'},question.id)]);await approve(q,id);}});
 });
 it('Unicode limits follow the relevant editors',async()=>{
  await as(db,owner,async q=>{await approve(q,await seed(q,[op('practice_code','update',{code:'😀'.repeat(50000)},217),op('behavioral_stories','update',{title:'😀'.repeat(160)},story)]));expect(await q('select char_length(code) as length from public.practice_code where problem=217')).toEqual([{length:50000}]);});
