@@ -134,3 +134,4 @@ One line each: date · decision · source. Newest last. Full reasoning lives in 
 
 - 2026-11-25 · Content hub is /content with Latest · Series · Free guides tabs; /articles, /resources, /guides 308 to /content, /content/guides; /articles/<slug> and /guides/<slug> stay; filters live in the URL read client-side so pages stay static; read state is per-browser localStorage; /p/<code> is a route handler (308 known, 307 unknown) · H2
 - 2026-11-25 · YouTube cards show "N min video" from the written version's read time because no video length is stored; replace with a real duration only if Jamie adds a field · H2
+- 2026-11-25 · Free guides (H4): the guide page has no Pin (pins are articles-only; adding guide pins needs a migration, not in scope) and "Posts that link here" means published articles in the guide's series; the guide page stays dynamic for the owner preview.
