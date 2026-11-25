@@ -1,6 +1,6 @@
 import {CATEGORY_LABEL,PLATFORM_LABEL,readMinutes,normalizeCode,articleHref,type Category,type Platform} from './articles';
 import {chapterCount,guideHref} from './guides';
-import type {SeriesRow} from './content-series-data';
+import {seriesHref,type SeriesRow} from './content-series-data';
 /** Content hub (/content): pure helpers for the Latest page, search and short links. No data access here. */
 
 /** One post card. Read time is computed from the body on the server; the body itself is never sent to the browser. */
@@ -103,7 +103,7 @@ export interface SearchItem{kind:'post'|'guide'|'series';title:string;summary:st
 export function buildSearchIndex(d:{posts:HubPost[];guides:HubGuide[];series:HubSeries[]}):SearchItem[]{
  return [
   ...d.posts.map(p=>({kind:'post' as const,title:p.title,summary:p.summary,href:articleHref(p.slug),code:p.code,platform:p.platform})),
-  ...d.series.map(s=>({kind:'series' as const,title:s.title,summary:s.goal,href:'/content/series',code:null})),
+  ...d.series.map(s=>({kind:'series' as const,title:s.title,summary:s.goal,href:seriesHref(s.slug),code:null})),
   ...d.guides.map(g=>({kind:'guide' as const,title:g.title,summary:g.summary,href:guideHref(g.slug),code:null})),
  ];
 }

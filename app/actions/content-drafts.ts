@@ -46,6 +46,8 @@ export async function approveContentChange(id: string): Promise<DraftResult> {
     // The database has committed. A cache failure must never be reported as a content rollback.
     try {
       for (const route of affectedRoutes(result.operations,saved.data[0].previous)) revalidatePath(route);
+      // A post or guide moving in or out of a series changes that series page, whose slug the draft does not carry.
+      if (result.operations.some(op => op.table === "articles" || op.table === "guides" || op.table === "content_series")) revalidatePath("/content/series/[slug]", "page");
       revalidatePath("/manage/review");
     } catch {
       return { ok: true, applied: true, message: "Approved and saved, but page refresh failed. Do not approve again; ask for a cache refresh." };

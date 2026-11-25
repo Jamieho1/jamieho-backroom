@@ -41,12 +41,13 @@ export async function loadPublishingPreview(sb:SupabaseClient,operations:Content
  return result;
 }
 export function publishingTargets(operations:ContentOperation[]):{href:string;label:string}[]{
- // Posts, guides and series are previewed on the Content hub tabs (a series page is added with H3).
+ // Posts, guides and series are previewed on the Content hub tabs; a series draft that names its slug also gets its own page.
  const tables=new Set(operations.map(op=>op.table).filter(isPublishingTable));
  const targets:{href:string;label:string}[]=[];
  if(tables.has('projects'))targets.push({href:'/projects',label:'Preview projects'},{href:'/',label:'Preview homepage'});
  if(tables.has('articles'))targets.push({href:'/content',label:'Preview Latest'});
- if(tables.has('content_series'))targets.push({href:'/content/series',label:'Preview Series'});
+ if(tables.has('content_series')){targets.push({href:'/content/series',label:'Preview Series'});
+  for(const slug of new Set(operations.flatMap(op=>op.table==='content_series'&&'slug' in op.fields&&typeof op.fields.slug==='string'&&op.fields.slug?[op.fields.slug]:[])))targets.push({href:`/content/series/${encodeURIComponent(slug)}`,label:'Preview series page'});}
  if(tables.has('guides'))targets.push({href:'/content/guides',label:'Preview Free guides'});
  return targets;
 }
