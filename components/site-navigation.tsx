@@ -26,7 +26,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
   const { viewer, configured } = useViewer();
   const menuGroup = useId();
   const pathname = usePathname() ?? "";
-  const navLink=(label:string,href:string,close:()=>void)=><Link href={href} onClick={close} aria-current={pathname===href||pathname.startsWith(href+"/")?"page":undefined}>{label}</Link>;
+  const navLink=(label:string,href:string,close:()=>void,exact=false)=><Link href={href} onClick={close} aria-current={pathname===href||(!exact&&pathname.startsWith(href+"/"))?"page":undefined}>{label}</Link>;
   return <header role="banner" ref={ref} className={`site-navigation${journey ? " is-journey" : ""}${embedded ? " is-embedded" : ""}`} data-floating="false">
     <Link href={journey ? "#sky" : "/"} className="site-navigation-logo" aria-label="Jamie Ho — back to the top" onClick={event => { if (onJump) { event.preventDefault(); onJump("sky"); } }}><img src="/brand/jh-mark.svg" width="412" height="220" alt=""/></Link>
     <nav className="site-navigation-links" aria-label="Site">
@@ -36,7 +36,7 @@ export const SiteNavigation = forwardRef<HTMLElement, Props>(function SiteNaviga
         </nav>}
       </NavigationMenu>
       <NavigationMenu label="My story" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="My story pages">{navLink("About","/about",close)}{navLink("Projects","/projects",close)}</nav>}</NavigationMenu>
-      <NavigationMenu label="Content" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="Content pages">{navLink("Articles","/articles",close)}{navLink("Resources","/resources",close)}</nav>}</NavigationMenu>
+      <NavigationMenu label="Content" group={menuGroup}>{close=><nav className="journey-chapter-list" aria-label="Content pages">{navLink("Latest","/content",close,true)}{navLink("Series","/content/series",close)}{navLink("Free guides","/content/guides",close)}</nav>}</NavigationMenu>
       <a href={PASSLOOP_URL} rel="noopener">PassLoop ↗</a>
     </nav>
     <div className="site-navigation-account">

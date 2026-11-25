@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async redirects() {
     return [
+      // Content hub (H2): Articles and Resources became /content. Post and guide pages (/articles/<slug>, /guides/<slug>) stay.
+      { source: "/articles", destination: "/content", permanent: true as const },
+      { source: "/resources", destination: "/content/guides", permanent: true as const },
+      { source: "/guides", destination: "/content/guides", permanent: true as const },
       // The bare /interview rule is separate: a lone `/:path*` produced an empty Location.
       pass("/interview", "/"),
       pass("/interview/:path*", "/:path*"),

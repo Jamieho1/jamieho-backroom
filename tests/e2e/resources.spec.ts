@@ -11,7 +11,7 @@ test.beforeAll(async()=>{
  }}]});bundle=out.outputFiles[0].text;
 });
 async function mount(page:Page,socials=false){
- await page.goto('/resources'+(socials?'?socials':''));
+ await page.goto('/privacy');
  if(socials)await page.addStyleTag({content:readFileSync('app/journey.css','utf8')});
  await page.addStyleTag({content:'body > :not(#resources-fixture){display:none!important}'});
  await page.evaluate(()=>{const root=document.createElement('div');root.id='resources-fixture';document.body.append(root)});

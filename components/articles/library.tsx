@@ -31,7 +31,7 @@ export function ArticlesShell({articles,currentId,children,footer}:{articles:Art
  const empty=<p className="muted">{articles.length?'No articles match these filters.':'No articles have been published yet.'}</p>;
  return <div className="articles-wrap"><div className="articles-app">
   <aside className="articles-side" aria-label="Browse articles" onScroll={moreLatest} tabIndex={0}>
-   <div className="articles-side-head"><Link href="/articles" prefetch={false} className="articles-home">Articles</Link><ArticleManageLink /></div>
+   <div className="articles-side-head"><Link href="/content" prefetch={false} className="articles-home">Content</Link><ArticleManageLink /></div>
    <label className="field"><span className="sr-only">Search articles</span><input type="search" placeholder="Search articles…" value={search} onChange={e=>{setSearch(e.target.value);reset();}} /></label>
    <div className="articles-pills" role="group" aria-label="Category">
     {(['',...Object.keys(CATEGORY_LABEL)] as (Category|'')[]).map(c=><button key={c||'all'} type="button" className="articles-pill" aria-pressed={category===c} onClick={()=>{setCategory(c);reset();}}>{c?CATEGORY_LABEL[c]:'All'}</button>)}
@@ -42,7 +42,7 @@ export function ArticlesShell({articles,currentId,children,footer}:{articles:Art
    {signedIn?<section className="articles-pinned" aria-label="Pinned posts">
     <h2 className="articles-list-heading">Pinned posts</h2>
     {pins.loading?<p className="muted" role="status">Loading pins…</p>:pins.loadError?<p role="alert">{pins.loadError} <button type="button" className="btn ghost small" onClick={pins.reload}>Retry loading pins</button></p>:!pinnedArticles.length?<p className="muted">Pin posts below to find them here.</p>:<nav className="articles-list" aria-label="Pinned articles">{pinnedArticles.map(a=><div className="article-sidebar-row" key={a.id}><Link href={articleHref(a.slug)} prefetch={false} aria-current={a.id===currentId?'page':undefined}><span>{a.title}</span></Link>{pinButton(a)}</div>)}</nav>}
-   </section>:viewer.status==='anonymous'?<div className="articles-pin-signin"><p className="muted">Sign in to pin posts across devices.</p>{configured?<SignInButton label="Sign in to pin posts" next={currentId?articleHref(articles.find(a=>a.id===currentId)?.slug??''):'/articles'} />:null}</div>:null}
+   </section>:viewer.status==='anonymous'?<div className="articles-pin-signin"><p className="muted">Sign in to pin posts across devices.</p>{configured?<SignInButton label="Sign in to pin posts" next={currentId?articleHref(articles.find(a=>a.id===currentId)?.slug??''):'/content'} />:null}</div>:null}
    {pins.saveError?<p role="alert">{pins.saveError} <button type="button" className="btn ghost small" onClick={()=>void pins.retry()}>Retry pin change</button></p>:null}
    <nav aria-label="Articles" className="articles-list" onScroll={moreLatest}>
     <h2 className="articles-list-heading">Latest posts</h2>

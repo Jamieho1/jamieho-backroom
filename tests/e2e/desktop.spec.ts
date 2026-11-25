@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test("the retired desktop redirects to the Guides resource shelf", async ({ page }) => {
- await page.goto('/desktop'); await expect(page).toHaveURL(/\/resources$/);
- await expect(page.getByRole('heading',{name:'Resources',level:1})).toBeVisible();
- await expect(page.getByRole('heading',{name:'Guides',exact:true})).toBeVisible();
+test("the retired desktop redirects to the Free guides tab", async ({ page }) => {
+ await page.goto('/desktop'); await expect(page).toHaveURL(/\/content\/guides$/);
+ await expect(page.getByRole('heading',{name:/The long version of every post/i,level:1})).toBeVisible();
+ await expect(page.getByRole('navigation',{name:'Content sections'}).getByRole('link',{name:/^Free guides/})).toHaveAttribute('aria-current','page');
  await expect(page.locator('.resource-preview')).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
@@ -17,20 +17,17 @@ test('retired Notes, Practice and Behavioral addresses permanently redirect to P
  }
 });
 
-test('Resources and Articles use client navigation without replacing the document',async({page})=>{
- await page.goto('/resources');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
-
- await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Articles',exact:true}).click();
- await expect(page).toHaveURL(/\/articles$/);
- expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
-
- await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:'Resources',exact:true}).click();
- await expect(page).toHaveURL(/\/resources$/);
- expect(await page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker)).toBe('persistent');
+test('Latest, Series and Free guides use client navigation without replacing the document',async({page})=>{
+ await page.goto('/content/guides');await page.evaluate(()=>{(window as unknown as {navigationMarker:string}).navigationMarker='persistent';});
+ const marker=()=>page.evaluate(()=>(window as unknown as {navigationMarker:string}).navigationMarker);
+ for(const [label,url] of [['Latest',/\/content$/],['Series',/\/content\/series$/],['Free guides',/\/content\/guides$/]] as const){
+  await page.locator('.site-navigation:visible [data-menu=content] summary').click();await page.getByRole('navigation',{name:'Site'}).getByRole('link',{name:label,exact:true}).click();
+  await expect(page).toHaveURL(url);expect(await marker()).toBe('persistent');
+ }
 });
 
-test('Privacy, Projects and Articles use plain pages with one shared header',async({page})=>{
- for(const path of ['/privacy','/projects','/articles']) {
+test('Privacy, Projects and Content use plain pages with one shared header',async({page})=>{
+ for(const path of ['/privacy','/projects','/content']) {
   await page.goto(path);
   await expect(page.locator('.app-page')).toBeVisible();
   await expect(page.locator('.desktop-window, .desktop-titlebar, .desktop-backdrop')).toHaveCount(0);
@@ -40,13 +37,13 @@ test('Privacy, Projects and Articles use plain pages with one shared header',asy
   await expect(page.getByRole('navigation',{name:'Site'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
- await page.goto('/resources');
+ await page.goto('/projects');
  const resources=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
  await page.goto('/privacy');
  expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(resources);
  await page.getByRole('button', { name: /^Colour mode:/ }).click();
   await page.getByRole('button', { name: /^Colour mode:/ }).click();
  const privacyDark=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
- await page.goto('/resources');
+ await page.goto('/projects');
  expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(privacyDark);
 });

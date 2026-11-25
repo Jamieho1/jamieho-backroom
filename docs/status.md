@@ -2,21 +2,18 @@
 
 ## Implementation
 
-H1 (Content hub data model, editors, drafts) is implemented locally and not committed, pushed or deployed. H2-H5 (hub pages, series, guides, post page) are not started. PL4 (PassLoop moved to its own repo) is also still local and uncommitted.
+H1 (Content hub data model, editors, drafts) and H2 (Content hub shell and Latest) are implemented locally and not committed, pushed or deployed. H3-H5 (series pages, guide pages, post page) are not started. PL4 (PassLoop moved to its own repo) is also still local and uncommitted.
 
-- Migration `20261125100000_content_hub.sql` adds `content_series`, series/code/takeaway/slides on articles, series/audience/highlights/exercises on guides, the cross-table part-uniqueness trigger, series detach on delete, and replaces `private.apply_publishing_draft` and `private.apply_content_change` (see content-drafts.md, security.md).
-- Owner editors: /articles/manage and /guides/manage have the new fields; /content/series/manage lists, creates, edits and publishes series. Shared zod schemas live in lib/articles.ts, lib/guides.ts and lib/content-series-data.ts; read time and chapter count are computed helpers.
-- Content Drafts: content_series and the new fields are in the TS allowlist, overlay, review and revalidation (/content, /content/series, /content/series/<slug>, /content/guides). Export manifest lists 19 personal-site tables.
-- Public pages are unchanged: detail reads keep the original columns and default the new fields, so they work before the migration is applied.
+- H1: owner editors (/articles/manage, /guides/manage, /content/series/manage), shared zod schemas, Content Drafts support for content_series and the new fields, 19-table export manifest.
+- H2: /content (Latest), /content/series and /content/guides share one frame (heading, one search box that also takes a post code, sticky tabs with counts, footer band). Latest has Topic and Platform dropdowns kept in the URL, guide band, month groups, Cards/List, 12 at a time, NEW and Read badges (Read is per browser). /p/<code> short links; /articles, /resources and /guides are 308 redirects; the Content menu lists Latest, Series, Free guides. /articles/<slug> and /guides/<slug> are unchanged apart from marking a post read. Public article/guide reads now select every column.
+- /content/series and /content/guides are plain placeholder lists until H3/H4; series search results link to /content/series until the series pages exist.
 
 ## Database and deployment
 
-`20261125100000_content_hub.sql` is NOT applied live; apply only after Jamie says "apply it", and only after the PL2 migration (PassLoop repo, `content_changes.site`) is live because it replaces the PL2 approval trigger. Apply the migration before deploying the new editors (owner pages select the new columns). Earlier local migrations (S1-S3, C4, SQL, notes visuals) remain NOT applied and belong to PassLoop's sequence. The PL4 deploy-order note still stands: PL2 applied and PassLoop live before deploying.
+`20261125100000_content_hub.sql` is applied live (2026-11-25, remote version 20261125130615, with Jamie's approval): RLS on content_series with 4 policies, no rows changed, no new security advisor findings. It replaced `private.apply_content_change`, so keep it consistent with the PL2 migration (PassLoop repo, `content_changes.site`), which must be live for Content Drafts. Earlier local migrations (S1-S3, C4, SQL, notes visuals) remain NOT applied and belong to PassLoop's sequence. H2 adds no migration. Deploy PL4 only after PL2 is applied and PassLoop is live.
 
 ## Verification (Linux copy, secret-free)
 
-Typecheck passed. Full suite: 104 files, 1,083 tests passed, including the new DB file (110 tests: RLS, constraints, cross-table part uniqueness, cascade, draft approval/rollback parity, site tagging, hardening), unit and editor UI tests. Production build (Google Fonts stubbed through Next's mock env, Linux copy only) and `node scripts/assert-static.mjs` passed.
+H2: typecheck passed. Full suite: 106 files, 1,126 tests passed (new: 26 hub logic, route and redirect tests, 17 component tests for filters, dropdown keyboard, Cards/List, Show more, search and code, tabs, footer). `next build` passed; /content, /content/series and /content/guides are pre-rendered; `node scripts/assert-static.mjs` passed. A `next start` smoke check confirmed the 308 redirects, `/p/<unknown>` 307 and the pages answer 200.
 
-Test changes to know: the DB harness now creates PassLoop's PL2 pieces (tests/support/content-changes-site.sql) before this migration, and three app-drafts tests were split so no approval mixes PassLoop and personal tables (PL2 rejects mixed sets).
-
-**Not run:** browser specs (no browser needed for H1; Chromium is unavailable in the sandbox), anything against the live Supabase database.
+**Not run:** browser specs (Chromium is unavailable in the sandbox). tests/e2e/content-hub.spec.ts is new (desktop and 390 px, dark and light) and the existing articles, desktop, home, publishing-preview, review-badge and feedback specs were edited for the new routes; all type-check and list under `playwright test --list` but were not executed. Nothing was run against the live database in H2.

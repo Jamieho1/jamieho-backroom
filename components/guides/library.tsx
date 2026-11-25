@@ -15,7 +15,7 @@ export function GuidesShell({guides,currentId,children}:{guides:GuideCard[];curr
  const seriesOptions=[...new Set(guides.map(guideSeries))];
  return <div className="articles-wrap"><div className="articles-app">
   <aside className="articles-side" aria-label="Browse resources" tabIndex={0} onScroll={event=>{const el=event.currentTarget;if(el.scrollHeight-el.scrollTop-el.clientHeight<48)setCount(n=>Math.min(n+8,shown.length));}}>
-   <div className="articles-side-head"><Link className="articles-home" href="/resources">Resources</Link>{viewer.status==='owner'?<Link className="btn ghost small" href="/guides/manage" prefetch={false}>Manage guides</Link>:null}</div>
+   <div className="articles-side-head"><Link className="articles-home" href="/content/guides">Free guides</Link>{viewer.status==='owner'?<Link className="btn ghost small" href="/guides/manage" prefetch={false}>Manage guides</Link>:null}</div>
    <label className="field"><span className="sr-only">Search resources</span><input type="search" placeholder="Search resources…" value={search} onChange={e=>{setSearch(e.target.value);setCount(8);}} /></label>
    <div className="articles-pills" role="group" aria-label="Series">{(['',...seriesOptions] as (ContentSeries|'')[]).map(s=><button key={s||'all'} type="button" className="articles-pill" aria-pressed={series===s} onClick={()=>{setSeries(s);setCount(8);}}>{s||'All series'}</button>)}</div>
    <nav className="articles-list" aria-label="Latest resources"><h2 className="articles-list-heading">Latest resources</h2>

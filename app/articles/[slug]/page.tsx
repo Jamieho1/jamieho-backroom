@@ -9,6 +9,7 @@ import {ArticleMarkdown} from '@/components/articles/article-markdown';
 import {ArticlesFooter} from '@/components/articles/footer';
 import {YouTubeEmbed} from '@/components/articles/youtube';
 import {OnThisPage} from '@/components/articles/on-this-page';
+import {MarkRead} from '@/components/content/mark-read';
 import {getPublicArticle,getPublicArticles} from '@/lib/articles-public';
 import {getSections} from '@/lib/sections';
 import {getProjectApps} from '@/lib/projects';
@@ -30,9 +31,10 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
  const related=relatedArticles(all,article);
  const {prev,next}=adjacentArticles(all,article.id);
  const toc=articleSections(article.body);
- return <><PagePreview preview={preview} page={article.published?`/articles/${article.slug}`:"/articles"}/><Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
+ return <><PagePreview preview={preview} page={article.published?`/articles/${article.slug}`:"/content"}/><Desktop apps={[]} initialApp="articles" discoverApps content={<ArticlesShell articles={all} currentId={article.id} footer={<ArticlesFooter socials={socialLinks(sections.contact.body)} />}>
   <div className="article-layout">
   <article className="article-read" data-draft-changed={article.draftChanged||undefined}>
+   <MarkRead id={article.id}/>
    <p className="article-meta" id="overview">{articleDate(article.created_at)} · {CATEGORY_LABEL[article.category]}</p>
    {article.draftChanged&&!article.published?<p role="status">Unpublished in this preview</p>:null}
    <h1>{article.title}</h1>

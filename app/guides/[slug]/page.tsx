@@ -5,6 +5,7 @@ import {notFound} from 'next/navigation';
 import Link from 'next/link';
 import {ArticleMarkdown} from '@/components/articles/article-markdown';
 import {OnThisPage} from '@/components/articles/on-this-page';
+import {MarkRead} from '@/components/content/mark-read';
 import {GuideToolkit} from '@/components/guides/shelf';
 import {getPublicGuide,getPublicGuides} from '@/lib/guides-public';
 import {GuidesShell} from '@/components/guides/library';
@@ -23,9 +24,10 @@ export default async function GuidePage({params}:{params:Promise<{slug:string}>}
  try{guide=await getPublicGuide(slug,preview);}catch{return <main className="page"><p role="alert">Can&apos;t load this guide right now.</p><a href={guideHref(slug)}>Try again</a></main>;}
  if(!guide)notFound();
  const guides=await getPublicGuides(preview).catch(()=>[]);
- return <><PagePreview preview={preview} page={guide.published?`/guides/${guide.slug}`:"/guides"}/><main className="app-page guides-page guide-page" data-app="resources"><div className="desktop-app-content app-page-content"><GuidesShell guides={guides} currentId={guide.id}><div className="article-layout">
+ return <><PagePreview preview={preview} page={guide.published?`/guides/${guide.slug}`:"/content/guides"}/><main className="app-page guides-page guide-page" data-app="resources"><div className="desktop-app-content app-page-content"><GuidesShell guides={guides} currentId={guide.id}><div className="article-layout">
   <article className="article-read" data-draft-changed={guide.draftChanged||undefined}>
-   <p className="article-meta" id="overview"><Link href="/resources" prefetch={false}>Resources</Link> · <Link href="/guides" prefetch={false}>Guides</Link> · Updated {articleDate(guide.updated_at)}</p>
+   <MarkRead id={guide.id}/>
+   <p className="article-meta" id="overview"><Link href="/content" prefetch={false}>Content</Link> · <Link href="/content/guides" prefetch={false}>Free guides</Link> · Updated {articleDate(guide.updated_at)}</p>
    {guide.draftChanged&&!guide.published?<p role="status">Unpublished in this preview</p>:null}
    <span className="content-series-tag">{guideSeries(guide)}</span><h1>{guide.title}</h1>
    {guide.summary?<p className="article-summary">{guide.summary}</p>:null}

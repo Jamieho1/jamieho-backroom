@@ -20,9 +20,9 @@ export const articleSchema=articleObject.refine(sameSeriesPair,{message:SERIES_P
 export type ArticleEdit=z.infer<typeof articleSchema>;
 export type Article=ArticleEdit&{draftChanged?:boolean;created_at:string;updated_at:string};
 export type ArticleCard=Pick<Article,'id'|'slug'|'title'|'summary'|'platform'|'category'|'cover_url'|'project_id'|'created_at'|'draftChanged'>;
-/** Owner editor and saves read every column. Public pages keep the original columns until H2-H5 use the new ones, so they keep working before the content-hub migration is applied. */
+/** Every column: the owner editor, saves and the public post page. (The content-hub migration is applied live.) */
 export const ARTICLE_SELECT='id,slug,title,summary,body,platform,category,source_url,cover_url,project_id,series_id,series_part,code,takeaway,slides,published,created_at,updated_at';
-export const ARTICLE_PUBLIC_SELECT='id,slug,title,summary,body,platform,category,source_url,cover_url,project_id,published,created_at,updated_at';
+/** Defaults for the content-hub fields, for fixtures and rows built before they existed. */
 export const ARTICLE_NEW_DEFAULTS={series_id:null,series_part:null,code:null,takeaway:'',slides:[] as string[]};
 export const CARD_SELECT='id,slug,title,summary,platform,category,cover_url,project_id,created_at';
 export const articleHref=(slug:string)=>`/articles/${encodeURIComponent(slug)}`;

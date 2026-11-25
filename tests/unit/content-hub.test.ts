@@ -2,8 +2,8 @@ import {beforeEach,describe,it,expect,vi} from 'vitest';
 const m=vi.hoisted(()=>({viewer:vi.fn(),server:vi.fn(),previous:vi.fn(),upsert:vi.fn(),saved:vi.fn(),revalidate:vi.fn(),client:vi.fn(),select:vi.fn(),eq:vi.fn(),order:vi.fn(),single:vi.fn()}));
 vi.mock('@/lib/viewer',()=>({getViewer:m.viewer}));vi.mock('@/lib/supabase/server',()=>({supabaseServer:m.server}));vi.mock('next/cache',()=>({revalidatePath:m.revalidate}));
 vi.mock('@/lib/env',()=>({readSupabaseEnv:()=>({url:'https://example.supabase.co',anonKey:'public-test-placeholder'})}));vi.mock('@supabase/supabase-js',()=>({createClient:m.client}));
-import {articleSchema,emptyArticle,readMinutes,wordCount,normalizeCode,ARTICLE_SELECT,ARTICLE_PUBLIC_SELECT} from '@/lib/articles';
-import {guideSchema,emptyGuide,chapterCount,GUIDE_SELECT,GUIDE_PUBLIC_SELECT} from '@/lib/guides';
+import {articleSchema,emptyArticle,readMinutes,wordCount,normalizeCode,ARTICLE_SELECT} from '@/lib/articles';
+import {guideSchema,emptyGuide,chapterCount,GUIDE_SELECT} from '@/lib/guides';
 import {seriesSchema,emptySeries,seriesHref,SERIES_SELECT} from '@/lib/content-series-data';
 import {saveSeries} from '@/app/actions/content-series';
 import {saveArticle} from '@/app/actions/articles';
@@ -102,15 +102,16 @@ describe('save actions',()=>{
  });
 });
 
-describe('public reads before the migration is applied',()=>{
- it('detail reads select only the original columns and fill the new fields with empty defaults',async()=>{
-  m.single.mockResolvedValue({data:{id,slug:'x',title:'X',body:'b'},error:null});
-  expect(await getPublicArticle('x')).toMatchObject({series_id:null,series_part:null,code:null,takeaway:'',slides:[]});expect(m.select).toHaveBeenCalledWith(ARTICLE_PUBLIC_SELECT);
-  expect(await getPublicGuide('x')).toMatchObject({series_id:null,series_part:null,audience:'',highlights:[],exercises:null});expect(m.select).toHaveBeenCalledWith(GUIDE_PUBLIC_SELECT);
+describe('public reads (the migration is applied live)',()=>{
+ it('detail reads select every column, including the series, code, takeaway and slide fields',async()=>{
+  m.single.mockResolvedValue({data:{id,slug:'x',title:'X',body:'b',series_id:sid,series_part:2,code:'MCP101',takeaway:'T',slides:['https://example.com/1.png']},error:null});
+  expect(await getPublicArticle('x')).toMatchObject({series_id:sid,series_part:2,code:'MCP101',takeaway:'T',slides:['https://example.com/1.png']});expect(m.select).toHaveBeenCalledWith(ARTICLE_SELECT);
+  m.single.mockResolvedValue({data:{id,slug:'x',title:'X',body:'b',audience:'Engineers',highlights:['Setup'],exercises:3},error:null});
+  expect(await getPublicGuide('x')).toMatchObject({audience:'Engineers',highlights:['Setup'],exercises:3});expect(m.select).toHaveBeenCalledWith(GUIDE_SELECT);
  });
- it('the owner editors read every new column',()=>{
-  for(const c of ['series_id','series_part','code','takeaway','slides'])expect(ARTICLE_SELECT.split(',')).toContain(c);expect(ARTICLE_PUBLIC_SELECT).not.toContain('series_id');
-  for(const c of ['series_id','series_part','audience','highlights','exercises'])expect(GUIDE_SELECT.split(',')).toContain(c);expect(GUIDE_PUBLIC_SELECT).not.toContain('audience');
+ it('the owner editors and public pages read every new column',()=>{
+  for(const c of ['series_id','series_part','code','takeaway','slides'])expect(ARTICLE_SELECT.split(',')).toContain(c);
+  for(const c of ['series_id','series_part','audience','highlights','exercises'])expect(GUIDE_SELECT.split(',')).toContain(c);
   expect(SERIES_SELECT.split(',')).toEqual(['id','slug','title','goal','topic','planned_parts','sort','published','created_at','updated_at']);
  });
 });
@@ -146,6 +147,7 @@ describe('Content Drafts',()=>{
   for(const r of ['/content','/content/series','/content/guides','/content/series/new-series','/content/series/old-series'])expect(routes).toContain(r);
   expect(routes.some(r=>r.startsWith('/content_series'))).toBe(false);
   for(const table of ['articles','guides'])for(const r of ['/content','/content/series','/content/guides'])expect(affectedRoutes(parse([op(table,'update',{series_part:null,series_id:null})]))).toContain(r);
-  expect(publishingTargets(parse([op('content_series','update',{goal:'x'})]))).toEqual([]);
+  expect(publishingTargets(parse([op('content_series','update',{goal:'x'})]))).toEqual([{href:'/content/series',label:'Preview Series'}]);
+  expect(publishingTargets(parse([op('articles','update',{title:'x'}),op('guides','update',{title:'y'},other)])).map(t=>t.href)).toEqual(['/content','/content/guides']);
  });
 });

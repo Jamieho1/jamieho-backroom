@@ -26,5 +26,5 @@ it('shows the current series row next to a content_series proposal, with no prev
  m.from.mockImplementation((table:string)=>({select:()=>table==='content_changes'?{eq:()=>({eq:()=>({order:m.order})})}:table==='content_series'?Promise.resolve({data:[{id:sid,goal:'Old goal'}],error:null}):m.live()}));
  m.order.mockResolvedValue({data:[{id:'series-draft',summary:'Series goal',status:'draft',operations:[{op:'update',table:'content_series',key:sid,fields:{goal:'New goal'}}],photo_slots:[],created_at:'2026-11-25'}],error:null});
  const [draft]=(await loadContentReview()).drafts;
- expect(draft.fields).toEqual([{field:`content_series.${sid}.goal`,current:'Old goal',proposed:'New goal'}]);expect(draft.previewTargets).toEqual([]);
+ expect(draft.fields).toEqual([{field:`content_series.${sid}.goal`,current:'Old goal',proposed:'New goal'}]);expect(draft.previewTargets).toEqual([{href:'/content/series',label:'Preview Series'}]);
 });

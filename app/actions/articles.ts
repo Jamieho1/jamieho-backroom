@@ -12,7 +12,7 @@ export async function saveArticle(input:unknown):Promise<ArticleSave>{
   const {data,error}=await sb.from('articles').upsert(parsed.data,{onConflict:'id'}).select(ARTICLE_SELECT).single();
   if(error?.code==='23505')return {ok:false,message:/articles_code/.test(error.message)?'That post code is already used by another post.':/series/i.test(error.message)?'That part number is already used in this series.':'That slug is already in use. Choose another one.'};
   if(error||!data)throw new Error('unavailable');
-  revalidatePath('/articles');revalidatePath('/content');revalidatePath('/content/series');revalidatePath(articleHref(data.slug));if(previous.data?.slug&&previous.data.slug!==data.slug)revalidatePath(articleHref(previous.data.slug));
+  revalidatePath('/articles');revalidatePath('/content');revalidatePath('/content/series');revalidatePath('/content/guides');revalidatePath(articleHref(data.slug));if(previous.data?.slug&&previous.data.slug!==data.slug)revalidatePath(articleHref(previous.data.slug));
   return {ok:true,article:data};
  }catch{return {ok:false,message:"Couldn't save. Your draft is still here — retry."};}
 }

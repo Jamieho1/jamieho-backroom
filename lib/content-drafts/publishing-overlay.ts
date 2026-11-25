@@ -41,10 +41,12 @@ export async function loadPublishingPreview(sb:SupabaseClient,operations:Content
  return result;
 }
 export function publishingTargets(operations:ContentOperation[]):{href:string;label:string}[]{
- // content_series has no preview page until the hub routes exist (H2/H3); its drafts are reviewed in the review list.
+ // Posts, guides and series are previewed on the Content hub tabs (a series page is added with H3).
  const tables=new Set(operations.map(op=>op.table).filter(isPublishingTable));
- const targets=[...tables].filter(table=>table!=='content_series').map(table=>({href:`/${table}`,label:`Preview ${table}`}));
- if(tables.has('projects'))targets.push({href:'/',label:'Preview homepage'});
- if(tables.has('guides'))targets.push({href:'/resources',label:'Preview Resources'});
+ const targets:{href:string;label:string}[]=[];
+ if(tables.has('projects'))targets.push({href:'/projects',label:'Preview projects'},{href:'/',label:'Preview homepage'});
+ if(tables.has('articles'))targets.push({href:'/content',label:'Preview Latest'});
+ if(tables.has('content_series'))targets.push({href:'/content/series',label:'Preview Series'});
+ if(tables.has('guides'))targets.push({href:'/content/guides',label:'Preview Free guides'});
  return targets;
 }

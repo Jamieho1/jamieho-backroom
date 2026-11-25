@@ -9,9 +9,8 @@ export const guideSchema=guideObject.refine(sameSeriesPair,{message:SERIES_PAIR_
 export type GuideEdit=z.infer<typeof guideSchema>;
 export type Guide=GuideEdit&{draftChanged?:boolean;created_at:string;updated_at:string};
 export type GuideCard=Pick<Guide,'id'|'slug'|'title'|'summary'|'cover_url'|'notion_url'|'doc_url'|'updated_at'|'draftChanged'>;
-/** Owner editor and saves read every column; public pages keep the original columns until H2-H5 use the new ones. */
+/** Every column: the owner editor, saves and the public guide page. */
 export const GUIDE_SELECT='id,slug,title,summary,body,notion_url,doc_url,cover_url,series_id,series_part,audience,highlights,exercises,published,created_at,updated_at';
-export const GUIDE_PUBLIC_SELECT='id,slug,title,summary,body,notion_url,doc_url,cover_url,published,created_at,updated_at';
 export const GUIDE_NEW_DEFAULTS={series_id:null,series_part:null,audience:'',highlights:[] as string[],exercises:null};
 export const GUIDE_CARD_SELECT='id,slug,title,summary,cover_url,notion_url,doc_url,updated_at';
 export const guideHref=(slug:string)=>`/guides/${encodeURIComponent(slug)}`;
