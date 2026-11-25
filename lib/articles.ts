@@ -4,14 +4,29 @@ export const CATEGORY_LABEL={ai:'AI',career:'Career',productivity:'Productivity 
 export type Category=keyof typeof CATEGORY_LABEL;
 export type Platform=keyof typeof PLATFORM_LABEL;
 const https=(s:string)=>{if(!s)return true;try{return new URL(s).protocol==='https:';}catch{return false;}};
-export const articleSchema=z.object({id:z.uuid(),slug:z.string().max(80).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).refine(s=>!['manage','new','edit'].includes(s)),title:z.string().trim().min(1).max(160),summary:z.string().max(600),body:z.string().max(200000),platform:z.enum(['youtube','instagram','xiaohongshu','other']),category:z.enum(['ai','career','productivity','building']),source_url:z.string().max(2048).refine(https),cover_url:z.string().max(2048).refine(https),project_id:z.string().max(80).nullable(),published:z.boolean()});
+/** Slug rules shared by articles, guides and series (reserved words are the owner-editor routes). */
+export const slugSchema=z.string().max(80).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).refine(s=>!['manage','new','edit'].includes(s));
+/** A series part number: 1-50. Series membership is both-or-neither (series_id and series_part together). */
+export const seriesPartSchema=z.number().int().min(1).max(50);
+export const sameSeriesPair=(r:{series_id:string|null;series_part:number|null})=>(r.series_id===null)===(r.series_part===null);
+export const SERIES_PAIR_MESSAGE='Choose a series and a part number together, or neither.';
+/** Post code from the last slide: uppercase letters and digits (e.g. MCP101); stored uppercase, null when unset. */
+export const codeSchema=z.string().regex(/^[A-Z0-9]{1,16}$/);
+export const normalizeCode=(raw:string):string|null=>{const c=raw.trim().toUpperCase();return c?c:null;};
+export const MAX_SLIDES=20;
+const slideUrl=z.string().max(2048).refine(s=>s!==''&&https(s),'Slides must be HTTPS image URLs.');
+export const articleObject=z.object({id:z.uuid(),slug:slugSchema,title:z.string().trim().min(1).max(160),summary:z.string().max(600),body:z.string().max(200000),platform:z.enum(['youtube','instagram','xiaohongshu','other']),category:z.enum(['ai','career','productivity','building']),source_url:z.string().max(2048).refine(https),cover_url:z.string().max(2048).refine(https),project_id:z.string().max(80).nullable(),series_id:z.uuid().nullable(),series_part:seriesPartSchema.nullable(),code:codeSchema.nullable(),takeaway:z.string().max(160),slides:z.array(slideUrl).max(MAX_SLIDES),published:z.boolean()});
+export const articleSchema=articleObject.refine(sameSeriesPair,{message:SERIES_PAIR_MESSAGE,path:['series_part']});
 export type ArticleEdit=z.infer<typeof articleSchema>;
 export type Article=ArticleEdit&{draftChanged?:boolean;created_at:string;updated_at:string};
 export type ArticleCard=Pick<Article,'id'|'slug'|'title'|'summary'|'platform'|'category'|'cover_url'|'project_id'|'created_at'|'draftChanged'>;
-export const ARTICLE_SELECT='id,slug,title,summary,body,platform,category,source_url,cover_url,project_id,published,created_at,updated_at';
+/** Owner editor and saves read every column. Public pages keep the original columns until H2-H5 use the new ones, so they keep working before the content-hub migration is applied. */
+export const ARTICLE_SELECT='id,slug,title,summary,body,platform,category,source_url,cover_url,project_id,series_id,series_part,code,takeaway,slides,published,created_at,updated_at';
+export const ARTICLE_PUBLIC_SELECT='id,slug,title,summary,body,platform,category,source_url,cover_url,project_id,published,created_at,updated_at';
+export const ARTICLE_NEW_DEFAULTS={series_id:null,series_part:null,code:null,takeaway:'',slides:[] as string[]};
 export const CARD_SELECT='id,slug,title,summary,platform,category,cover_url,project_id,created_at';
 export const articleHref=(slug:string)=>`/articles/${encodeURIComponent(slug)}`;
-export const emptyArticle=():ArticleEdit=>({id:crypto.randomUUID(),slug:'',title:'',summary:'',body:'',platform:'youtube',category:'ai',source_url:'',cover_url:'',project_id:null,published:false});
+export const emptyArticle=():ArticleEdit=>({id:crypto.randomUUID(),slug:'',title:'',summary:'',body:'',platform:'youtube',category:'ai',source_url:'',cover_url:'',project_id:null,series_id:null,series_part:null,code:null,takeaway:'',slides:[],published:false});
 export type ArticleSave={ok:true;article:Article}|{ok:false;message:string};
 export const articleDate=(iso:string)=>{const d=new Date(iso);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(d);};
 
@@ -58,3 +73,7 @@ export function codeMeta(meta:string|undefined):{title:string;collapsed:boolean}
  const m=meta??'';
  return {title:/title="([^"]{1,120})"/.exec(m)?.[1]??'',collapsed:/(^|\s)collapsed(\s|$)/.test(m)};
 }
+
+/** Read time from the body: words / 220, rounded up, at least one minute. Not stored. */
+export const wordCount=(md:string)=>md.trim().split(/\s+/).filter(Boolean).length;
+export const readMinutes=(md:string)=>Math.max(1,Math.ceil(wordCount(md)/220));

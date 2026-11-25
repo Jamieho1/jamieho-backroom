@@ -34,13 +34,18 @@ $$;
 grant execute on function auth.jwt(), auth.uid() to anon, authenticated, service_role;
 `;
 
+/** PL2 (content_changes.site) is authored in PassLoop at 20261124120000; later migrations here depend on it. */
+const PL2_AFTER = "20261124120000";
 export const MIGRATIONS_DIR = join(__dirname, "..", "..", "supabase", "migrations");
 
 export async function freshDb(options:{storage?:boolean;beforeMigration?:(db:PGlite,file:string)=>Promise<void>}={}): Promise<PGlite> {
   const db = new PGlite();
   await db.exec(BOOTSTRAP);
   if(options.storage)await db.exec(readFileSync(join(__dirname,"../support/storage-bootstrap.sql"),"utf8"));
+  let site = false;
   for (const f of readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith(".sql")).sort()) {
+    // PL2 lives in PassLoop's repo: provide its content_changes.site pieces before the first migration that builds on them.
+    if (!site && f > PL2_AFTER) { await db.exec(readFileSync(join(__dirname, "../support/content-changes-site.sql"), "utf8")); site = true; }
     await options.beforeMigration?.(db,f);
     await db.exec(readFileSync(join(MIGRATIONS_DIR, f), "utf8"));
   }

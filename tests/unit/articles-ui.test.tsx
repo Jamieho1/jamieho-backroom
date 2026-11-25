@@ -6,10 +6,10 @@ vi.mock('@/app/actions/articles',()=>({saveArticle:m.save}));vi.mock('@/componen
 vi.mock('@/app/actions/article-pins',()=>({loadArticlePins:vi.fn(async()=>({ok:true,ids:[]})),saveArticlePin:vi.fn(async()=>({ok:true}))}));
 import {ArticleEditor} from '@/components/articles/editor';
 import {ArticlesShell} from '@/components/articles/library';
-import {relatedArticles,youtubeId} from '@/lib/articles';
+import {relatedArticles,youtubeId,ARTICLE_NEW_DEFAULTS} from '@/lib/articles';
 import {socialLinks} from '@/lib/social';
 import type {Article} from '@/lib/articles';
-const article:Article={id:'00000000-0000-4000-8000-000000000001',slug:'example',title:'Example reference',summary:'Summary',body:'Reference text',platform:'youtube',category:'ai',source_url:'',cover_url:'',project_id:null,published:false,created_at:'now',updated_at:'now'};
+const article:Article={id:'00000000-0000-4000-8000-000000000001',slug:'example',title:'Example reference',summary:'Summary',body:'Reference text',platform:'youtube',category:'ai',source_url:'',cover_url:'',project_id:null,...ARTICLE_NEW_DEFAULTS,published:false,created_at:'now',updated_at:'now'};
 beforeEach(()=>{vi.clearAllMocks();m.role='anonymous';m.save.mockImplementation(async input=>({ok:true,article:{...input,created_at:'now',updated_at:'now'}}));});afterEach(cleanup);
 it('readers filter by category pills and platform toggle, with no dropdowns or "Extra references"',()=>{
  const {container}=render(<ArticlesShell articles={[article,{...article,id:'two',slug:'second',title:'Second post',platform:'instagram',category:'career'}]} />);

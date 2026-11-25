@@ -4,7 +4,7 @@ vi.mock('@/lib/viewer',()=>({getViewer:m.viewer}));vi.mock('@/lib/supabase/serve
 vi.mock('@/lib/env',()=>({readSupabaseEnv:()=>({url:'https://example.supabase.co',anonKey:'public-test-placeholder'})}));vi.mock('@supabase/supabase-js',()=>({createClient:m.client}));
 import {saveGuide} from '@/app/actions/guides';
 import {getPublicGuides,getPublicGuide} from '@/lib/guides-public';
-const draft={id:'00000000-0000-4000-8000-000000000002',slug:'example-guide',title:'Example guide',summary:'Summary',body:'Body',notion_url:'https://example.com/toolkit',doc_url:'',cover_url:'',published:false};
+const draft={id:'00000000-0000-4000-8000-000000000002',slug:'example-guide',title:'Example guide',summary:'Summary',body:'Body',notion_url:'https://example.com/toolkit',doc_url:'',cover_url:'',series_id:null,series_part:null,audience:'',highlights:[],exercises:null,published:false};
 beforeEach(()=>{vi.clearAllMocks();m.viewer.mockResolvedValue({role:'owner'});m.previous.mockResolvedValue({data:{slug:'old-guide'},error:null});m.saved.mockResolvedValue({data:{...draft,created_at:'now',updated_at:'now'},error:null});m.upsert.mockReturnValue({select:()=>({single:m.saved})});m.server.mockResolvedValue({from:()=>({select:()=>({eq:()=>({maybeSingle:m.previous})}),upsert:m.upsert})});
  m.order.mockResolvedValue({data:[],error:null});m.single.mockResolvedValue({data:null,error:null});m.eq.mockReturnValue({eq:m.eq,order:m.order,maybeSingle:m.single});m.select.mockReturnValue({eq:m.eq});m.client.mockReturnValue({from:()=>({select:m.select})});});
 it('only the owner can save; unsafe links and reserved slugs are rejected',async()=>{

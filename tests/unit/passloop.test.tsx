@@ -91,6 +91,6 @@ describe("privacy page and export", () => {
   it("keeps exporting every personal-only table", () => {
     const tables: string[] = JSON.parse(readFileSync("scripts/export-tables.json", "utf8"));
     for (const t of ["profiles", "signins", "app_opens", "apps", "invites", "site_sections", "experience_items", "experience_bullets", "messages", "ops_status", "behavioral_stories", "behavioral_answers", "articles", "projects", "article_pins", "guides", "content_changes", "about_photos"]) expect(tables).toContain(t);
-    expect(tables).toHaveLength(18);
+    expect(tables).toHaveLength(19);
   });
 });

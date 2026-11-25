@@ -2,8 +2,9 @@ import {APP_ALLOWLIST,isAppTable,appOperationSchema} from "./app-allowlist";
 import { z } from "zod";
 import {photoFields,JOURNEY_ICONS,journeyPhotoPath} from "@/lib/home-content-schema";
 import { projectSchema } from "@/lib/portfolio-core";
-import { articleSchema } from "@/lib/articles";
-import { guideSchema } from "@/lib/guides";
+import { articleSchema, articleObject } from "@/lib/articles";
+import { guideSchema, guideObject } from "@/lib/guides";
+import { seriesSchema } from "@/lib/content-series-data";
 import { KINDS, LIMITS } from "@/lib/experience";
 import { SECTION_KEYS, MAX_BODY, MAX_TITLE } from "@/lib/sections";
 
@@ -16,18 +17,22 @@ const sort = z.number().int().min(-2147483648).max(2147483647);
 const itemFields = { show_on_journey:z.boolean(), journey_icon:z.enum(JOURNEY_ICONS), journey_photo:journeyPhotoPath, kind: z.enum(KINDS), title: cvText(LIMITS.title).refine(value => !!value, "Give it a title first."), org: cvText(LIMITS.org), dates: cvText(LIMITS.dates), location: cvText(LIMITS.location), summary: cvText(LIMITS.summary), sort, public: z.boolean() };
 const bulletFields = { item_id: uuid, text: cvText(LIMITS.bullet).refine(value => !!value, "Give the bullet text."), sort, public: z.boolean() };
 const cvRoutes = ["/", "/journey", "/about"] as const;
-export const publishingSchemas = {projects:projectSchema,articles:articleSchema,guides:guideSchema};
+export const publishingSchemas = {projects:projectSchema,articles:articleSchema,guides:guideSchema,content_series:seriesSchema};
 export type PublishingTable = keyof typeof publishingSchemas;
 export const isPublishingTable = (table:string):table is PublishingTable => Object.hasOwn(publishingSchemas,table);
 const projectFields=projectSchema.omit({id:true}).shape;
-const articleFields=articleSchema.omit({id:true}).shape;
-const guideFields=guideSchema.omit({id:true}).shape;
+const articleFields=articleObject.omit({id:true}).shape;
+const guideFields=guideObject.omit({id:true}).shape;
+const seriesFields=seriesSchema.omit({id:true}).shape;
+/** Hub pages whose data changes with posts, guides and series (the series page itself is added per slug). */
+const hubRoutes=["/content","/content/series","/content/guides"] as const;
 export const CONTENT_ALLOWLIST = {
   ...APP_ALLOWLIST,
   about_photos:{key:uuid,fields:photoFields,operations:["insert","update","delete"] as const,routes:["/","/about","/journey"] as const},
   projects: {key:uuid,fields:projectFields,operations:["insert","update","delete"] as const,routes:["/projects","/","/journey"] as const},
-  articles: {key:uuid,fields:articleFields,operations:["insert","update","delete"] as const,routes:["/articles","/","/journey"] as const},
-  guides: {key:uuid,fields:guideFields,operations:["insert","update","delete"] as const,routes:["/guides","/resources"] as const},
+  articles: {key:uuid,fields:articleFields,operations:["insert","update","delete"] as const,routes:["/articles","/","/journey",...hubRoutes] as const},
+  guides: {key:uuid,fields:guideFields,operations:["insert","update","delete"] as const,routes:["/guides","/resources",...hubRoutes] as const},
+  content_series: {key:uuid,fields:seriesFields,operations:["insert","update","delete"] as const,routes:hubRoutes},
   site_sections: {
     key: z.enum(SECTION_KEYS),
     fields: { title: text(MAX_TITLE), body: text(MAX_BODY) },
@@ -74,7 +79,7 @@ function publishingOperation<T extends PublishingTable>(table:T) {
     for(const [field,input] of Object.entries(value.fields))for(const text of Array.isArray(input)?input:[input]){
       if(typeof text!=="string")continue;
       if(text.includes("\0"))ctx.addIssue({code:"custom",path:["fields",field],message:"Text cannot contain NUL."});
-      if(field.endsWith("_url")||field==="url"||field==="screenshots") {
+      if(field.endsWith("_url")||field==="url"||field==="screenshots"||field==="slides") {
         if(!text)continue;
         const valid=draftHttps(text);
         if(!valid)ctx.addIssue({code:"custom",path:["fields",field],message:"Links must be valid HTTPS URLs."});
@@ -82,7 +87,7 @@ function publishingOperation<T extends PublishingTable>(table:T) {
     }
   });
 }
-const publishingOperations={projects:publishingOperation("projects"),articles:publishingOperation("articles"),guides:publishingOperation("guides")};
+const publishingOperations={projects:publishingOperation("projects"),articles:publishingOperation("articles"),guides:publishingOperation("guides"),content_series:publishingOperation("content_series")};
 // Dispatch first so a bad field produces its own rule's explanation, rather than a generic union error.
 export const operationSchema = z.unknown().transform((input, ctx) => {
   const op = input as {table?:unknown;op?:unknown} | null;
@@ -102,9 +107,11 @@ export function validateOperations(input: unknown): { ok: true; operations: Cont
   if (!result.success) return { ok: false, message: `Invalid draft: ${result.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`).join("; ")}` };
   return { ok: true, operations: result.data };
 }
+/** Detail page of a publishing row; series pages live under /content/series. */
+const detailRoute=(table:PublishingTable,slug:string)=>`${table==="content_series"?"/content/series":`/${table}`}/${encodeURIComponent(slug)}`;
 export function affectedRoutes(operations: ContentOperation[], previous:unknown = []): string[] {
   const routes=operations.flatMap(operation=>[...CONTENT_ALLOWLIST[operation.table].routes] as string[]);
-  for(const operation of operations)if(isPublishingTable(operation.table)&&"slug" in operation.fields&&typeof operation.fields.slug==="string")routes.push(`/${operation.table}/${encodeURIComponent(operation.fields.slug)}`);
-  if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(`/${row.table}/${encodeURIComponent(row.values.slug)}`);
+  for(const operation of operations)if(isPublishingTable(operation.table)&&"slug" in operation.fields&&typeof operation.fields.slug==="string")routes.push(detailRoute(operation.table,operation.fields.slug));
+  if(Array.isArray(previous))for(const row of previous)if(row&&isPublishingTable(row.table)&&typeof row.values?.slug==="string")routes.push(detailRoute(row.table,row.values.slug));
   return [...new Set(routes)];
 }

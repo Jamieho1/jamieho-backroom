@@ -1,7 +1,7 @@
 import type {HomePreview} from './content-drafts/types';
 import {createClient} from '@supabase/supabase-js';
 import {readSupabaseEnv} from './env';
-import {ARTICLE_SELECT,CARD_SELECT,type Article,type ArticleCard} from './articles';
+import {ARTICLE_PUBLIC_SELECT,ARTICLE_NEW_DEFAULTS,CARD_SELECT,type Article,type ArticleCard} from './articles';
 function publicClient(){const env=readSupabaseEnv();return env?createClient(env.url,env.anonKey,{auth:{persistSession:false}}):null;}
 /** Cookie-free public reads: drafts are excluded by both query and RLS. */
 export async function getPublicArticles(preview?:HomePreview|null):Promise<ArticleCard[]>{
@@ -13,8 +13,8 @@ export async function getPublicArticles(preview?:HomePreview|null):Promise<Artic
 export async function getPublicArticle(slug:string,preview?:HomePreview|null):Promise<Article|null>{
  if(preview?.publishing?.articles)return preview.publishing.articles.find(a=>a.slug===slug&&(a.published||a.draftChanged))??null;
  const sb=publicClient();if(!sb)return null;
- const {data,error}=await sb.from('articles').select(ARTICLE_SELECT).eq('slug',slug).eq('published',true).maybeSingle();
- if(error)throw new Error('Articles unavailable');return data as Article|null;
+ const {data,error}=await sb.from('articles').select(ARTICLE_PUBLIC_SELECT).eq('slug',slug).eq('published',true).maybeSingle();
+ if(error)throw new Error('Articles unavailable');return data?({...ARTICLE_NEW_DEFAULTS,...data} as Article):null;
 }
 export type LatestItem=Pick<Article,'slug'|'title'|'platform'|'source_url'|'cover_url'|'created_at'>;
 /** The journey's Creator section (v1.1): newest YouTube post, newest Instagram post and newest other article. */

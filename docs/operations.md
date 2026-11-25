@@ -23,7 +23,7 @@ Public health: /api/health. Manual service setup remains in README.md. Journey m
 
 Local browser verification may use an installed Chromium via a temporary config if the pinned executable is absent. Keep repository CI pins unchanged. Use an isolated copy excluding .env files for tests that assume unconfigured placeholder content.
 
-Export manifest (PL4): scripts/export-tables.json lists only the 18 personal-site tables; practice, notes, resume, interview, company and system-design tables are exported by PassLoop's manifest. Tests assert the two lists plus the migrations cover every public table, with no overlap. This repo's migrations remain the shared history; encrypted backups keep the same 90-day retention.
+Export manifest (PL4): scripts/export-tables.json lists only the 19 personal-site tables; practice, notes, resume, interview, company and system-design tables are exported by PassLoop's manifest. Tests assert the two lists plus the migrations cover every public table, with no overlap. This repo's migrations remain the shared history; encrypted backups keep the same 90-day retention.
 
 Resume export (TKT-121): export-tables.json includes user_resumes (all accounts’ validated JSON/revision/timestamps) and resume_templates. scripts/ops.mjs orders them by user_id/key before existing encrypted pagination; backups remain encrypted with the same 90-day retention. No live CV import/seed. Migration 20261115011458_user_resumes.sql applied live with Jamie’s explicit approval on 2026-11-15 as remote 20261115105347.
 

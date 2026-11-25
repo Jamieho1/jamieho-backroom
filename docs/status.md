@@ -2,21 +2,21 @@
 
 ## Implementation
 
-PL4 is implemented locally (not committed, pushed or deployed): PassLoop now lives in its own repo and Vercel project; this site only links and redirects to it.
+H1 (Content hub data model, editors, drafts) is implemented locally and not committed, pushed or deployed. H2-H5 (hub pages, series, guides, post page) are not started. PL4 (PassLoop moved to its own repo) is also still local and uncommitted.
 
-- `lib/passloop.ts` is the single reader of `NEXT_PUBLIC_PASSLOOP_URL` (fallback `https://pass-loop.vercel.app`).
-- `next.config.ts` 308-redirects `/interview` (separate rule) and `/interview/:path*`, `/notes`, `/practices[/:problem]`, `/behavioral` and `/desktop?app=notes|practice|behavioral` to PassLoop.
-- Navigation shows "PassLoop ↗" instead of Interview Prep; /projects has a code-defined PassLoop card (no database content written).
-- Removed: app/interview, the Notes, Practice and Behavioral desktop apps and their components, libs, CSS, tests, e2e specs, the Pyodide/Excalidraw/PGlite scripts, the notes importer, and the codemirror, Excalidraw and Pyodide dependencies. Kept because remaining pages import them: markdown, diagram, code-highlight (so the two lezer packages). PGlite is now a dev dependency (test harness).
-- Content Drafts filter `site = 'personal'` everywhere (review list, preview, approve, discard, counter); the allowlist drops PassLoop's tables; a passloop draft is invisible here (new tests).
-- Privacy page says PassLoop is a separate service and links its privacy page; the export manifest lists only the 18 personal-site tables.
+- Migration `20261125100000_content_hub.sql` adds `content_series`, series/code/takeaway/slides on articles, series/audience/highlights/exercises on guides, the cross-table part-uniqueness trigger, series detach on delete, and replaces `private.apply_publishing_draft` and `private.apply_content_change` (see content-drafts.md, security.md).
+- Owner editors: /articles/manage and /guides/manage have the new fields; /content/series/manage lists, creates, edits and publishes series. Shared zod schemas live in lib/articles.ts, lib/guides.ts and lib/content-series-data.ts; read time and chapter count are computed helpers.
+- Content Drafts: content_series and the new fields are in the TS allowlist, overlay, review and revalidation (/content, /content/series, /content/series/<slug>, /content/guides). Export manifest lists 19 personal-site tables.
+- Public pages are unchanged: detail reads keep the original columns and default the new fields, so they work before the migration is applied.
 
 ## Database and deployment
 
-No table, row, policy or migration was touched (`desktop_apps` row `notes` kept). This repo's review and preview now require the PL2 migration (`content_changes.site`, authored in PassLoop) to be applied live. **Do not deploy PL4 before PL2 is applied and PassLoop is live**, or /interview redirects to a site that does not exist yet. Set `NEXT_PUBLIC_PASSLOOP_URL` in Vercel if the URL differs from the fallback. Earlier local migrations (S1-S3, C4, SQL, notes visuals) stay NOT applied and belong to PassLoop's sequence. PassLoop's tables are no longer in this repo's weekly export; PassLoop's own export must cover them.
+`20261125100000_content_hub.sql` is NOT applied live; apply only after Jamie says "apply it", and only after the PL2 migration (PassLoop repo, `content_changes.site`) is live because it replaces the PL2 approval trigger. Apply the migration before deploying the new editors (owner pages select the new columns). Earlier local migrations (S1-S3, C4, SQL, notes visuals) remain NOT applied and belong to PassLoop's sequence. The PL4 deploy-order note still stands: PL2 applied and PassLoop live before deploying.
 
 ## Verification (Linux copy, secret-free)
 
-Typecheck passed; unit plus database suite 101 files, 946 tests passed; one production build and assert-static passed (no Next advisory). `next start` smoke: `/interview`, `/interview/sql/notes`, `/notes`, `/practices`, `/behavioral` return 308 to PassLoop; home, about, projects, articles and resources return 200 with the PassLoop link.
+Typecheck passed. Full suite: 104 files, 1,083 tests passed, including the new DB file (110 tests: RLS, constraints, cross-table part uniqueness, cascade, draft approval/rollback parity, site tagging, hardening), unit and editor UI tests. Production build (Google Fonts stubbed through Next's mock env, Linux copy only) and `node scripts/assert-static.mjs` passed.
 
-**Not run:** browser specs. Chromium is not installed in the sandbox (one attempt: 2 passed, 13 failed to launch). Edited specs (desktop, home, feedback, home-polish4, experience-preview, content-review-badge) are unverified in a browser.
+Test changes to know: the DB harness now creates PassLoop's PL2 pieces (tests/support/content-changes-site.sql) before this migration, and three app-drafts tests were split so no approval mixes PassLoop and personal tables (PL2 rejects mixed sets).
+
+**Not run:** browser specs (no browser needed for H1; Chromium is unavailable in the sandbox), anything against the live Supabase database.

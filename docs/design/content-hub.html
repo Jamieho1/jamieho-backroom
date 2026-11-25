@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jamie Ho — Content v3 (easier to scan)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,800&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme=dark]{--bg:#1B2333;--card:#222c40;--card2:#273249;--ink:#F3EEE6;--bold:#E8C46A;--boldtx:#E8C46A;--body:rgba(243,238,230,.8);--mute:rgba(243,238,230,.55);--line:rgba(243,238,230,.16);--goldline:rgba(232,196,106,.4);--nav:#152033;--shadow:0 24px 60px rgba(0,0,0,.35)}
+[data-theme=light]{--bg:#F6F2EA;--card:#FFFDF8;--card2:#F0EADF;--ink:#1B2333;--bold:#E8C46A;--boldtx:#8A6514;--body:rgba(27,35,51,.82);--mute:rgba(27,35,51,.58);--line:rgba(27,35,51,.14);--goldline:rgba(168,126,30,.45);--nav:#FFFDF8;--shadow:0 24px 60px rgba(27,35,51,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--bold);outline-offset:3px;border-radius:4px}
+.demo{position:sticky;top:0;z-index:60;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:#0b0b0c;color:#aaa;font-size:12px}
+.demo button{border:1px solid #333;border-radius:999px;padding:5px 11px;color:#ddd}
+.demo button[aria-pressed=true]{background:#fafafa;color:#111}
+.demo .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.nav{margin:10px 16px 0;display:flex;align-items:center;gap:20px;padding:9px 12px;border:1px solid var(--line);border-radius:14px;background:var(--nav);font-size:13.5px;position:relative}
+.nav .logo{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:600 10px ui-monospace,monospace}
+.nav .on{color:var(--boldtx)}.nav .sp{flex:1}
+.nav .pill{background:var(--bold);color:#1B2333;border-radius:8px;padding:6px 12px;font-weight:600}
+.dd{position:absolute;left:186px;top:46px;background:var(--nav);border:1px solid var(--line);border-radius:12px;padding:6px;display:none;z-index:5;min-width:200px;box-shadow:var(--shadow)}
+.ddw:hover .dd,.ddw:focus-within .dd{display:block}
+.dd a{display:block;padding:8px 10px;border-radius:8px}.dd a:hover{background:var(--card)}
+.dd small{display:block;color:var(--mute);font-size:12px}
+.page{position:relative;isolation:isolate;overflow:clip}
+.dots{position:absolute;inset:0;z-index:-1;background-image:radial-gradient(circle,var(--ink) 1px,transparent 1.2px);background-size:24px 24px;opacity:.08;-webkit-mask-image:radial-gradient(ellipse at 70% 0%,#000 20%,transparent 60%);mask-image:radial-gradient(ellipse at 70% 0%,#000 20%,transparent 60%)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.eyebrow{font:600 12px ui-monospace,monospace;letter-spacing:.26em;color:var(--boldtx);text-transform:uppercase}
+.meta{font:11px ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+h1.big{font:700 clamp(38px,4.6vw,62px)/.92 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;margin:12px 0 0}
+h1.big em{font:italic 400 .58em Georgia,serif;text-transform:lowercase;color:var(--boldtx);margin:0 .12em}
+.lede{margin-top:14px;max-width:36em;color:var(--body);font-size:16px;line-height:1.55}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--bold);color:#1B2333;font-weight:600;border-radius:10px;padding:10px 16px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 10.5px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--mute);white-space:nowrap}
+.chip.gold{color:var(--boldtx);border-color:var(--goldline)}
+.plat{width:18px;height:18px;border-radius:5px;display:inline-grid;place-items:center;color:#fff;flex:none;font:700 9px Inter}
+.plat.ig{background:linear-gradient(45deg,#f9a03f,#e1306c 50%,#833ab4)}.plat.yt{background:#E0262E}.plat.gd{background:var(--bold);color:#1B2333}
+
+/* header + tabs: the one frame every content page shares */
+.head{display:grid;grid-template-columns:1fr minmax(280px,400px);gap:40px;align-items:end;padding:44px 0 24px}
+.find{position:relative}
+.find input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px 13px 40px;color:var(--ink);font:inherit}
+.find input:focus{outline:none;border-color:var(--bold)}
+.find::before{content:"⌕";position:absolute;left:14px;top:9px;font-size:20px;color:var(--mute)}
+.find small{display:block;margin-top:8px;color:var(--mute);font-size:12.5px}
+.find .hit{position:absolute;left:0;right:0;top:52px;background:var(--card);border:1px solid var(--goldline);border-radius:12px;padding:10px 12px;display:none;box-shadow:var(--shadow);z-index:4}
+.find .hit.on{display:flex;gap:10px;align-items:center}
+.tabs{position:sticky;top:38px;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin:0 -24px;padding:0 24px}
+.tabs .in{max-width:1180px;margin:0 auto;display:flex;gap:4px;overflow-x:auto}
+.tabs a{padding:14px 14px 13px;font:600 12px ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);border-bottom:2px solid transparent;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tabs a small{font-size:10.5px;letter-spacing:.06em;opacity:.8}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current=page]{color:var(--boldtx);border-bottom-color:var(--bold)}
+.view{display:none}.view.on{display:block}
+
+/* filter row: only on Latest, one line */
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:20px 0 16px}
+.filters .lbl{font:600 11px ui-monospace,monospace;letter-spacing:.18em;color:var(--mute);text-transform:uppercase;margin-right:4px}
+.fchip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--body);background:var(--card)}
+.fchip[aria-pressed=true]{background:var(--bold);color:#1B2333;border-color:var(--bold);font-weight:600}
+.filters .sp{flex:1}
+.sel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;color:var(--ink);font:inherit;font-size:13px}
+
+/* guide banner: one line, not a section */
+.gband{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--goldline);border-radius:14px;background:var(--card);margin-bottom:18px}
+.gband .t{flex:1;min-width:0;font-size:14px;color:var(--body)}.gband .t b{color:var(--ink)}
+.gband a{font:600 11px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--boldtx);white-space:nowrap}
+
+/* uniform post grid: same card everywhere, scales to hundreds */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.pc{display:flex;flex-direction:column;gap:10px;border-radius:14px;transition:transform .15s}
+.pc:hover{transform:translateY(-2px)}.pc:hover h4{color:var(--boldtx)}
+.cv{aspect-ratio:4/5;border-radius:12px;overflow:hidden;position:relative;padding:14px;display:flex;flex-direction:column;background:#FBEFE0;color:#231a12;border:1px solid var(--line)}
+.cv .h{display:flex;justify-content:space-between;font:700 9px Inter,sans-serif;border-bottom:1px solid rgba(0,0,0,.25);padding-bottom:5px}
+.cv .h i{font-style:normal;color:#B5452F}
+.cv .t{font:800 22px/1.02 Fraunces,Georgia,serif;margin-top:10px}
+.cv .t u{color:#B5452F;text-decoration-thickness:2px;text-underline-offset:4px}
+.cv.c2{background:#EFE6D6}.cv.c3{background:#E3ECE4}.cv.c4{background:#F3E1DA}
+.cv.yt{background:#141a26;color:#F3EEE6}
+.cv.yt .t{font:700 24px/.95 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase}
+.cv.yt .h{border-color:rgba(255,255,255,.2)}
+.cv.yt::after{content:"";position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;background:#E0262E}
+.cv .plat{position:absolute;left:10px;bottom:10px}
+.pc .pm{display:flex;gap:8px;align-items:center;font:11px ui-monospace,monospace;letter-spacing:.12em;color:var(--mute);text-transform:uppercase}
+.pc h4{font-size:15.5px;line-height:1.3;transition:color .15s}
+.more{display:flex;justify-content:center;flex-direction:column;align-items:center;gap:8px;margin:32px 0 8px}
+.more small{color:var(--mute);font-size:12.5px}
+
+/* series index */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding-top:24px}
+.sc{border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s}
+.sc:hover{border-color:var(--goldline)}
+.stack{height:150px;position:relative;background:var(--card2);overflow:hidden}
+.stack .cv{position:absolute;width:96px;top:18px;aspect-ratio:4/5;padding:8px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.stack .cv .t{font-size:12px;margin-top:4px}.stack .cv .h{font-size:6px}
+.sc .sb{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.sc h3{font:700 26px/.95 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase}
+.sc p{color:var(--body);font-size:13.5px}
+.sc .sf{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:8px}
+
+/* series detail */
+.sd{display:grid;grid-template-columns:320px 1fr;gap:40px;padding-top:28px}
+.sd-aside{position:sticky;top:110px;align-self:start;display:grid;gap:12px}
+.sd-aside .bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden}.sd-aside .bar i{display:block;height:100%;background:var(--bold)}
+.parts{list-style:none;border-left:1px solid var(--line);padding-left:26px;display:grid;gap:8px}
+.parts li{position:relative}
+.parts li::before{content:"";position:absolute;left:-30px;top:30px;width:7px;height:7px;border-radius:50%;background:var(--bold)}
+.parts li.soon::before{background:var(--mute);opacity:.5}
+.parts a,.parts .sn{display:grid;grid-template-columns:86px 1fr auto;gap:16px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.parts a:hover{border-color:var(--goldline)}
+.parts .mini{aspect-ratio:4/5;border-radius:8px;padding:6px;font:800 11px/1 Fraunces,Georgia,serif}
+.parts .k{font:600 11px ui-monospace,monospace;letter-spacing:.16em;color:var(--boldtx);text-transform:uppercase}
+.parts b{display:block;font-size:16px;margin:2px 0}
+.parts small{color:var(--mute);font-size:13px}
+.parts .soon .sn{border-style:dashed;background:transparent;color:var(--mute)}
+
+/* guides */
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding-top:24px}
+.gc{border:1px solid var(--goldline);border-radius:18px;background:var(--card);overflow:hidden;display:grid;grid-template-columns:120px 1fr}
+.gc .art{background:radial-gradient(120% 90% at 20% 10%,rgba(232,196,106,.3),transparent 60%),linear-gradient(160deg,#25314a,#151d2c);display:flex;align-items:flex-end;padding:12px;font:700 22px/.9 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;color:#E8C46A}
+.gc .gb{padding:16px;display:flex;flex-direction:column;gap:8px}
+.gc h3{font:700 22px/1 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase}
+.gc p{color:var(--body);font-size:13.5px}
+.gc.soon{border-style:dashed;border-color:var(--line);background:transparent}.gc.soon .art{opacity:.4}
+
+/* post page */
+.post-top{display:grid;grid-template-columns:200px minmax(0,680px);gap:48px;padding:36px 0 0;justify-content:center}
+.crumb{display:flex;gap:10px;flex-wrap:wrap}.crumb a{color:var(--mute)}.crumb a:hover{color:var(--boldtx)}
+.rail{position:sticky;top:110px;align-self:start;list-style:none;border-left:1px solid var(--line);padding-left:22px;display:grid;gap:14px}
+.rail li{position:relative}.rail li::before{content:"";position:absolute;left:-26px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--mute);opacity:.6}
+.rail li.on::before{background:var(--bold);opacity:1;box-shadow:0 0 0 4px rgba(232,196,106,.2)}
+.rail a{font:600 11px/1.45 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}.rail li.on a{color:var(--boldtx)}
+.origin{display:flex;gap:12px;align-items:center;margin-top:20px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13.5px;color:var(--body)}
+.origin a{margin-left:auto;font:600 11px ui-monospace,monospace;letter-spacing:.16em;color:var(--boldtx);text-transform:uppercase;white-space:nowrap}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:132px;gap:10px;overflow-x:auto;margin:18px 0 6px;padding-bottom:4px}
+.strip .cv{padding:8px}.strip .cv .t{font-size:14px}.strip .cv .h{font-size:6px}
+.body h2{font:700 26px/1.05 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;margin:36px 0 10px;display:flex;gap:10px;align-items:baseline}
+.body h2 .n{font:600 12px ui-monospace,monospace;letter-spacing:.2em;color:var(--boldtx)}
+.body p{color:var(--body);margin:0 0 14px;font-size:16px;line-height:1.7}
+.nextbar{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:40px 0 0}
+.nextbar a{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--card);display:grid;gap:4px}
+.nextbar a:hover{border-color:var(--goldline)}
+.nextbar a:last-child{text-align:right}
+.nextbar b{font-size:15px}
+.rel{margin:44px 0 0}
+.rel .grid{grid-template-columns:repeat(3,minmax(0,1fr))}.rel .pc3 .take{display:none}
+.foot{margin:56px 0 0;padding:36px 0 48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.foot h3{font:700 clamp(26px,2.8vw,38px)/1 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase}.foot h3 span{color:var(--boldtx)}
+.note{margin:28px 0 40px;padding:16px 18px;border:1px dashed var(--line);border-radius:14px;color:var(--mute);font-size:13.5px;line-height:1.55}.note b{color:var(--ink)}
+
+
+.fA{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:20px 0 14px}
+.dd2{position:relative}
+.dd2>button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font-size:14px}
+.dd2>button span{color:var(--mute)}.dd2>button b{font-weight:600}
+.dd2>button:hover,.dd2.open>button{border-color:var(--goldline)}
+.dd2 .menu{position:absolute;top:calc(100% + 6px);left:0;min-width:230px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;z-index:10}
+.dd2.open .menu{display:block}
+.dd2 .menu button{display:flex;justify-content:space-between;gap:12px;width:100%;padding:8px 10px;border-radius:8px;text-align:left;font-size:14px}
+.dd2 .menu button:hover{background:var(--card2)}
+.dd2 .menu button[aria-checked=true]{color:var(--boldtx);font-weight:600}
+.dd2 .menu small{font:11px ui-monospace,monospace;color:var(--mute)}
+.fA .res{margin-left:auto;color:var(--mute);font-size:13px}
+.fA .clr{font-size:13px;color:var(--boldtx);text-decoration:underline;text-underline-offset:3px}
+.fB{display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid var(--line);margin:18px 0 14px;overflow-x:auto}
+.fB button{padding:8px 0 10px;font-size:14.5px;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;gap:6px;align-items:baseline}
+.fB button small{font:11px ui-monospace,monospace;color:var(--mute)}
+.fB button:hover{color:var(--ink)}
+.fB button[aria-pressed=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--bold)}
+.fB .sp{flex:1}
+.fB select{margin-bottom:6px}
+.fC{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(170px,1fr);gap:10px;overflow-x:auto;padding:20px 0 6px}
+.fC button{display:grid;grid-template-columns:34px 1fr;gap:4px 10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;transition:border-color .15s}
+.fC button .ic{grid-row:span 2;width:34px;height:34px;border-radius:10px;background:var(--card2);display:grid;place-items:center;font-size:16px}
+.fC button b{font-size:14px;font-weight:600}
+.fC button small{font:11px ui-monospace,monospace;color:var(--mute)}
+.fC button:hover{border-color:var(--goldline)}
+.fC button[aria-pressed=true]{border-color:var(--bold);background:var(--card2)}
+.fC button[aria-pressed=true] .ic{background:var(--bold);color:#1B2333}
+.fCbar{display:flex;justify-content:flex-end;padding:4px 0 10px}
+.tabintro{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 0 0;color:var(--body);font-size:14px}
+.tabintro b{color:var(--ink)}
+.vt{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:2px;background:var(--card)}
+.vt button{padding:5px 10px;border-radius:8px;font-size:12.5px;color:var(--mute)}
+.vt button[aria-pressed=true]{background:var(--card2);color:var(--ink)}
+.month{display:flex;align-items:center;gap:12px;margin:26px 0 14px;font:600 12px ui-monospace,monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--boldtx)}
+.month::after{content:"";flex:1;height:1px;background:var(--line)}
+.month small{color:var(--mute);letter-spacing:.1em}
+.pc3{display:grid;grid-template-rows:auto 1fr;border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;transition:border-color .15s,transform .15s}
+.pc3:hover{border-color:var(--goldline);transform:translateY(-2px)}
+.pc3 .cv{aspect-ratio:16/10;border:0;border-radius:0}
+.pc3 .cv .t{font-size:24px}
+.pc3 .badge{position:absolute;right:10px;top:30px;font:700 9.5px ui-monospace,monospace;letter-spacing:.14em;background:var(--bold);color:#1B2333;border-radius:999px;padding:2px 7px}
+.pc3 .badge.read{background:rgba(27,35,51,.75);color:#F3EEE6}
+.pc3 .in{padding:14px 16px 16px;display:flex;flex-direction:column;gap:7px}
+.pc3 .pm{display:flex;gap:8px;align-items:center;font:11px ui-monospace,monospace;letter-spacing:.12em;color:var(--mute);text-transform:uppercase}
+.pc3 h4{font-size:16px;line-height:1.3}
+.pc3 .take{font-size:13.5px;color:var(--body);line-height:1.45}
+.pc3 .take b{color:var(--boldtx);font-weight:600}
+.pc3 .ft{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.list3{display:grid;gap:0;border-top:1px solid var(--line)}
+.lr{display:grid;grid-template-columns:72px 1fr auto;gap:16px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);transition:background .15s}
+.lr:hover{background:var(--card)}
+.lr .cv{aspect-ratio:1;border-radius:10px;padding:6px}.lr .cv .t{font-size:11px;margin-top:2px}.lr .cv .h,.lr .cv .badge{display:none}.lr .cv::after{width:16px;height:16px;right:6px;bottom:6px}
+.lr b{display:block;font-size:15.5px}.lr small{color:var(--mute);font-size:13px}
+.lr .r{display:flex;gap:6px;align-items:center}
+.sgrid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;padding-top:18px}
+.s3{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s}
+.s3:hover{border-color:var(--goldline)}
+.s3 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.s3 h3{font:700 26px/.95 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;margin-top:8px}
+.s3 .goal{font-size:13.5px;color:var(--body)}.s3 .goal b{color:var(--ink)}
+.ring{--p:0;width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--bold) calc(var(--p)*1%),var(--line) 0);position:relative}
+.ring::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}
+.ring span{position:relative;font:600 11px ui-monospace,monospace;color:var(--ink)}
+.s3 ol{list-style:none;display:grid;gap:2px}
+.s3 li{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;font-size:13.5px;color:var(--body);padding:4px 0}
+.s3 li .c{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:9px;color:#1B2333}
+.s3 li.done .c{background:var(--bold);border-color:var(--bold)}
+.s3 li.next{color:var(--ink);font-weight:600}.s3 li.next .c{border-color:var(--bold)}
+.s3 li.soon{color:var(--mute)}
+.s3 li small{font:10.5px ui-monospace,monospace;color:var(--boldtx);letter-spacing:.1em;text-transform:uppercase}
+.s3 li.soon small{color:var(--mute)}
+.s3 .foot3{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;margin-top:auto}
+.s3 .foot3 .btn{padding:8px 12px;font-size:13.5px}
+.ggrid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px;padding-top:18px}
+.g3{border:1px solid var(--goldline);border-radius:18px;background:var(--card);overflow:hidden;display:flex;flex-direction:column}
+.g3 .hd{padding:18px 18px 14px;background:radial-gradient(120% 120% at 0% 0%,rgba(232,196,106,.18),transparent 55%);display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.g3 h3{font:700 28px/.95 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase}
+.g3 .facts{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.g3 .facts div{padding:10px 14px;border-left:1px solid var(--line)}.g3 .facts div:first-child{border-left:0}
+.g3 .facts b{display:block;font:700 20px/1 "Barlow Condensed",Impact,sans-serif}.g3 .facts small{color:var(--mute);font-size:11.5px}
+.g3 .bd{padding:14px 18px;display:grid;gap:10px;flex:1;align-content:start}
+.g3 .for{font-size:13.5px;color:var(--body)}.g3 .for b{color:var(--ink)}
+.g3 ul{list-style:none;display:grid;gap:5px;font-size:13.5px;color:var(--body)}
+.g3 li{display:flex;gap:8px}.g3 li::before{content:"✓";color:var(--boldtx);font-weight:700}
+.g3 .act{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 18px}
+.g3 .act .btn{padding:9px 14px;font-size:13.5px}
+.g3.soon{border-style:dashed;border-color:var(--line);background:transparent}
+@media(max-width:600px){.grid3{grid-template-columns:1fr}.sgrid3,.ggrid3{grid-template-columns:1fr}.lr{grid-template-columns:56px 1fr}.lr .r{display:none}}
+@media(max-width:900px){.head{grid-template-columns:1fr;gap:20px}.sd{grid-template-columns:1fr}.sd-aside{position:static}.post-top{grid-template-columns:1fr}.rail{display:none}.rel .grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.wrap{padding:0 16px}.tabs{margin:0 -16px;padding:0 16px}.nav{margin:8px 8px 0;gap:12px}.nav .hide{display:none}.grid{grid-template-columns:1fr 1fr;gap:12px}.cv .t{font-size:17px}.parts a,.parts .sn{grid-template-columns:60px 1fr}.parts a>span:last-child{display:none}.gc{grid-template-columns:90px 1fr}.nextbar{grid-template-columns:1fr}.nextbar a:last-child{text-align:left}.rel .grid{grid-template-columns:1fr 1fr}.filters .sp{display:none}.filters{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:16px}.fchip,.sel{flex:none}.gband .t span{display:none}.gband .t{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="demo" role="toolbar" aria-label="Pages"><b style="color:#fff">Content v3 · easier to scan:</b>
+ <button data-v="latest" aria-pressed="true">Latest</button><button data-v="series" aria-pressed="false">Series</button><button data-v="seriesd" aria-pressed="false">Series page</button><button data-v="guides" aria-pressed="false">Guides</button><button data-v="post" aria-pressed="false">Post page</button>
+ <span style="margin-left:10px;color:#fff">Topic filter:</span><button data-fo="A" aria-pressed="true">A · Dropdowns</button><button data-fo="B" aria-pressed="false">B · Text tabs</button><button data-fo="C" aria-pressed="false">C · Topic tiles</button><span class="r">Sample data: 40 posts · <button id="theme">☾ / ☀</button></span></div>
+
+<nav class="nav" aria-label="Site"><span class="logo">JH</span><a href="#" class="hide">Journey ⌄</a><a href="#" class="hide">My story ⌄</a>
+ <span class="ddw"><a href="#" class="on" data-v="latest">Content ⌄</a><span class="dd"><a href="#" data-v="latest">Latest<small>Every post, newest first</small></a><a href="#" data-v="series">Series<small>Topics in order</small></a><a href="#" data-v="guides">Free guides<small>Toolkits and long reads</small></a></span></span>
+ <a href="#" class="hide">PassLoop ↗</a><span class="sp"></span><a href="#" class="pill">Schedule a call</a></nav>
+
+<div class="page"><div class="dots" aria-hidden="true"></div><div class="wrap">
+
+ <!-- shared header (not on the post page) -->
+ <div id="frame">
+  <div class="head">
+   <div><p class="eyebrow">Content</p><h1 class="big">The long version <em>of</em> every post</h1>
+    <p class="lede">Written versions of my Instagram and YouTube posts, plus free guides.</p></div>
+   <div class="find"><input id="q" placeholder="Search, or type the code from a post" aria-label="Search posts or enter a post code"><small>Every post ends with a code, like <b style="color:var(--ink)">MCP101</b>.</small>
+    <a href="#" class="hit" id="hit" data-v="post"><span class="plat ig">IG</span><span style="flex:1"><b>Stop copy-pasting into Claude</b><br><small style="color:var(--mute)">Code MCP101 · open the long version</small></span><span style="color:var(--boldtx)">→</span></a></div>
+  </div>
+  <nav class="tabs" aria-label="Content sections"><div class="in">
+   <a href="#" data-v="latest" aria-current="page">Latest <small>40</small></a><a href="#" data-v="series">Series <small>6</small></a><a href="#" data-v="guides">Free guides <small>3</small></a></div></nav>
+ </div>
+
+ <!-- LATEST -->
+ <section class="view on" id="v-latest">
+  <div id="filt"></div>
+  <div class="gband"><span class="plat gd">G</span><span class="t"><b>Free: The MCP Guide.</b><span> From your first connection to production, with a Notion toolkit.</span></span><a href="#" data-v="guides">All free guides →</a></div>
+  <div class="tabintro"><span><b>Every post's long version, newest first.</b> Posts you've opened are marked Read.</span><span class="vt" role="group" aria-label="View"><button aria-pressed="true" data-vw="grid">▦ Cards</button><button aria-pressed="false" data-vw="list">☰ List</button></span></div>
+  <div id="grid"></div>
+  <div class="more"><button class="btn ghost" id="moreBtn">Show 12 more</button><small id="count"></small></div>
+ </section>
+
+ <!-- SERIES INDEX -->
+ <section class="view" id="v-series"><div class="tabintro"><span><b>Topics you can read in order, start to finish.</b> Each one shows where you are and what to read next.</span></div><div class="sgrid3" id="sgrid"></div>
+  </section>
+
+ <!-- SERIES DETAIL -->
+ <section class="view" id="v-seriesd">
+  <div class="sd">
+   <aside class="sd-aside"><div class="crumb meta"><a href="#" data-v="series">Series</a> / <span style="color:var(--boldtx)">MCP 101</span></div>
+    <h2 style="font:700 44px/.92 'Barlow Condensed',Impact,sans-serif;text-transform:uppercase">MCP 101</h2>
+    <p style="color:var(--body)">Connect AI to your own apps, then build it properly. Read in order.</p>
+    <span class="chip gold" style="justify-self:start">AI Engineering</span>
+    <span class="meta">4 of 5 parts out</span><div class="bar"><i style="width:80%"></i></div>
+    <a href="#" class="btn" data-v="post" style="justify-self:start">Start at part 1 →</a></aside>
+   <ol class="parts">
+    <li><a href="#" data-v="post"><span class="cv mini"><span>Stop copy-pasting</span></span><span><span class="k">Part 1 · Instagram</span><b>Stop copy-pasting into Claude</b><small>Why MCP exists · 5 min</small></span><span class="chip">11 Nov</span></a></li>
+    <li><a href="#" data-v="guides"><span class="mini" style="background:linear-gradient(160deg,#25314a,#151d2c);color:#E8C46A;font:700 13px/.9 'Barlow Condensed',Impact;text-transform:uppercase;display:flex;align-items:flex-end">MCP guide</span><span><span class="k">Part 2 · Free guide</span><b>The MCP Guide</b><small>Your first connection to production · 25 min</small></span><span class="chip gold">Guide</span></a></li>
+    <li><a href="#"><span class="cv yt mini"></span><span><span class="k">Part 3 · YouTube · sample</span><b>Connect Notion to Claude in 10 minutes</b><small>Micro-build · 10 min video</small></span><span class="chip">24 Nov</span></a></li>
+    <li><a href="#"><span class="cv c3 mini"><span>Safe tools</span></span><span><span class="k">Part 4 · Instagram · sample</span><b>Give AI tools without giving it the keys</b><small>Permissions · 4 min</small></span><span class="chip">1 Dec</span></a></li>
+    <li class="soon"><div class="sn"><span class="mini" style="border:1px dashed var(--line);border-radius:8px"></span><span><span class="k" style="color:var(--mute)">Part 5 · coming</span><b>Build your own MCP server</b><small>Follow on Instagram to get it first</small></span></div></li>
+   </ol>
+  </div>
+ </section>
+
+ <!-- GUIDES -->
+ <section class="view" id="v-guides"><div class="tabintro"><span><b>Free, long-lived references.</b> See what's inside before you open one.</span></div>
+ <div class="ggrid3">
+  <article class="g3"><div class="hd"><span style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip gold">AI Engineering</span><span class="chip">Updated 12 Nov</span></span><h3>The MCP guide</h3><span style="color:var(--body);font-size:14px">From your first connection to production.</span></div>
+   <div class="facts"><div><b>5</b><small>chapters</small></div><div><b>25m</b><small>to read</small></div><div><b>12</b><small>exercises</small></div></div>
+   <div class="bd"><p class="for"><b>For:</b> anyone who uses Claude or ChatGPT daily and wants it to reach their own apps.</p>
+    <ul><li>What MCP is, in plain words</li><li>Connect your first app safely</li><li>Build and ship your own server</li></ul></div>
+   <div class="act"><a href="#" class="btn">Read the guide →</a><a href="#" class="btn ghost">Notion toolkit ↗</a></div></article>
+  <article class="g3"><div class="hd"><span style="display:flex;gap:6px"><span class="chip gold">Productivity</span><span class="chip">Sample</span></span><h3>Prompts I reuse every week</h3><span style="color:var(--body);font-size:14px">Copy-ready prompts for planning, review and research.</span></div>
+   <div class="facts"><div><b>24</b><small>prompts</small></div><div><b>15m</b><small>to read</small></div><div><b>1</b><small>Google Doc</small></div></div>
+   <div class="bd"><p class="for"><b>For:</b> beginners who want better answers without learning "prompt engineering".</p><ul><li>Plan a week in one prompt</li><li>Review your own writing</li><li>Research a topic fast</li></ul></div>
+   <div class="act"><a href="#" class="btn">Read the guide →</a><a href="#" class="btn ghost">Copy to Google Docs ↗</a></div></article>
+  <article class="g3"><div class="hd"><span style="display:flex;gap:6px"><span class="chip gold">Career</span><span class="chip">Sample</span></span><h3>Bioengineering to software</h3><span style="color:var(--body);font-size:14px">The plan I'd follow again.</span></div>
+   <div class="facts"><div><b>6</b><small>steps</small></div><div><b>20m</b><small>to read</small></div><div><b>30+</b><small>links</small></div></div>
+   <div class="bd"><p class="for"><b>For:</b> people switching into tech from another degree.</p><ul><li>What to learn first, and what to skip</li><li>Projects that got me interviews</li><li>How I prepared for interviews</li></ul></div>
+   <div class="act"><a href="#" class="btn">Read the guide →</a></div></article>
+  <article class="g3 soon"><div class="hd" style="background:none"><span class="chip">In progress</span><h3 style="color:var(--mute)">Your first AI agent</h3><span style="color:var(--mute);font-size:14px">Follow on Instagram to hear when it's out.</span></div></article>
+ </div></section>
+
+ <!-- POST PAGE -->
+ <section class="view" id="v-post">
+  <div class="post-top">
+   <ol class="rail" aria-label="On this page"><li class="on"><a href="#">01 · The loop</a></li><li><a href="#">02 · Plug it in once</a></li><li><a href="#">03 · The plug has a name</a></li><li><a href="#">04 · Do you need it?</a></li></ol>
+   <article>
+    <div class="crumb meta"><a href="#" data-v="latest">Content</a> / <a href="#" data-v="seriesd">MCP 101 · part 1 of 5</a></div>
+    <h1 class="big" style="font-size:clamp(34px,4vw,52px)">Stop copy-pasting <em>into</em> Claude</h1>
+    <p class="lede">Claude only sees what you paste in. Here's what MCP changes, when you need it, and how to start safely.</p>
+    <p class="meta" style="margin-top:14px">11 Nov 2026 · 5 min read · AI Engineering · Code MCP101</p>
+    <div class="origin"><span class="plat ig">IG</span><span>The long version of my Instagram carousel.</span><a href="#">View post ↗</a></div>
+    <div class="strip" aria-label="Carousel slides">
+     <div class="cv"><div class="h"><span>@jamie.backroom</span><i>1/6</i></div><p class="t">Stop copy-pasting <u>into Claude.</u></p></div>
+     <div class="cv c2"><div class="h"><span>@jamie.backroom</span><i>2/6</i></div><p class="t">Claude only sees what you paste.</p></div>
+     <div class="cv"><div class="h"><span>@jamie.backroom</span><i>3/6</i></div><p class="t">Plug it in <u>once.</u></p></div>
+     <div class="cv c2"><div class="h"><span>@jamie.backroom</span><i>4/6</i></div><p class="t">The plug: MCP</p></div>
+     <div class="cv"><div class="h"><span>@jamie.backroom</span><i>5/6</i></div><p class="t">Do you need it?</p></div>
+     <div class="cv c2"><div class="h"><span>@jamie.backroom</span><i>6/6</i></div><p class="t">Code: MCP101</p></div></div>
+    <div class="body"><h2><span class="n">01</span>The loop</h2><p>If you use Claude every day, you probably know this loop: copy from your notes, paste into the chat, copy the answer back, and do it all again tomorrow…</p>
+     <h2><span class="n">02</span>Plug it in once</h2><p>Instead of pasting, you connect the app once and Claude looks things up itself…</p></div>
+    <div class="nextbar"><a href="#" data-v="seriesd"><span class="meta">Series</span><b>All 5 parts of MCP 101</b></a><a href="#" data-v="guides"><span class="meta">Next · part 2</span><b>The MCP Guide →</b></a></div>
+    <div class="rel"><p class="meta" style="margin-bottom:12px">More like this</p><div class="grid" id="rel"></div></div>
+   </article>
+  </div>
+ </section>
+
+ <div class="foot"><h3>New posts every week. <span>Follow along.</span></h3><div style="display:flex;gap:8px"><a href="#" class="btn">Instagram ↗</a><a href="#" class="btn ghost">YouTube ↗</a></div></div>
+ <p class="note"><b>What changed from v2.</b> Every card leads with what you get. Posts show a one-line “You’ll learn”, read time, series part and New / Read badges; Latest is grouped by month and has a compact list view. Series cards show your progress, the parts with what to read next, and a Continue button. Guide cards show who it’s for, what’s inside and the facts (chapters, time, exercises) with direct buttons, so you can decide without opening it. Read progress is per browser, no sign-in needed.</p>
+</div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const topics=['AI Engineering','Discover Tech','Career','Building in Public'];
+const real=[['Stop copy-pasting <u>into Claude.</u>','Stop copy-pasting into Claude: plug it into your apps instead','ig','AI Engineering','11 Nov',1,''],['Most people <u>ask AI.</u>','Most people ask AI. These 3 agents help you do the work','ig','Discover Tech','2 Nov',2,'']];
+const words=['Agents','RAG','Evals','Notion','Cursor','Interviews','System design','Claude Code','Prompting','Side projects','Kafka','Vector DBs','London SWE','Portfolio','MCP servers','Automations','Pivoting','Resumes','Cloud','Python'];
+const POSTS=[];
+for(let i=0;i<38;i++){const w=words[i%words.length],yt=i%4===1,t=topics[(i*3)%4];POSTS.push([yt?w+' in 10 min':`${w}, <u>simply.</u>`,`Sample post ${i+1}: ${w} ${yt?'micro-build':'explained'}`,yt?'yt':'ig',t,`${(28-i%27)} ${['Oct','Sep','Aug','Jul'][Math.floor(i/10)]}`,1+(i%4),'sample'])}
+POSTS.unshift(...real);
+let shown=12,topic='all',plat='all',vw='grid';
+const READ=new Set([1]);
+const TAKE=['Connect Claude to your apps once, instead of pasting every day.','What each agent is actually good at, tested on a real deadline.','The one idea behind it, and when you need it.','Follow along and ship it in one sitting.'];
+const SERIESOF=i=>i===0?'MCP 101 · 1/5':i===1?'AI tools · 1/6':i%5===2?'Agents · '+(1+i%8)+'/8':'';
+const mins=p=>p[2]==='yt'?'10 min video':(4+p[5])+' min read';
+const cov=(p,i)=>`<span class="cv ${p[2]==='yt'?'yt':'c'+p[5]}"><span class="h"><span>${p[6]?'sample':'@jamie.backroom'}</span><i>${p[2]==='yt'?'▶ video':'carousel'}</i></span><span class="t">${p[0]}</span><span class="plat ${p[2]}">${p[2]==='yt'?'▶':'IG'}</span>${i<2?'<span class="badge">NEW</span>':READ.has(i)?'<span class="badge read">READ</span>':''}</span>`;
+const card=(p,i)=>`<a href="#" class="pc3" data-v="post">${cov(p,i)}<span class="in"><span class="pm">${p[4]} · ${p[3]}</span><h4>${p[1]}</h4><span class="take"><b>You'll learn:</b> ${TAKE[i%4]}</span><span class="ft"><span class="chip">${mins(p)}</span>${SERIESOF(i)?`<span class="chip gold">${SERIESOF(i)}</span>`:''}</span></span></a>`;
+const row=(p,i)=>`<a href="#" class="lr" data-v="post">${cov(p,i)}<span><b>${p[1]}</b><small>${p[4]} · ${p[3]} · ${mins(p)}</small></span><span class="r">${SERIESOF(i)?`<span class="chip gold">${SERIESOF(i)}</span>`:''}${READ.has(i)?'<span class="chip">Read</span>':''}</span></a>`;
+function list(){return POSTS.map((p,i)=>[p,i]).filter(([p])=>(topic==='all'||p[3]===topic)&&(plat==='all'||p[2]===plat))}
+const monthOf=p=>p[4].split(' ')[1];
+const MN={Nov:'November 2026',Oct:'October 2026',Sep:'September 2026',Aug:'August 2026',Jul:'July 2026'};
+function render(){const all=list(),L=all.slice(0,shown);let html='',cur='',buf=[];
+ const flush=()=>{if(buf.length)html+=vw==='grid'?`<div class="grid3">${buf.join('')}</div>`:`<div class="list3">${buf.join('')}</div>`;buf=[]};
+ L.forEach(([p,i])=>{const m=monthOf(p);if(m!==cur){flush();cur=m;html+=`<div class="month">${MN[m]}<small>${all.filter(([q])=>monthOf(q)===m).length} posts</small></div>`}buf.push(vw==='grid'?card(p,i):row(p,i))});flush();
+ $('#grid').innerHTML=html;$('#count').textContent=`Showing ${L.length} of ${all.length}`;$('#moreBtn').style.display=shown>=all.length?'none':''}
+$$('[data-vw]').forEach(b=>b.onclick=()=>{vw=b.dataset.vw;$$('[data-vw]').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+$('#moreBtn').onclick=()=>{shown+=12;render()};
+const SER=[['MCP 101','AI Engineering','Connect AI to your apps, then build it properly.',5,4],['AI tools that do the work','Discover Tech','What each tool is good at, on real tasks.',6,3],['Agents from scratch','AI Engineering','Sample: build a small agent step by step.',8,8],['Bio to software','Career','Sample: how I switched careers.',4,4],['Building PassLoop','Building in Public','Sample: shipping an interview app.',10,6],['Interview season','Career','Sample: what I practise and why.',5,2]];
+const SP={0:['Stop copy-pasting into Claude','The MCP Guide','Connect Notion to Claude','Give AI tools safely','Build your own MCP server'],1:['These 3 agents do the work','Research with AI','Plan your week with AI','Write with AI','AI for spreadsheets','Which one to pay for']};
+$('#sgrid').innerHTML=SER.map((s,i)=>{const read=i===0?1:i===2?3:0,parts=SP[i]||Array.from({length:s[3]},(_,k)=>'Part '+(k+1)+' (sample)');const p=Math.round(read/s[3]*100);
+ const items=parts.slice(0,4).map((t,k)=>{const st=k<read?'done':k===read&&k<s[4]?'next':k>=s[4]?'soon':'';return `<li class="${st}"><span class="c">${st==='done'?'✓':''}</span><span>${k+1}. ${t}</span><small>${st==='next'?'Next':st==='soon'?'Soon':''}</small></li>`}).join('')+(parts.length>4?`<li class="soon"><span></span><span>+ ${parts.length-4} more</span><small></small></li>`:'');
+ return `<article class="s3"><div class="top"><div><span class="chip gold">${s[1]}</span><h3>${s[0]}</h3></div><span class="ring" style="--p:${p}" title="You have read ${read} of ${s[3]}"><span>${read}/${s[3]}</span></span></div>
+ <p class="goal"><b>After this:</b> ${s[2]}</p><ol>${items}</ol>
+ <div class="foot3"><span class="meta">${s[4]} of ${s[3]} out · ~${s[3]*6} min</span><a href="#" class="btn" data-v="seriesd">${read?'Continue':'Start'} →</a></div></article>`}).join('');
+$('#rel').innerHTML=POSTS.slice(2,5).map((p,i)=>card(p,i+2)).join('');
+function go(v){$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));$$('.demo [data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+ $('#frame').style.display=v==='post'||v==='seriesd'?'none':'';const tab=v==='seriesd'?'series':v;$$('.tabs a').forEach(a=>a.toggleAttribute('aria-current',a.dataset.v===tab));if($$('.tabs a[aria-current]')[0])$$('.tabs a[aria-current]')[0].setAttribute('aria-current','page');$('#hit').classList.remove('on');window.scrollTo(0,0)}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-v]');if(t){e.preventDefault();go(t.dataset.v)}});
+$('#q').oninput=e=>{const v=e.target.value.trim().toUpperCase();$('#hit').classList.toggle('on',v.length>1&&('MCP101'.startsWith(v)||'STOP COPY-PASTING'.includes(v)))};
+$('#theme').onclick=()=>{const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark'};
+render();
+
+let FO='A';
+const TOP=[['all','All topics','◎'],['AI Engineering','AI Engineering','⚙'],['Discover Tech','Discover Tech','✦'],['Career','Career','↗'],['Building in Public','Building in Public','▲']];
+const PL=[['all','All platforms'],['ig','Instagram'],['yt','YouTube']];
+const cnt=t=>POSTS.filter(p=>(t==='all'||p[3]===t)&&(plat==='all'||p[2]===plat)).length;
+function renderFilters(){const el=$('#filt');const tn=TOP.find(t=>t[0]===topic)[1],pn=PL.find(p=>p[0]===plat)[1];
+ if(FO==='A')el.innerHTML=`<div class="fA"><div class="dd2" id="ddT"><button aria-haspopup="true"><span>Topic</span><b>${tn}</b> ⌄</button><div class="menu" role="menu">${TOP.map(t=>`<button role="menuitemradio" aria-checked="${t[0]===topic}" data-t="${t[0]}">${t[1]}<small>${cnt(t[0])}</small></button>`).join('')}</div></div>
+  <div class="dd2" id="ddP"><button aria-haspopup="true"><span>Platform</span><b>${pn}</b> ⌄</button><div class="menu" role="menu">${PL.map(p=>`<button role="menuitemradio" aria-checked="${p[0]===plat}" data-p="${p[0]}">${p[1]}</button>`).join('')}</div></div>
+  ${topic!=='all'||plat!=='all'?'<button class="clr" data-clear>Clear filters</button>':''}<span class="res">${list().length} posts</span></div>`;
+ if(FO==='B')el.innerHTML=`<div class="fB" role="tablist" aria-label="Topic">${TOP.map(t=>`<button role="tab" aria-pressed="${t[0]===topic}" data-t="${t[0]}">${t[0]==='all'?'All':t[1]}<small>${cnt(t[0])}</small></button>`).join('')}<span class="sp"></span><select class="sel" id="plat2" aria-label="Platform">${PL.map(p=>`<option value="${p[0]}" ${p[0]===plat?'selected':''}>${p[1]}</option>`).join('')}</select></div>`;
+ if(FO==='C')el.innerHTML=`<div class="fC" role="group" aria-label="Topic">${TOP.map(t=>`<button aria-pressed="${t[0]===topic}" data-t="${t[0]}"><span class="ic">${t[2]}</span><b>${t[1]}</b><small>${cnt(t[0])} posts</small></button>`).join('')}</div><div class="fCbar"><select class="sel" id="plat2" aria-label="Platform">${PL.map(p=>`<option value="${p[0]}" ${p[0]===plat?'selected':''}>${p[1]}</option>`).join('')}</select></div>`;
+ const p2=$('#plat2');if(p2)p2.onchange=e=>{plat=e.target.value;shown=12;renderFilters();render()}}
+document.addEventListener('click',e=>{const fo=e.target.closest('[data-fo]');if(fo){FO=fo.dataset.fo;$$('[data-fo]').forEach(b=>b.setAttribute('aria-pressed',b===fo));if(!$('#v-latest').classList.contains('on'))go('latest');renderFilters();return}
+ const dd=e.target.closest('.dd2>button');$$('.dd2').forEach(d=>{if(!dd||d!==dd.parentElement)d.classList.remove('open')});if(dd){dd.parentElement.classList.toggle('open');return}
+ const t=e.target.closest('#filt [data-t]');if(t){topic=t.dataset.t;shown=12;renderFilters();render();return}
+ const p=e.target.closest('#filt [data-p]');if(p){plat=p.dataset.p;shown=12;renderFilters();render();return}
+ if(e.target.closest('[data-clear]')){topic='all';plat='all';shown=12;renderFilters();render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.dd2').forEach(d=>d.classList.remove('open'))});
+renderFilters();
+</script>
+</body>
+</html>

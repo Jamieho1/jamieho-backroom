@@ -12,8 +12,10 @@ async function seed(q:Query,operations:unknown[]){return (await q<{id:string}>("
 const approve=(q:Query,id:string)=>q<{previous:{table:string;key:string|number;values:Record<string,unknown>|null}[];status:string}>("update public.content_changes set status='approved' where id=$1 returning *",[id]);
 it('atomically updates all six tables, retains full previous values and preserves note metadata',async()=>{
  await as(db,owner,async q=>{
-  const id=await seed(q,[op(),op('question_notes','update',{body:'Draft question'},217),op('practice_code','update',{code:'Draft code'},217),op('practice_stars','delete',{},217),op('behavioral_stories','update',{title:' Draft story ',situation:'Situation',task:'Task',action:'Action',result:'Result',skills:'Skills',numbers:'1',bullet_id:null},story),op('behavioral_answers','update',{outline:'Draft outline',followups:'Followups',secondary_story_id:null},'g-intro')]);
-  const [set]=await approve(q,id);expect(set.status).toBe('approved');expect(set.previous).toHaveLength(6);expect(set.previous[3].values).toMatchObject({problem:217,created_at:expect.anything()});
+  // PL2: a set cannot mix PassLoop tables with this site's legacy behavioral tables, so the six tables go in two sets.
+  const [passloopSet]=await approve(q,await seed(q,[op(),op('question_notes','update',{body:'Draft question'},217),op('practice_code','update',{code:'Draft code'},217),op('practice_stars','delete',{},217)]));
+  const id=await seed(q,[op('behavioral_stories','update',{title:' Draft story ',situation:'Situation',task:'Task',action:'Action',result:'Result',skills:'Skills',numbers:'1',bullet_id:null},story),op('behavioral_answers','update',{outline:'Draft outline',followups:'Followups',secondary_story_id:null},'g-intro')]);
+  const [set]=await approve(q,id);expect(set.status).toBe('approved');expect(passloopSet.status).toBe('approved');expect(passloopSet.previous).toHaveLength(4);expect(set.previous).toHaveLength(2);expect(passloopSet.previous[3].values).toMatchObject({problem:217,created_at:expect.anything()});
   expect(await q('select title,body,free,visual,sort from public.notes where id=$1',['fixture-note'])).toEqual([{title:'Live title',body:'Draft note',free:'Live free',visual:[],sort:4}]);
   expect(await q('select body from public.question_notes where problem=217')).toEqual([{body:'Draft question'}]);expect(await q('select code from public.practice_code where problem=217')).toEqual([{code:'Draft code'}]);expect(await q('select * from public.practice_stars where problem=217')).toEqual([]);
   expect(await q('select title,action from public.behavioral_stories where id=$1',[story])).toEqual([{title:'Draft story',action:'Action'}]);expect(await q("select outline,followups from public.behavioral_answers where question_id='g-intro'")).toEqual([{outline:'Draft outline',followups:'Followups'}]);
@@ -21,7 +23,8 @@ it('atomically updates all six tables, retains full previous values and preserve
 });
 it('inserts practice data, stars, story and answer in dependency order with editor defaults',async()=>{
  await as(db,owner,async q=>{
-  const [set]=await approve(q,await seed(q,[op('question_notes','insert',{body:'New question'},1),op('practice_code','insert',{code:'New code'},1),op('practice_stars','insert',{},1),op('behavioral_stories','insert',{title:'New story'},added),op('behavioral_answers','insert',{primary_story_id:added,outline:'New answer'},'g-proud')]));expect(set.previous.every(p=>p.values===null)).toBe(true);
+  const [passloopSet]=await approve(q,await seed(q,[op('question_notes','insert',{body:'New question'},1),op('practice_code','insert',{code:'New code'},1),op('practice_stars','insert',{},1)]));
+  const [set]=await approve(q,await seed(q,[op('behavioral_stories','insert',{title:'New story'},added),op('behavioral_answers','insert',{primary_story_id:added,outline:'New answer'},'g-proud')]));expect(passloopSet.previous.every(p=>p.values===null)).toBe(true);expect(set.previous.every(p=>p.values===null)).toBe(true);
   expect(await q('select bullet_id,title,situation,action from public.behavioral_stories where id=$1',[added])).toEqual([{bullet_id:null,title:'New story',situation:'',action:''}]);
   expect(await q("select primary_story_id,secondary_story_id,outline,followups from public.behavioral_answers where question_id='g-proud'")).toEqual([{primary_story_id:added,secondary_story_id:null,outline:'New answer',followups:''}]);
  });
@@ -32,7 +35,7 @@ for(const [i,operation] of invalid.entries())it(`invalid app proposal ${i+1} rol
  await as(db,owner,async q=>{const before=await q('select * from public.notes where id=$1',['fixture-note']);const id=await seed(q,[op('notes','update',{body:'Must roll back'}),operation]);await q('savepoint approval');await expect(approve(q,id)).rejects.toThrow();await q('rollback to savepoint approval');expect(await q('select * from public.notes where id=$1',['fixture-note'])).toEqual(before);expect(await q('select status,previous,approved_at from public.content_changes where id=$1',[id])).toEqual([{status:'draft',previous:null,approved_at:null}]);});
 });
 it('Unicode limits follow the relevant editors',async()=>{
- await as(db,owner,async q=>{await approve(q,await seed(q,[op('practice_code','update',{code:'😀'.repeat(50000)},217),op('behavioral_stories','update',{title:'😀'.repeat(160)},story)]));expect(await q('select char_length(code) as length from public.practice_code where problem=217')).toEqual([{length:50000}]);});
+ await as(db,owner,async q=>{await approve(q,await seed(q,[op('practice_code','update',{code:'😀'.repeat(50000)},217)]));await approve(q,await seed(q,[op('behavioral_stories','update',{title:'😀'.repeat(160)},story)]));expect(await q('select char_length(code) as length from public.practice_code where problem=217')).toEqual([{length:50000}]);});
  await expect(as(db,owner,async q=>approve(q,await seed(q,[op('practice_code','update',{code:'😀'.repeat(50001)},217)])))).rejects.toThrow(/limit/);
 });
 it('discard changes no app rows; members with app access and visitors cannot read or approve proposals',async()=>{
