@@ -37,13 +37,9 @@ test('Privacy, Projects and Content use plain pages with one shared header',asyn
   await expect(page.getByRole('navigation',{name:'Site'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
- await page.goto('/projects');
- const resources=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
- await page.goto('/privacy');
- expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(resources);
- await page.getByRole('button', { name: /^Colour mode:/ }).click();
-  await page.getByRole('button', { name: /^Colour mode:/ }).click();
- const privacyDark=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
- await page.goto('/projects');
- expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(privacyDark);
+ // Behind the floating top bar, Projects and Content show their own page colour in both modes (not the app grey/blue).
+ for(const [mode,bg] of [['dark','rgb(27, 35, 51)'],['light','rgb(246, 242, 234)']] as const){
+  await page.evaluate(m=>localStorage.setItem('jb.theme',m),mode);
+  for(const path of ['/projects','/content']){await page.goto(path);expect(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(bg);}
+ }
 });

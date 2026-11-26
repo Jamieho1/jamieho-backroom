@@ -14,6 +14,8 @@ export interface LineShapeHandle { frame(layer: HTMLElement | null, s: LineState
 
 const TONE = { light: { color: 0x15110c, alpha: 0.16 }, dark: { color: 0xf2e6d2, alpha: 0.14 } } as const;
 const WIDE = "(min-width: 900px)";
+/** Night (explicit, or Auto on a dark system): a light section such as Creator turns navy, so its lines must be light too. */
+const isNight = () => { const t = document.documentElement.dataset.theme; return t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches); };
 
 function hasWebGL() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch { return false; }
@@ -79,7 +81,7 @@ export const LineShape = forwardRef<LineShapeHandle>(function LineShape(_props, 
         c.style.opacity = "1";
         const k = `${s.from}>${s.shape}@${s.morph.toFixed(3)}`;
         if (k !== key) { key = k; lerpInto(pos, shapes[s.from ?? s.shape], shapes[s.shape], s.morph); attr.needsUpdate = true; }
-        const t = TONE[tone];
+        const t = TONE[tone === "light" && isNight() ? "dark" : tone];
         mat.color.setHex(t.color);
         mat.opacity = t.alpha * s.opacity;
         lines.rotation.y += Math.min(0.064, dt / 1000) * 0.12;

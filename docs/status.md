@@ -2,7 +2,7 @@
 
 ## Implementation
 
-Colour mode (local, uncommitted): every public page now switches with the Day/Night toggle like /content. Night is the default for new visitors and is the existing navy, unchanged; Day is the /content cream (app/day-theme.css) on /about, /projects, project pages and the home Background, What I build and Contact sections; the home Creator section turns navy at Night. The toggle cycles Night → Day → Auto. Verified in a Linux copy: typecheck, unit suite, build, and the full Playwright suite (desktop and 390 px) including the new tests/e2e/day-theme.spec.ts.
+Colour mode (local, uncommitted): every public page now switches with the Day/Night toggle like /content. Night is the default for new visitors and is the existing navy, unchanged; Day is the /content cream (app/day-theme.css) on /about, /projects, project pages and the home Background, What I build and Contact sections; the home Creator section turns navy at Night (navy card, wireframe drawn in light lines). The strip behind the top bar on My story, Projects and Content matches the page colour in both modes. The toggle cycles Night → Day → Auto. Verified in a Linux copy: typecheck, unit suite, build, and the full Playwright suite (desktop and 390 px) including the new tests/e2e/day-theme.spec.ts.
 
 H1 (Content hub data model, editors, drafts), H2 (Content hub shell and Latest), H3 (series index and series pages), H4 (free guides index and guide page) and H5 (post page) are implemented locally (H1+H2 committed as 9f5b104, H3 as 034525b, H4 as 4a91e81; H5 as 19616f8; follow-up fixes uncommitted), not pushed or deployed. The Content hub tickets H1-H5 are all built. PL4 (PassLoop moved to its own repo) is also still local and uncommitted.
 

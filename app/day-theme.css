@@ -148,3 +148,11 @@ html[data-theme="dark"] .journey-section-light .journey-links a{background:rgb(2
 html:not([data-theme]) .journey-section-light{background:#1B2333;--s-ink:#F3EEE6;--s-soft:rgba(243,238,230,.76);--s-line:rgba(243,238,230,.18);--s-accent:#E8C46A;--reading-surface:34 44 64;--reading-border:210 225 241;--reading-shadow:0 0 0}
 html:not([data-theme]) .journey-section-light .journey-links a{background:rgb(255 255 255 / .04)}
 }
+
+/* ---- Behind the top bar: the page colour, not the app grey/blue ----
+   globals.css paints body grey (Day) or #0d1725 (Night) on every .app-page; on My story, Projects and the Content hub the
+   strip behind the floating top bar must match the page itself. :root and :has(.site-header) only raise specificity above globals. */
+html[data-theme="light"]:root body:has(:is(.sty,.pj)):has(.site-header){background:#F6F2EA}
+html[data-theme="dark"]:root body:has(:is(.sty,.pj)):has(.site-header){background:#1B2333}
+@media (prefers-color-scheme: light){html:not([data-theme]):root body:has(:is(.sty,.pj)):has(.site-header){background:#F6F2EA}}
+@media (prefers-color-scheme: dark){html:not([data-theme]):root body:has(:is(.sty,.pj)):has(.site-header){background:#1B2333}}

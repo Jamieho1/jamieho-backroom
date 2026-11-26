@@ -9,7 +9,7 @@ const auto=(page:Page)=>page.addInitScript(()=>{try{localStorage.setItem('jb.the
 for(const [scheme,bg] of [['light',CREAM],['dark',NAVY]] as const){
  test(`My story follows Auto (${scheme} system)`,async({page})=>{
   await auto(page);await page.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await page.goto('/about');
-  await expect(page.locator('.story-editorial')).toHaveCSS('background-color',bg);if(scheme==='light')expect(await bodyBg(page)).toBe(CREAM);
+  await expect(page.locator('.story-editorial')).toHaveCSS('background-color',bg);expect(await bodyBg(page)).toBe(bg);
   await expect(page.locator('.story-editorial .sty-eyebrow').first()).toHaveCSS('color',scheme==='light'?'rgb(138, 101, 20)':'rgb(232, 196, 106)');
   expect(await fits(page)).toBe(true);
  });
