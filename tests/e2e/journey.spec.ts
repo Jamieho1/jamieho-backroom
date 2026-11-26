@@ -159,7 +159,7 @@ test('reduced motion and no JavaScript retain canonical/legacy anchors without r
 });
 
 test('About text and photos stay on their own opaque section through chapter handovers',async({page})=>{
- await page.goto('/#about');const about=page.locator('[data-chapter="about"]');await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
+ await page.emulateMedia({colorScheme:'dark'});await page.goto('/#about');const about=page.locator('[data-chapter="about"]');await expect(page.locator('.home-dial:visible [data-dial-step="0"]')).toBeVisible();
  await expect(about).toHaveCSS('isolation','isolate');await expect(about).toHaveCSS('overflow','clip');await expect(about).toHaveCSS('background-color','rgb(27, 35, 51)');
  // Model elevated descendants in a neighbouring chapter: their z-index must remain contained.
  await page.evaluate(()=>{const hero=document.querySelector<HTMLElement>('.journey-hero-art');if(hero)hero.style.zIndex='999';});

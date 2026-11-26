@@ -3,6 +3,7 @@ import "./globals.css";
 import "./primary-pill.css";
 import "./what-i-build.css";
 import "./desktop.css";
+import "./day-theme.css";
 import { SiteHeader } from "@/components/site-header";
 import { DesktopAppsProvider } from "@/components/desktop-apps-provider";
 import { ViewerProvider } from "@/components/viewer-provider";

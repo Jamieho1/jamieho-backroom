@@ -1,0 +1,150 @@
+/* Day / Night for the pages that used to be navy-only (/about, /projects, project pages, home sections).
+   Night = each page's own navy CSS, unchanged. Day = the cream paper of /content (app/content/content.css).
+   Day applies when the toggle says Day, or in Auto when the system is light. The home Creator section (cream by design) turns navy in Night.
+   Every rule appears twice (explicit toggle, then Auto + system), because plain CSS cannot share one selector across both. Edit both copies. */
+
+/* ---- Day: toggle set to Day ---- */
+html[data-theme="light"] body:has(.sty:not(.hub)),html[data-theme="light"] .app-page[data-app="story"]:has(.sty){background:#F6F2EA}
+html[data-theme="light"] .sty:not(.hub){--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--bt:#8A6514;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--gold-line:rgba(168,126,30,.45)}
+html[data-theme="light"] .sty:not(.hub) .sty-md ol>li::before{color:var(--bt)}
+html[data-theme="light"] .sty:not(.hub) .sty-grain{mix-blend-mode:multiply;opacity:.05}
+html[data-theme="light"] .sty:not(.hub) :is(.sty-eyebrow,.sty-rail li.on a,.sty-mbar b,.sty-mbar .car,.sty-ch-h .n,.sty-md a:hover,.sty-pc .k,.sty-brk figcaption,.sty-back:hover,.sty-hero h1 em,.sty-line em){color:var(--bt)}
+html[data-theme="light"] .app-page[data-app="projects"]:has(.pj){background:#F6F2EA}
+html[data-theme="light"] .pj{--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--bt:#8A6514;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--tag:#8A6514;--cap:rgba(27,35,51,.62);--meta:rgba(27,35,51,.45)}
+html[data-theme="light"] .pj :is(.pj-eyebrow,.chip.vol,.pj-status,.pj-lnk.g,.pj-num,.pj-rn,.pj-draft,.pj-toc li.on a,.pj-sx>.pj-lbl,.pj-nx .k,.pj-ar){color:var(--bt)}
+html[data-theme="light"] .pj .md strong{color:var(--ink);font-weight:600}
+html[data-theme="light"] .pj .md ol>li::before{color:var(--bt)}
+html[data-theme="light"] .pj .browser-traffic-lights{background:#E9E2D4;border-bottom-color:rgba(27,35,51,.1)}
+html[data-theme="light"] .pj-burl{background:rgba(27,35,51,.08)}
+html[data-theme="light"] .pj-lnk{border-bottom-color:rgba(27,35,51,.35)}
+html[data-theme="light"] .pj-fchip{border-color:rgba(27,35,51,.2)}
+html[data-theme="light"] .journey-chapter[data-chapter="about"],html[data-theme="light"] .journey-stills>#about{background:#F6F2EA}
+html[data-theme="light"] .home-dial{--dial-ink:#F6F2EA;--dial-paper:#1B2333;--dial-gold:#8A6514;--s-bg:#EFE8DA;--s-ink:#1B2333;--s-line:#1b233333}
+html[data-theme="light"] .home-dial::before{background-image:radial-gradient(#1b233355 .6px,transparent .8px)}
+html[data-theme="light"] .dial-index-line{background:#1b233333}
+html[data-theme="light"] .dial-index button{color:#1b2333a0}
+html[data-theme="light"] .dial-index button[aria-current="step"]{color:#8A6514}
+html[data-theme="light"] .dial-node{background:#1b23334d}
+html[data-theme="light"] .dial-index button[aria-current="step"] .dial-node{background:#8A6514}
+html[data-theme="light"] :is(.dial-prose,.dial-points,.dial-tagline){color:#1b2333dd}
+html[data-theme="light"] .dial-meta{color:#1b2333a0}
+html[data-theme="light"] .dial-tags li{border-color:#1b233333;color:#1b2333b3}
+html[data-theme="light"] .dial-board::before{background:linear-gradient(transparent,#1b233326,transparent)}
+html[data-theme="light"] .dial-watermark{-webkit-text-stroke:1px #1b233318}
+html[data-theme="light"] .dial-rings{stroke:#1b23334d}
+html[data-theme="light"] :is(.dial-coordinate,.dial-corners){color:#1b233380}
+html[data-theme="light"] .dial-print{background:#FFFDF8;box-shadow:0 12px 30px #1b233326}
+html[data-theme="light"] .home-dial .dial-icon.dial-icon-badge{box-shadow:0 0 0 .8cqw #F6F2EA}
+html[data-theme="light"] .dial-stack-step{border-bottom-color:#1b233326}
+html[data-theme="light"] .home-dial .dial-link{border-bottom-color:#8A651466;color:#1B2333}
+html[data-theme="light"] .wib{--ink:#1B2333;--bold:#8A6514;--body80:rgba(27,35,51,.82);--meta:rgba(27,35,51,.5);--tag:#8A6514;--cap:rgba(27,35,51,.65);background:#F6F2EA}
+html[data-theme="light"] .journey-chapter[data-chapter="toolkit"],html[data-theme="light"] .journey-stills>#toolkit{background:#F6F2EA}
+html[data-theme="light"] .wib-grid{background-image:linear-gradient(rgba(27,35,51,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(27,35,51,.05) 1px,transparent 1px)}
+html[data-theme="light"] .wi{border-color:rgba(27,35,51,.16)}
+html[data-theme="light"] .wi-n{color:rgba(27,35,51,.45)}
+html[data-theme="light"] .wi-t{color:rgba(27,35,51,.5)}
+html[data-theme="light"] .wi.open .wi-n{color:#8A6514}
+html[data-theme="light"] .wi.open .wi-t,html[data-theme="light"] .wib .wib-head h2{color:#1B2333}
+html[data-theme="light"] .wib .diag{border-color:rgba(27,35,51,.16);background:#FFFDF8}
+html[data-theme="light"] .wib .diag .sub{fill:rgba(27,35,51,.62)}
+html[data-theme="light"] .wib .diag .ln{fill:rgba(27,35,51,.45)}
+html[data-theme="light"] .wib .diag .tm{fill:rgba(27,35,51,.85)}
+html[data-theme="light"] .wib .diag .nd rect{stroke:rgba(27,35,51,.8)}
+html[data-theme="light"] .wib .diag .nd.note rect{stroke:rgba(27,35,51,.45)}
+html[data-theme="light"] .wib .diag .ed path{stroke:rgba(27,35,51,.65)}
+html[data-theme="light"] .wib .chip{border-color:rgba(27,35,51,.22);color:rgba(27,35,51,.82)}
+html[data-theme="light"] .wib .chip:hover{border-color:#8A6514;color:#8A6514}
+html[data-theme="light"] .cred{border-color:rgba(27,35,51,.25);background:#FFFDF8;color:#1B2333}
+html[data-theme="light"] .cred i{color:#8A6514}
+html[data-theme="light"] .contact-brief{--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--gold-line:rgba(168,126,30,.45)}
+html[data-theme="light"] .brief-meta{color:rgba(27,35,51,.45)}
+html[data-theme="light"] .brief-card{box-shadow:0 30px 60px -30px rgba(27,35,51,.25)}
+html[data-theme="light"] .brief-chip span{border-color:rgba(27,35,51,.3)}
+html[data-theme="light"] :is(.brief-field input,.brief-field textarea){border-bottom-color:rgba(27,35,51,.3)}
+html[data-theme="light"] .contact-brief .btn{border-color:rgba(27,35,51,.6)}
+html[data-theme="light"] .contact-brief .brief-heading{color:#1B2333}
+html[data-theme="light"] .contact-brief :is(.brief-eyebrow,.brief-card-head,.brief-done p b,.brief-field input:focus+label){color:#8A6514}
+html[data-theme="light"] .contact-brief .brief-opening .brief-eyebrow{color:#8A6514}
+html[data-theme="light"] .contact-brief .brief-opening::before{background:radial-gradient(closest-side,rgb(232 196 106 / .28),rgb(232 196 106 / .08) 55%,transparent)}
+html[data-theme="light"] .dial-tags li:hover,html[data-theme="light"] .dial-tags li:focus-visible{border-color:#8A6514;color:#8A6514}
+html[data-theme="light"] .wib .chip:focus,html[data-theme="light"] .wib .chip:focus-visible,html[data-theme="light"] .wib .chip.l:hover{border-color:#8A6514;color:#8A6514}
+html[data-theme="light"] .pj-lnk:hover,html[data-theme="light"] .pj-lnk:focus-visible,html[data-theme="light"] .pj-lnk:hover .pj-ar,html[data-theme="light"] .pj-lnk:focus-visible .pj-ar,html[data-theme="light"] .pj-nx:hover .k,html[data-theme="light"] .pj-nx:focus-visible .k{color:#1B2333}
+html[data-theme="light"] .wib .chip:focus-visible{border-color:#8A6514;color:#8A6514}
+
+/* ---- Day: Auto + system light (same rules) ---- */
+@media (prefers-color-scheme: light) {
+html:not([data-theme]) body:has(.sty:not(.hub)),html:not([data-theme]) .app-page[data-app="story"]:has(.sty){background:#F6F2EA}
+html:not([data-theme]) .sty:not(.hub){--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--bt:#8A6514;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--gold-line:rgba(168,126,30,.45)}
+html:not([data-theme]) .sty:not(.hub) .sty-md ol>li::before{color:var(--bt)}
+html:not([data-theme]) .sty:not(.hub) .sty-grain{mix-blend-mode:multiply;opacity:.05}
+html:not([data-theme]) .sty:not(.hub) :is(.sty-eyebrow,.sty-rail li.on a,.sty-mbar b,.sty-mbar .car,.sty-ch-h .n,.sty-md a:hover,.sty-pc .k,.sty-brk figcaption,.sty-back:hover,.sty-hero h1 em,.sty-line em){color:var(--bt)}
+html:not([data-theme]) .app-page[data-app="projects"]:has(.pj){background:#F6F2EA}
+html:not([data-theme]) .pj{--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--bt:#8A6514;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--tag:#8A6514;--cap:rgba(27,35,51,.62);--meta:rgba(27,35,51,.45)}
+html:not([data-theme]) .pj :is(.pj-eyebrow,.chip.vol,.pj-status,.pj-lnk.g,.pj-num,.pj-rn,.pj-draft,.pj-toc li.on a,.pj-sx>.pj-lbl,.pj-nx .k,.pj-ar){color:var(--bt)}
+html:not([data-theme]) .pj .md strong{color:var(--ink);font-weight:600}
+html:not([data-theme]) .pj .md ol>li::before{color:var(--bt)}
+html:not([data-theme]) .pj .browser-traffic-lights{background:#E9E2D4;border-bottom-color:rgba(27,35,51,.1)}
+html:not([data-theme]) .pj-burl{background:rgba(27,35,51,.08)}
+html:not([data-theme]) .pj-lnk{border-bottom-color:rgba(27,35,51,.35)}
+html:not([data-theme]) .pj-fchip{border-color:rgba(27,35,51,.2)}
+html:not([data-theme]) .journey-chapter[data-chapter="about"],html:not([data-theme]) .journey-stills>#about{background:#F6F2EA}
+html:not([data-theme]) .home-dial{--dial-ink:#F6F2EA;--dial-paper:#1B2333;--dial-gold:#8A6514;--s-bg:#EFE8DA;--s-ink:#1B2333;--s-line:#1b233333}
+html:not([data-theme]) .home-dial::before{background-image:radial-gradient(#1b233355 .6px,transparent .8px)}
+html:not([data-theme]) .dial-index-line{background:#1b233333}
+html:not([data-theme]) .dial-index button{color:#1b2333a0}
+html:not([data-theme]) .dial-index button[aria-current="step"]{color:#8A6514}
+html:not([data-theme]) .dial-node{background:#1b23334d}
+html:not([data-theme]) .dial-index button[aria-current="step"] .dial-node{background:#8A6514}
+html:not([data-theme]) :is(.dial-prose,.dial-points,.dial-tagline){color:#1b2333dd}
+html:not([data-theme]) .dial-meta{color:#1b2333a0}
+html:not([data-theme]) .dial-tags li{border-color:#1b233333;color:#1b2333b3}
+html:not([data-theme]) .dial-board::before{background:linear-gradient(transparent,#1b233326,transparent)}
+html:not([data-theme]) .dial-watermark{-webkit-text-stroke:1px #1b233318}
+html:not([data-theme]) .dial-rings{stroke:#1b23334d}
+html:not([data-theme]) :is(.dial-coordinate,.dial-corners){color:#1b233380}
+html:not([data-theme]) .dial-print{background:#FFFDF8;box-shadow:0 12px 30px #1b233326}
+html:not([data-theme]) .home-dial .dial-icon.dial-icon-badge{box-shadow:0 0 0 .8cqw #F6F2EA}
+html:not([data-theme]) .dial-stack-step{border-bottom-color:#1b233326}
+html:not([data-theme]) .home-dial .dial-link{border-bottom-color:#8A651466;color:#1B2333}
+html:not([data-theme]) .wib{--ink:#1B2333;--bold:#8A6514;--body80:rgba(27,35,51,.82);--meta:rgba(27,35,51,.5);--tag:#8A6514;--cap:rgba(27,35,51,.65);background:#F6F2EA}
+html:not([data-theme]) .journey-chapter[data-chapter="toolkit"],html:not([data-theme]) .journey-stills>#toolkit{background:#F6F2EA}
+html:not([data-theme]) .wib-grid{background-image:linear-gradient(rgba(27,35,51,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(27,35,51,.05) 1px,transparent 1px)}
+html:not([data-theme]) .wi{border-color:rgba(27,35,51,.16)}
+html:not([data-theme]) .wi-n{color:rgba(27,35,51,.45)}
+html:not([data-theme]) .wi-t{color:rgba(27,35,51,.5)}
+html:not([data-theme]) .wi.open .wi-n{color:#8A6514}
+html:not([data-theme]) .wi.open .wi-t,html:not([data-theme]) .wib .wib-head h2{color:#1B2333}
+html:not([data-theme]) .wib .diag{border-color:rgba(27,35,51,.16);background:#FFFDF8}
+html:not([data-theme]) .wib .diag .sub{fill:rgba(27,35,51,.62)}
+html:not([data-theme]) .wib .diag .ln{fill:rgba(27,35,51,.45)}
+html:not([data-theme]) .wib .diag .tm{fill:rgba(27,35,51,.85)}
+html:not([data-theme]) .wib .diag .nd rect{stroke:rgba(27,35,51,.8)}
+html:not([data-theme]) .wib .diag .nd.note rect{stroke:rgba(27,35,51,.45)}
+html:not([data-theme]) .wib .diag .ed path{stroke:rgba(27,35,51,.65)}
+html:not([data-theme]) .wib .chip{border-color:rgba(27,35,51,.22);color:rgba(27,35,51,.82)}
+html:not([data-theme]) .wib .chip:hover{border-color:#8A6514;color:#8A6514}
+html:not([data-theme]) .cred{border-color:rgba(27,35,51,.25);background:#FFFDF8;color:#1B2333}
+html:not([data-theme]) .cred i{color:#8A6514}
+html:not([data-theme]) .contact-brief{--bg:#F6F2EA;--card:#FFFDF8;--ink:#1B2333;--body80:rgba(27,35,51,.82);--mute:rgba(27,35,51,.6);--line:rgba(27,35,51,.14);--gold-line:rgba(168,126,30,.45)}
+html:not([data-theme]) .brief-meta{color:rgba(27,35,51,.45)}
+html:not([data-theme]) .brief-card{box-shadow:0 30px 60px -30px rgba(27,35,51,.25)}
+html:not([data-theme]) .brief-chip span{border-color:rgba(27,35,51,.3)}
+html:not([data-theme]) :is(.brief-field input,.brief-field textarea){border-bottom-color:rgba(27,35,51,.3)}
+html:not([data-theme]) .contact-brief .btn{border-color:rgba(27,35,51,.6)}
+html:not([data-theme]) .contact-brief .brief-heading{color:#1B2333}
+html:not([data-theme]) .contact-brief :is(.brief-eyebrow,.brief-card-head,.brief-done p b,.brief-field input:focus+label){color:#8A6514}
+html:not([data-theme]) .contact-brief .brief-opening .brief-eyebrow{color:#8A6514}
+html:not([data-theme]) .contact-brief .brief-opening::before{background:radial-gradient(closest-side,rgb(232 196 106 / .28),rgb(232 196 106 / .08) 55%,transparent)}
+html:not([data-theme]) .dial-tags li:hover,html:not([data-theme]) .dial-tags li:focus-visible{border-color:#8A6514;color:#8A6514}
+html:not([data-theme]) .wib .chip:focus,html:not([data-theme]) .wib .chip:focus-visible,html:not([data-theme]) .wib .chip.l:hover{border-color:#8A6514;color:#8A6514}
+html:not([data-theme]) .pj-lnk:hover,html:not([data-theme]) .pj-lnk:focus-visible,html:not([data-theme]) .pj-lnk:hover .pj-ar,html:not([data-theme]) .pj-lnk:focus-visible .pj-ar,html:not([data-theme]) .pj-nx:hover .k,html:not([data-theme]) .pj-nx:focus-visible .k{color:#1B2333}
+html:not([data-theme]) .wib .chip:focus-visible{border-color:#8A6514;color:#8A6514}
+}
+
+/* ---- Night: the Creator section turns navy ---- */
+html[data-theme="dark"] .journey-section-light{background:#1B2333;--s-ink:#F3EEE6;--s-soft:rgba(243,238,230,.76);--s-line:rgba(243,238,230,.18);--s-accent:#E8C46A;--reading-surface:34 44 64;--reading-border:210 225 241;--reading-shadow:0 0 0}
+html[data-theme="dark"] .journey-section-light .journey-links a{background:rgb(255 255 255 / .04)}
+@media (prefers-color-scheme: dark) {
+html:not([data-theme]) .journey-section-light{background:#1B2333;--s-ink:#F3EEE6;--s-soft:rgba(243,238,230,.76);--s-line:rgba(243,238,230,.18);--s-accent:#E8C46A;--reading-surface:34 44 64;--reading-border:210 225 241;--reading-shadow:0 0 0}
+html:not([data-theme]) .journey-section-light .journey-links a{background:rgb(255 255 255 / .04)}
+}
