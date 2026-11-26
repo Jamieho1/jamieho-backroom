@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test('homepage artwork and navigation work without WebGL', async ({ page }) => {
+  await page.addInitScript(() => { try { localStorage.setItem('jb.theme', 'light'); } catch { /* storage blocked */ } });
   await page.addInitScript(`HTMLCanvasElement.prototype.getContext = function() { return null; }`);
   await page.goto('/');
   await expect(page.locator('.journey-hero-art')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Jamie Ho', level: 1 })).toBeVisible();
   await expect(page.getByRole('button', { name: /desktop motion/ })).toHaveCount(0);
+  // Start from Day, then Day → Auto → Night (Night is also the default for new visitors).
   await page.getByRole('button', { name: /^Colour mode:/ }).click();
   await page.getByRole('button', { name: /^Colour mode:/ }).click();
   await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('1');

@@ -21,6 +21,7 @@ test.beforeAll(async()=>{
  }}]});bundle=out.outputFiles[0].text;
 });
 async function mount(page:Page,scheme:'light'|'dark'='dark',hash=''){
+ await page.addInitScript(()=>{try{localStorage.setItem('jb.theme','auto')}catch{}}); // Night is the site default; these specs check Auto following the system.
  await page.emulateMedia({colorScheme:scheme});
  await page.goto('/privacy'+(hash?'#'+hash:''));
  for(const css of ['app/page-scale.css','app/about/story.css','app/content/content.css'])await page.addStyleTag({content:readFileSync(css,'utf8')});

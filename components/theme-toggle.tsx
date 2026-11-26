@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 type Theme = "auto" | "light" | "dark";
 export const THEME_KEY = "jb.theme";
-/** Apply saved overrides before paint; Auto leaves CSS/system colour preferences in control. */
-export const THEME_BOOT = `try{var t=localStorage.getItem("${THEME_KEY}");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}catch(e){}`;
+/** Apply the saved choice before paint. Night is the default (nothing saved, or storage blocked); only a saved "auto" hands control to the system setting. */
+export const THEME_BOOT = `(function(d){try{var t=localStorage.getItem("${THEME_KEY}");if(t==="auto")delete d.dataset.theme;else d.dataset.theme=t==="light"?"light":"dark"}catch(e){d.dataset.theme="dark"}})(document.documentElement)`;
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("auto");
+  const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
     const sync = () => setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : document.documentElement.dataset.theme === "light" ? "light" : "auto");
     sync();
@@ -15,7 +15,8 @@ export function ThemeToggle() {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     return () => observer.disconnect();
   }, []);
-  const next: Theme = theme === "auto" ? "light" : theme === "light" ? "dark" : "auto";
+  /* Night (default) → Day → Auto → Night. */
+  const next: Theme = theme === "dark" ? "light" : theme === "light" ? "auto" : "dark";
   const labels = { auto: "Auto", light: "Day", dark: "Night" };
   return <button type="button" className="theme-control" data-theme-mode={theme}
     aria-label={`Colour mode: ${labels[theme]}. Switch to ${labels[next]}`}

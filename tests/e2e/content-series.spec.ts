@@ -19,6 +19,7 @@ test.beforeAll(async()=>{
  }}]});bundle=out.outputFiles[0].text;
 });
 async function mount(page:Page,scheme:'light'|'dark'='dark',hash='',read:string[]=[]){
+ await page.addInitScript(()=>{try{localStorage.setItem('jb.theme','auto')}catch{}}); // Night is the site default; these specs check Auto following the system.
  await page.emulateMedia({colorScheme:scheme});
  await page.goto('/privacy');
  await page.evaluate(ids=>localStorage.setItem('jb.content.read',JSON.stringify(ids)),read);

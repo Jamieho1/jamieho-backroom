@@ -13,24 +13,24 @@ test("Free guides shows only public Guides", async ({ page }) => {
   await expect(page.locator('.resource-card,.resource-preview')).toHaveCount(0);
 });
 
-test("Auto tracks the computer while explicit Day and Night choices persist", async ({ page }) => {
-  await page.emulateMedia({ colorScheme: "dark" }); await page.goto("/");
+test("Night is the default; Day and Auto persist, and Auto tracks the computer", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" }); await page.goto("/");
   const mode = page.getByRole('button', { name: /^Colour mode:/ });
-  await expect(mode).toHaveAttribute("data-theme-mode", "auto");
-  await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
+  const night = () => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity);
+  await expect(mode).toHaveAttribute("data-theme-mode", "dark"); expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('dark');
+  await expect.poll(night).toBe('1');
   await mode.click();
   expect(await mode.evaluate(el => getComputedStyle(el).outlineStyle)).toBe('none');
   await page.reload();
   await expect(mode).toHaveAttribute('data-theme-mode','light'); expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('light');
-  await mode.click(); await page.reload(); await expect(mode).toHaveAttribute('data-theme-mode','dark');
-  await mode.click(); await page.emulateMedia({colorScheme:'light'});
-  await expect.poll(() => page.locator('.journey-hero-night').evaluate(el => getComputedStyle(el).opacity)).toBe('0');
+  await mode.click(); await page.reload(); await expect(mode).toHaveAttribute('data-theme-mode','auto');
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBeUndefined();
-  await expect(mode).toHaveAttribute('data-theme-mode','auto');
+  await expect.poll(night).toBe('0');
+  await page.emulateMedia({colorScheme:'dark'}); await expect.poll(night).toBe('1');
   await mode.focus(); await page.keyboard.press('Enter');
-  await expect(mode).toHaveAttribute('data-theme-mode','light');
-  await page.keyboard.press('Space');
   await expect(mode).toHaveAttribute('data-theme-mode','dark');
+  await page.keyboard.press('Space');
+  await expect(mode).toHaveAttribute('data-theme-mode','light');
   await expect(page.locator('.site-navigation:visible').getByRole('link',{name:'Privacy',exact:true})).toHaveCount(0);
   await expect(page.locator('.contact-form a[href="/privacy"]').first()).toBeAttached();
 });
@@ -108,7 +108,7 @@ test('colour mode changes preserve the clouds after returning from an Education 
  await expect(navigation).toHaveAttribute('data-floating','false');
  await expect.poll(()=>page.evaluate(()=>scrollY)).toBeLessThan(3);
  const mode=page.getByRole('button',{name:/^Colour mode:/});
- for(const state of ['light','dark','auto']){
+ for(const state of ['light','auto','dark']){
   await mode.click();await expect(mode).toHaveAttribute('data-theme-mode',state);
   await page.waitForTimeout(500);
   await expect(navigation).toHaveAttribute('data-floating','false');
